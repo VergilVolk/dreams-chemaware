@@ -78,7 +78,7 @@ class ChemAwareDreaMS(DreaMS):
         # Step 1: 提取并设置模块一专属参数（必须在 super().__init__ 之前）
         # =====================================================================
         self.chem_attn_enabled = getattr(args, 'chem_attn', False)
-        self.chem_attn_attenuation = getattr(args, 'chem_attn_attenuation', -5.0)
+        self.chem_attn_attenuation = getattr(args, 'chem_attn_attenuation', -2.0)
         self.chem_attn_tolerance = getattr(args, 'chem_attn_tolerance', 0.02)
         self.chem_attn_entropy_w = getattr(args, 'chem_attn_entropy_w', 0.0)
 

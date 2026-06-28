@@ -65,7 +65,7 @@ def run_ablation(ablation_seq, mode_name):
     results = []
     for label, rules in ablation_seq:
         engine = ChemicalRuleEngine(
-            attenuation=-5.0, tolerance=0.02,
+            attenuation=-2.0, tolerance=0.02,
             enable_rules=rules if rules else []
         ) if rules else None
 

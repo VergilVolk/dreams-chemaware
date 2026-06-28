@@ -364,7 +364,7 @@ def main():
     print(f'   谱图数量: {len(dataset)}')
 
     # 化学规则引擎（用于事后模拟 + 中性丢失统计）
-    engine = ChemicalRuleEngine(attenuation=-5.0, tolerance=0.02)
+    engine = ChemicalRuleEngine(attenuation=-2.0, tolerance=0.02)
 
     # ------------------------------------------------------------------
     # Step 4: 逐谱图深度对比

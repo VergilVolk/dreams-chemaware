@@ -339,7 +339,7 @@ def main():
     # Step 2: 初始化化学规则引擎
     # ------------------------------------------------------------------
     print('\n[3/5] 初始化化学规则引擎...')
-    engine = ChemicalRuleEngine(attenuation=-5.0, tolerance=0.02)
+    engine = ChemicalRuleEngine(attenuation=-2.0, tolerance=0.02)
     print(f'   中性丢失规则: {len(engine.neutral_masses)} 条')
 
     # ------------------------------------------------------------------

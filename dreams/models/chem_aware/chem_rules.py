@@ -131,7 +131,7 @@ class ChemicalRuleEngine(nn.Module):
 
     def __init__(
         self,
-        attenuation: float = -5.0,
+        attenuation: float = -2.0,
         tolerance: float = 0.02,
         learnable_attenuation: bool = True,
         enable_rules: Optional[List[str]] = None
@@ -180,9 +180,9 @@ class ChemicalRuleEngine(nn.Module):
     # 内部方法
     # =====================================================================
 
-    def _effective_attenuation(self) -> float:
-        val = self.attenuation * self.attenuation_scale
-        return float(val.item()) if isinstance(val, torch.Tensor) else float(val)
+    def _effective_attenuation(self):
+        """返回有效衰减强度。训练时保留计算图梯度，推理时可取 .item()"""
+        return self.attenuation * self.attenuation_scale
 
     def _has_rule(self, name: str) -> bool:
         return name in self.enabled_rules
@@ -212,90 +212,77 @@ class ChemicalRuleEngine(nn.Module):
         """
         batch, n, _ = mz_diffs.shape
         device = mz_diffs.device
-        atten = self._effective_attenuation()
+        atten = self._effective_attenuation()  # 0-dim tensor with grad
         self._last_contributions = {}
 
         # ---- 初始化：所有峰对默认衰减 ----
-        chem_bias = torch.full((batch, 1, n, n), atten, device=device, dtype=torch.float32)
+        # 用 ones * atten 替代 torch.full，保持梯度链
+        chem_bias = torch.ones(batch, 1, n, n, device=device, dtype=torch.float32) * atten
 
         # ---- 基础豁免：对角线（自注）+ precursor 行/列 ----
+        # 用非原地叠加替代原地赋值，保持梯度
+        base_mask = torch.ones(batch, 1, n, n, device=device, dtype=torch.float32)
         diag_idx = torch.arange(n, device=device)
-        chem_bias[:, :, diag_idx, diag_idx] = 0.0
-        chem_bias[:, :, 0, :] = 0.0
-        chem_bias[:, :, :, 0] = 0.0
+        base_mask[:, :, diag_idx, diag_idx] = 0.0  # 对角线不衰减
+        base_mask[:, :, 0, :] = 0.0                 # precursor 行
+        base_mask[:, :, :, 0] = 0.0                 # precursor 列
 
         # =================================================================
         # 维度 1: 中性丢失匹配
-        # 逻辑：峰对质量差落在已知中性丢失 ± 容差 → 豁免衰减
         # =================================================================
         if self._has_rule('neutral_loss'):
-            before = chem_bias.clone()
             for mass in self.neutral_masses:
                 hit = torch.abs(mz_diffs - mass) < self.tolerance
-                chem_bias[hit.unsqueeze(1)] = 0.0
-            self._last_contributions['neutral_loss'] = chem_bias - before
+                base_mask[hit.unsqueeze(1)] = 0.0
+            self._last_contributions['neutral_loss'] = None  # 贡献体现在 base_mask 中
 
         # =================================================================
         # 维度 2: 特征碎片离子识别
-        # 逻辑：如果某个峰的 m/z 恰好是已知特征碎片离子 → 该峰与所有其他峰的
-        #       双向关联都不衰减（它是"重要峰"，值得被所有头关注）
         # =================================================================
         if self._has_rule('char_fragment') and mz_values is not None:
-            before = chem_bias.clone()
             for frag_mz in self.fragment_mz:
-                is_frag = torch.abs(mz_values - frag_mz) < self.tolerance  # (batch, n)
-                # 双向豁免：frag 峰所在行 & 列
-                chem_bias[is_frag.unsqueeze(1).unsqueeze(-1).expand(-1, 1, -1, n)] = 0.0  # 行
-                chem_bias[is_frag.unsqueeze(1).unsqueeze(-2).expand(-1, 1, n, -1)] = 0.0  # 列
-            self._last_contributions['char_fragment'] = chem_bias - before
+                is_frag = torch.abs(mz_values - frag_mz) < self.tolerance
+                base_mask[is_frag.unsqueeze(1).unsqueeze(-1).expand(-1, 1, -1, n)] = 0.0
+                base_mask[is_frag.unsqueeze(1).unsqueeze(-2).expand(-1, 1, n, -1)] = 0.0
+            self._last_contributions['char_fragment'] = None
 
         # =================================================================
         # 维度 3: 同位素模式
-        # 逻辑：峰对质量差 ≈ 2 Da（Cl/Br/S 的 M 与 M+2 同位素峰）→ 豁免衰减
         # =================================================================
         if self._has_rule('isotope'):
-            before = chem_bias.clone()
             for iso_lo, iso_hi in self.isotope_ranges:
                 iso_hit = (mz_diffs >= iso_lo) & (mz_diffs <= iso_hi)
-                chem_bias[iso_hit.unsqueeze(1)] = 0.0
-            self._last_contributions['isotope'] = chem_bias - before
+                base_mask[iso_hit.unsqueeze(1)] = 0.0
+            self._last_contributions['isotope'] = None
+
+        # ---- 应用基础掩码 ----
+        chem_bias = chem_bias * base_mask
 
         # =================================================================
-        # 维度 4: 氮规则
-        # 母离子质量数奇偶性 = 碎片 N 原子数奇偶性
-        #   - 偶质量母离子 → 合理碎片质量差为偶数（保留偶数个 N）
-        #   - 奇质量母离子 → 合理碎片质量差为奇数（保留奇数个 N）
-        # 逻辑：违反氮规则的峰对 → 额外衰减 50%（软约束）
+        # 维度 4: 氮规则（额外衰减 50%，叠加在已有 bias 上）
         # =================================================================
         if self._has_rule('nitrogen_rule') and precursor_mz is not None:
-            before = chem_bias.clone()
-            # 母离子整数质量奇偶性: 0=偶, 1=奇
-            prec_parity = (precursor_mz.round().long() % 2).view(-1, 1, 1, 1)  # (batch, 1, 1, 1)
-            # 峰对质量差整数奇偶性
-            diff_parity = (mz_diffs.round().long() % 2).unsqueeze(1)  # (batch, 1, n, n)
-            # 违反：母离子偶但差奇数，或母离子奇但差偶数
-            violation = (prec_parity != diff_parity)
-            chem_bias[violation] = chem_bias[violation] + atten * 0.5  # 额外 50% 衰减
-            self._last_contributions['nitrogen_rule'] = chem_bias - before
+            prec_parity = (precursor_mz.round().long() % 2).view(-1, 1, 1, 1)
+            diff_parity = (mz_diffs.round().long() % 2).unsqueeze(1)
+            violation = (prec_parity != diff_parity).float()
+            # 违反位叠加 50% 衰减
+            chem_bias = chem_bias + violation * atten * 0.5
+            self._last_contributions['nitrogen_rule'] = None
 
         # =================================================================
         # 维度 5: 偶电子规则
-        # ESI 软电离下，稳定碎片为偶电子离子（even-electron ion）
-        # 逻辑：质量差 < 1 Da 且 > 0.1 Da 的非同位素小丢失 → 轻度衰减（可能为噪声）
         # =================================================================
         if self._has_rule('even_electron') and mz_values is not None:
-            before = chem_bias.clone()
-            # 排除同位素区间 (~2 Da) 和中性丢失已匹配区间的小质量差
-            too_small = (mz_diffs > 0.1) & (mz_diffs < 1.0)
-            chem_bias[too_small.unsqueeze(1)] = chem_bias[too_small.unsqueeze(1)] + atten * 0.3
-            self._last_contributions['even_electron'] = chem_bias - before
+            too_small = ((mz_diffs > 0.1) & (mz_diffs < 1.0)).float()
+            chem_bias = chem_bias + too_small.unsqueeze(1) * atten * 0.3
+            self._last_contributions['even_electron'] = None
 
         # ---- 后处理：padding 位清零 ----
         if padding_mask is not None:
-            pad_rows = padding_mask.unsqueeze(1).unsqueeze(-1).expand(-1, 1, -1, n)
-            pad_cols = padding_mask.unsqueeze(1).unsqueeze(-2).expand(-1, 1, n, -1)
-            chem_bias[pad_rows] = 0.0
-            chem_bias[pad_cols] = 0.0
+            pad_mask = (~padding_mask).float().unsqueeze(1).unsqueeze(-1) * \
+                       (~padding_mask).float().unsqueeze(1).unsqueeze(-2)
+            # pad_mask 形状: (batch, 1, n, n)，直接乘
+            chem_bias = chem_bias * pad_mask
 
         return chem_bias
 

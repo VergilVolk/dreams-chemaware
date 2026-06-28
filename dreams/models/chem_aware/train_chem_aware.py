@@ -57,10 +57,14 @@ def parse_args():
     p.add_argument('--entropy_weight', type=float, default=0.01,
                    help='Weight for attention entropy regularization')
     p.add_argument('--lambda_min', type=float, default=0.05,
-                   help='Minimum λ to prevent collapse')
+                   help='Minimum lambda to prevent collapse')
     p.add_argument('--dry_run', action='store_true',
                    help='Use synthetic data for local testing')
     p.add_argument('--save_dir', type=str, default='./chem_aware_checkpoints')
+    p.add_argument('--output_dir', type=str, default=None,
+                   help='Alias for --save_dir')
+    p.add_argument('--num_devices', type=int, default=1, help=argparse.SUPPRESS)
+    p.add_argument('--accelerator', type=str, default='gpu', help=argparse.SUPPRESS)
     return p.parse_args()
 
 
@@ -110,7 +114,7 @@ def build_chem_aware_from_pretrained(pretrained_model: DreaMS) -> ChemAwareDreaM
 
     # 化学感知参数
     old_args.chem_attn = True
-    old_args.chem_attn_attenuation = -5.0
+    old_args.chem_attn_attenuation = -2.0
     old_args.chem_attn_tolerance = 0.02
     old_args.chem_attn_entropy_w = 0.01
 
@@ -208,7 +212,7 @@ def train_chem_aware(
                 charge = charge.to(device)
 
             # ---- 前向传播 ----
-            if spec_real is not None and mask is not None:
+            if isinstance(spec_real, torch.Tensor) and isinstance(mask, torch.Tensor):
                 spec_real = spec_real.to(device)
                 mask = mask.to(device)
                 loss, embs, pred_mz, real_mz = model.spec_ssl_step(
@@ -216,9 +220,21 @@ def train_chem_aware(
                 )
                 loss_mask = loss.sum() / loss.numel()
             else:
-                # 无 mask 字段：直接 forward
-                embs = model(spec, charge)
-                loss_mask = torch.tensor(0.0, device=device, requires_grad=True)
+                # 无 mask 字段时：动态生成 mask，做 mask prediction
+                # 随机遮住 15% 的峰（排除 precursor），预测被遮住的 m/z
+                bs, n_peaks = spec.shape[0], spec.shape[1]
+                n_mask = max(1, int(n_peaks * 0.15))
+                mask_bool = torch.zeros(bs, n_peaks, dtype=torch.bool, device=device)
+                spec_mask = spec.clone()
+                for b in range(bs):
+                    idx = torch.randperm(n_peaks - 1, device=device)[:n_mask] + 1
+                    mask_bool[b, idx] = True
+                    spec_mask[b, idx, :] = 0.0
+
+                loss, embs, pred_mz, real_mz = model.spec_ssl_step(
+                    spec_mask, spec, mask_bool, charge
+                )
+                loss_mask = loss.sum() / loss.numel()
 
             # ---- 化学感知辅助损失 ----
             # 注意力熵正则化
@@ -312,8 +328,42 @@ def main():
     if not Path(ckpt_path).exists():
         raise FileNotFoundError(f'Checkpoint not found: {ckpt_path}')
     print(f'Loading pretrained model: {ckpt_path}')
-    pretrained = DreaMS.load_from_checkpoint(ckpt_path, map_location=device)
-    pretrained.eval()
+
+    # 自动检测格式：Lightning checkpoint vs 纯 state_dict
+    pkg = torch.load(ckpt_path, map_location='cpu', weights_only=False)
+    if 'args' in pkg and 'state_dict' in pkg:
+        # --- 新格式：{state_dict, args}，零平台依赖 ---
+        print('   Detected server-optimized format (state_dict + args)')
+        state_dict = pkg['state_dict']
+        from argparse import Namespace
+        recon_args = Namespace(**pkg['args'])
+        # 重建 dformat（不可序列化对象）
+        from dreams.utils.dformats import DataFormatA
+        recon_args.dformat = DataFormatA()
+        # 覆盖 dformat 属性（从 args 中提取）
+        for da in ['max_mz', 'max_peaks_n', 'max_tbxic_stdev', 'min_peaks_n',
+                   'min_charge', 'max_charge', 'max_prec_mz', 'high_intensity_thld',
+                   'min_intensity_ampl', 'max_ms_level']:
+            if da in pkg['args']:
+                setattr(recon_args.dformat, da, pkg['args'][da])
+        recon_args.d_graphormer_params = 0  # 推理模式不需要
+
+        from dreams.utils.data import SpectrumPreprocessor
+        spec_preproc_recon = SpectrumPreprocessor(
+            dformat=recon_args.dformat,
+            n_highest_peaks=recon_args.max_peaks_n)
+        pretrained = DreaMS(recon_args, spec_preproc_recon)
+        pretrained.load_state_dict(state_dict, strict=False)
+        pretrained.eval()
+        n_args = len(pkg['args'])
+        print(f'   Loaded {len(state_dict)} params, {n_args} args')
+    elif 'pytorch-lightning_version' in pkg:
+        # --- 旧格式：Lightning checkpoint ---
+        print('   Detected Lightning checkpoint format')
+        pretrained = DreaMS.load_from_checkpoint(ckpt_path, map_location=device)
+        pretrained.eval()
+    else:
+        raise ValueError(f'Unknown checkpoint format. Keys: {list(pkg.keys())[:5]}')
 
     # ---- 构建 ChemAwareDreaMS ----
     print('Building ChemAwareDreaMS...')
