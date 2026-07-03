@@ -1,0 +1,2507 @@
+{
+  "version": "v2",
+  "task": "P0 — 立即注入高可信规则",
+  "n_rules": 250,
+  "baseline_count": 2,
+  "added_count": 248,
+  "dedup_removed": 53,
+  "dedup_tolerance_Da": 0.005,
+  "by_category": {
+    "NR": 1,
+    "EE": 1,
+    "NL": 180,
+    "CF": 59,
+    "HR": 9
+  },
+  "by_source": {
+    "baseline": 2,
+    "CompMS2Miner": 220,
+    "ESI(+) common functional-group fragmentation": 19,
+    "Tsugawa et al.": 9
+  },
+  "sources": [
+    "baseline: chem_rules.py v3 (127 rules)",
+    "CompMS2Miner: compMS2Miner R package, Substructure_masses",
+    "HR: Tsugawa et al., Anal. Chem. 2016 (MS-FINDER, 9 hydrogen rearrangement rules)",
+    "ESI: common ESI(+) functional-group fragmentation (McLafferty / empirical)"
+  ],
+  "rules": [
+    {
+      "name": "nitrogen_rule",
+      "category": "NR",
+      "match_type": "parity",
+      "value": 0.0,
+      "source": "baseline (chem_rules.py v3, 127 rules)"
+    },
+    {
+      "name": "even_electron",
+      "category": "EE",
+      "match_type": "mass_diff_range",
+      "value": [
+        0.02,
+        1.0
+      ],
+      "source": "baseline (chem_rules.py v3, 127 rules)"
+    },
+    {
+      "name": "NL:cms2_HNE",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 156.115,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C9H16O2",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_Acetate",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 60.0211,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C2H5O2",
+      "mode": "pos+neg",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "CF:cms2_Acetate",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 61.0284,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C2H5O3",
+      "mode": "neg",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "NL:cms2_Acetate_Na",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 82.0031,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "",
+      "mode": "pos+neg",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "CF:cms2_Acetate_Na",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 80.9958,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "",
+      "mode": "neg",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "CF:cms2_Acetate_Na_2",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 83.0103,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "",
+      "mode": "pos",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "CF:cms2_Acetyl_kete_43",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 43.0178,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C2H3O",
+      "mode": "pos",
+      "ref": "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+    },
+    {
+      "name": "NL:cms2_Acetyl_kete",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 42.0106,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C2H2O",
+      "mode": "pos+neg",
+      "ref": "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+    },
+    {
+      "name": "NL:cms2_Ala_Gly_or_Glut",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 146.0691,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "",
+      "mode": "pos+neg",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "NL:cms2_CH2O",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 30.0106,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "",
+      "mode": "pos+neg",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "NL:cms2_CO",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 27.9949,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "",
+      "mode": "pos+neg",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "NL:cms2_NH3",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 17.0265,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "NH3",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_C3H7NOS",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 105.0248,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C3H7NOS",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_HCN",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 27.0109,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "HCN",
+      "mode": "pos+neg",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_HCN_CO",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 55.0058,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C2HNO",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_NH3_CO_or_HCN_H2O",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 45.0215,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "CH3NO",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_CO2_NH3",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 61.0164,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "CH3NO2",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_Anhydro_aminodeoxyhexose",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 161.0688,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C6H11NO4",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_C2H7N",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 45.0578,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C2H7N",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_CO2_CO_CO",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 99.9797,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C3O4",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_CO_CO_H",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 56.9977,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C2HO2",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_CO_CO_CO",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 83.9847,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C3O3",
+      "mode": "?",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_CH2N2",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 42.0218,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "CH2N2",
+      "mode": "neg",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_NH2",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 16.0187,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "NH2",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_H2CN",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 28.0187,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "H2CN",
+      "mode": "neg",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_NH3_HCN",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 44.0374,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "CH4N2",
+      "mode": "?",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_N_CH3_2",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 44.05,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C2H6N",
+      "mode": "?",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_HI",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 127.9123,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "HI",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_CH3_H2O",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 33.034,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "CH5O",
+      "mode": "neg",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_CH3NH2",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 31.0422,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "CH5N",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_CH3",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 15.0235,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "",
+      "mode": "pos+neg",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "NL:cms2_CF3",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 68.9952,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "CF3",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_Br",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 78.9183,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "Br",
+      "mode": "?",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_HBr",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 79.9262,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "HBr",
+      "mode": "?",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_HC_O_OC4H9",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 102.0681,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C5H10O2",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_COOH",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 44.9977,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "CHO2",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_HCOOH",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 46.0055,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "CH2O2",
+      "mode": "pos+neg",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_H2O_CO2",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 62.0004,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "CH2O3",
+      "mode": "neg",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_H2O_H2O_CO2",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 80.011,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "CH4O4",
+      "mode": "neg",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "NL:cms2_H20",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 18.0106,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "",
+      "mode": "pos+neg",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "NL:cms2_Decarboxy_CO2",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 43.9898,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "CO2",
+      "mode": "pos+neg",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "CF:cms2_Carn_85",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 85.0284,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "",
+      "mode": "pos",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "CF:cms2_Carn_144",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 144.1019,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "",
+      "mode": "pos",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "CF:cms2_Carn_TMA",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 59.0735,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "",
+      "mode": "pos",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "NL:cms2_Carnitine",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 143.0946,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "",
+      "mode": "pos",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "NL:cms2_Cl",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 34.9689,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "Cl",
+      "mode": "?",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_HCl_CO",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 63.9716,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "CHOCl",
+      "mode": "?",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_CO_CO_HCl",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 91.9665,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C2HO2Cl",
+      "mode": "?",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_HNCO",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 43.0058,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "CHNO",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_Coumaroyl",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 146.0368,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "",
+      "mode": "pos+neg",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "NL:cms2_Cys_alanine",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 119.0041,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C3H7NO2",
+      "mode": "pos",
+      "ref": "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+    },
+    {
+      "name": "CF:cms2_Cys",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 120.0125,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C3H6NO2S",
+      "mode": "neg",
+      "ref": "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+    },
+    {
+      "name": "CF:cms2_Cys_2",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 122.027,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C3H8NO2S",
+      "mode": "pos",
+      "ref": "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+    },
+    {
+      "name": "NL:cms2_Anhydro_deoxyhexose",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 146.0579,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C6H10O4",
+      "mode": "pos+neg",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "CF:cms2_DGTS_236",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 236.1498,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C10H22O5N",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_Anhydro_dideoxyhexose",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 130.063,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C6H10O3",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_DGDG_341",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 341.1322,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C12H23NO10",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_DiAnhyGlucose",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 360.1268,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C6H10O5.C6H10O5",
+      "mode": "pos",
+      "ref": "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+    },
+    {
+      "name": "NL:cms2_DiAnhyGLN",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 352.0642,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C6H8O6.C6H8O6",
+      "mode": "pos+neg",
+      "ref": "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+    },
+    {
+      "name": "NL:cms2_H2O_H2O",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 36.0211,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "H4O2",
+      "mode": "?",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_DiSulf_SO3",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 159.9136,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "O3S.O3S",
+      "mode": "pos+neg",
+      "ref": "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+    },
+    {
+      "name": "NL:cms2_OCH3",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 31.0185,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "CH3O",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_C2H5",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 46.0419,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "",
+      "mode": "pos+neg",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "NL:cms2_Feruloyl",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 176.0473,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "",
+      "mode": "pos+neg",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "NL:cms2_HF",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 20.0062,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "HF",
+      "mode": "?",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "CF:cms2_Formate",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 44.9982,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "CH2O2",
+      "mode": "neg",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "CF:cms2_Formate_2",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 47.0128,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "CH2O4",
+      "mode": "pos",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "NL:cms2_Formate_Na",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 67.9874,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "CH2O2Na",
+      "mode": "pos+neg",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "CF:cms2_Formate_Na",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 66.9801,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "CH2O2Na",
+      "mode": "neg",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "CF:cms2_Formate_Na_2",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 68.9947,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "CH2O2Na",
+      "mode": "pos",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "NL:cms2_Galloyl",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 152.011,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "",
+      "mode": "pos+neg",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "NL:cms2_gamma_GluCys",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 250.0623,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C8H14N2O5S",
+      "mode": "pos+neg",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_AnhydroGlucose",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 180.0634,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C6H10O5",
+      "mode": "pos",
+      "ref": "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+    },
+    {
+      "name": "NL:cms2_AnhyGLN_177",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 176.0321,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C6H9O6",
+      "mode": "neg",
+      "ref": "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+    },
+    {
+      "name": "CF:cms2_AnhyGLN_175",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 175.0248,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C6H7O6",
+      "mode": "neg",
+      "ref": "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+    },
+    {
+      "name": "CF:cms2_AnhyGLN_113",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 113.0244,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C5H5O3",
+      "mode": "pos+neg",
+      "ref": "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+    },
+    {
+      "name": "NL:cms2_AnhyGLN_Na",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 198.014,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C6H8O6Na",
+      "mode": "pos+neg",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "NL:cms2_GLN_Na",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 215.9946,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "",
+      "mode": "pos+neg",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "NL:cms2_GLN_192",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 192.027,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "",
+      "mode": "pos+neg",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "NL:cms2_Glucuronic_acid",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 194.0427,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C6H10O7",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_AnhyGLN_SO2",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 255.9889,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C6H8O6.O2S",
+      "mode": "pos+neg",
+      "ref": "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+    },
+    {
+      "name": "NL:cms2_GSH_AnhydroGlutamic_ac",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 305.0682,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C5H7NO3",
+      "mode": "pos+neg",
+      "ref": "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+    },
+    {
+      "name": "CF:cms2_GSH_AnhydroGlutamic_ac",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 128.0353,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C5H6NO3",
+      "mode": "neg",
+      "ref": "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+    },
+    {
+      "name": "CF:cms2_GSH_AnhydroGlutamic_ac_2",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 130.0499,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C5H8NO3",
+      "mode": "pos",
+      "ref": "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+    },
+    {
+      "name": "CF:cms2_GSH_GluAlaGly_2H",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 272.0888,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C10H14N3O6",
+      "mode": "neg",
+      "ref": "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+    },
+    {
+      "name": "CF:cms2_GSH_GluAlaGly_2H_2",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 274.1034,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C10H16N3O6",
+      "mode": "pos",
+      "ref": "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+    },
+    {
+      "name": "CF:cms2_GSH_Glutamine",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 147.0775,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C5H9N2O3",
+      "mode": "neg",
+      "ref": "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+    },
+    {
+      "name": "CF:cms2_GSH_Gly",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 74.0248,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C2H4NO2",
+      "mode": "neg",
+      "ref": "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+    },
+    {
+      "name": "CF:cms2_GSH_Gly_2",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 76.0393,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C2H6NO2",
+      "mode": "pos",
+      "ref": "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+    },
+    {
+      "name": "CF:cms2_GSH",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 306.0765,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C10H16N3O6S",
+      "mode": "neg",
+      "ref": "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+    },
+    {
+      "name": "CF:cms2_GSH_2",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 308.0911,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C10H18N3O6S",
+      "mode": "pos",
+      "ref": "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+    },
+    {
+      "name": "NL:cms2_Cys_Gly",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 178.0412,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "",
+      "mode": "pos+neg",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "NL:cms2_CysGly",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 176.0256,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C5H8N2O3S",
+      "mode": "neg",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_Gly",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 57.0215,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C2H5NO2",
+      "mode": "pos+neg",
+      "ref": "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+    },
+    {
+      "name": "NL:cms2_Histidine_side_chain",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 81.0453,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C4H5N2",
+      "mode": "neg",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_H2O_CO_CO",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 74.0004,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C2H2O3",
+      "mode": "?",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_4CO",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 111.9797,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "4CO",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_CO2_CO",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 71.9847,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C2O3",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_HCNO_CH2N2",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 85.0276,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C2H3N3O",
+      "mode": "neg",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_C3H7",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 43.0548,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C3H7",
+      "mode": "pos",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "NL:cms2_Lyso_PA",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 154.0031,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C3H7O5P",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_LysoPC_225",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 225.0766,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C7H16NO5P",
+      "mode": "neg",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_Lyso_PG_172",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 172.0137,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C3H9O6P",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_LysoPG_228",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 228.0399,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C6H13O7P",
+      "mode": "neg",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_Lyso_PI_260",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 260.0297,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C6H13O9P",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_Lyso_PI_316",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 316.0559,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C9H17O10P",
+      "mode": "neg",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_Malonyl",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 86.0004,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "",
+      "mode": "pos+neg",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "NL:cms2_MalonylGlc_266",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 266.0638,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C9H14O9",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_AnhydromalonylGlc",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 248.0532,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C9H12O8",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "CF:cms2_NAcCys_rad_129",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 129.0431,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C5H7NO3",
+      "mode": "neg",
+      "ref": "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+    },
+    {
+      "name": "NL:cms2_NAcCys_Acetamide_59",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 161.0147,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C2H5NO",
+      "mode": "pos",
+      "ref": "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+    },
+    {
+      "name": "CF:cms2_NAcCys_kete_88",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 88.0393,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C3H6NO2",
+      "mode": "pos",
+      "ref": "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+    },
+    {
+      "name": "CF:cms2_NAcCys_164",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 164.0376,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C5H10NO3S",
+      "mode": "pos",
+      "ref": "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+    },
+    {
+      "name": "NL:cms2_C3H6O3",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 90.0317,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C3H6O3",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_C4H8O4",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 120.0423,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C4H8O4",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_C3H6S",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 74.019,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C3H6S",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_methylsulfenic_acid",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 63.9983,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "CH4OS",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_CH4",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 16.0313,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "CH4",
+      "mode": "?",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_CO_CO",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 55.9898,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "CO+CO",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_CH3OH",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 32.0262,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "CH4O",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_CH4S",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 48.0034,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "CH4S",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_MGDG",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 179.0794,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C6H13NO5",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "CF:cms2_MGDG_Na_243",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 243.0845,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C9H16O6Na",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_NAc_Lys_171",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 171.0895,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C8H13NO3",
+      "mode": "neg",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_GlcNAc_221",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 221.0899,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C8H15NO6",
+      "mode": "pos+neg",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "NL:cms2_AnhydroGlcNAc_203",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 203.0794,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C8H13NO5",
+      "mode": "pos+neg",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_C2H2O2",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 58.0055,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C2H2O2",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_HNO3",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 62.9956,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "HNO3",
+      "mode": "neg",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_CN",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 26.0031,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "CN",
+      "mode": "?",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_H2O_NO",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 48.0086,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "H2NO2",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_NO2_CO",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 73.9878,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "CNO3",
+      "mode": "pos+neg",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_NO2_HCN",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 73.0038,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "CHNO2",
+      "mode": "?",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_OH",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 17.0027,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "OH",
+      "mode": "pos+neg",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_NO",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 29.998,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "NO",
+      "mode": "pos+neg",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_HNO",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 31.0058,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "HNO",
+      "mode": "neg",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_NO2",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 45.9929,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "NO2",
+      "mode": "pos+neg",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_NO_OH",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 47.0007,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "HO2N",
+      "mode": "neg",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_NO_NO",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 59.996,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "N2O2",
+      "mode": "?",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_NO_NO2",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 75.9909,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "N2O3",
+      "mode": "?",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_NO_CO_CO",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 85.9878,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C2NO3",
+      "mode": "?",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_NO_NO_CO",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 87.9909,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "CN2O3",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_NO2_NO2",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 91.9858,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "N2O4",
+      "mode": "?",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_NO_NO2_CO",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 103.9858,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "CN2O4",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_NO2_NO2_CO",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 119.9807,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "CN2O5",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_CHO",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 29.0027,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "",
+      "mode": "pos+neg",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "NL:cms2_NO_CO",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 57.9929,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "CNO2",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_NO2_NO_NO_CO",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 133.9838,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "CN3O5",
+      "mode": "neg",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_N2",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 28.0061,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "",
+      "mode": "pos+neg",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "NL:cms2_SO2_NO",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 93.9599,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "NO3S",
+      "mode": "neg",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_SO2_NO_NO",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 123.9579,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "N2O4S",
+      "mode": "neg",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_O",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 15.9949,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "",
+      "mode": "pos+neg",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "NL:cms2_Anhydro_pentose",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 132.0423,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C5H8O4",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_tyrosine_side_chain",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 107.0497,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C7H7O",
+      "mode": "neg",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_tyrosine_side_chain_hydrogen",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 108.0575,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C7H8O",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_phenyl_radical",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 77.0391,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C6H5",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_benzene",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 78.0469,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C6H6",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_benzyne",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 76.0313,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C6H4",
+      "mode": "neg",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_phenylthio_radical",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 109.0112,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C6H5S",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_H3PO4_from_2",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 48.9884,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "H3O4P/2",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_HPO3",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 79.9663,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "HPO3",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "CF:cms2_H2PO4",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 96.9696,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "H2PO4",
+      "mode": "neg",
+      "ref": "HMDB glucose-1-phosphate"
+    },
+    {
+      "name": "NL:cms2_H3PO4",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 97.9769,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "H3PO4",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "CF:cms2_PC_184",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 184.0733,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C5H15NO4P",
+      "mode": "pos",
+      "ref": "Brügger, B. et. al. Quantitative analysis of biological membrane lipids at the low picomole level by nano-electrospray i"
+    },
+    {
+      "name": "NL:cms2_PC_183",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 183.0655,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C5H15NO4P",
+      "mode": "pos",
+      "ref": "Brügger, B. et. al. Quantitative analysis of biological membrane lipids at the low picomole level by nano-electrospray i"
+    },
+    {
+      "name": "CF:cms2_PC_166",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 166.0628,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C5H13NO3P",
+      "mode": "pos",
+      "ref": "Brügger, B. et. al. Quantitative analysis of biological membrane lipids at the low picomole level by nano-electrospray i"
+    },
+    {
+      "name": "CF:cms2_PC_124",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 124.9998,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C2H6O4P",
+      "mode": "pos",
+      "ref": "Brügger, B. et. al. Quantitative analysis of biological membrane lipids at the low picomole level by nano-electrospray i"
+    },
+    {
+      "name": "CF:cms2_PC_104",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 104.107,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C5H14NO",
+      "mode": "pos",
+      "ref": "Brügger, B. et. al. Quantitative analysis of biological membrane lipids at the low picomole level by nano-electrospray i"
+    },
+    {
+      "name": "NL:cms2_PC_103",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 103.0992,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C5H13NO",
+      "mode": "pos",
+      "ref": "Brügger, B. et. al. Quantitative analysis of biological membrane lipids at the low picomole level by nano-electrospray i"
+    },
+    {
+      "name": "CF:cms2_PC_86",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 86.0964,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C5H12N",
+      "mode": "pos",
+      "ref": "Brügger, B. et. al. Quantitative analysis of biological membrane lipids at the low picomole level by nano-electrospray i"
+    },
+    {
+      "name": "CF:cms2_PC_60",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 60.0808,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C3H10N",
+      "mode": "pos",
+      "ref": "Brügger, B. et. al. Quantitative analysis of biological membrane lipids at the low picomole level by nano-electrospray i"
+    },
+    {
+      "name": "NL:cms2_PC_CH3Cl",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 49.9923,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "CH3Cl",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_TMA",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 59.0735,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C3H9N",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "CF:cms2_PE_216",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 216.0632,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C5H15NO6P",
+      "mode": "pos",
+      "ref": "Brügger, B. et. al. Quantitative analysis of biological membrane lipids at the low picomole level by nano-electrospray i"
+    },
+    {
+      "name": "NL:cms2_PE_141",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 141.0191,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C2H8NO4P",
+      "mode": "pos",
+      "ref": "Brügger, B. et. al. Quantitative analysis of biological membrane lipids at the low picomole level by nano-electrospray i"
+    },
+    {
+      "name": "CF:cms2_PE_62",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 62.06,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C2H8NO",
+      "mode": "pos",
+      "ref": "Brügger, B. et. al. Quantitative analysis of biological membrane lipids at the low picomole level by nano-electrospray i"
+    },
+    {
+      "name": "CF:cms2_PE_44",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 44.0495,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C2H6N",
+      "mode": "pos",
+      "ref": "Brügger, B. et. al. Quantitative analysis of biological membrane lipids at the low picomole level by nano-electrospray i"
+    },
+    {
+      "name": "CF:cms2_PE_196",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 196.038,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C5H11NO5P",
+      "mode": "neg",
+      "ref": "Brügger, B. et. al. Quantitative analysis of biological membrane lipids at the low picomole level by nano-electrospray i"
+    },
+    {
+      "name": "NL:cms2_PE_197",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 197.0453,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C5H12NO5P",
+      "mode": "neg",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "CF:cms2_PG_153",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 152.9958,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C3H6O5P",
+      "mode": "neg",
+      "ref": "Brügger, B. et. al. Quantitative analysis of biological membrane lipids at the low picomole level by nano-electrospray i"
+    },
+    {
+      "name": "NL:cms2_PG_189",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 189.0402,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C3H12NO6P",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "CF:cms2_PI_241",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 241.0119,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C6H10O8P",
+      "mode": "neg",
+      "ref": "Brügger, B. et. al. Quantitative analysis of biological membrane lipids at the low picomole level by nano-electrospray i"
+    },
+    {
+      "name": "NL:cms2_PI_277",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 277.0563,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C6H16NO9P",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_PS_185",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 185.0089,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C3H8NO6P",
+      "mode": "pos",
+      "ref": "Brügger, B. et. al. Quantitative analysis of biological membrane lipids at the low picomole level by nano-electrospray i"
+    },
+    {
+      "name": "NL:cms2_PS_87",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 87.032,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C3H5NO2",
+      "mode": "neg",
+      "ref": "Brügger, B. et. al. Quantitative analysis of biological membrane lipids at the low picomole level by nano-electrospray i"
+    },
+    {
+      "name": "CF:cms2_Phthalate_149",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 149.0233,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C8H5O3",
+      "mode": "pos",
+      "ref": ""
+    },
+    {
+      "name": "CF:cms2_pSilox_73",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 73.0474,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C3H9Si",
+      "mode": "pos",
+      "ref": "Fouquet, T et. al. Electrospray_tandem_mass_spectrometry_combined_with_authentic_compound_synthesis_for_structural_chara"
+    },
+    {
+      "name": "NL:cms2_pSilox_88",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 88.0708,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C4H12Si",
+      "mode": "pos",
+      "ref": "Fouquet, T et. al. Electrospray_tandem_mass_spectrometry_combined_with_authentic_compound_synthesis_for_structural_chara"
+    },
+    {
+      "name": "NL:cms2_K",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 37.9559,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "",
+      "mode": "pos+neg",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "NL:cms2_H_and_NO",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 28.9902,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "",
+      "mode": "pos+neg",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "NL:cms2_H_and_NO2",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 44.9851,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "",
+      "mode": "pos+neg",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "NL:cms2_Rhamnose",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 164.0685,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C6H12O5",
+      "mode": "neg",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_dehydroalanine",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 71.0371,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C3H5NO",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_Na",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 21.9819,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "",
+      "mode": "pos+neg",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "CF:cms2_SM_168",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 168.0431,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C4H11NO4P",
+      "mode": "neg",
+      "ref": "Brügger, B. et. al. Quantitative analysis of biological membrane lipids at the low picomole level by nano-electrospray i"
+    },
+    {
+      "name": "CF:cms2_Sulf_96",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 96.9601,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "HO4S",
+      "mode": "neg",
+      "ref": "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+    },
+    {
+      "name": "CF:cms2_Sulf_95",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 95.9523,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "O4S",
+      "mode": "neg",
+      "ref": "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+    },
+    {
+      "name": "NL:cms2_Sulf_SO2",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 79.9568,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "O2S",
+      "mode": "neg",
+      "ref": "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+    },
+    {
+      "name": "CF:cms2_Sulf_79",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 79.9574,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "O3S",
+      "mode": "neg",
+      "ref": "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+    },
+    {
+      "name": "NL:cms2_H2SO3",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 81.9725,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "H2SO3",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_SO2",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 63.9619,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "SO2",
+      "mode": "neg",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_SQVD_261",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 261.028,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C6H13O9S",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "CF:cms2_SQDG_225",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 225.0069,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C6H9O7S",
+      "mode": "neg",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_S",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 31.9721,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "S",
+      "mode": "?",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_Taurine",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 107.0041,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "",
+      "mode": "pos",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "NL:cms2_TFA",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 113.9929,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "",
+      "mode": "pos+neg",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "CF:cms2_TFA",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 112.9856,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "",
+      "mode": "neg",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "CF:cms2_TFA_2",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 114.9929,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "",
+      "mode": "pos",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "NL:cms2_H2S",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 33.9877,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "H2S",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_C2H4",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 28.0313,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "",
+      "mode": "pos+neg",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "NL:cms2_C3H6",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 42.0469,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C3H6",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_CH2N2_HCl",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 77.9985,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "CH3N2Cl",
+      "mode": "pos",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_C3H6_C3H6",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 84.0939,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "C6H12",
+      "mode": "?",
+      "ref": "Yan, M et. al. MS2Analyzer  A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+    },
+    {
+      "name": "NL:cms2_H2_and_O",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 13.9793,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "",
+      "mode": "pos+neg",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "NL:cms2_H2_and_O2",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 29.9742,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "",
+      "mode": "pos+neg",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "NL:cms2_O_and_C2H4",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 12.0364,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "",
+      "mode": "pos+neg",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "NL:cms2_O_and_S",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 15.9772,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "",
+      "mode": "pos+neg",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "NL:cms2_C4H9",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 57.0704,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "",
+      "mode": "pos+neg",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "NL:cms2_CH3CO",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 43.0184,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "",
+      "mode": "pos+neg",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "NL:cms2_Demethyl",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 14.0157,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "",
+      "mode": "pos+neg",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "NL:cms2_Isobutene_C4H8",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 56.0626,
+      "source": "CompMS2Miner (Substructure_masses)",
+      "formula": "",
+      "mode": "pos+neg",
+      "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+    },
+    {
+      "name": "NL:esi_CH3CHO",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 44.0262,
+      "source": "ESI(+) common functional-group fragmentation (McLafferty / empirical)",
+      "mode": "pos"
+    },
+    {
+      "name": "NL:esi_C2H2",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 26.0157,
+      "source": "ESI(+) common functional-group fragmentation (McLafferty / empirical)",
+      "mode": "pos"
+    },
+    {
+      "name": "NL:esi_C3H4O2",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 72.0211,
+      "source": "ESI(+) common functional-group fragmentation (McLafferty / empirical)",
+      "mode": "pos"
+    },
+    {
+      "name": "NL:esi_CH5N3",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 59.0483,
+      "source": "ESI(+) common functional-group fragmentation (McLafferty / empirical)",
+      "mode": "pos"
+    },
+    {
+      "name": "NL:esi_CH2S",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 45.9877,
+      "source": "ESI(+) common functional-group fragmentation (McLafferty / empirical)",
+      "mode": "pos"
+    },
+    {
+      "name": "NL:esi_CH3SOH",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 64.0139,
+      "source": "ESI(+) common functional-group fragmentation (McLafferty / empirical)",
+      "mode": "pos"
+    },
+    {
+      "name": "NL:esi_H4P2O7",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 177.9432,
+      "source": "ESI(+) common functional-group fragmentation (McLafferty / empirical)",
+      "mode": "pos"
+    },
+    {
+      "name": "NL:esi_C6H10O5",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 162.0528,
+      "source": "ESI(+) common functional-group fragmentation (McLafferty / empirical)",
+      "mode": "pos"
+    },
+    {
+      "name": "NL:esi_C6H8O4",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 144.0423,
+      "source": "ESI(+) common functional-group fragmentation (McLafferty / empirical)",
+      "mode": "pos"
+    },
+    {
+      "name": "NL:esi_C5H5N",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 79.0422,
+      "source": "ESI(+) common functional-group fragmentation (McLafferty / empirical)",
+      "mode": "pos"
+    },
+    {
+      "name": "NL:esi_C7H8",
+      "category": "NL",
+      "match_type": "mass_diff",
+      "value": 92.0626,
+      "source": "ESI(+) common functional-group fragmentation (McLafferty / empirical)",
+      "mode": "pos"
+    },
+    {
+      "name": "CF:esi_hydroxytropylium",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 107.0491,
+      "source": "ESI(+) common functional-group fragmentation (McLafferty / empirical)",
+      "mode": "pos"
+    },
+    {
+      "name": "CF:esi_dihydroxybenzoyl",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 137.0233,
+      "source": "ESI(+) common functional-group fragmentation (McLafferty / empirical)",
+      "mode": "pos"
+    },
+    {
+      "name": "CF:esi_methoxybenzoyl",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 135.0441,
+      "source": "ESI(+) common functional-group fragmentation (McLafferty / empirical)",
+      "mode": "pos"
+    },
+    {
+      "name": "CF:esi_flavone_1_3A",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 153.0182,
+      "source": "ESI(+) common functional-group fragmentation (McLafferty / empirical)",
+      "mode": "pos"
+    },
+    {
+      "name": "CF:esi_flavone_A_ring",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 121.0284,
+      "source": "ESI(+) common functional-group fragmentation (McLafferty / empirical)",
+      "mode": "pos"
+    },
+    {
+      "name": "CF:esi_indole_frag",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 118.0651,
+      "source": "ESI(+) common functional-group fragmentation (McLafferty / empirical)",
+      "mode": "pos"
+    },
+    {
+      "name": "CF:esi_cytosine_frag",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 112.0505,
+      "source": "ESI(+) common functional-group fragmentation (McLafferty / empirical)",
+      "mode": "pos"
+    },
+    {
+      "name": "CF:esi_guanine_frag",
+      "category": "CF",
+      "match_type": "peak_mz",
+      "value": 152.0567,
+      "source": "ESI(+) common functional-group fragmentation (McLafferty / empirical)",
+      "mode": "pos"
+    },
+    {
+      "name": "HR:P1_pos",
+      "category": "HR",
+      "match_type": "hr_shift",
+      "value": 0.0,
+      "source": "Tsugawa et al., Anal. Chem. 2016 (MS-FINDER, 9 HR rules)",
+      "mode": "pos",
+      "atom": "C(P,S)",
+      "n_H": 0,
+      "desc": "正模式初次断裂：C键断裂不加氢（偶电子），P/S通常亦然",
+      "target_mass_diff": 0.0
+    },
+    {
+      "name": "HR:P2_pos",
+      "category": "HR",
+      "match_type": "hr_shift",
+      "value": 2.0,
+      "source": "Tsugawa et al., Anal. Chem. 2016 (MS-FINDER, 9 HR rules)",
+      "mode": "pos",
+      "atom": "N,O",
+      "n_H": 2,
+      "desc": "正模式初次断裂：N/O键断裂加两个氢 [M+2H]+",
+      "target_mass_diff": 2.0157
+    },
+    {
+      "name": "HR:P3_pos",
+      "category": "HR",
+      "match_type": "hr_shift",
+      "value": 1.0,
+      "source": "Tsugawa et al., Anal. Chem. 2016 (MS-FINDER, 9 HR rules)",
+      "mode": "pos",
+      "atom": "N,O",
+      "n_H": 1,
+      "desc": "正模式后续断裂：加一个氢中和碎片 [M'+aH]+（N/O更常见）",
+      "target_mass_diff": 1.0078
+    },
+    {
+      "name": "HR:P4_pos",
+      "category": "HR",
+      "match_type": "hr_shift",
+      "value": -1.0,
+      "source": "Tsugawa et al., Anal. Chem. 2016 (MS-FINDER, 9 HR rules)",
+      "mode": "pos",
+      "atom": "C,P",
+      "n_H": -1,
+      "desc": "正模式后续断裂：丢一个氢成双键/环 [M'+(a-2)H]+（C/P更常见）",
+      "target_mass_diff": 1.0078
+    },
+    {
+      "name": "HR:N1_neg",
+      "category": "HR",
+      "match_type": "hr_shift",
+      "value": 0.0,
+      "source": "Tsugawa et al., Anal. Chem. 2016 (MS-FINDER, 9 HR rules)",
+      "mode": "neg",
+      "atom": "CNOPS",
+      "n_H": 0,
+      "desc": "负模式初次断裂：所有元素不招募氢 [M-0H]-",
+      "target_mass_diff": 0.0
+    },
+    {
+      "name": "HR:N2_neg",
+      "category": "HR",
+      "match_type": "hr_shift",
+      "value": -2.0,
+      "source": "Tsugawa et al., Anal. Chem. 2016 (MS-FINDER, 9 HR rules)",
+      "mode": "neg",
+      "atom": "C,P",
+      "n_H": -2,
+      "desc": "负模式初次断裂：C键断裂丢两个氢 [M-2H]-（磷酸亦然）",
+      "target_mass_diff": 2.0157
+    },
+    {
+      "name": "HR:N3_neg",
+      "category": "HR",
+      "match_type": "hr_shift",
+      "value": -1.0,
+      "source": "Tsugawa et al., Anal. Chem. 2016 (MS-FINDER, 9 HR rules)",
+      "mode": "neg",
+      "atom": "S",
+      "n_H": -1,
+      "desc": "负模式初次断裂：S键均裂产生奇电子radical（磺酸盐）",
+      "target_mass_diff": 1.0078
+    },
+    {
+      "name": "HR:N4_neg",
+      "category": "HR",
+      "match_type": "hr_shift",
+      "value": 1.0,
+      "source": "Tsugawa et al., Anal. Chem. 2016 (MS-FINDER, 9 HR rules)",
+      "mode": "neg",
+      "atom": "N,O",
+      "n_H": 1,
+      "desc": "负模式后续断裂：加一个氢中和碎片（N/O更常见）",
+      "target_mass_diff": 1.0078
+    },
+    {
+      "name": "HR:N5_neg",
+      "category": "HR",
+      "match_type": "hr_shift",
+      "value": -2.0,
+      "source": "Tsugawa et al., Anal. Chem. 2016 (MS-FINDER, 9 HR rules)",
+      "mode": "neg",
+      "atom": "C,P,S",
+      "n_H": -2,
+      "desc": "负模式后续断裂：丢一个氢 [M'-(b+2)H]-（C/P/S更常见）",
+      "target_mass_diff": 2.0157
+    }
+  ]
+}

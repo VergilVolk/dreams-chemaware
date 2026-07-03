@@ -73,7 +73,7 @@ class ChemAwareDreaMS(DreaMS):
         if self.chem_attn_enabled:
             self.chem_rule_engine = ChemicalRuleEngine(
                 tolerance=self.chem_attn_tolerance,
-                enable_categories=None  # 全部 5 类启用
+                enable_categories=None  # 全部 6 类启用（NL/CF/ISO/NR/EE/HR）
             )
         else:
             self.chem_rule_engine = None
