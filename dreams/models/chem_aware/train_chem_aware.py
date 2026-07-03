@@ -1,9 +1,15 @@
 """
-化学感知 DreaMS 轻量微调脚本 [阶段二]
+化学感知 DreaMS 轻量微调脚本 [v3 简化版]
 
 功能：
-  冻结预训练 DreaMS backbone → 仅训练化学感知模块（A: GateNetwork + B: λ）
-  通过 mask prediction 任务驱动 λ 和门控权重的学习。
+  冻结预训练 DreaMS backbone → 仅训练化学规则引擎的 5 维权重向量
+  通过 mask prediction 任务驱动各规则权重的学习。
+
+核心改动（v2 → v3）：
+  - 移除 LambdaController / 课程调度 / 协同损失
+  - 化学偏置仅注入最后一层
+  - 训练仅最小化 mask prediction loss
+  - 规则权重通过梯度自然选择：有用的 ↑，无用的 ↓
 
 用法：
   # 服务器：用 MoNA/NIST20 标注数据微调
@@ -14,12 +20,6 @@
 
   # 本地：用小示例数据测试流程
   python -m dreams.models.chem_aware.train_chem_aware --dry_run
-
-核心设计（阶段二 vs 阶段三）：
-  阶段二（当前）：λ = attenuation * attenuation_scale（单标量可学习参数）
-                   梯度来自 mask loss → λ 向最优值收敛
-  阶段三（未来）：λ = LambdaGenerator(state_vector)（动态 MLP 输出）
-                   梯度来自 mask loss + 对抗 loss → 条件自适应 λ
 
 作者：module1-chem-attn 开发分支
 """
@@ -36,17 +36,12 @@ import dreams.utils.data as du
 import dreams.utils.dformats as dformats
 from dreams.models.dreams.dreams import DreaMS
 from dreams.models.chem_aware.chem_aware_dreams import ChemAwareDreaMS
-from dreams.models.chem_aware.chem_rules import ChemicalRuleEngine, NEUTRAL_LOSSES as NL_DICT
-from dreams.models.chem_aware.gating import HeadGatingNetwork, StateExtractor, LambdaGenerator
-from dreams.models.chem_aware.losses import (
-    attention_entropy_loss,
-    lambda_regularization_loss,
-)
+from dreams.models.chem_aware.chem_rules import ChemicalRuleEngine
 from dreams.definitions import PRETRAINED
 
 
 def parse_args():
-    p = argparse.ArgumentParser(description='ChemAwareDreaMS lightweight fine-tuning')
+    p = argparse.ArgumentParser(description='ChemAwareDreaMS v3 lightweight fine-tuning')
     p.add_argument('--dataset_path', type=str, default=None,
                    help='Path to HDF5 training dataset (MoNA/NIST20)')
     p.add_argument('--ckpt_path', type=str, default=None,
@@ -54,13 +49,11 @@ def parse_args():
     p.add_argument('--epochs', type=int, default=5)
     p.add_argument('--batch_size', type=int, default=8)
     p.add_argument('--lr', type=float, default=1e-4)
-    p.add_argument('--entropy_weight', type=float, default=0.01,
-                   help='Weight for attention entropy regularization')
-    p.add_argument('--lambda_min', type=float, default=0.05,
-                   help='Minimum lambda to prevent collapse')
+    p.add_argument('--chem_attn_layer', type=int, default=-1,
+                   help='Layer index to inject chem bias (-1 = last layer)')
     p.add_argument('--dry_run', action='store_true',
                    help='Use synthetic data for local testing')
-    p.add_argument('--save_dir', type=str, default='./chem_aware_checkpoints')
+    p.add_argument('--save_dir', type=str, default='./chem_aware_checkpoints_v3')
     p.add_argument('--output_dir', type=str, default=None,
                    help='Alias for --save_dir')
     p.add_argument('--num_devices', type=int, default=1, help=argparse.SUPPRESS)
@@ -72,11 +65,10 @@ def parse_args():
 # 从预训练 DreaMS 构建 ChemAwareDreaMS（参数克隆）
 # ==============================================================================
 
-def build_chem_aware_from_pretrained(pretrained_model: DreaMS) -> ChemAwareDreaMS:
-    """从预训练 DreaMS 克隆 backbone 参数到 ChemAwareDreaMS"""
+def build_chem_aware_from_pretrained(pretrained_model: DreaMS, chem_attn_layer: int = -1) -> ChemAwareDreaMS:
+    """从预训练 DreaMS 克隆 backbone 参数到 ChemAwareDreaMS [v3]"""
     from argparse import Namespace
 
-    # 从 hparams 或模型属性重建 args
     old_args = pretrained_model.hparams.get('args', None) if hasattr(pretrained_model, 'hparams') else None
     if old_args is None:
         old_args = Namespace()
@@ -112,11 +104,10 @@ def build_chem_aware_from_pretrained(pretrained_model: DreaMS) -> ChemAwareDreaM
             and not hasattr(old_args, 'max_peaks_n'):
         old_args.max_peaks_n = pretrained_model.spec_preproc.n_highest_peaks
 
-    # 化学感知参数
+    # ---- [v3] 化学感知参数 ----
     old_args.chem_attn = True
-    old_args.chem_attn_attenuation = -2.0
     old_args.chem_attn_tolerance = 0.02
-    old_args.chem_attn_entropy_w = 0.01
+    old_args.chem_attn_layer = chem_attn_layer
 
     # 构建
     chem_model = ChemAwareDreaMS(old_args, pretrained_model.spec_preproc)
@@ -137,7 +128,7 @@ def build_chem_aware_from_pretrained(pretrained_model: DreaMS) -> ChemAwareDreaM
 
 
 # ==============================================================================
-# 轻量微调循环
+# 轻量微调循环 [v3 简化版]
 # ==============================================================================
 
 def train_chem_aware(
@@ -145,18 +136,20 @@ def train_chem_aware(
     dataloader,
     epochs: int = 5,
     lr: float = 1e-4,
-    entropy_weight: float = 0.01,
-    lambda_min: float = 0.05,
-    save_dir: Path = Path('./chem_aware_checkpoints'),
+    save_dir: Path = Path('./chem_aware_checkpoints_v3'),
     device: torch.device = torch.device('cpu')
 ):
     """
-    轻量微调：冻结 backbone，仅训练化学感知模块
+    轻量微调 [v3]：冻结 backbone，仅训练化学规则引擎的逐规则权重向量
 
-    训练循环每步：
-      1. 前向传播 → chem_bias（含 λ）+ gate_weights 参与 Transformer
-      2. 计算 L = L_mask + β_ent * L_entropy + β_λ * L_lambda
-      3. 只反向传播 chem_aware 模块参数
+    每步：
+      1. 前向传播（化学偏置自动注入最后一层）
+      2. 计算 L_mask（掩码峰预测损失）
+      3. 反向传播 → 仅更新 rule_weights_raw
+
+    规则权重通过梯度自然选择：
+      - 对 mask prediction 有帮助的规则 → 权重 ↑
+      - 对 mask prediction 无帮助的规则 → 权重 ↓（自动边缘化，不拖累好规则）
     """
     save_dir = Path(save_dir)
     save_dir.mkdir(parents=True, exist_ok=True)
@@ -170,34 +163,34 @@ def train_chem_aware(
     model = model.to(device)
     model.train()
 
-    # ---- 优化器（仅 chem_aware 参数） ----
+    # ---- 优化器（仅规则权重） ----
     chem_params = model.get_chem_aware_params()
     optimizer = torch.optim.Adam(chem_params, lr=lr)
-    print(f'   Optimizer params: {sum(p.numel() for p in chem_params):,}')
+    n_params = sum(p.numel() for p in chem_params)
+    n_rules = n_params  # 每个规则一个权重
+    print(f'   Optimizer params: {n_params} ({n_rules} rule weights)')
 
     # ---- 日志 ----
+    rule_names = model.chem_rule_engine.get_rule_names()  # 逐规则名称列表
     history = {
-        'epoch': [], 'step': [], 'loss_mask': [], 'loss_entropy': [],
-        'loss_lambda': [], 'loss_total': [],
-        'lambda_val': [], 'gate_mean': [], 'gate_std': [],
+        'epoch': [], 'step': [], 'loss_mask': [],
+        'rule_weights': [],  # List of (n_rules,) tensors per step
     }
 
     global_step = 0
 
     for epoch in range(epochs):
         epoch_losses = []
-        epoch_entropies = []
-        epoch_lambdas = []
 
         for batch_idx, batch in enumerate(dataloader):
-            # 数据准备 — 兼容 dict 和 tuple 两种格式
+            # ---- 数据准备 ----
             if isinstance(batch, dict):
                 spec = batch.get('spectrum', batch.get('spec_mask', None))
                 spec_real = batch.get('spec_real', None)
                 mask = batch.get('mask', None)
                 charge = batch.get('charge', None)
             elif isinstance(batch, (tuple, list)):
-                spec = batch[0]  # TensorDataset 返回 (tensor,)
+                spec = batch[0]
                 spec_real = None
                 mask = None
                 charge = None
@@ -211,17 +204,8 @@ def train_chem_aware(
             if charge is not None and isinstance(charge, torch.Tensor):
                 charge = charge.to(device)
 
-            # ---- 前向传播 ----
-            if isinstance(spec_real, torch.Tensor) and isinstance(mask, torch.Tensor):
-                spec_real = spec_real.to(device)
-                mask = mask.to(device)
-                loss, embs, pred_mz, real_mz = model.spec_ssl_step(
-                    spec, spec_real, mask, charge
-                )
-                loss_mask = loss.sum() / loss.numel()
-            else:
-                # 无 mask 字段时：动态生成 mask，做 mask prediction
-                # 随机遮住 15% 的峰（排除 precursor），预测被遮住的 m/z
+            # ---- 动态 mask 生成（如无预置 mask） ----
+            if not (isinstance(spec_real, torch.Tensor) and isinstance(mask, torch.Tensor)):
                 bs, n_peaks = spec.shape[0], spec.shape[1]
                 n_mask = max(1, int(n_peaks * 0.15))
                 mask_bool = torch.zeros(bs, n_peaks, dtype=torch.bool, device=device)
@@ -230,79 +214,126 @@ def train_chem_aware(
                     idx = torch.randperm(n_peaks - 1, device=device)[:n_mask] + 1
                     mask_bool[b, idx] = True
                     spec_mask[b, idx, :] = 0.0
+                spec_real = spec
+                spec = spec_mask
+                mask = mask_bool
 
-                loss, embs, pred_mz, real_mz = model.spec_ssl_step(
-                    spec_mask, spec, mask_bool, charge
-                )
-                loss_mask = loss.sum() / loss.numel()
+            if isinstance(spec_real, torch.Tensor) and isinstance(mask, torch.Tensor):
+                spec_real = spec_real.to(device)
+                mask = mask.to(device)
 
-            # ---- 化学感知辅助损失 ----
-            # 注意力熵正则化
-            loss_entropy = torch.tensor(0.0, device=device)
-            if model._last_chem_analysis is not None:
-                # 从缓存中提取注意力矩阵
-                # 注意：需要从 model 内部获取注意力权重
-                # 目前用桩实现（后续从 hook 获取）
-                pass
-
-            # λ 正则化：防止 λ 塌缩到 0
-            lambda_val = model.chem_rule_engine._effective_attenuation() \
-                if model.chem_rule_engine is not None else 0.0
-            abs_lambda = abs(lambda_val) if isinstance(lambda_val, (int, float)) \
-                else abs(lambda_val.item())
-            loss_lambda = torch.tensor(
-                max(0.0, lambda_min - abs_lambda / abs(model.chem_attn_attenuation)),
-                device=device
+            # ---- 前向传播 ----
+            loss, embs, pred_mz, real_mz = model.spec_ssl_step(
+                spec, spec_real, mask, charge
             )
-
-            # ---- 总损失 ----
-            loss_total = loss_mask + entropy_weight * loss_entropy + 0.001 * loss_lambda
+            loss_mask = loss.sum() / loss.numel()
 
             # ---- 反向传播 ----
             optimizer.zero_grad()
-            loss_total.backward()
+            loss_mask.backward()
+
+            # [DEBUG] 诊断梯度是否到达 rule_weights_raw
+            if global_step < 5:
+                rw_param = model.chem_rule_engine.rule_weights_raw
+                print(f'[DEBUG step {global_step}] rule_weights_raw.grad is None: {rw_param.grad is None}')
+                if rw_param.grad is not None:
+                    print(f'[DEBUG step {global_step}] grad norm: {rw_param.grad.norm().item():.6f}')
+                    print(f'[DEBUG step {global_step}] grad abs sum: {rw_param.grad.abs().sum().item():.6f}')
+                    # 打印前5个有梯度的规则
+                    grad_abs = rw_param.grad.abs()
+                    top5 = grad_abs.topk(min(5, len(grad_abs)))
+                    for idx, g in zip(top5.indices, top5.values):
+                        rn = rule_names[idx]
+                        print(f'[DEBUG step {global_step}]   {rn}: grad={g.item():.8f}')
+                else:
+                    print(f'[DEBUG step {global_step}] *** GRAD IS NONE — 计算图断裂! ***')
+                # 同时检查 chem_bias 的统计
+                analysis = model.get_chem_attn_analysis()
+                if analysis:
+                    cb = analysis['chem_bias']
+                    print(f'[DEBUG step {global_step}] chem_bias requires_grad: {cb.requires_grad}')
+                    print(f'[DEBUG step {global_step}] chem_bias sum: {cb.sum().item():.4f}, '
+                          f'min={cb.min().item():.4f}, max={cb.max().item():.4f}')
+                    print(f'[DEBUG step {global_step}] chem_bias.grad_fn: {cb.grad_fn}')
+                # 规则匹配统计
+                stats = model.chem_rule_engine.get_rule_stats()
+                print(f'[DEBUG step {global_step}] rule stats: {stats}')
+                print()
+
             optimizer.step()
 
             # ---- 记录 ----
-            gate_mean = 0.0
-            gate_std = 0.0
-            if model.gate_network is not None:
-                # 获取最近一次的门控权重
-                analysis = model.get_chem_attn_analysis()
-                if analysis and analysis.get('gate_weights') is not None:
-                    gw = analysis['gate_weights']
-                    gate_mean = gw.mean().item()
-                    gate_std = gw.std().item()
+            analysis = model.get_chem_attn_analysis()
+            rw = analysis['rule_weights'].clone() if analysis else torch.zeros(n_rules)
 
             epoch_losses.append(loss_mask.item())
-            epoch_lambdas.append(abs_lambda)
-
             history['step'].append(global_step)
             history['loss_mask'].append(loss_mask.item())
-            history['loss_lambda'].append(loss_lambda.item())
-            history['loss_total'].append(loss_total.item())
-            history['lambda_val'].append(abs_lambda)
-            history['gate_mean'].append(gate_mean)
-            history['gate_std'].append(gate_std)
+            history['rule_weights'].append(rw)
 
             global_step += 1
 
+            # 每 5000 步保存 checkpoint
+            if batch_idx > 0 and batch_idx % 5000 == 0:
+                ckpt_path = save_dir / f'chem_aware_v3_step{global_step}.pt'
+                torch.save({
+                    'epoch': epoch, 'global_step': global_step,
+                    'model_state_dict': model.state_dict(),
+                    'optimizer_state_dict': optimizer.state_dict(),
+                    'history': history,
+                }, ckpt_path)
+                print(f'   [Checkpoint] Step {global_step} saved to {ckpt_path}')
+
             if batch_idx % 10 == 0:
+                # 每 10 步打印摘要：top-3 最高权重 + 平均值
+                rw_np = rw.cpu().numpy()
+                top3_idx = np.argsort(rw_np)[-3:][::-1]
+                bot3_idx = np.argsort(rw_np)[:3]
+                top_str = ' | '.join(f'{rule_names[i].split(":")[-1]}={rw_np[i]:.3f}'
+                                    for i in top3_idx)
+                bot_str = ' | '.join(f'{rule_names[i].split(":")[-1]}={rw_np[i]:.3f}'
+                                    for i in bot3_idx)
                 print(f'   Epoch {epoch+1}/{epochs} | Step {batch_idx} | '
                       f'mask_loss={loss_mask.item():.4f} | '
-                      f'lambda={abs_lambda:.2f} | gate_std={gate_std:.3f}')
+                      f'avg_w={rw_np.mean():.4f} | '
+                      f'top:[{top_str}] | bot:[{bot_str}]')
 
-        # epoch summary
+        # ---- Epoch 总结 ----
         avg_loss = np.mean(epoch_losses) if epoch_losses else 0.0
-        avg_lambda = np.mean(epoch_lambdas) if epoch_lambdas else 0.0
         history['epoch'].append(epoch)
-        print(f'\n--- Epoch {epoch+1}/{epochs} Summary ---')
-        print(f'   Avg mask loss: {avg_loss:.4f}')
-        print(f'   Avg |lambda|:   {avg_lambda:.2f}')
-        print(f'   Lambda scale:  {model.chem_rule_engine.attenuation_scale.item():.4f}')
+
+        # 最终权重（按类别分组显示）
+        final_analysis = model.get_chem_attn_analysis()
+        final_rw = final_analysis['rule_weights'] if final_analysis else torch.zeros(n_rules)
+        w_by_cat = model.chem_rule_engine.get_rule_weights_by_category()
+
+        print(f'\n{"=" * 60}')
+        print(f'Epoch {epoch+1}/{epochs} Summary')
+        print(f'  Avg mask loss: {avg_loss:.4f}')
+        print(f'  Rule weights by category:')
+        for cat in ChemicalRuleEngine.CATEGORY_NAMES:
+            if cat not in w_by_cat:
+                continue
+            cat_rules = w_by_cat[cat]
+            sorted_rules = sorted(cat_rules.items(), key=lambda x: x[1], reverse=True)
+            print(f'  [{cat}] {len(sorted_rules)} rules, '
+                  f'mean={np.mean([w for _, w in sorted_rules]):.4f}, '
+                  f'max={sorted_rules[0][1]:.4f}')
+            # 显示前 3 和后 2
+            shown = sorted_rules[:3]
+            if len(sorted_rules) > 5:
+                shown += [('...', -1)] + sorted_rules[-2:]
+            for name, w in shown:
+                if name == '...':
+                    print(f'        ...')
+                else:
+                    bar = '█' * int(w * 40) + '░' * (40 - int(w * 40))
+                    short_name = name.split(':')[-1] if ':' in name else name
+                    print(f'        {short_name:30s}: {w:.4f} |{bar}|')
+        print(f'{"=" * 60}\n')
 
         # 保存 checkpoint
-        ckpt_path = save_dir / f'chem_aware_epoch{epoch+1}.pt'
+        ckpt_path = save_dir / f'chem_aware_v3_epoch{epoch+1}.pt'
         torch.save({
             'epoch': epoch,
             'model_state_dict': model.state_dict(),
@@ -322,6 +353,9 @@ def main():
     args = parse_args()
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f'Device: {device}')
+    print(f'ChemAwareDreaMS v3 — Reward-based, last-layer-only')
+    print(f'  chem_attn_layer: {args.chem_attn_layer} '
+          f'({"last" if args.chem_attn_layer == -1 else args.chem_attn_layer})')
 
     # ---- 加载预训练 DreaMS ----
     ckpt_path = args.ckpt_path or (PRETRAINED / 'ssl_model.ckpt')
@@ -329,24 +363,20 @@ def main():
         raise FileNotFoundError(f'Checkpoint not found: {ckpt_path}')
     print(f'Loading pretrained model: {ckpt_path}')
 
-    # 自动检测格式：Lightning checkpoint vs 纯 state_dict
     pkg = torch.load(ckpt_path, map_location='cpu', weights_only=False)
     if 'args' in pkg and 'state_dict' in pkg:
-        # --- 新格式：{state_dict, args}，零平台依赖 ---
         print('   Detected server-optimized format (state_dict + args)')
         state_dict = pkg['state_dict']
         from argparse import Namespace
         recon_args = Namespace(**pkg['args'])
-        # 重建 dformat（不可序列化对象）
         from dreams.utils.dformats import DataFormatA
         recon_args.dformat = DataFormatA()
-        # 覆盖 dformat 属性（从 args 中提取）
         for da in ['max_mz', 'max_peaks_n', 'max_tbxic_stdev', 'min_peaks_n',
                    'min_charge', 'max_charge', 'max_prec_mz', 'high_intensity_thld',
                    'min_intensity_ampl', 'max_ms_level']:
             if da in pkg['args']:
                 setattr(recon_args.dformat, da, pkg['args'][da])
-        recon_args.d_graphormer_params = 0  # 推理模式不需要
+        recon_args.d_graphormer_params = 0
 
         from dreams.utils.data import SpectrumPreprocessor
         spec_preproc_recon = SpectrumPreprocessor(
@@ -358,33 +388,31 @@ def main():
         n_args = len(pkg['args'])
         print(f'   Loaded {len(state_dict)} params, {n_args} args')
     elif 'pytorch-lightning_version' in pkg:
-        # --- 旧格式：Lightning checkpoint ---
         print('   Detected Lightning checkpoint format')
         pretrained = DreaMS.load_from_checkpoint(ckpt_path, map_location=device)
         pretrained.eval()
     else:
         raise ValueError(f'Unknown checkpoint format. Keys: {list(pkg.keys())[:5]}')
 
-    # ---- 构建 ChemAwareDreaMS ----
-    print('Building ChemAwareDreaMS...')
-    model = build_chem_aware_from_pretrained(pretrained)
+    # ---- 构建 ChemAwareDreaMS [v3] ----
+    print('Building ChemAwareDreaMS v3...')
+    model = build_chem_aware_from_pretrained(pretrained, chem_attn_layer=args.chem_attn_layer)
     print(f'   chem_attn_enabled: {model.chem_attn_enabled}')
-    print(f'   Initial lambda: {model.chem_rule_engine._effective_attenuation():.2f}')
+    rw = model.chem_rule_engine.get_rule_weights()
+    print(f'   Initial rule weights: {rw.tolist()}')
 
     # ---- 准备数据 ----
     if args.dry_run or args.dataset_path is None:
         print('\n*** DRY RUN: Creating synthetic dataset for testing ***')
         from torch.utils.data import DataLoader, TensorDataset
-        # 创建 20 张伪谱图（每张 30 个峰），格式 (n, 2) = [mz, intensity]
         dummy_specs = []
         for _ in range(20):
             mz = torch.rand(30) * 1000.0
             mz = mz.sort().values
             intens = torch.rand(30)
             intens = intens / intens.max()
-            spec = torch.stack([mz, intens], dim=-1)  # (30, 2)
+            spec = torch.stack([mz, intens], dim=-1)
             dummy_specs.append(spec)
-        # Pad to same length
         max_len = max(s.shape[0] for s in dummy_specs)
         specs_padded = torch.zeros(20, max_len, 2)
         for i, s in enumerate(dummy_specs):
@@ -392,14 +420,9 @@ def main():
         dummy_dataset = TensorDataset(specs_padded)
         dataloader = DataLoader(dummy_dataset, batch_size=args.batch_size, shuffle=True)
         print(f'   Synthetic dataset: {len(dummy_dataset)} spectra, {max_len} peaks each')
-        # Dry run: 只做 1 个 epoch 的 5 步
         actual_epochs = 1
     else:
         print(f'\nLoading dataset: {args.dataset_path}')
-        # 使用 DreaMS 的 MaskedSpectraDataset
-        from dreams.training.train_argparse import parse_args as train_parse
-        # 注：此处需根据实际数据格式调整
-        # 简化为直接加载 MSData + to_torch_dataset
         msdata = du.MSData.load(args.dataset_path)
         spec_preproc = model.spec_preproc
         dataset = msdata.to_torch_dataset(spec_preproc)
@@ -416,17 +439,41 @@ def main():
         dataloader=dataloader,
         epochs=actual_epochs,
         lr=args.lr,
-        entropy_weight=args.entropy_weight,
-        lambda_min=args.lambda_min,
         save_dir=Path(args.save_dir),
         device=device,
     )
 
+    # ---- 最终结果 ----
     print('=' * 60)
     print('Fine-tuning complete!')
-    print(f'   Initial lambda: {history["lambda_val"][0]:.2f}')
-    print(f'   Final lambda:   {history["lambda_val"][-1]:.2f}')
+    initial = history['rule_weights'][0]
+    final = history['rule_weights'][-1]
+    print(f'   Initial mean weight: {initial.mean().item():.4f}')
+    print(f'   Final mean weight:   {final.mean().item():.4f}')
     print(f'   Checkpoints saved in: {args.save_dir}')
+
+    # 打印权重变化摘要（按变化量排序，top-10）
+    rule_names = model.chem_rule_engine.get_rule_names()
+    print('\n   Weight change summary (top changes):')
+    changes = []
+    for i, name in enumerate(rule_names):
+        delta = final[i].item() - initial[i].item()
+        changes.append((name, initial[i].item(), final[i].item(), delta))
+    changes.sort(key=lambda x: abs(x[3]), reverse=True)
+    for name, init_val, fin_val, delta in changes[:10]:
+        direction = '↑' if delta > 0 else '↓' if delta < 0 else '→'
+        print(f'     {name:35s}: {init_val:.4f} → {fin_val:.4f} '
+              f'({direction} {abs(delta):.4f})')
+
+    # 最终 top-5 和 bottom-5
+    print('\n   Top-5 active rules:')
+    w_dict = model.chem_rule_engine.get_rule_weight_dict()
+    sorted_rules = sorted(w_dict.items(), key=lambda x: x[1], reverse=True)
+    for name, w in sorted_rules[:5]:
+        print(f'     {name:35s}: {w:.4f}')
+    print('\n   Bottom-5 (near-zero) rules:')
+    for name, w in sorted_rules[-5:]:
+        print(f'     {name:35s}: {w:.4f}')
 
 
 if __name__ == '__main__':

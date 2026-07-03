@@ -1,195 +1,251 @@
 """
-化学规则引擎 (Chemical Rule Engine) — 模块 B 核心组件 [v2 五维规则版]
+化学规则引擎 (Chemical Rule Engine) — 模块 B [v3 逐规则向量版]
 
-功能：
-  将多维质谱碎裂化学先验转化为注意力偏置矩阵，注入 MultiheadAttention 的 softmax 前计算。
+核心改动（v2 → v3）：
+  1. 惩罚 → 奖励：默认 bias = 0（不惩罚任何峰对），匹配规则 → 加正向偏置
+  2. 标量 λ → 逐规则向量：每条具体规则一个独立可学习参数（~55 条规则 ~55 个权重）
+     - H₂O 丢失和 CO 丢失不再被迫共用一个权重
+     - 好规则自动涨，坏规则自动降到 0，互不拖累
+  3. Softplus 参数化：权重天然非负，梯度处处可导
+  4. 配合"仅最后一层注入"策略，消除跨层复合放大
 
-五维规则（每维可独立开关，支持消融实验）：
-  1. 中性丢失匹配     — 峰对质量差 = 已知中性丢失质量 → 不衰减
-  2. 特征碎片离子识别 — 峰本身的 m/z = 已知碎片离子 → 该峰与所有峰的关联不衰减
-  3. 同位素模式       — 峰对形成 ~2Da 同位素簇（Cl/Br/S 的 M/M+2）→ 不衰减
-  4. 氮规则           — 母离子偶质量 → 合理碎片差为偶数，奇质量 → 奇数（违反衰减 50%）
-  5. 偶电子规则       — ESI 下稳定碎片为偶电子离子，非偶电子碎裂路径轻度衰减
-
-消融实验用法：
-  >>> engine = ChemicalRuleEngine(enable_rules=['neutral_loss'])
-  >>> engine = ChemicalRuleEngine(enable_rules=['neutral_loss', 'char_fragment', 'isotope'])
-  >>> engine = ChemicalRuleEngine()  # 全部 5 维
+规则清单（~55 条）：
+  - 28 条中性丢失（H₂O, NH₃, CO, CO₂, CH₃OH, ...）
+  - 22 条特征碎片离子（苯基, tropylium, immoniums, 糖碎片...）
+  - 3 条同位素模式（Cl, Br, S 的 M/M+2）
+  - 1 条氮规则
+  - 1 条偶电子规则
 
 设计原则：
-  - 化学合理的峰对 → bias ≈ 0（不衰减）
-  - 化学不合理的峰对 → bias = -λ（可学习衰减，非硬截断）
-  - 五维规则独立贡献，互不覆盖（叠加制）
+  - 规则库覆盖到的 → 加分（模型可学习该规则是否可靠）
+  - 规则库没覆盖到的 → 不扣分（保持 DreaMS 原有注意力自由）
+  - 每条规则独立学习 → 训练完打印"哪些规则有用/没用"本身就是有意义的科学发现
 
 参考资料：
   - McLafferty, F. W. "Interpretation of Mass Spectra", 4th ed.
-  - Kind, T. & Fiehn, O. "Seven Golden Rules for heuristic filtering of molecular formulas" (2007)
-  - DreaMS 原论文 Fig.3d
-
-作者：module1-chem-attn 开发分支
+  - Kind, T. & Fiehn, O. "Seven Golden Rules" (2007)
 """
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 from typing import Optional, Dict, List, Tuple, Set
+from dataclasses import dataclass
+
 
 # ==============================================================================
 # 化学先验知识库
 # ==============================================================================
 
-# --- 维度 1：常见中性丢失（正离子模式 ESI）---
-# 数据来源：McLafferty + GNPS 社区注释 + HMDB 碎片规律
-NEUTRAL_LOSSES: Dict[str, float] = {
-    # 小分子丢失
-    'H2O':  18.0106,    # 水
-    'NH3':  17.0265,    # 氨
-    'CO':   27.9949,    # 一氧化碳
-    'CO2':  43.9898,    # 二氧化碳
-    'CH2O': 30.0106,    # 甲醛
-    'CH3OH': 32.0262,   # 甲醇
-    'HCOOH': 46.0055,   # 甲酸
-    'CH3COOH': 60.0211, # 乙酸
-    'H2S':  33.9877,    # 硫化氢
-    'SO2':  63.9619,    # 二氧化硫
-    'SO3':  79.9568,    # 三氧化硫
-    'HCl':  35.9767,    # 氯化氢
-    'HBr':  79.9262,    # 溴化氢
-    'HI':   127.9123,   # 碘化氢
-    'HCN':  27.0109,    # 氰化氢
-    'H3PO4': 97.9769,   # 磷酸
-    # 氨基酸/肽段相关
-    'HCONH2': 45.0215,  # 甲酰胺
-    'CH3CONH2': 59.0371,# 乙酰胺
-    'C3H7NO': 73.0528,  # 丙酰胺
-    'H2NCN': 42.0218,   # 氰胺
-    # 烷基链丢失
-    'CH3':  15.0235,    # 甲基
-    'C2H5': 29.0391,    # 乙基
-    'C2H4': 28.0313,    # 乙烯
-    'C3H6': 42.0470,    # 丙烯
-    'C4H8': 56.0626,    # 丁烯
-    'C6H12': 84.0939,   # 己烯
-}
+@dataclass
+class ChemRule:
+    """单条化学规则"""
+    name: str           # 人类可读名称，如 'NL:H2O', 'CF:tropylium'
+    category: str       # 'NL' | 'CF' | 'ISO' | 'NR' | 'EE'
+    match_type: str     # 'mass_diff' | 'peak_mz' | 'mass_range' | 'parity' | 'mass_diff_range'
+    value: float | Tuple[float, float]  # 匹配目标值
 
-# --- 维度 2：特征碎片离子（正离子模式）---
-# 特定结构的"指纹"离子——峰 m/z 落在这些值说明存在对应子结构
-CHARACTERISTIC_FRAGMENTS: Dict[str, List[float]] = {
-    'tropylium_C7H7+': [91.0542],
-    'phenyl_C6H5+': [77.0386],
-    'benzyl_C7H7O+': [107.0491],
-    'benzoyl_C7H5O+': [105.0335],
-    'acetyl_CH3CO+': [43.0184],
-    'propionyl_C2H5CO+': [57.0340],
-    'butyryl_C3H7CO+': [71.0497],
-    'immonium_K': [86.0964],
-    'immonium_H': [110.0713],
-    'immonium_F': [120.0808],
-    'immonium_Y': [136.0757],
-    'immonium_W': [159.0917],
-    'immonium_R': [129.1135],
-    'immonium_M': [104.0528],
-    'hexose_oxonium': [163.0601],
-    'pentose_oxonium': [133.0495],
-    'deoxyhexose_oxonium': [147.0652],
-    'disaccharide_oxonium': [325.1130],
-    'pyridinium': [80.0495, 94.0651],
-    'quinolinium': [130.0651],
-    'phosphate_frag': [98.9842],
-}
 
-# --- 维度 3：同位素模式 ---
-# M/M+2 同位素簇质量差 ~2 Da（Cl, Br, S 特征）
-ISOTOPE_PATTERNS: Dict[str, Tuple[float, float]] = {
-    'Cl35_Cl37': (1.9970, 1.9980),   # ³⁵Cl/³⁷Cl
-    'Br79_Br81': (1.9975, 1.9985),   # ⁷⁹Br/⁸¹Br
-    'S32_S34':   (1.9955, 1.9970),   # ³²S/³⁴S
-}
+def _build_rule_list() -> List[ChemRule]:
+    """从知识库构建完整的规则列表"""
+    rules = []
+
+    # --- 中性丢失 (mass_diff) ---
+    NEUTRAL_LOSSES = {
+        'H2O': 18.0106, 'NH3': 17.0265, 'CO': 27.9949,
+        'CO2': 43.9898, 'CH2O': 30.0106, 'CH3OH': 32.0262,
+        'HCOOH': 46.0055, 'CH3COOH': 60.0211, 'H2S': 33.9877,
+        'SO2': 63.9619, 'SO3': 79.9568, 'HCl': 35.9767,
+        'HBr': 79.9262, 'HI': 127.9123, 'HCN': 27.0109,
+        'H3PO4': 97.9769, 'HCONH2': 45.0215, 'CH3CONH2': 59.0371,
+        'C3H7NO': 73.0528, 'H2NCN': 42.0218,
+        'CH3': 15.0235, 'C2H5': 29.0391, 'C2H4': 28.0313,
+        'C3H6': 42.0470, 'C4H8': 56.0626, 'C6H12': 84.0939,
+        'CH3CN': 41.0265, 'C5H8': 68.0626,
+    }
+    for name, mass in sorted(NEUTRAL_LOSSES.items(), key=lambda x: x[1]):
+        rules.append(ChemRule(name=f'NL:{name}', category='NL',
+                      match_type='mass_diff', value=float(mass)))
+
+    # --- 特征碎片离子 (peak_mz) ---
+    CHAR_FRAGMENTS = {
+        'acetyl': [43.0184], 'propionyl': [57.0340], 'butyryl': [71.0497],
+        'phenyl': [77.0386], 'pyridinium_lo': [80.0495],
+        'immonium_K': [86.0964], 'tropylium': [91.0542],
+        'pyridinium_hi': [94.0651], 'phosphate_frag': [98.9842],
+        'immonium_M': [104.0528], 'benzoyl': [105.0335],
+        'benzyl': [107.0491], 'immonium_H': [110.0713],
+        'immonium_F': [120.0808], 'immonium_R': [129.1135],
+        'quinolinium': [130.0651], 'pentose_oxonium': [133.0495],
+        'immonium_Y': [136.0757], 'deoxyhexose_oxonium': [147.0652],
+        'immonium_W': [159.0917], 'hexose_oxonium': [163.0601],
+        'disaccharide_oxonium': [325.1130],
+    }
+    for name, mz_list in sorted(CHAR_FRAGMENTS.items()):
+        for mz in mz_list:
+            rules.append(ChemRule(name=f'CF:{name}', category='CF',
+                          match_type='peak_mz', value=float(mz)))
+
+    # --- 同位素模式 (mass_range) ---
+    ISOTOPE_PATTERNS = {
+        'Cl35_Cl37': (1.9970, 1.9980),
+        'Br79_Br81': (1.9975, 1.9985),
+        'S32_S34':   (1.9955, 1.9970),
+    }
+    for name, (lo, hi) in sorted(ISOTOPE_PATTERNS.items()):
+        rules.append(ChemRule(name=f'ISO:{name}', category='ISO',
+                      match_type='mass_range', value=(float(lo), float(hi))))
+
+    # --- 氮规则 (parity) ---
+    rules.append(ChemRule(name='nitrogen_rule', category='NR',
+                  match_type='parity', value=0.0))
+
+    # --- 偶电子规则 (mass_diff_range) ---
+    rules.append(ChemRule(name='even_electron', category='EE',
+                  match_type='mass_diff_range', value=(0.02, 1.0)))
+
+    return rules
 
 
 # ==============================================================================
-# 化学规则引擎 v2
+# 化学规则引擎 v3 — 逐规则权重
 # ==============================================================================
 
 class ChemicalRuleEngine(nn.Module):
     """
-    化学规则引擎 v2（模块 B 核心 — 五维化学先验 + 消融开关）
+    化学规则引擎 v3 — 奖励式 + 逐规则独立权重
 
-    每类规则可独立开关，支持消融实验。所有规则缓冲预存为 torch buffer，
-    随模型移动到 GPU，不参与梯度计算。
+    每条具体规则（H₂O 丢失、CO 丢失、苯基碎片……）各自拥有一个可学习权重。
+    权重初始化为 ~0.05（softplus(-3.0)），通过 mask prediction 损失的梯度自然选择。
 
     参数：
-        attenuation: float — 默认衰减强度（负值），默认 -5.0
         tolerance: float — 质量匹配容差 (Da)，默认 0.02
-        learnable_attenuation: bool — λ 是否可学习，默认 True
-        enable_rules: List[str] | None — 启用的规则列表，None = 全部启用。
-            可选值: 'neutral_loss', 'char_fragment', 'isotope', 'nitrogen_rule', 'even_electron'
+        enable_categories: List[str] | None — 启用的规则类别，
+            None = 全部启用。可选值: 'NL', 'CF', 'ISO', 'NR', 'EE'
     """
 
-    AVAILABLE_RULES: List[str] = [
-        'neutral_loss', 'char_fragment', 'isotope', 'nitrogen_rule', 'even_electron'
-    ]
+    # 类别名称
+    CATEGORY_NAMES = ['NL', 'CF', 'ISO', 'NR', 'EE']
 
     def __init__(
         self,
-        attenuation: float = -2.0,
         tolerance: float = 0.02,
-        learnable_attenuation: bool = True,
-        enable_rules: Optional[List[str]] = None
+        enable_categories: Optional[List[str]] = None
     ):
         super().__init__()
         self.tolerance = tolerance
-        self.learnable_attenuation = learnable_attenuation
-        self.attenuation = attenuation
 
-        # ---- 规则开关 ----
-        if enable_rules is None:
-            enable_rules = list(self.AVAILABLE_RULES)
-        self.enabled_rules: Set[str] = set(enable_rules)
-        for r in self.enabled_rules:
-            if r not in self.AVAILABLE_RULES:
-                raise ValueError(f'未知规则 "{r}"，可用: {self.AVAILABLE_RULES}')
+        # ---- 构建规则列表 ----
+        all_rules = _build_rule_list()
 
-        # ---- 可学习衰减因子 λ ----
-        if learnable_attenuation:
-            self.attenuation_scale = nn.Parameter(torch.tensor(1.0))
+        # ---- 规则类别开关 ----
+        if enable_categories is None:
+            enable_categories = list(self.CATEGORY_NAMES)
+        self.enabled_categories: Set[str] = set(enable_categories)
+
+        # 过滤出启用的规则
+        self.rules: List[ChemRule] = [
+            r for r in all_rules if r.category in self.enabled_categories
+        ]
+
+        # ---- 按 match_type 分组，便于批量计算 ----
+        self._mass_diff_rules: List[Tuple[int, ChemRule]] = []   # (idx, rule)
+        self._peak_mz_rules: List[Tuple[int, ChemRule]] = []
+        self._mass_range_rules: List[Tuple[int, ChemRule]] = []
+        self._parity_rules: List[Tuple[int, ChemRule]] = []
+        self._mass_diff_range_rules: List[Tuple[int, ChemRule]] = []
+
+        for idx, rule in enumerate(self.rules):
+            if rule.match_type == 'mass_diff':
+                self._mass_diff_rules.append((idx, rule))
+            elif rule.match_type == 'peak_mz':
+                self._peak_mz_rules.append((idx, rule))
+            elif rule.match_type == 'mass_range':
+                self._mass_range_rules.append((idx, rule))
+            elif rule.match_type == 'parity':
+                self._parity_rules.append((idx, rule))
+            elif rule.match_type == 'mass_diff_range':
+                self._mass_diff_range_rules.append((idx, rule))
+
+        n_rules = len(self.rules)
+
+        # ---- 逐规则独立可学习权重（v3 核心） ----
+        # softplus(-3.0) ≈ 0.0486 → 初始权重约 0.05
+        self.rule_weights_raw = nn.Parameter(torch.full((n_rules,), -3.0))
+
+        # ---- 预计算匹配目标的 buffer ----
+        # mass_diff 类：各规则的目标质量值
+        if self._mass_diff_rules:
+            md_indices, md_rules = zip(*self._mass_diff_rules)
+            self.register_buffer('md_indices', torch.tensor(md_indices, dtype=torch.long))
+            self.register_buffer('md_targets', torch.tensor(
+                [r.value for r in md_rules], dtype=torch.float32))
         else:
-            self.register_buffer('attenuation_scale', torch.tensor(1.0))
+            self.register_buffer('md_indices', torch.tensor([], dtype=torch.long))
+            self.register_buffer('md_targets', torch.tensor([], dtype=torch.float32))
 
-        # ---- 预计算 buffer（不参与梯度，随模型移动） ----
-        # 维度 1: 中性丢失质量列表
-        self.register_buffer(
-            'neutral_masses',
-            torch.tensor(sorted(set(NEUTRAL_LOSSES.values())), dtype=torch.float32)
-        )
-        # 维度 2: 特征碎片 m/z 列表（去重排序）
-        all_frag = []
-        for mz_list in CHARACTERISTIC_FRAGMENTS.values():
-            all_frag.extend(mz_list)
-        self.register_buffer(
-            'fragment_mz',
-            torch.tensor(sorted(set(all_frag)), dtype=torch.float32)
-        )
-        # 维度 3: 同位素质量差范围 (N_iso, 2)
-        iso_pairs = [(float(lo), float(hi)) for lo, hi in ISOTOPE_PATTERNS.values()]
-        self.register_buffer('isotope_ranges', torch.tensor(iso_pairs, dtype=torch.float32))
+        # peak_mz 类：各规则的目标 m/z 值
+        if self._peak_mz_rules:
+            pm_indices, pm_rules = zip(*self._peak_mz_rules)
+            self.register_buffer('pm_indices', torch.tensor(pm_indices, dtype=torch.long))
+            self.register_buffer('pm_targets', torch.tensor(
+                [r.value for r in pm_rules], dtype=torch.float32))
+        else:
+            self.register_buffer('pm_indices', torch.tensor([], dtype=torch.long))
+            self.register_buffer('pm_targets', torch.tensor([], dtype=torch.float32))
 
-        # 最近一次前向传播的各规则贡献（用于分析和可视化）
-        self._last_contributions: Dict[str, torch.Tensor] = {}
+        # mass_range 类：各规则的质量范围 (n_iso, 2)
+        if self._mass_range_rules:
+            mr_indices, mr_rules = zip(*self._mass_range_rules)
+            self.register_buffer('mr_indices', torch.tensor(mr_indices, dtype=torch.long))
+            self.register_buffer('mr_ranges', torch.tensor(
+                [r.value for r in mr_rules], dtype=torch.float32))
+        else:
+            self.register_buffer('mr_indices', torch.tensor([], dtype=torch.long))
+            self.register_buffer('mr_ranges', torch.tensor([], dtype=torch.float32).reshape(0, 2))
 
-    # =====================================================================
-    # 内部方法
-    # =====================================================================
+        # ---- 缓存 ----
+        self._last_stats: Dict[str, float] = {}
 
-    def _effective_attenuation(self):
-        """返回有效衰减强度。训练时保留计算图梯度，推理时可取 .item()"""
-        return self.attenuation * self.attenuation_scale
+    # =========================================================================
+    # 工具方法
+    # =========================================================================
 
-    def _has_rule(self, name: str) -> bool:
-        return name in self.enabled_rules
+    def get_rule_weights(self) -> torch.Tensor:
+        """返回所有规则的当前有效权重，形状 (n_rules,)"""
+        return F.softplus(self.rule_weights_raw)
 
-    # =====================================================================
+    def get_rule_weight_dict(self) -> Dict[str, float]:
+        """返回 {规则名称: 权重} 字典（用于日志和可视化）"""
+        w = self.get_rule_weights()
+        return {rule.name: w[i].item() for i, rule in enumerate(self.rules)}
+
+    def get_rule_names(self) -> List[str]:
+        """返回所有规则名称列表"""
+        return [r.name for r in self.rules]
+
+    def get_rule_weights_by_category(self) -> Dict[str, Dict[str, float]]:
+        """返回按类别分组的 {类别: {规则名: 权重}} 字典"""
+        w = self.get_rule_weights()
+        result: Dict[str, Dict[str, float]] = {}
+        for i, rule in enumerate(self.rules):
+            if rule.category not in result:
+                result[rule.category] = {}
+            result[rule.category][rule.name] = w[i].item()
+        return result
+
+    def get_enabled_rules_summary(self) -> str:
+        """返回当前启用的规则摘要"""
+        cats = ', '.join(sorted(self.enabled_categories))
+        return f'{len(self.rules)} rules in [{cats}]'
+
+    def get_rule_stats(self) -> Dict[str, float]:
+        """返回最近一次 forward 的各规则匹配统计"""
+        return self._last_stats
+
+    # =========================================================================
     # 前向传播
-    # =====================================================================
+    # =========================================================================
 
     def forward(
         self,
@@ -199,96 +255,136 @@ class ChemicalRuleEngine(nn.Module):
         padding_mask: Optional[torch.Tensor] = None,
     ) -> torch.Tensor:
         """
-        计算五维化学感知注意力偏置矩阵
+        计算化学感知注意力偏置矩阵（v3 奖励式 + 逐规则权重）
 
         参数：
             mz_diffs: (batch, n, n) — 峰对质量差绝对值矩阵
-            mz_values: (batch, n) — 各峰 m/z 值（维度 2/5 需要），可选
-            precursor_mz: (batch,) — 母离子 m/z（维度 4 氮规则需要），可选
+            mz_values: (batch, n) — 各峰 m/z 值（peak_mz 类规则需要），可选
+            precursor_mz: (batch,) — 母离子 m/z（parity 类规则需要），可选
             padding_mask: (batch, n) — padding 掩码（True=填充位），可选
 
         返回：
-            chem_bias: (batch, 1, n, n) — 化学偏置矩阵，可广播到所有注意力头
+            chem_bias: (batch, 1, n, n) — 化学偏置矩阵（非负值，默认全 0）
         """
         batch, n, _ = mz_diffs.shape
         device = mz_diffs.device
-        atten = self._effective_attenuation()  # 0-dim tensor with grad
-        self._last_contributions = {}
 
-        # ---- 初始化：所有峰对默认衰减 ----
-        # 用 ones * atten 替代 torch.full，保持梯度链
-        chem_bias = torch.ones(batch, 1, n, n, device=device, dtype=torch.float32) * atten
+        # ---- 有效权重（softplus 保持非负） ----
+        w = F.softplus(self.rule_weights_raw)  # (n_rules,)
 
-        # ---- 基础豁免：对角线（自注）+ precursor 行/列 ----
-        # 用非原地叠加替代原地赋值，保持梯度
-        base_mask = torch.ones(batch, 1, n, n, device=device, dtype=torch.float32)
-        diag_idx = torch.arange(n, device=device)
-        base_mask[:, :, diag_idx, diag_idx] = 0.0  # 对角线不衰减
-        base_mask[:, :, 0, :] = 0.0                 # precursor 行
-        base_mask[:, :, :, 0] = 0.0                 # precursor 列
+        # ---- 初始化：全零（不惩罚任何峰对） ----
+        chem_bias = torch.zeros(batch, 1, n, n, device=device, dtype=torch.float32)
+        self._last_stats = {}
+        _debug = not hasattr(self, '_debug_done') or self._debug_done < 3
 
         # =================================================================
-        # 维度 1: 中性丢失匹配
+        # mass_diff 类规则（中性丢失）：批量检查 |mz_diff - target| < tol
         # =================================================================
-        if self._has_rule('neutral_loss'):
-            for mass in self.neutral_masses:
-                hit = torch.abs(mz_diffs - mass) < self.tolerance
-                base_mask[hit.unsqueeze(1)] = 0.0
-            self._last_contributions['neutral_loss'] = None  # 贡献体现在 base_mask 中
+        if len(self.md_targets) > 0:
+            # mz_diffs: (batch, n, n), md_targets: (n_md,)
+            # → match: (batch, n_md, n, n)
+            diffs_expanded = mz_diffs.unsqueeze(1)  # (batch, 1, n, n)
+            targets = self.md_targets.view(1, -1, 1, 1)  # (1, n_md, 1, 1)
+            match_md = (torch.abs(diffs_expanded - targets) < self.tolerance).float()
+
+            # [DEBUG] 统计每条规则的匹配数
+            if _debug:
+                per_rule_hits = match_md.sum(dim=(0, 2, 3))  # (n_md,)
+                matched_rules = []
+                for j, (idx, rule) in enumerate(self._mass_diff_rules):
+                    nh = per_rule_hits[j].item()
+                    if nh > 0:
+                        matched_rules.append(f'{rule.name}={int(nh)}')
+                if matched_rules:
+                    print(f'[chem_rules] mass_diff matches: {matched_rules[:10]}')
+                else:
+                    print(f'[chem_rules] mass_diff: ZERO matches across all {len(self._mass_diff_rules)} rules')
+
+            # 加权求和: (batch, n_md, n, n) → (batch, 1, n, n)
+            w_md = w[self.md_indices]  # (n_md,)
+            bias_md = (match_md * w_md.view(1, -1, 1, 1)).sum(dim=1, keepdim=True)
+            chem_bias = chem_bias + bias_md
+
+            n_hits = match_md.sum().item()
+            self._last_stats['mass_diff_hits'] = n_hits / max(1, batch * n * n * len(self.md_targets))
 
         # =================================================================
-        # 维度 2: 特征碎片离子识别
+        # peak_mz 类规则（特征碎片）：检查 |peak_mz - target| < tol
+        # 匹配的峰 → 其所在行和列全部加分
         # =================================================================
-        if self._has_rule('char_fragment') and mz_values is not None:
-            for frag_mz in self.fragment_mz:
-                is_frag = torch.abs(mz_values - frag_mz) < self.tolerance
-                base_mask[is_frag.unsqueeze(1).unsqueeze(-1).expand(-1, 1, -1, n)] = 0.0
-                base_mask[is_frag.unsqueeze(1).unsqueeze(-2).expand(-1, 1, n, -1)] = 0.0
-            self._last_contributions['char_fragment'] = None
+        if len(self.pm_targets) > 0 and mz_values is not None:
+            # mz_values: (batch, n), pm_targets: (n_pm,)
+            # → is_frag: (batch, n_pm, n) — 每个峰是否匹配每个碎片规则
+            mz_expanded = mz_values.unsqueeze(1)  # (batch, 1, n)
+            pm_t = self.pm_targets.view(1, -1, 1)  # (1, n_pm, 1)
+            is_frag = (torch.abs(mz_expanded - pm_t) < self.tolerance).float()  # (batch, n_pm, n)
+
+            # 行 + 列展开: (batch, n_pm, n, n)
+            cf_row = is_frag.unsqueeze(-1).expand(-1, -1, -1, n)
+            cf_col = is_frag.unsqueeze(-2).expand(-1, -1, n, -1)
+            cf_match = (cf_row + cf_col).clamp(0, 1)  # 避免重复计数
+
+            # 加权求和
+            w_pm = w[self.pm_indices]  # (n_pm,)
+            bias_cf = (cf_match * w_pm.view(1, -1, 1, 1)).sum(dim=1, keepdim=True)
+            chem_bias = chem_bias + bias_cf
+
+            n_cf_hits = cf_match.sum().item()
+            self._last_stats['peak_mz_hits'] = n_cf_hits / max(1, batch * n * n * len(self.pm_targets))
 
         # =================================================================
-        # 维度 3: 同位素模式
+        # mass_range 类规则（同位素）：检查 mz_diff ∈ [lo, hi]
         # =================================================================
-        if self._has_rule('isotope'):
-            for iso_lo, iso_hi in self.isotope_ranges:
-                iso_hit = (mz_diffs >= iso_lo) & (mz_diffs <= iso_hi)
-                base_mask[iso_hit.unsqueeze(1)] = 0.0
-            self._last_contributions['isotope'] = None
+        if len(self.mr_ranges) > 0:
+            # mr_ranges: (n_mr, 2), mz_diffs: (batch, n, n)
+            diffs_expanded = mz_diffs.unsqueeze(1)  # (batch, 1, n, n)
+            lo = self.mr_ranges[:, 0].view(1, -1, 1, 1)  # (1, n_mr, 1, 1)
+            hi = self.mr_ranges[:, 1].view(1, -1, 1, 1)
+            match_mr = ((diffs_expanded >= lo) & (diffs_expanded <= hi)).float()
 
-        # ---- 应用基础掩码 ----
-        chem_bias = chem_bias * base_mask
+            w_mr = w[self.mr_indices]  # (n_mr,)
+            bias_mr = (match_mr * w_mr.view(1, -1, 1, 1)).sum(dim=1, keepdim=True)
+            chem_bias = chem_bias + bias_mr
 
-        # =================================================================
-        # 维度 4: 氮规则（额外衰减 50%，叠加在已有 bias 上）
-        # =================================================================
-        if self._has_rule('nitrogen_rule') and precursor_mz is not None:
-            prec_parity = (precursor_mz.round().long() % 2).view(-1, 1, 1, 1)
-            diff_parity = (mz_diffs.round().long() % 2).unsqueeze(1)
-            violation = (prec_parity != diff_parity).float()
-            # 违反位叠加 50% 衰减
-            chem_bias = chem_bias + violation * atten * 0.5
-            self._last_contributions['nitrogen_rule'] = None
+            n_iso_hits = match_mr.sum().item()
+            self._last_stats['mass_range_hits'] = n_iso_hits / max(1, batch * n * n * len(self.mr_ranges))
 
         # =================================================================
-        # 维度 5: 偶电子规则
+        # parity 类规则（氮规则）：奇偶一致性 → 加分
         # =================================================================
-        if self._has_rule('even_electron') and mz_values is not None:
-            too_small = ((mz_diffs > 0.1) & (mz_diffs < 1.0)).float()
-            chem_bias = chem_bias + too_small.unsqueeze(1) * atten * 0.3
-            self._last_contributions['even_electron'] = None
+        if len(self._parity_rules) > 0 and precursor_mz is not None:
+            for idx, rule in self._parity_rules:
+                prec_parity = (precursor_mz.round().long() % 2).view(-1, 1, 1, 1).float()
+                diff_parity = (mz_diffs.round().long() % 2).unsqueeze(1).float()
+                consistent = (prec_parity == diff_parity).float()
+                chem_bias = chem_bias + consistent * w[idx]
+            self._last_stats['parity_consistency'] = consistent.float().mean().item() if 'consistent' in dir() else 0.0
 
-        # ---- 后处理：padding 位清零 ----
+        # =================================================================
+        # mass_diff_range 类规则（偶电子）：质量差不在"太小但不为零"范围 → 加分
+        # =================================================================
+        if len(self._mass_diff_range_rules) > 0:
+            for idx, rule in self._mass_diff_range_rules:
+                lo, hi = rule.value
+                not_too_small = ((mz_diffs > hi) | (mz_diffs < lo)).float().unsqueeze(1)
+                chem_bias = chem_bias + not_too_small * w[idx]
+            self._last_stats['mass_diff_range_frac'] = not_too_small.float().mean().item() if 'not_too_small' in dir() else 0.0
+
+        # ---- Padding 位清零 ----
         if padding_mask is not None:
-            pad_mask = (~padding_mask).float().unsqueeze(1).unsqueeze(-1) * \
-                       (~padding_mask).float().unsqueeze(1).unsqueeze(-2)
-            # pad_mask 形状: (batch, 1, n, n)，直接乘
-            chem_bias = chem_bias * pad_mask
+            pad_mat = (~padding_mask).float().unsqueeze(1).unsqueeze(-1) * \
+                      (~padding_mask).float().unsqueeze(1).unsqueeze(-2)
+            chem_bias = chem_bias * pad_mat
+
+        # [DEBUG] 递增调试计数器
+        if _debug:
+            self._debug_done = getattr(self, '_debug_done', 0) + 1
 
         return chem_bias
 
-    # =====================================================================
-    # 工具方法
-    # =====================================================================
+    # =========================================================================
+    # 静态工具
+    # =========================================================================
 
     @staticmethod
     def compute_peak_pair_mz_diffs(mz_values: torch.Tensor) -> torch.Tensor:
@@ -298,20 +394,12 @@ class ChemicalRuleEngine(nn.Module):
     def get_matched_rules(self, mz_diff: float) -> List[str]:
         """查询单个质量差匹配了哪些已知规则（用于可解释性分析）"""
         matched = []
-        if self._has_rule('neutral_loss'):
-            for name, mass in NEUTRAL_LOSSES.items():
-                if abs(mz_diff - mass) < self.tolerance:
-                    matched.append(f'NL:{name}')
-        if self._has_rule('isotope'):
-            for name, (lo, hi) in ISOTOPE_PATTERNS.items():
+        for idx, rule in enumerate(self.rules):
+            if rule.match_type == 'mass_diff':
+                if abs(mz_diff - float(rule.value)) < self.tolerance:
+                    matched.append(rule.name)
+            elif rule.match_type == 'mass_range':
+                lo, hi = rule.value
                 if lo <= mz_diff <= hi:
-                    matched.append(f'ISO:{name}')
+                    matched.append(rule.name)
         return matched
-
-    def get_enabled_rules_summary(self) -> str:
-        """返回当前启用的规则摘要"""
-        return ', '.join(sorted(self.enabled_rules))
-
-    def get_rule_contributions(self) -> Dict[str, torch.Tensor]:
-        """返回最近一次 forward 的各规则贡献（用于消融可视化）"""
-        return self._last_contributions

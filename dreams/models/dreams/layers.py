@@ -151,6 +151,14 @@ class MultiheadAttention(nn.Module):
 
         # --- [模块一 新增] 化学感知规则偏置（来自模块 B：ChemicalRuleEngine） ---
         if chem_bias is not None:
+            # [DEBUG v3] 验证 chem_bias 是否进入计算图
+            if not hasattr(MultiheadAttention, '_debug_chem_count'):
+                MultiheadAttention._debug_chem_count = 0
+            if MultiheadAttention._debug_chem_count < 3:
+                MultiheadAttention._debug_chem_count += 1
+                print(f'[attn debug {MultiheadAttention._debug_chem_count}] '
+                      f'chem_bias requires_grad={chem_bias.requires_grad}, '
+                      f'sum={chem_bias.sum().item():.4f}, grad_fn={chem_bias.grad_fn}')
             att_weights = att_weights + chem_bias
 
         # --- [模块一 新增] 注意力头门控权重（来自模块 A：HeadGatingNetwork） ---
@@ -334,7 +342,10 @@ class TransformerEncoder(nn.Module):
             src_inputs: (batch, n_peaks, d_model) — 嵌入后的谱图 token 序列
             src_mask: (batch, n_peaks) — padding 掩码
             graphormer_dists: (batch, n, n, d) — Graphormer 距离编码
-            chem_bias: (batch, 1, n, n) — [模块一] 化学规则偏置，所有层共享，为 None 时原版行为
+            chem_bias: (batch, 1, n, n) 或 List[Optional[Tensor]] — [模块一 v3]
+                单张 tensor → 所有层共享同一偏置（向后兼容）
+                列表 → 每层独立偏置，chem_bias[i] 给第 i 层，可为 None
+                整体为 None → 所有层不加化学偏置（原版行为）
             gate_weights_per_layer: List[Tensor] 或 None — [模块一] 每层门控权重列表，
                 每个元素形状为 (batch, n_heads)，长度为 n_layers，为 None 时所有头等权
 
@@ -346,14 +357,19 @@ class TransformerEncoder(nn.Module):
         for i in range(self.n_layers):
             # 提取当前层的门控权重（如有）
             gw = gate_weights_per_layer[i] if gate_weights_per_layer is not None else None
+            # 提取当前层的化学偏置（支持列表或单张 tensor）
+            if isinstance(chem_bias, (list, tuple)):
+                cb = chem_bias[i]
+            else:
+                cb = chem_bias
 
             if self._gradient_checkpointing and self.training:
                 x = torch.utils.checkpoint.checkpoint(
-                    self._layer_forward, i, x, src_mask, graphormer_dists, chem_bias, gw,
+                    self._layer_forward, i, x, src_mask, graphormer_dists, cb, gw,
                     use_reentrant=False
                 )
             else:
-                x = self._layer_forward(i, x, src_mask, graphormer_dists, chem_bias, gw)
+                x = self._layer_forward(i, x, src_mask, graphormer_dists, cb, gw)
 
         x = self.scales[-1](x) if self.pre_norm else x
         return x

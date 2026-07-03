@@ -1,0 +1,7 @@
+SPECTRUM RETRIEVAL AUC RESULTS
+Protocol: DreaMS SpecRetrievalValidation
+==================================================
+Original DreaMS  AUC: 0.8853
+ChemAware DreaMS  AUC: 0.7302
+Delta:                -0.1551  (-17.52%)
+Pairs evaluated:      20,000
