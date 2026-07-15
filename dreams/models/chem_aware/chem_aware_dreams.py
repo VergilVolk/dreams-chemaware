@@ -73,10 +73,13 @@ class ChemAwareDreaMS(DreaMS):
         if self.chem_attn_enabled:
             self.chem_rule_engine = ChemicalRuleEngine(
                 tolerance=self.chem_attn_tolerance,
-                enable_categories=None  # 全部 5 类启用
+                enable_categories=None  # 全部 5 类（127 条规则）都注册为可训练参数
             )
+            # 化学残差的全局缩放因子（可学习，初始 1.0）
+            self.chem_residual_scale = nn.Parameter(torch.tensor(1.0))
         else:
             self.chem_rule_engine = None
+            self.chem_residual_scale = None
 
         # 缓存最近一次的化学分析数据
         self._last_chem_analysis: Optional[Dict] = None
@@ -136,44 +139,59 @@ class ChemAwareDreaMS(DreaMS):
                 graphormer_dists = spec_emb[..., 0].unsqueeze(2) - spec_emb[..., 0].unsqueeze(1)
                 graphormer_dists = graphormer_dists.unsqueeze(-1)
 
-        # ---- Step 6: [v3] 化学奖励偏置 — 仅最后一层 ----
-        chem_bias_per_layer = None
+        # ---- Step 6: [v3] 化学偏置计算 ----
+        chem_bias = None
+        chem_bias_specific = None
         if self.chem_attn_enabled and self.chem_rule_engine is not None:
             # 计算峰对质量差
             mz_diffs = ChemicalRuleEngine.compute_peak_pair_mz_diffs(raw_mz)
 
-            # 化学规则引擎 v3：默认全零 + 匹配规则加分
+            # 全类别偏置（用于日志/分析，包含 EE/NR）
             chem_bias = self.chem_rule_engine(
                 mz_diffs,
                 mz_values=raw_mz,
-                precursor_mz=raw_mz[:, 0] if 'NR' in self.chem_rule_engine.enabled_categories else None,
+                precursor_mz=raw_mz[:, 0],
                 padding_mask=padding_mask
             )
 
-            # 仅注入指定层（默认最后一层），其余层为 None
-            target_layer = self.chem_attn_layer
-            if target_layer < 0:
-                target_layer = self.n_layers + target_layer  # -1 → n_layers-1
-            chem_bias_per_layer = [None] * self.n_layers
-            chem_bias_per_layer[target_layer] = chem_bias
+            # 特异性偏置（仅 NL/CF/ISO，用于残差连接）
+            # EE 和 NR 是全覆盖规则，不加区分地给所有峰对加分，会稀释特异性信号
+            chem_bias_specific = self.chem_rule_engine(
+                mz_diffs,
+                mz_values=raw_mz,
+                precursor_mz=raw_mz[:, 0],
+                padding_mask=padding_mask,
+                categories=['NL', 'CF', 'ISO']
+            )
 
             # 缓存分析数据
             self._last_chem_analysis = {
                 'chem_bias': chem_bias.detach(),
                 'rule_weights': self.chem_rule_engine.get_rule_weights().detach().clone(),
                 'rule_stats': self.chem_rule_engine.get_rule_stats(),
-                'target_layer': target_layer,
             }
 
-        # ---- Step 7: Transformer 编码器 ----
+        # ---- Step 7: Transformer 编码器（原版 DreaMS，不传 chem_bias） ----
         if self.vanilla_transformer:
             spec = self.transformer_encoder(spec_emb, src_key_padding_mask=padding_mask)
         else:
             spec = self.transformer_encoder(
                 spec_emb, padding_mask, graphormer_dists,
-                chem_bias=chem_bias_per_layer,
-                gate_weights_per_layer=None
+                chem_bias=None, gate_weights_per_layer=None
             )
+
+        # ---- Step 8: [v3] 化学残差连接 ----
+        if self.chem_attn_enabled and chem_bias_specific is not None:
+            cw0 = chem_bias_specific.squeeze(1)                    # (batch, n, n)
+            cw1 = cw0 - cw0.mean(dim=-1, keepdim=True)             # mean-subtract
+            cw2 = cw1 * self.chem_residual_scale                    # × learnable scale
+            chem_context = torch.bmm(cw2, spec)
+            # 诊断：逐级 retain_grad
+            for name, t in [('cw2', cw2), ('chem_context', chem_context)]:
+                if t.requires_grad:
+                    t.retain_grad()
+                    setattr(self, f'_diag_{name}', t)
+            spec = spec + chem_context
 
         return spec
 
@@ -182,28 +200,31 @@ class ChemAwareDreaMS(DreaMS):
     # =========================================================================
 
     def freeze_backbone(self):
-        """冻结 DreaMS backbone 的所有参数（化学规则引擎除外）"""
+        """冻结 DreaMS backbone 的所有参数（chem_aware 模块除外）"""
         count = 0
         for name, param in self.named_parameters():
-            if 'chem_rule_engine' not in name:
+            if 'chem_rule_engine' not in name and 'chem_residual_scale' not in name:
                 param.requires_grad = False
                 count += 1
         return count
 
     def unfreeze_chem_aware(self):
-        """仅解冻化学规则引擎参数"""
+        """仅解冻 chem_aware 模块参数（规则权重 + 残差缩放）"""
         count = 0
         for name, param in self.named_parameters():
-            if 'chem_rule_engine' in name:
+            if 'chem_rule_engine' in name or 'chem_residual_scale' in name:
                 param.requires_grad = True
                 count += 1
         return count
 
     def get_chem_aware_params(self):
-        """返回化学规则引擎的可训练参数"""
+        """返回所有 chem_aware 可训练参数（规则权重 + 残差缩放因子）"""
         if self.chem_rule_engine is None:
             return []
-        return list(self.chem_rule_engine.parameters())
+        params = list(self.chem_rule_engine.parameters())
+        if self.chem_residual_scale is not None:
+            params.append(self.chem_residual_scale)
+        return params
 
     # =========================================================================
     # 优化器

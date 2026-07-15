@@ -14,7 +14,7 @@
 │   [m/z, intensity] ──→ FFN_P ──→ P_j                       │
 │                                                             │
 │   PeakEmb_j = F_j ∥ P_j    (Fourier ∥ Peak)                 │
-│   维度: d_model = d_fourier + d_peak = 980 + 44 = 1024       │
+│   维度: d_model = d_fou![alt text](image.png)rier + d_peak = 980 + 44 = 1024       │
 └───────────────────────────┬─────────────────────────────────┘
                             │ (n, 1024)
                             ▼

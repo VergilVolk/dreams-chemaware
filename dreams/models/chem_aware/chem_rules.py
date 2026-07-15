@@ -52,6 +52,7 @@ def _build_rule_list() -> List[ChemRule]:
 
     # --- 中性丢失 (mass_diff) ---
     NEUTRAL_LOSSES = {
+        # 小分子丢失（原版）
         'H2O': 18.0106, 'NH3': 17.0265, 'CO': 27.9949,
         'CO2': 43.9898, 'CH2O': 30.0106, 'CH3OH': 32.0262,
         'HCOOH': 46.0055, 'CH3COOH': 60.0211, 'H2S': 33.9877,
@@ -59,9 +60,54 @@ def _build_rule_list() -> List[ChemRule]:
         'HBr': 79.9262, 'HI': 127.9123, 'HCN': 27.0109,
         'H3PO4': 97.9769, 'HCONH2': 45.0215, 'CH3CONH2': 59.0371,
         'C3H7NO': 73.0528, 'H2NCN': 42.0218,
+        # 烷基链
         'CH3': 15.0235, 'C2H5': 29.0391, 'C2H4': 28.0313,
         'C3H6': 42.0470, 'C4H8': 56.0626, 'C6H12': 84.0939,
         'CH3CN': 41.0265, 'C5H8': 68.0626,
+        # === 新增：II 相代谢 ===
+        'glucuronide': 176.0321,         # C6H8O6
+        'glucuronide+H2O': 194.0427,     # C6H10O7
+        'sulfate': 79.9568,              # SO3（同SO3，但独立权重）
+        'glutathione': 307.0838,         # C10H17N3O6S
+        'cysteinylglycine': 178.0419,    # C5H10N2O3S
+        'glycine_conj': 57.0215,         # C2H3NO
+        'taurine_conj': 107.0041,        # C2H5NO2S
+        'acetyl_conj': 42.0106,          # C2H2O（区别于ketene）
+        'methylation': 14.0157,          # CH2
+        'dimethylation': 28.0313,        # C2H4（同C2H4，独立权重）
+        # === 新增：氨基酸残基丢失（肽键断裂） ===
+        'Gly_res': 57.0215,              # 甘氨酸
+        'Ala_res': 71.0371,              # 丙氨酸
+        'Ser_res': 87.0320,              # 丝氨酸
+        'Pro_res': 97.0528,              # 脯氨酸
+        'Val_res': 99.0684,              # 缬氨酸
+        'Thr_res': 101.0477,             # 苏氨酸
+        'Leu_Ile_res': 113.0841,         # 亮氨酸/异亮氨酸
+        'Asn_res': 114.0429,             # 天冬酰胺
+        'Asp_res': 115.0269,             # 天冬氨酸
+        'Gln_res': 128.0586,             # 谷氨酰胺
+        'Glu_res': 129.0426,             # 谷氨酸
+        'Met_res': 131.0405,             # 甲硫氨酸
+        'His_res': 137.0589,             # 组氨酸
+        'Phe_res': 147.0684,             # 苯丙氨酸
+        'Arg_res': 156.1011,             # 精氨酸
+        'Tyr_res': 163.0633,             # 酪氨酸
+        'Trp_res': 186.0793,             # 色氨酸
+        'Lys_res': 128.0950,             # 赖氨酸
+        # === 新增：脂质相关 ===
+        'palmitic_acid': 256.2402,       # C16H32O2
+        'oleic_acid': 282.2559,          # C18H34O2
+        'stearic_acid': 284.2715,        # C18H36O2
+        'linoleic_acid': 280.2402,       # C18H32O2
+        'phosphocholine': 183.0660,      # C5H15NO4P (head group)
+        'phosphoethanolamine': 141.0191, # C2H8NO4P (head group)
+        'glycerol': 92.0473,            # C3H8O3
+        # === 新增：其他常见丢失 ===
+        'HNCO': 43.0058,                # 异氰酸
+        'C2H2O': 42.0106,               # 乙烯酮
+        'C3H6O': 58.0419,               # 丙酮
+        'HNCS': 59.0068,                # 异硫氰酸
+        'CH4O2': 48.0211,               # 过氧化氢? no, methanediol
     }
     for name, mass in sorted(NEUTRAL_LOSSES.items(), key=lambda x: x[1]):
         rules.append(ChemRule(name=f'NL:{name}', category='NL',
@@ -69,6 +115,7 @@ def _build_rule_list() -> List[ChemRule]:
 
     # --- 特征碎片离子 (peak_mz) ---
     CHAR_FRAGMENTS = {
+        # 原版
         'acetyl': [43.0184], 'propionyl': [57.0340], 'butyryl': [71.0497],
         'phenyl': [77.0386], 'pyridinium_lo': [80.0495],
         'immonium_K': [86.0964], 'tropylium': [91.0542],
@@ -80,6 +127,39 @@ def _build_rule_list() -> List[ChemRule]:
         'immonium_Y': [136.0757], 'deoxyhexose_oxonium': [147.0652],
         'immonium_W': [159.0917], 'hexose_oxonium': [163.0601],
         'disaccharide_oxonium': [325.1130],
+        # === 新增：更多 immonium 离子 ===
+        'immonium_P': [70.0651],
+        'immonium_T': [74.0600],
+        'immonium_N': [87.0553],
+        'immonium_D': [88.0393],
+        'immonium_Q': [101.0715],
+        'immonium_E': [102.0555],
+        'immonium_L_I': [86.0964],   # 同 immonium_K，独立权重
+        # === 新增：脂质特征碎片 ===
+        'phosphocholine_head': [184.0733],   # C5H15NO4P+
+        'acyl_glycerol': [339.2899],          # C21H39O3+
+        'cholesterol_skel': [369.3516],       # C27H45+
+        # === 新增：糖/糖苷特征 ===
+        'hexose_oxonium_2': [145.0495],       # 脱水中性糖
+        'GlcA_oxonium': [177.0395],           # 葡萄糖醛酸
+        'NeuAc_oxonium': [292.1030],          # 唾液酸
+        'N_acetylhexosamine': [204.0866],     # C8H14NO5+
+        # === 新增：药物/天然产物 ===
+        'dimethylanilinium': [122.0964],      # C8H12N+
+        'methylpiperidinium': [98.0964],       # C6H12N+
+        'phenethylamine': [121.0650],          # C8H9N+? 不对, 应该是136
+        'amphetamine_frag': [91.0542],         # tropylium, 同原版
+        'caffeine_frag': [138.0662],           # C6H8N3O+
+        # === 新增：核苷 ===
+        'ribose_frag': [133.0495],             # 同 pentose
+        'adenine_frag': [136.0618],            # C5H4N5+
+        'uracil_frag': [113.0346],             # C4H3N2O2+
+        # === 新增：常见污染物/加合物 ===
+        'phthalate': [149.0233],               # C8H5O3+
+        'phthalate_2': [167.0339],             # C8H7O4+
+        'PEG_frag': [89.0597],                 # C4H9O2+ (PEG系列)
+        'PEG_frag_2': [133.0859],              # C6H13O3+
+        'PEG_frag_3': [177.1121],              # C8H17O4+
     }
     for name, mz_list in sorted(CHAR_FRAGMENTS.items()):
         for mz in mz_list:
@@ -91,6 +171,12 @@ def _build_rule_list() -> List[ChemRule]:
         'Cl35_Cl37': (1.9970, 1.9980),
         'Br79_Br81': (1.9975, 1.9985),
         'S32_S34':   (1.9955, 1.9970),
+        # 新增
+        'Si28_Si29': (0.9990, 1.0000),    # M/M+1 (~1 Da)
+        'Si28_Si30': (1.9960, 1.9980),    # M/M+2 (~2 Da)
+        'Se80_Se78': (1.9980, 2.0020),    # ⁷⁸Se/⁸⁰Se
+        'Se80_Se82': (1.9960, 2.0000),    # ⁸⁰Se/⁸²Se
+        'K39_K41':   (1.9980, 2.0020),    # ³⁹K/⁴¹K (加合物)
     }
     for name, (lo, hi) in sorted(ISOTOPE_PATTERNS.items()):
         rules.append(ChemRule(name=f'ISO:{name}', category='ISO',
@@ -170,8 +256,9 @@ class ChemicalRuleEngine(nn.Module):
         n_rules = len(self.rules)
 
         # ---- 逐规则独立可学习权重（v3 核心） ----
-        # softplus(-3.0) ≈ 0.0486 → 初始权重约 0.05
-        self.rule_weights_raw = nn.Parameter(torch.full((n_rules,), -3.0))
+        # softplus(0.0) ≈ 0.693 → 初始权重约 0.69（足够影响 softmax 决策）
+        # 之前的 -3.0 → 0.05 太小，预训练模型的注意力 logits 完全不变 → grad=0
+        self.rule_weights_raw = nn.Parameter(torch.full((n_rules,), 0.0))
 
         # ---- 预计算匹配目标的 buffer ----
         # mass_diff 类：各规则的目标质量值
@@ -244,6 +331,99 @@ class ChemicalRuleEngine(nn.Module):
         return self._last_stats
 
     # =========================================================================
+    # 规则匹配向量 — 用于对比学习（谱图间规则重叠度计算）
+    # =========================================================================
+
+    @torch.no_grad()
+    def get_rule_match_vectors(
+        self,
+        mz_diffs: torch.Tensor,
+        mz_values: Optional[torch.Tensor] = None,
+        precursor_mz: Optional[torch.Tensor] = None,
+        padding_mask: Optional[torch.Tensor] = None,
+        categories: Optional[List[str]] = None,
+    ) -> torch.Tensor:
+        """
+        计算每张谱图中每条规则是否命中（二进制向量），用于谱图间规则重叠度计算。
+
+        参数同 forward()，categories 可筛选规则类别。
+
+        返回：
+            match_vecs: (batch, n_rules) — 每张谱图中每条规则是否至少命中一次
+        """
+        batch, n, _ = mz_diffs.shape
+        device = mz_diffs.device
+
+        if categories is not None:
+            active_cats = set(categories) & self.enabled_categories
+        else:
+            active_cats = self.enabled_categories
+
+        match_vecs = torch.zeros(batch, len(self.rules), device=device)
+
+        # --- mass_diff 规则 ---
+        if len(self.md_targets) > 0 and 'NL' in active_cats:
+            diffs_expanded = mz_diffs.unsqueeze(1)
+            targets = self.md_targets.view(1, -1, 1, 1)
+            match_md = (torch.abs(diffs_expanded - targets) < self.tolerance).any(dim=-1).any(dim=-1)  # (batch, n_md)
+            match_vecs[:, self.md_indices] = match_md.float()
+
+        # --- peak_mz 规则 ---
+        if len(self.pm_targets) > 0 and 'CF' in active_cats:
+            if mz_values is not None:
+                mz_expanded = mz_values.unsqueeze(1)
+                pm_t = self.pm_targets.view(1, -1, 1)
+                match_pm = (torch.abs(mz_expanded - pm_t) < self.tolerance).any(dim=-1)  # (batch, n_pm)
+                match_vecs[:, self.pm_indices] = match_pm.float()
+
+        # --- mass_range 规则 ---
+        if len(self.mr_ranges) > 0 and 'ISO' in active_cats:
+            if padding_mask is not None:
+                valid_mask = (~padding_mask).float().unsqueeze(1).unsqueeze(-1) * \
+                             (~padding_mask).float().unsqueeze(1).unsqueeze(-2)
+            else:
+                valid_mask = torch.ones_like(mz_diffs).unsqueeze(1)
+            diffs_expanded = mz_diffs.unsqueeze(1)
+            lo = self.mr_ranges[:, 0].view(1, -1, 1, 1)
+            hi = self.mr_ranges[:, 1].view(1, -1, 1, 1)
+            match_mr = ((diffs_expanded >= lo) & (diffs_expanded <= hi) & (valid_mask > 0)).any(dim=-1).any(dim=-1)
+            match_vecs[:, self.mr_indices] = match_mr.float()
+
+        # --- parity 规则 (NR) ---
+        if len(self._parity_rules) > 0 and 'NR' in active_cats:
+            if precursor_mz is not None:
+                prec_parity = (precursor_mz.round().long() % 2).view(-1, 1, 1, 1).float()
+                diff_parity = (mz_diffs.round().long() % 2).unsqueeze(1).float()
+                consistent = (prec_parity == diff_parity).any(dim=-1).any(dim=-1)  # (batch, 1)
+                for j, (idx, _) in enumerate(self._parity_rules):
+                    match_vecs[:, idx] = consistent[:, 0].float()
+
+        # --- mass_diff_range 规则 (EE) ---
+        if len(self._mass_diff_range_rules) > 0 and 'EE' in active_cats:
+            lo_val, hi_val = self._mass_diff_range_rules[0][1].value
+            not_too_small = ((mz_diffs > hi_val) | (mz_diffs < lo_val)).any(dim=-1).any(dim=-1)  # (batch,)
+            for j, (idx, _) in enumerate(self._mass_diff_range_rules):
+                match_vecs[:, idx] = not_too_small.float()
+
+        return match_vecs
+
+    @staticmethod
+    def compute_rule_overlap(match_vecs_A: torch.Tensor, match_vecs_B: torch.Tensor) -> torch.Tensor:
+        """
+        计算两张（或多张）谱图之间的规则 Jaccard 重叠度。
+
+        参数：
+            match_vecs_A: (n_rules,) 或 (batch, n_rules)
+            match_vecs_B: (n_rules,) 或 (batch, n_rules)
+
+        返回：
+            overlap: 标量或 (batch,) — Jaccard 相似度 [0, 1]
+        """
+        intersection = (match_vecs_A * match_vecs_B).sum(dim=-1).float()
+        union = ((match_vecs_A + match_vecs_B) > 0).float().sum(dim=-1)
+        return intersection / union.clamp(min=1)
+
+    # =========================================================================
     # 前向传播
     # =========================================================================
 
@@ -253,6 +433,7 @@ class ChemicalRuleEngine(nn.Module):
         mz_values: Optional[torch.Tensor] = None,
         precursor_mz: Optional[torch.Tensor] = None,
         padding_mask: Optional[torch.Tensor] = None,
+        categories: Optional[List[str]] = None,
     ) -> torch.Tensor:
         """
         计算化学感知注意力偏置矩阵（v3 奖励式 + 逐规则权重）
@@ -272,6 +453,12 @@ class ChemicalRuleEngine(nn.Module):
         # ---- 有效权重（softplus 保持非负） ----
         w = F.softplus(self.rule_weights_raw)  # (n_rules,)
 
+        # ---- 类别过滤：None = 所有启用类别 ----
+        if categories is not None:
+            active_cats = set(categories) & self.enabled_categories
+        else:
+            active_cats = self.enabled_categories
+
         # ---- 初始化：全零（不惩罚任何峰对） ----
         chem_bias = torch.zeros(batch, 1, n, n, device=device, dtype=torch.float32)
         self._last_stats = {}
@@ -280,7 +467,7 @@ class ChemicalRuleEngine(nn.Module):
         # =================================================================
         # mass_diff 类规则（中性丢失）：批量检查 |mz_diff - target| < tol
         # =================================================================
-        if len(self.md_targets) > 0:
+        if len(self.md_targets) > 0 and 'NL' in active_cats:
             # mz_diffs: (batch, n, n), md_targets: (n_md,)
             # → match: (batch, n_md, n, n)
             diffs_expanded = mz_diffs.unsqueeze(1)  # (batch, 1, n, n)
@@ -312,7 +499,7 @@ class ChemicalRuleEngine(nn.Module):
         # peak_mz 类规则（特征碎片）：检查 |peak_mz - target| < tol
         # 匹配的峰 → 其所在行和列全部加分
         # =================================================================
-        if len(self.pm_targets) > 0 and mz_values is not None:
+        if len(self.pm_targets) > 0 and mz_values is not None and 'CF' in active_cats:
             # mz_values: (batch, n), pm_targets: (n_pm,)
             # → is_frag: (batch, n_pm, n) — 每个峰是否匹配每个碎片规则
             mz_expanded = mz_values.unsqueeze(1)  # (batch, 1, n)
@@ -335,7 +522,7 @@ class ChemicalRuleEngine(nn.Module):
         # =================================================================
         # mass_range 类规则（同位素）：检查 mz_diff ∈ [lo, hi]
         # =================================================================
-        if len(self.mr_ranges) > 0:
+        if len(self.mr_ranges) > 0 and 'ISO' in active_cats:
             # mr_ranges: (n_mr, 2), mz_diffs: (batch, n, n)
             diffs_expanded = mz_diffs.unsqueeze(1)  # (batch, 1, n, n)
             lo = self.mr_ranges[:, 0].view(1, -1, 1, 1)  # (1, n_mr, 1, 1)
@@ -352,7 +539,7 @@ class ChemicalRuleEngine(nn.Module):
         # =================================================================
         # parity 类规则（氮规则）：奇偶一致性 → 加分
         # =================================================================
-        if len(self._parity_rules) > 0 and precursor_mz is not None:
+        if len(self._parity_rules) > 0 and precursor_mz is not None and 'NR' in active_cats:
             for idx, rule in self._parity_rules:
                 prec_parity = (precursor_mz.round().long() % 2).view(-1, 1, 1, 1).float()
                 diff_parity = (mz_diffs.round().long() % 2).unsqueeze(1).float()
@@ -363,7 +550,7 @@ class ChemicalRuleEngine(nn.Module):
         # =================================================================
         # mass_diff_range 类规则（偶电子）：质量差不在"太小但不为零"范围 → 加分
         # =================================================================
-        if len(self._mass_diff_range_rules) > 0:
+        if len(self._mass_diff_range_rules) > 0 and 'EE' in active_cats:
             for idx, rule in self._mass_diff_range_rules:
                 lo, hi = rule.value
                 not_too_small = ((mz_diffs > hi) | (mz_diffs < lo)).float().unsqueeze(1)

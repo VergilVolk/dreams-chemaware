@@ -222,6 +222,32 @@ def train_chem_aware(
                 spec_real = spec_real.to(device)
                 mask = mask.to(device)
 
+            # ---- [有限差分测试] step0 验证 rule_weights 对 loss 是否有因果影响 ----
+            if global_step == 0:
+                print('[FINITE DIFF] Testing if rule_weights affect loss...')
+                with torch.no_grad():
+                    orig_raw = model.chem_rule_engine.rule_weights_raw.clone()
+                    orig_w = model.chem_rule_engine.get_rule_weights().clone()
+
+                    # 权重→0（softplus(-100)≈0，即无化学偏置）
+                    model.chem_rule_engine.rule_weights_raw.fill_(-100.0)
+                    loss0 = model.spec_ssl_step(spec, spec_real, mask, charge)[0].sum().item()
+
+                    # 权重→大值（softplus(10)≈10，即强化化学偏置）
+                    model.chem_rule_engine.rule_weights_raw.fill_(10.0)
+                    loss10 = model.spec_ssl_step(spec, spec_real, mask, charge)[0].sum().item()
+
+                    # 恢复
+                    model.chem_rule_engine.rule_weights_raw.copy_(orig_raw)
+
+                diff = loss10 - loss0
+                print(f'[FINITE DIFF] loss(weights→0)={loss0:.6f}  loss(weights→10)={loss10:.6f}  diff={diff:.6f}')
+                if abs(diff) < 1e-5:
+                    print('[FINITE DIFF] *** FAIL: rule_weights 对 loss 无因果影响! chem_bias 未到达 loss! ***')
+                else:
+                    print(f'[FINITE DIFF] PASS: rule_weights 影响 loss，diff={diff:.6f}，梯度应能回传')
+                print()
+
             # ---- 前向传播 ----
             loss, embs, pred_mz, real_mz = model.spec_ssl_step(
                 spec, spec_real, mask, charge
@@ -235,10 +261,26 @@ def train_chem_aware(
             # [DEBUG] 诊断梯度是否到达 rule_weights_raw
             if global_step < 5:
                 rw_param = model.chem_rule_engine.rule_weights_raw
+                scale_param = model.chem_residual_scale
                 print(f'[DEBUG step {global_step}] rule_weights_raw.grad is None: {rw_param.grad is None}')
+                print(f'[DEBUG step {global_step}] chem_residual_scale={scale_param.item():.4f}')
+                # 诊断：逐级检查中间张量梯度
+                ctx = getattr(model, '_diag_chem_context', None)
+                cw2 = getattr(model, '_diag_cw2', None)
+                if cw2 is not None:
+                    g2 = cw2.grad
+                    print(f'[DEBUG step {global_step}] cw2.grad is None: {g2 is None}')
+                    if g2 is not None:
+                        print(f'[DEBUG step {global_step}] cw2.grad norm: {g2.norm().item():.6f}')
+                    else:
+                        print(f'[DEBUG step {global_step}] *** cw2 has NO grad — 断在 bmm→cw2 ***')
+                if ctx is not None:
+                    gctx = ctx.grad
+                    print(f'[DEBUG step {global_step}] chem_context.grad norm: {gctx.norm().item() if gctx is not None else 0:.6f}')
                 if rw_param.grad is not None:
                     print(f'[DEBUG step {global_step}] grad norm: {rw_param.grad.norm().item():.6f}')
                     print(f'[DEBUG step {global_step}] grad abs sum: {rw_param.grad.abs().sum().item():.6f}')
+                    print(f'[DEBUG step {global_step}] scale grad: {scale_param.grad.item() if scale_param.grad is not None else 0:.6f}')
                     # 打印前5个有梯度的规则
                     grad_abs = rw_param.grad.abs()
                     top5 = grad_abs.topk(min(5, len(grad_abs)))
@@ -285,7 +327,7 @@ def train_chem_aware(
                 print(f'   [Checkpoint] Step {global_step} saved to {ckpt_path}')
 
             if batch_idx % 10 == 0:
-                # 每 10 步打印摘要：top-3 最高权重 + 平均值
+                # 每 10 步打印摘要：top-3 最高权重 + scale + 平均值
                 rw_np = rw.cpu().numpy()
                 top3_idx = np.argsort(rw_np)[-3:][::-1]
                 bot3_idx = np.argsort(rw_np)[:3]
@@ -293,8 +335,9 @@ def train_chem_aware(
                                     for i in top3_idx)
                 bot_str = ' | '.join(f'{rule_names[i].split(":")[-1]}={rw_np[i]:.3f}'
                                     for i in bot3_idx)
+                scale_val = model.chem_residual_scale.item()
                 print(f'   Epoch {epoch+1}/{epochs} | Step {batch_idx} | '
-                      f'mask_loss={loss_mask.item():.4f} | '
+                      f'mask_loss={loss_mask.item():.4f} | scale={scale_val:.3f} | '
                       f'avg_w={rw_np.mean():.4f} | '
                       f'top:[{top_str}] | bot:[{bot_str}]')
 

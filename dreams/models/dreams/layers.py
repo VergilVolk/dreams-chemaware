@@ -149,19 +149,7 @@ class MultiheadAttention(nn.Module):
                 att_bias = graphormer_dists.sum(dim=-1).unsqueeze(1)
             att_weights = att_weights + att_bias
 
-        # --- [模块一 新增] 化学感知规则偏置（来自模块 B：ChemicalRuleEngine） ---
-        if chem_bias is not None:
-            # [DEBUG v3] 验证 chem_bias 是否进入计算图
-            if not hasattr(MultiheadAttention, '_debug_chem_count'):
-                MultiheadAttention._debug_chem_count = 0
-            if MultiheadAttention._debug_chem_count < 3:
-                MultiheadAttention._debug_chem_count += 1
-                print(f'[attn debug {MultiheadAttention._debug_chem_count}] '
-                      f'chem_bias requires_grad={chem_bias.requires_grad}, '
-                      f'sum={chem_bias.sum().item():.4f}, grad_fn={chem_bias.grad_fn}')
-            att_weights = att_weights + chem_bias
-
-        # --- [模块一 新增] 注意力头门控权重（来自模块 A：HeadGatingNetwork） ---
+        # --- [模块一 遗留] 注意力头门控权重（v3 不再使用） ---
         if gate_weights is not None:
             # gate_weights: (bs, n_heads) -> (bs, n_heads, 1, 1) 广播到 (n, n) 维度
             att_weights = att_weights * gate_weights.unsqueeze(-1).unsqueeze(-1)
