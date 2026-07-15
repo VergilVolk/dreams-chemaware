@@ -73,7 +73,7 @@ class ChemAwareDreaMS(DreaMS):
         if self.chem_attn_enabled:
             self.chem_rule_engine = ChemicalRuleEngine(
                 tolerance=self.chem_attn_tolerance,
-                enable_categories=None  # 全部 5 类（127 条规则）都注册为可训练参数
+                enable_categories=None  # 全部 6 类启用（NL/CF/ISO/NR/EE/HR）
             )
             # 化学残差的全局缩放因子（可学习，初始 1.0）
             self.chem_residual_scale = nn.Parameter(torch.tensor(1.0))

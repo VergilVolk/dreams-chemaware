@@ -1,36 +1,45 @@
 """
-化学规则引擎 (Chemical Rule Engine) — 模块 B [v3 逐规则向量版]
+化学规则引擎 (Chemical Rule Engine) — 模块 B [v4(0715) 规则库扩展版]
 
-核心改动（v2 → v3）：
-  1. 惩罚 → 奖励：默认 bias = 0（不惩罚任何峰对），匹配规则 → 加正向偏置
-  2. 标量 λ → 逐规则向量：每条具体规则一个独立可学习参数（~55 条规则 ~55 个权重）
-     - H₂O 丢失和 CO 丢失不再被迫共用一个权重
-     - 好规则自动涨，坏规则自动降到 0，互不拖累
-  3. Softplus 参数化：权重天然非负，梯度处处可导
-  4. 配合"仅最后一层注入"策略，消除跨层复合放大
+核心改动（v3 → v4(0715)，任务一 P0 立即注入高可信规则）：
+  1. 规则库从 127 条扩展至 ~335 条，并入三个高可信规则源：
+     - CompMS2Miner 子结构库（Neut.loss → NL，frag → CF）
+     - MS-FINDER 9 条氢重排规则（新建 HR 类别）
+     - ESI(+) 常见官能团碎裂规则（教科书/经验）
+  2. 规则数据外置到 chem_rules_data.json（数据与代码分离，每条带 source 溯源）；
+     _build_rule_list() 优先加载 JSON，缺失时回退到内联基线 127 条。
+  3. 新增 HR 类别（match_type='hr_shift'）：编码氢重排数 n_H，
+     n_H≠0 匹配"相差 |n_H| 个氢"的峰对，n_H=0 匹配近整数质量差（偶电子规范断裂）。
 
-规则清单（~55 条）：
-  - 28 条中性丢失（H₂O, NH₃, CO, CO₂, CH₃OH, ...）
-  - 22 条特征碎片离子（苯基, tropylium, immoniums, 糖碎片...）
-  - 3 条同位素模式（Cl, Br, S 的 M/M+2）
-  - 1 条氮规则
-  - 1 条偶电子规则
+继承自 v3 的设计（不变）：
+  - 惩罚 → 奖励：默认 bias = 0，匹配规则 → 加正向偏置
+  - 逐规则独立可学习权重（softplus 参数化，天然非负）
+  - 规则库覆盖到的 → 加分；没覆盖到的 → 不扣分（保持 DreaMS 注意力自由）
+  - 每条规则独立学习 → 训练完打印"哪些规则有用/没用"即是科学发现
 
-设计原则：
-  - 规则库覆盖到的 → 加分（模型可学习该规则是否可靠）
-  - 规则库没覆盖到的 → 不扣分（保持 DreaMS 原有注意力自由）
-  - 每条规则独立学习 → 训练完打印"哪些规则有用/没用"本身就是有意义的科学发现
+规则类别：NL（中性丢失）| CF（特征碎片）| ISO（同位素）| NR（氮规则）
+          | EE（偶电子）| HR（氢重排，v4(0715) 新增）
 
 参考资料：
   - McLafferty, F. W. "Interpretation of Mass Spectra", 4th ed.
   - Kind, T. & Fiehn, O. "Seven Golden Rules" (2007)
+  - Tsugawa et al. "Hydrogen Rearrangement Rules", Anal. Chem. 2016 (MS-FINDER)
+  - compMS2Miner R package (Substructure_masses)
 """
 
+import json
+import os
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from typing import Optional, Dict, List, Tuple, Set
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+
+# 氢原子单同位素质量 (Da)，用于 HR 氢重排规则的质量偏移计算
+M_H = 1.0078250319
+
+# 规则库 JSON 路径（与本文件同目录）
+_RULES_JSON = os.path.join(os.path.dirname(os.path.abspath(__file__)), "chem_rules_data.json")
 
 
 # ==============================================================================
@@ -40,14 +49,57 @@ from dataclasses import dataclass
 @dataclass
 class ChemRule:
     """单条化学规则"""
-    name: str           # 人类可读名称，如 'NL:H2O', 'CF:tropylium'
-    category: str       # 'NL' | 'CF' | 'ISO' | 'NR' | 'EE'
-    match_type: str     # 'mass_diff' | 'peak_mz' | 'mass_range' | 'parity' | 'mass_diff_range'
-    value: float | Tuple[float, float]  # 匹配目标值
+    name: str           # 人类可读名称，如 'NL:H2O', 'CF:tropylium', 'HR:P2_pos'
+    category: str       # 'NL' | 'CF' | 'ISO' | 'NR' | 'EE' | 'HR'
+    match_type: str     # 'mass_diff' | 'peak_mz' | 'mass_range' | 'parity' | 'mass_diff_range' | 'hr_shift'
+    value: float | Tuple[float, float]  # 匹配目标值（HR 规则：带符号氢重排数 n_H）
+    source: str = ""    # 规则来源（溯源用），如 'CompMS2Miner', 'Tsugawa 2016'
+    meta: dict = field(default_factory=dict)  # 额外元信息（formula, mode, desc...）
 
 
 def _build_rule_list() -> List[ChemRule]:
-    """从知识库构建完整的规则列表"""
+    """构建完整规则列表。
+
+    优先从同目录 chem_rules_data.json 加载（任务一 P0 产出的扩展规则库，~335 条，
+    含来源溯源）；若 JSON 缺失或损坏，则回退到内联基线规则（127 条），
+    保证引擎在任何环境下都能实例化。
+    """
+    rules = _load_rules_from_json()
+    if rules:
+        return rules
+    print(f"[chem_rules] 未找到/无法加载 {os.path.basename(_RULES_JSON)}，回退到内联基线 127 条规则")
+    return _build_baseline_rules()
+
+
+def _load_rules_from_json() -> List[ChemRule]:
+    """从 chem_rules_data.json 加载规则；失败返回空列表。"""
+    if not os.path.exists(_RULES_JSON):
+        return []
+    try:
+        with open(_RULES_JSON, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except (OSError, json.JSONDecodeError) as e:
+        print(f"[chem_rules] 加载 {os.path.basename(_RULES_JSON)} 失败: {e}")
+        return []
+
+    rules: List[ChemRule] = []
+    for r in data.get("rules", []):
+        val = r["value"]
+        # mass_range 的 value 是 [lo, hi] → 转 tuple；其余为 float
+        if isinstance(val, list):
+            val = tuple(float(x) for x in val)
+        else:
+            val = float(val)
+        meta = {k: r[k] for k in ("formula", "mode", "atom", "n_H", "desc",
+                                  "target_mass_diff", "ref") if k in r}
+        rules.append(ChemRule(name=r["name"], category=r["category"],
+                              match_type=r["match_type"], value=val,
+                              source=r.get("source", ""), meta=meta))
+    return rules
+
+
+def _build_baseline_rules() -> List[ChemRule]:
+    """内联基线规则（127 条），作为 JSON 缺失时的回退。"""
     rules = []
 
     # --- 中性丢失 (mass_diff) ---
@@ -210,8 +262,8 @@ class ChemicalRuleEngine(nn.Module):
             None = 全部启用。可选值: 'NL', 'CF', 'ISO', 'NR', 'EE'
     """
 
-    # 类别名称
-    CATEGORY_NAMES = ['NL', 'CF', 'ISO', 'NR', 'EE']
+    # 类别名称（v4(0715) 新增 HR — 氢重排规则）
+    CATEGORY_NAMES = ['NL', 'CF', 'ISO', 'NR', 'EE', 'HR']
 
     def __init__(
         self,
@@ -240,6 +292,7 @@ class ChemicalRuleEngine(nn.Module):
         self._mass_range_rules: List[Tuple[int, ChemRule]] = []
         self._parity_rules: List[Tuple[int, ChemRule]] = []
         self._mass_diff_range_rules: List[Tuple[int, ChemRule]] = []
+        self._hr_rules: List[Tuple[int, ChemRule]] = []          # v4(0715): 氢重排规则
 
         for idx, rule in enumerate(self.rules):
             if rule.match_type == 'mass_diff':
@@ -252,6 +305,8 @@ class ChemicalRuleEngine(nn.Module):
                 self._parity_rules.append((idx, rule))
             elif rule.match_type == 'mass_diff_range':
                 self._mass_diff_range_rules.append((idx, rule))
+            elif rule.match_type == 'hr_shift':
+                self._hr_rules.append((idx, rule))
 
         n_rules = len(self.rules)
 
@@ -290,6 +345,21 @@ class ChemicalRuleEngine(nn.Module):
         else:
             self.register_buffer('mr_indices', torch.tensor([], dtype=torch.long))
             self.register_buffer('mr_ranges', torch.tensor([], dtype=torch.float32).reshape(0, 2))
+
+        # hr_shift 类（v4(0715) 氢重排）：value 存带符号氢重排数 n_H
+        #   - hr_targets = |n_H| × M_H（n_H≠0 时匹配"相差 n 个氢"的峰对）
+        #   - hr_is_zero = (n_H == 0)（匹配近整数质量差 = 偶电子规范断裂）
+        if self._hr_rules:
+            hr_indices, hr_rules = zip(*self._hr_rules)
+            self.register_buffer('hr_indices', torch.tensor(hr_indices, dtype=torch.long))
+            self.register_buffer('hr_targets', torch.tensor(
+                [abs(float(r.value)) * M_H for r in hr_rules], dtype=torch.float32))
+            self.register_buffer('hr_is_zero', torch.tensor(
+                [float(r.value) == 0.0 for r in hr_rules], dtype=torch.bool))
+        else:
+            self.register_buffer('hr_indices', torch.tensor([], dtype=torch.long))
+            self.register_buffer('hr_targets', torch.tensor([], dtype=torch.float32))
+            self.register_buffer('hr_is_zero', torch.tensor([], dtype=torch.bool))
 
         # ---- 缓存 ----
         self._last_stats: Dict[str, float] = {}
@@ -404,6 +474,18 @@ class ChemicalRuleEngine(nn.Module):
             not_too_small = ((mz_diffs > hi_val) | (mz_diffs < lo_val)).any(dim=-1).any(dim=-1)  # (batch,)
             for j, (idx, _) in enumerate(self._mass_diff_range_rules):
                 match_vecs[:, idx] = not_too_small.float()
+
+        # --- hr_shift 规则 (HR, v4(0715)) ---
+        if len(self.hr_indices) > 0 and 'HR' in active_cats:
+            diffs_expanded = mz_diffs.unsqueeze(1)                     # (batch, 1, n, n)
+            tgt = self.hr_targets.view(1, -1, 1, 1)
+            match_nonzero = (torch.abs(diffs_expanded - tgt) < self.tolerance)
+            near_int = ((torch.abs(mz_diffs - mz_diffs.round()) < self.tolerance)
+                        & (mz_diffs >= 12.0)).unsqueeze(1)
+            is_zero = self.hr_is_zero.view(1, -1, 1, 1)
+            match_hr = torch.where(is_zero, near_int.expand_as(match_nonzero),
+                                   match_nonzero).any(dim=-1).any(dim=-1)  # (batch, n_hr)
+            match_vecs[:, self.hr_indices] = match_hr.float()
 
         return match_vecs
 
@@ -557,6 +639,31 @@ class ChemicalRuleEngine(nn.Module):
                 chem_bias = chem_bias + not_too_small * w[idx]
             self._last_stats['mass_diff_range_frac'] = not_too_small.float().mean().item() if 'not_too_small' in dir() else 0.0
 
+        # =================================================================
+        # hr_shift 类规则（v4(0715) 氢重排，MS-FINDER 9 条 HR 规则）
+        #   n_H≠0 → 峰对质量差 ≈ |n_H|×M_H（相差 n 个氢的碎片对）→ 加分
+        #   n_H=0 → 峰对质量差接近整数（偶电子规范断裂、无净氢重排）→ 加分
+        # =================================================================
+        if len(self.hr_indices) > 0 and 'HR' in active_cats:
+            diffs_expanded = mz_diffs.unsqueeze(1)                     # (batch, 1, n, n)
+            # 非零氢重排：|d - |n_H|×M_H| < tol
+            tgt = self.hr_targets.view(1, -1, 1, 1)                    # (1, n_hr, 1, 1)
+            match_nonzero = (torch.abs(diffs_expanded - tgt) < self.tolerance)
+            # 零氢重排：|d - round(d)| < tol 且 d ≥ 12（含碳骨架断裂，
+            # nominal ≥ C 原子质量；排除对角线及 ±1H/±2H 纯氢簇的重叠）
+            near_int = ((torch.abs(mz_diffs - mz_diffs.round()) < self.tolerance)
+                        & (mz_diffs >= 12.0)).unsqueeze(1)             # (batch, 1, n, n)
+            is_zero = self.hr_is_zero.view(1, -1, 1, 1)                # (1, n_hr, 1, 1)
+            match_hr = torch.where(is_zero, near_int.expand_as(match_nonzero),
+                                   match_nonzero).float()
+
+            w_hr = w[self.hr_indices]                                  # (n_hr,)
+            bias_hr = (match_hr * w_hr.view(1, -1, 1, 1)).sum(dim=1, keepdim=True)
+            chem_bias = chem_bias + bias_hr
+
+            n_hr_hits = match_hr.sum().item()
+            self._last_stats['hr_shift_hits'] = n_hr_hits / max(1, batch * n * n * len(self.hr_indices))
+
         # ---- Padding 位清零 ----
         if padding_mask is not None:
             pad_mat = (~padding_mask).float().unsqueeze(1).unsqueeze(-1) * \
@@ -589,4 +696,13 @@ class ChemicalRuleEngine(nn.Module):
                 lo, hi = rule.value
                 if lo <= mz_diff <= hi:
                     matched.append(rule.name)
+            elif rule.match_type == 'hr_shift':
+                n_h = float(rule.value)
+                if n_h == 0.0:
+                    # 零氢重排：近整数质量差（偶电子规范断裂，含碳骨架 nominal≥12）
+                    if mz_diff >= 12.0 and abs(mz_diff - round(mz_diff)) < self.tolerance:
+                        matched.append(rule.name)
+                else:
+                    if abs(mz_diff - abs(n_h) * M_H) < self.tolerance:
+                        matched.append(rule.name)
         return matched

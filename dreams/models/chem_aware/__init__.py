@@ -6,7 +6,7 @@
   - ChemAwareDreaMS v3：继承 DreaMS，仅最后一层注入化学偏置，避免跨层复合
 
 组件清单：
-  chem_rules.py          — ChemicalRuleEngine v3：5 维化学规则 → 注意力奖励偏置
+  chem_rules.py          — ChemicalRuleEngine v4(0715)：6 类化学规则（NL/CF/ISO/NR/EE/HR，~335 条）→ 注意力奖励偏置
   chem_aware_dreams.py   — ChemAwareDreaMS v3：简化主模型（最后一层注入）
   gating.py              — [遗留] HeadGatingNetwork 等（v3 不再使用，保留供参考）
   losses.py              — [遗留] 协同/对抗损失函数（v3 不再使用，保留供参考）
