@@ -2,7 +2,7 @@
 #SBATCH --gpus=1
 #SBATCH -o triplet_%j.out
 #SBATCH -e triplet_%j.err
-#SBATCH -t 08:00:00
+#SBATCH -t 02:00:00
 
 export PYTHONUNBUFFERED=1
 export PYTHONIOENCODING=utf-8
@@ -43,6 +43,12 @@ python -u -m dreams.models.chem_aware.train_contrastive_v5 \
     --auc_monitor_steps 500 \
     --auc_n_spectra 500 \
     --auc_n_pairs 2000 \
-    --overlap_categories "NL,CF,ISO,HR"
+    --overlap_categories "NL,CF,ISO,HR" \
+    --ckpt_every 2000
 
 echo "===== Job finished at $(date) ====="
+echo ""
+echo "Resume instructions:"
+echo "  If killed by timeout, resubmit with:"
+echo "  --resume_from ./contrastive_checkpoints_v5_triplet/contrastive_v5_epochN.pt"
+echo "  (or step_XXXXX.pt for mid-epoch resume)"

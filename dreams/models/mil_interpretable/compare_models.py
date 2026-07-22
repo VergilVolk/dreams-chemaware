@@ -167,60 +167,65 @@ def eval_baseline(X, y, folds, valid_pairs):
 
 # ---- MIL training ----
 def train_mil_fold(model, train_bags, train_labels, val_bags, val_labels,
-                   epochs=100, lr=1e-3, patience=20):
-    optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+                   epochs=500, lr=1e-3, patience=50, batch_size=16):
+    # 用 DataLoader 加速数据迭代
+    from torch.utils.data import DataLoader
+    train_data = list(zip(train_bags, train_labels))
+    dl = DataLoader(train_data, batch_size=batch_size, shuffle=True,
+                    num_workers=0, collate_fn=lambda b: (list(zip(*b))[0], list(zip(*b))[1]))
+
+    optimizer = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=1e-4)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+        optimizer, mode='max', factor=0.5, patience=20)
     best_r, best_state, counter = 0.0, None, 0
 
     for epoch in range(epochs):
         model.train()
         total_loss, n = 0.0, 0
-        for bag, label in zip(train_bags, train_labels):
-            if bag.shape[0] == 0:
-                continue
-            pred, _ = model(bag)
-            loss = F.mse_loss(pred, torch.tensor(label, dtype=torch.float32).unsqueeze(0))
-            loss.backward()
-            total_loss += loss.item()
-            n += 1
-        if n > 0:
-            optimizer.step()
-            optimizer.zero_grad()
+        for bags, labels in dl:
+            batch_loss = None
+            for bag, label in zip(bags, labels):
+                if bag.shape[0] == 0: continue
+                pred, attn = model(bag)
+                loss_mse = F.mse_loss(pred, torch.tensor(label, dtype=torch.float32).unsqueeze(0))
+                if len(attn) > 1:
+                    attn_c = attn.clamp(min=1e-8)
+                    loss_ent = -(attn_c * torch.log(attn_c)).sum() / attn.size(0)
+                    loss_mse = loss_mse + 0.01 * loss_ent
+                batch_loss = loss_mse if batch_loss is None else batch_loss + loss_mse
+                total_loss += loss_mse.item(); n += 1
+            if batch_loss is not None:
+                batch_loss.backward()
+            optimizer.step(); optimizer.zero_grad()
 
         # Evaluate
         model.eval()
         preds, trues = [], []
         with torch.no_grad():
             for bag, label in zip(val_bags, val_labels):
-                if bag.shape[0] == 0:
-                    preds.append(0.0)
-                else:
-                    p, _ = model(bag)
-                    preds.append(p.item())
+                if bag.shape[0] == 0: preds.append(0.0)
+                else: p, _ = model(bag); preds.append(p.item())
                 trues.append(label.item())
         r, _ = pearsonr(preds, trues)
         r = max(r, 0.0)
+        scheduler.step(r)
+
+        if epoch % 20 == 0:
+            print(f'     ep {epoch:3d}: loss={total_loss/max(n,1):.4f}  val_r={r:.4f}  best={best_r:.4f}')
 
         if r > best_r:
-            best_r = r
-            best_state = {k: v.clone() for k, v in model.state_dict().items()}
-            counter = 0
+            best_r = r; best_state = {k: v.clone() for k, v in model.state_dict().items()}; counter = 0
         else:
             counter += 1
-            if counter >= patience:
-                break
+            if counter >= patience: break
 
-    if best_state:
-        model.load_state_dict(best_state)
-    # Final test r on val set
+    if best_state: model.load_state_dict(best_state)
     model.eval()
     preds, trues = [], []
     with torch.no_grad():
         for bag, label in zip(val_bags, val_labels):
-            if bag.shape[0] == 0:
-                preds.append(0.0)
-            else:
-                p, _ = model(bag)
-                preds.append(p.item())
+            if bag.shape[0] == 0: preds.append(0.0)
+            else: p, _ = model(bag); preds.append(p.item())
             trues.append(label.item())
     r, _ = pearsonr(preds, trues)
     return max(r, 0.0)
@@ -238,7 +243,7 @@ def eval_mil(instances_list, labels, folds, valid_pairs, epochs=100, lr=1e-3, pa
         val_bags = [instances_list[i] for i in va]
         val_labels = [labels[i] for i in va]
 
-        model = RuleAttentionMIL(instance_dim=12, hidden_dim=32)
+        model = RuleAttentionMIL(instance_dim=12, hidden_dim=64)
         r = train_mil_fold(model, train_bags, train_labels, val_bags, val_labels,
                            epochs=epochs, lr=lr, patience=patience)
         rs.append(r)

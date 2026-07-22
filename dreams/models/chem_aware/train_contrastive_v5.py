@@ -119,6 +119,10 @@ def parse_args():
 
     # 保存
     p.add_argument('--save_dir', type=str, default='./contrastive_checkpoints_v5')
+    p.add_argument('--resume_from', type=str, default=None,
+                   help='Resume from checkpoint path (restores model, optimizer, step)')
+    p.add_argument('--ckpt_every', type=int, default=2000,
+                   help='Save checkpoint every N steps (in addition to per-epoch)')
     p.add_argument('--dry_run', action='store_true')
 
     return p.parse_args()
@@ -262,22 +266,17 @@ def compute_batch_rule_vectors(
     precursor_mzs: torch.Tensor,
     categories: List[str],
 ) -> torch.Tensor:
-    """为一个 batch 的谱图计算规则匹配向量 (batch, n_rules)"""
-    batch_size = specs.shape[0]
-    match_vecs_list = []
+    """为一个 batch 的谱图计算规则匹配向量 (batch, n_rules)
 
-    for b in range(batch_size):
-        mz = specs[b:b+1, :, 0] 
-        pad = padding_masks[b:b+1]
-        prec = precursor_mzs[b:b+1]
-        mz_diffs = ChemicalRuleEngine.compute_peak_pair_mz_diffs(mz)
-        vec = engine.get_rule_match_vectors(
-            mz_diffs, mz_values=mz, precursor_mz=prec,
-            padding_mask=pad, categories=categories
-        )
-        match_vecs_list.append(vec)
-
-    return torch.cat(match_vecs_list, dim=0)  # (batch, n_rules)
+    get_rule_match_vectors 原生支持 batch 输入，一次调用处理整个 batch，
+    无需逐谱图循环（v6 修复：64x 循环 → 1x 批量调用）。
+    """
+    mz = specs[:, :, 0]  # (batch, n)
+    mz_diffs = ChemicalRuleEngine.compute_peak_pair_mz_diffs(mz)  # (batch, n, n)
+    return engine.get_rule_match_vectors(
+        mz_diffs, mz_values=mz, precursor_mz=precursor_mzs,
+        padding_mask=padding_masks, categories=categories
+    )  # (batch, n_rules)
 
 
 # ==============================================================================
@@ -588,6 +587,8 @@ def train_contrastive_v5(
     auc_monitor: Optional[AUCMonitor] = None,
     auc_monitor_steps: int = 500,
     save_dir: Path = Path('./contrastive_checkpoints_v5'),
+    resume_from: Optional[str] = None,   # checkpoint path for resume
+    ckpt_every: int = 2000,              # save step checkpoint every N steps
     device: torch.device = torch.device('cpu'),
 ):
     """
@@ -641,6 +642,20 @@ def train_contrastive_v5(
     global_step = 0
     best_auc = 0.0
     best_ckpt_path = None
+    start_epoch = 0
+
+    # ---- Resume from checkpoint ----
+    if resume_from and Path(resume_from).exists():
+        print(f'\n[Resume] Loading checkpoint: {resume_from}')
+        ckpt = torch.load(resume_from, map_location=device, weights_only=False)
+        model.load_state_dict(ckpt['model_state_dict'])
+        optimizer.load_state_dict(ckpt['optimizer_state_dict'])
+        start_epoch = ckpt['epoch'] + 1  # resume from next epoch
+        global_step = ckpt.get('global_step', 0)
+        best_auc = ckpt.get('best_auc', 0.0)
+        if 'history' in ckpt:
+            history = ckpt['history']
+        print(f'   Resumed: epoch={start_epoch}, step={global_step}, best_auc={best_auc:.4f}')
 
     print(f'\n{"=" * 60}')
     print(f'v5 Training Config:')
@@ -662,7 +677,7 @@ def train_contrastive_v5(
         print(f'  Mixed batches: sorted={sorted_batch_fraction:.0%}, '
               f'random={1-sorted_batch_fraction:.0%}')
 
-    for epoch in range(epochs):
+    for epoch in range(start_epoch, epochs):
         epoch_losses = {'mask': [], 'contra': [], 'preserve': [], 'total': []}
         epoch_n_hard = []
         epoch_n_easy = []
@@ -835,12 +850,10 @@ def train_contrastive_v5(
                 cos_neg = F.cosine_similarity(anchor_emb, neg_emb, dim=-1)
                 sep_pos_neg = (cos_pos.mean() - cos_neg.mean()).item()
 
-                # 规则重叠度（仅用于日志）
-                overlaps_pos = torch.tensor([
-                    ChemicalRuleEngine.compute_rule_overlap(
-                        match_vecs[t[0]], match_vecs[t[1]]
-                    ).item() for t in triplets
-                ], device=device)
+                # 规则重叠度（仅用于日志，批量计算避免 Python 循环）
+                anc_vecs = match_vecs[[t[0] for t in triplets]]  # (n_trip, n_rules)
+                pos_vecs = match_vecs[[t[1] for t in triplets]]
+                overlaps_pos = ChemicalRuleEngine.compute_rule_overlap(anc_vecs, pos_vecs)
                 avg_overlap_hard = overlaps_pos.mean().item()
                 n_triplets_used = len(triplets)
 
@@ -962,6 +975,7 @@ def train_contrastive_v5(
                         'model_state_dict': model.state_dict(),
                         'optimizer_state_dict': optimizer.state_dict(),
                         'history': history,
+                        'best_auc': best_auc,
                         'auc_metrics': metrics,
                     }, best_ckpt_path)
                     print(f'   >>> Best AUC checkpoint: {best_ckpt_path} (AUC={best_auc:.4f})')
@@ -970,6 +984,20 @@ def train_contrastive_v5(
                     print(f'   ⚠ WARNING: AUC={metrics["auc"]:.4f} < 0.65! '
                           f'Possible embedding collapse.')
                 print()
+
+            # ---- 定期 step checkpoint（用于 2h 超时后恢复） ----
+            if ckpt_every > 0 and global_step % ckpt_every == 0:
+                step_ckpt = save_dir / f'step_{global_step}.pt'
+                torch.save({
+                    'epoch': epoch, 'global_step': global_step,
+                    'model_state_dict': model.state_dict(),
+                    'optimizer_state_dict': optimizer.state_dict(),
+                    'history': history, 'best_auc': best_auc,
+                }, step_ckpt)
+                # 只保留最近 3 个 step checkpoint，避免占满磁盘
+                old_ckpts = sorted(save_dir.glob('step_*.pt'))[:-3]
+                for oc in old_ckpts:
+                    oc.unlink(missing_ok=True)
 
         # ================================================================
         # Epoch 总结
@@ -995,9 +1023,11 @@ def train_contrastive_v5(
         ckpt_path = save_dir / f'contrastive_v5_epoch{epoch+1}.pt'
         torch.save({
             'epoch': epoch,
+            'global_step': global_step,
             'model_state_dict': model.state_dict(),
             'optimizer_state_dict': optimizer.state_dict(),
             'history': history,
+            'best_auc': best_auc,
         }, ckpt_path)
         print(f'   Checkpoint saved: {ckpt_path}\n')
 
@@ -1085,6 +1115,7 @@ def main():
         prec_tensor = torch.tensor(dummy_prec, dtype=torch.float32)
         dummy_dataset = TensorDataset(specs_padded, prec_tensor)
         dataloader = DataLoader(dummy_dataset, batch_size=args.batch_size, shuffle=True)
+        dataloader_sorted = None
         auc_monitor = None
         print(f'   Synthetic: {len(dummy_specs)} spectra')
         print(f'   All imports OK, model forward OK, engine OK')
@@ -1180,6 +1211,8 @@ def main():
         auc_monitor=auc_monitor,
         auc_monitor_steps=args.auc_monitor_steps,
         save_dir=Path(args.save_dir),
+        resume_from=args.resume_from,
+        ckpt_every=args.ckpt_every,
         device=device,
     )
 

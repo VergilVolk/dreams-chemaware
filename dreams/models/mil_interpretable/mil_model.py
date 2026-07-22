@@ -30,13 +30,14 @@ class RuleAttentionMIL(nn.Module):
         attn: (n,) — 每条规则的 attention weight
     """
 
-    def __init__(self, instance_dim=12, hidden_dim=32):
+    def __init__(self, instance_dim=12, hidden_dim=64):
         super().__init__()
 
         # 特征提取器
         self.feature_extractor = nn.Sequential(
             nn.Linear(instance_dim, hidden_dim),
             nn.ReLU(),
+            nn.Dropout(0.2),
         )
 
         # Gated attention（两路门控：Tanh + Sigmoid → 逐元素乘）
@@ -49,15 +50,13 @@ class RuleAttentionMIL(nn.Module):
             nn.Sigmoid(),
         )
         self.attn_w = nn.Linear(hidden_dim, 1)
+        self.attn_dropout = nn.Dropout(0.2)  # 注意力 dropout
 
         # 分类器
         self.classifier = nn.Linear(hidden_dim, 1)
 
         # 空 bag 的 embedding（可学习）
         self.no_evidence_embedding = nn.Parameter(torch.zeros(hidden_dim))
-
-        # Temperature scaling 参数（阶段 B 单独训练，阶段 A 冻结）
-        self.log_temperature = nn.Parameter(torch.zeros(1))
 
     def encode_bag(self, instances):
         """
@@ -75,6 +74,7 @@ class RuleAttentionMIL(nn.Module):
 
         h = self.feature_extractor(instances)                       # (n, hidden_dim)
         a_raw = self.attn_w(self.attn_V(h) * self.attn_U(h))        # (n, 1)
+        a_raw = self.attn_dropout(a_raw)                             # attention dropout
         a = torch.softmax(a_raw, dim=0)                              # (n, 1)
         bag_repr = (a * h).sum(dim=0)                                # (hidden_dim,)
         return bag_repr, a.squeeze(-1)
