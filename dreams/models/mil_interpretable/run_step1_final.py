@@ -40,15 +40,18 @@ def main():
     print(f'Output dir: {out_dir}')
 
     print('=' * 60)
-    print('MIL Step 1 FINAL: 500 epochs, 5-fold CV')
+    print('MIL Step 1 FINAL v2: 300 epochs + health monitoring')
     print('=' * 60)
 
-    # ===== 配置 =====
+    # ===== 配置（融合版：版本A的随机性 + 版本B的耐心）=====
     CFG = {
-        'lr': 2e-4, 'weight_decay': 1e-4, 'betas': (0.9, 0.999),
-        'hidden_dim': 64, 'dropout': 0.2, 'entropy_coef': 0.005,
-        'epochs': 500, 'batch_size': 64, 'grad_clip': 1.0,
-        'scheduler_patience': 100, 'scheduler_factor': 0.5, 'min_lr': 1e-6,
+        'lr': 5e-4, 'weight_decay': 1e-3, 'betas': (0.9, 0.999),
+        'hidden_dim': 32, 'dropout': 0.3, 'entropy_coef': 0.02,
+        'epochs': 300, 'batch_size': 32, 'grad_clip': 1.0,
+        'scheduler_patience': 50, 'scheduler_factor': 0.5, 'min_lr': 1e-6,
+        'early_stop_patience': 100,  # 恢复早停，100 epoch 耐心
+        'ori_warn_threshold': 10,     # ORI 连续上升 10 epoch → 预警
+        'decay_warn_threshold': 20,   # val_r 连续不刷新 20 epoch → 预警
         'n_folds': 5, 'n_pairs': 3000, 'seed': 42,
     }
     with open(out_dir / 'config.json', 'w') as f:
@@ -199,6 +202,9 @@ def main():
         logs = []
         best_r, best_state, best_epoch = 0, None, 0
         t0 = time.time()
+        ori_rise_count = 0       # ORI 连续上升计数器
+        decay_count = 0          # 泛化衰退计数器
+        prev_ori = None
 
         for ep in range(CFG['epochs']):
             # Train
@@ -238,11 +244,25 @@ def main():
                 val_r, _ = pearsonr(pr, lb); val_r = max(val_r, 0)
                 val_loss /= max(len(va), 1)
 
+            tl = train_loss/max(n,1)
             lr_now = opt.param_groups[0]['lr']
+
+            # ---- 健康度监控 ----
+            ori = (val_loss - tl) / max(tl, 1e-8)
+            if prev_ori is not None and ori > prev_ori:
+                ori_rise_count += 1
+            else:
+                ori_rise_count = 0
+            prev_ori = ori
+            if val_r < best_r:
+                decay_count += 1
+            else:
+                decay_count = 0
+
             logs.append({
                 'epoch': ep, 'lr': lr_now,
-                'train_loss': train_loss/max(n,1),
-                'val_loss': val_loss, 'val_r': val_r,
+                'train_loss': tl, 'val_loss': val_loss, 'val_r': val_r,
+                'ori': ori, 'ori_rise': ori_rise_count, 'decay': decay_count,
             })
 
             if val_r > best_r:
@@ -251,14 +271,26 @@ def main():
 
             scheduler.step(val_r)
 
-            if ep % 10 == 0 or ep < 10:
+            # 过拟合预警
+            warn = ''
+            if ori_rise_count >= CFG['ori_warn_threshold']:
+                warn += f' [ORI_RISE={ori_rise_count}]'
+            if decay_count >= CFG['decay_warn_threshold']:
+                warn += f' [DECAY={decay_count}]'
+
+            if ep % 10 == 0 or ep < 10 or warn:
                 elapsed = time.time()-t0
                 eta = (elapsed/(ep+1))*(CFG['epochs']-ep-1)
                 print(f'   Fold {k} ep {ep:3d}/{CFG["epochs"]}: '
-                      f'train_loss={logs[-1]["train_loss"]:.4f} '
-                      f'val_loss={val_loss:.4f} val_r={val_r:.4f} '
-                      f'best_r={best_r:.4f}@{best_epoch} '
-                      f'lr={lr_now:.1e} eta={eta/60:.0f}min')
+                      f'train={tl:.4f} val={val_loss:.4f} r={val_r:.4f} '
+                      f'best={best_r:.4f}@{best_epoch} '
+                      f'ORI={ori:.3f} D={decay_count} '
+                      f'lr={lr_now:.1e}{warn} eta={eta/60:.0f}m')
+
+            # 早停
+            if decay_count >= CFG['early_stop_patience']:
+                print(f'   Fold {k}: EARLY STOP at epoch {ep} (decay={decay_count})')
+                break
 
         # Save best model
         if best_state:
