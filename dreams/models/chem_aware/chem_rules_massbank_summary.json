@@ -1,0 +1,28 @@
+{
+  "n_rules": 3151,
+  "by_category": {
+    "NL": 79,
+    "CF": 3072
+  },
+  "by_source": {
+    "MassBank record-derived": 3151
+  },
+  "by_tier": {
+    "extended": 3151
+  },
+  "by_evidence_level": {
+    "medium": 3151
+  },
+  "by_specificity": {
+    "medium": 3151
+  },
+  "by_expected_frequency": {
+    "medium": 3151
+  },
+  "by_recommended_action": {
+    "keep": 3151
+  },
+  "by_enabled_by_default": {
+    "True": 3151
+  }
+}

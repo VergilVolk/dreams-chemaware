@@ -40,6 +40,7 @@ M_H = 1.0078250319
 
 # 规则库 JSON 路径（与本文件同目录）
 _RULES_JSON = os.path.join(os.path.dirname(os.path.abspath(__file__)), "chem_rules_data.json")
+_MASSBANK_RULES_JSON = os.path.join(os.path.dirname(os.path.abspath(__file__)), "chem_rules_massbank.json")
 
 
 # ==============================================================================
@@ -60,14 +61,19 @@ class ChemRule:
 def _build_rule_list() -> List[ChemRule]:
     """构建完整规则列表。
 
-    优先从同目录 chem_rules_data.json 加载（任务一 P0 产出的扩展规则库，~335 条，
-    含来源溯源）；若 JSON 缺失或损坏，则回退到内联基线规则（127 条），
-    保证引擎在任何环境下都能实例化。
+    优先从同目录 chem_rules_data.json / chem_rules_massbank.json 加载扩展规则；
+    若二者都缺失或损坏，则回退到内联基线规则（127 条），保证引擎在任何环境下都能实例化。
     """
     rules = _load_rules_from_json()
     if rules:
-        return rules
-    print(f"[chem_rules] 未找到/无法加载 {os.path.basename(_RULES_JSON)}，回退到内联基线 127 条规则")
+        massbank_rules = _load_massbank_rules_json()
+        if massbank_rules:
+            rules.extend(massbank_rules)
+        return _dedup_rules(rules)
+    massbank_rules = _load_massbank_rules_json()
+    if massbank_rules:
+        return _dedup_rules(massbank_rules)
+    print(f"[chem_rules] 未找到/无法加载 {os.path.basename(_RULES_JSON)} 与 {os.path.basename(_MASSBANK_RULES_JSON)}，回退到内联基线 127 条规则")
     return _build_baseline_rules()
 
 
@@ -82,20 +88,49 @@ def _load_rules_from_json() -> List[ChemRule]:
         print(f"[chem_rules] 加载 {os.path.basename(_RULES_JSON)} 失败: {e}")
         return []
 
+    return _json_to_rules(data)
+
+
+def _load_massbank_rules_json() -> List[ChemRule]:
+    if not os.path.exists(_MASSBANK_RULES_JSON):
+        return []
+    try:
+        with open(_MASSBANK_RULES_JSON, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except (OSError, json.JSONDecodeError) as e:
+        print(f"[chem_rules] 加载 {os.path.basename(_MASSBANK_RULES_JSON)} 失败: {e}")
+        return []
+    return _json_to_rules(data)
+
+
+def _json_to_rules(data) -> List[ChemRule]:
     rules: List[ChemRule] = []
     for r in data.get("rules", []):
         val = r["value"]
-        # mass_range 的 value 是 [lo, hi] → 转 tuple；其余为 float
         if isinstance(val, list):
             val = tuple(float(x) for x in val)
         else:
             val = float(val)
         meta = {k: r[k] for k in ("formula", "mode", "atom", "n_H", "desc",
-                                  "target_mass_diff", "ref") if k in r}
+                                  "target_mass_diff", "ref", "scope", "confidence",
+                                  "notes", "alias_group", "tier", "enabled_by_default",
+                                  "specificity", "expected_frequency", "recommended_action") if k in r}
         rules.append(ChemRule(name=r["name"], category=r["category"],
                               match_type=r["match_type"], value=val,
                               source=r.get("source", ""), meta=meta))
     return rules
+
+
+def _dedup_rules(rules: List[ChemRule]) -> List[ChemRule]:
+    seen = set()
+    out: List[ChemRule] = []
+    for r in rules:
+        key = (r.category, r.match_type, r.name, r.value)
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append(r)
+    return out
 
 
 def _build_baseline_rules() -> List[ChemRule]:

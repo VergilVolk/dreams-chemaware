@@ -1,0 +1,43 @@
+{
+  "purpose": "P1 source manifest",
+  "expected_fields": [
+    "name",
+    "category",
+    "match_type",
+    "value",
+    "mode",
+    "scope",
+    "evidence_level",
+    "support",
+    "confidence",
+    "source",
+    "notes"
+  ],
+  "expected_sources": {
+    "MassBank": [
+      "massbank_rules.csv",
+      "massbank_rules.json",
+      "massbank_rules.tsv"
+    ],
+    "GNPS": [
+      "gnps_rules.csv",
+      "gnps_rules.json",
+      "gnps_rules.tsv"
+    ],
+    "ChemFrag": [
+      "chemfrag_rules.csv",
+      "chemfrag_rules.json",
+      "chemfrag_rules.tsv"
+    ],
+    "CFM-ID": [
+      "cfmid_rules.csv",
+      "cfmid_rules.json",
+      "cfmid_rules.tsv"
+    ]
+  },
+  "notes": [
+    "Put source files here and rerun build_p1_rules.py.",
+    "CSV/TSV files should contain a header row matching the template columns.",
+    "JSON files may be either a list of rule dicts or an object with a 'rules' array."
+  ]
+}
