@@ -184,7 +184,7 @@ def train_one(model, mdl_cfg, tr, va, instances_list, labels, out_dir, fold_idx,
 def main():
     out_dir = Path('outputs')/f'A0123_benchmark_{datetime.now().strftime("%Y%m%d_%H%M%S")}'
     out_dir.mkdir(parents=True,exist_ok=True)
-    N_FOLDS=10; N_TARGET=3000
+    N_FOLDS=10; N_TARGET=4000  # 900 pos + 1800 iso + 1300 easy
     EPOCHS=1500
 
     # Configs — all based on A1, only scheduler differs
@@ -221,14 +221,34 @@ def main():
     MSP_FILES=['data/MassBank_NIST.msp','data/MoNA-export-LC-MS-MS_Spectra.msp',
                'data/MoNA-export-LC-MS-MS_Negative_Mode.msp']
 
-    # ===== 1. Parse =====
-    print('\n[1] Parsing MSP (ALL spectra)...')
+    # ===== 1. Parse ALL 4 databases =====
+    print('\n[1] Parsing ALL databases (MSP + MassSpecGym)...')
     spectra=[]
     for fp in MSP_FILES:
         s=parse_msp(fp,max_spectra=50000)
         print(f'   {fp.replace(chr(92),chr(47)).split(chr(47))[-1]}: {len(s)}')
         spectra.extend(s)
-    print(f'   Total: {len(spectra)}')
+    # Add MassSpecGym
+    import dreams.utils.data as dud
+    msdata=dud.MSData.load('data/MassSpecGym_MurckoHist_split.hdf5')
+    n_msg=min(50000,len(msdata))
+    print(f'   MassSpecGym: reading {n_msg}...')
+    for i in tqdm(range(n_msg),desc='MassSpecGym'):
+        try:
+            smi=msdata.get_values('smiles',i)
+            if isinstance(smi,bytes): smi=smi.decode('utf-8')
+            ik=msdata.get_values('INCHIKEY',i)
+            if isinstance(ik,bytes): ik=ik.decode('utf-8')
+            fm=msdata.get_values('FORMULA',i)
+            if isinstance(fm,bytes): fm=fm.decode('utf-8')
+            pm=msdata.get_values('precursor_mz',i)
+            spec_raw=torch.as_tensor(msdata.get_spectra(i),dtype=torch.float32)
+            peaks=[(float(spec_raw[0,j]),float(spec_raw[1,j])) for j in range(spec_raw.shape[1]) if spec_raw[0,j]>0]
+            spectra.append({'SMILES':str(smi).strip(),'InChIKey':str(ik).strip(),
+                           'PrecursorMZ':float(pm) if pm else 0,'_formula':str(fm).strip(),
+                           'peaks':peaks,'_source':'msg'})
+        except: pass
+    print(f'   Total spectra: {len(spectra)}')
 
     # ===== 2. Filter =====
     print('\n[2] Filtering...')
@@ -268,12 +288,13 @@ def main():
         a,b=rng.choice(multi_ik[ik],2,replace=False)
         pairs.append((a,b)); labels.append(1.0); pair_types.append('pos'); n_pos+=1
         if n_pos>=900: break
+    iso_target=1800  # doubled!
     iso_found=0; iso_fm=Counter(); iso_tans=[]
     for fm in sorted(multi_fm.keys(),key=lambda x:-len(multi_fm[x])):
         idxs=multi_fm[fm]
         if len(idxs)<2: continue
         seen=set()
-        for _ in range(min(50,len(idxs)*3)):
+        for _ in range(min(80,len(idxs)*5)):  # more aggressive search
             a,b=rng.choice(idxs,2,replace=False)
             if valid[a]['InChIKey']==valid[b]['InChIKey']: continue
             pk=(min(a,b),max(a,b))
@@ -282,8 +303,8 @@ def main():
             if 0.3<=tan<=0.9:
                 pairs.append((a,b)); labels.append(tan); pair_types.append('isomer')
                 iso_found+=1; iso_fm[fm]+=1; iso_tans.append(tan)
-            if iso_found>=900: break
-        if iso_found>=900: break
+            if iso_found>=iso_target: break
+        if iso_found>=iso_target: break
     for _ in range(10000):
         a,b=rng.choice(vidx,2,replace=False)
         if valid[a]['InChIKey']==valid[b]['InChIKey']: continue
@@ -301,14 +322,24 @@ def main():
     print(f'  Iso Tanimoto: mean={iso_tans.mean():.4f} std={iso_tans.std():.4f} '
           f'[0.3-0.5):{(iso_tans<0.5).sum()} [0.5-0.7):{((iso_tans>=0.5)&(iso_tans<0.7)).sum()} [0.7-0.9):{(iso_tans>=0.7).sum()}')
     print(f'  Unique iso formulas: {len(iso_fm)}, max/formula={max(iso_fm.values())}')
-    # V2
+    # V2: Weighted Jaccard (L2=4x, L1=2x, L0=1x)
     pos_idx=[i for i,pt in enumerate(pair_types) if pt=='pos'][:100]
-    ovs=[]
+    ovs,ovs_w=[],[]
+    level_weights=np.ones(len(engine.rules),dtype=np.float32)
+    for idx,r in enumerate(engine.rules):
+        if r.category=='HR' or r.category=='ISO': level_weights[idx]=4.0
+        elif r.category in ('NR','EE'): level_weights[idx]=1.0
+        else: level_weights[idx]=2.0
     for pi in pos_idx:
         a,b=pairs[pi]; va,vb=mvs[a],mvs[b]
-        inter=(va*vb).sum().float(); union=((va+vb)>0).float().sum()
+        va_f=va.float(); vb_f=vb.float()
+        inter=(va_f*vb_f).sum(); union=((va_f+vb_f)>0).float().sum()
         ovs.append((inter/union.clamp(min=1)).item())
-    print(f'  Pos Jaccard: mean={np.mean(ovs):.4f} std={np.std(ovs):.4f} min={np.min(ovs):.4f}')
+        w_inter=((va_f*vb_f)*torch.tensor(level_weights)).sum()
+        w_union=(((va_f+vb_f)>0).float()*torch.tensor(level_weights)).sum()
+        ovs_w.append((w_inter/w_union.clamp(min=1)).item())
+    print(f'  Pos Jaccard (equal):  mean={np.mean(ovs):.4f} std={np.std(ovs):.4f}')
+    print(f'  Pos Jaccard (weighted): mean={np.mean(ovs_w):.4f} std={np.std(ovs_w):.4f}')
     # Bag check
     bag_sizes=[((mvs[a]*mvs[b])>0).sum().item() for a,b in pairs]
     r_bag,_=pearsonr(bag_sizes,labels)
