@@ -11,7 +11,8 @@ run_explainability_v0.py — 化学可解释性模块 V0
 import numpy as np
 from pathlib import Path
 from tqdm import tqdm
-import argparse, json, sys
+import argparse, json, sys, warnings
+warnings.filterwarnings('ignore')
 
 
 def parse_args():
@@ -21,32 +22,48 @@ def parse_args():
     p.add_argument('--n_pairs', type=int, default=20)
     p.add_argument('--output_dir', type=str, default='./explainability_output')
     p.add_argument('--ms2deepscore_model', type=str,
-                   default='data/ms2deepscore_model.pt')
+                   default='data/MS2DeepScore_allGNPSpositive_10k_500_500_200.hdf5')
     p.add_argument('--transexion_model', type=str,
                    default='data/TransExION_GNPS_MassBank.ms.model')
     return p.parse_args()
 
 
 def run_ms2deepscore(spectra_list, model_path):
-    """Run MS2DeepScore on a list of matchms Spectrum objects."""
+    """Run MS2DeepScore on spectrum dicts (converted to matchms format)."""
     print('\n' + '=' * 60)
     print('  MS2DeepScore')
     print('=' * 60)
+
+    if not Path(model_path).exists():
+        print(f'  Model not found: {model_path}')
+        return None
+
     try:
         from ms2deepscore.models import load_model
         from ms2deepscore import MS2DeepScore
+        from matchms import Spectrum
         from matchms import calculate_scores
 
-        model = load_model(model_path)
-        ms2ds = MS2DeepScore(model=model)
+        # Convert our dict spectra to matchms Spectrum objects
+        ms_spectra = []
+        for s in spectra_list:
+            mz = np.array([p[0] for p in s.get('peaks', [])], dtype=float)
+            intens = np.array([p[1] for p in s.get('peaks', [])], dtype=float)
+            if len(mz) == 0: continue
+            precursor = float(s.get('PrecursorMZ', 0) or 0)
+            spectrum = Spectrum(mz=mz, intensities=intens,
+                               metadata={'precursor_mz': precursor,
+                                        'precursor_type': s.get('Precursor_type', '[M+H]+')})
+            ms_spectra.append(spectrum)
 
-        # Calculate pairwise similarity matrix
-        scores = calculate_scores(
-            references=spectra_list,
-            queries=spectra_list,
-            similarity_function=ms2ds,
-        )
-        n = len(spectra_list)
+        print(f'  Converted {len(ms_spectra)} spectra to matchms format')
+
+        model = load_model(model_path, allow_legacy=True)
+        ms2ds = MS2DeepScore(model=model)
+        scores = calculate_scores(references=ms_spectra, queries=ms_spectra,
+                                  similarity_function=ms2ds)
+
+        n = len(ms_spectra)
         sim_matrix = np.zeros((n, n))
         for i in range(n):
             for j in range(n):
@@ -58,8 +75,7 @@ def run_ms2deepscore(spectra_list, model_path):
         return sim_matrix
     except Exception as e:
         print(f'  MS2DeepScore error: {e}')
-        print(f'  To use, download model from: https://zenodo.org/records/6339969')
-        print(f'  Then: --ms2deepscore_model path/to/ms2deepscore_model.pt')
+        import traceback; traceback.print_exc()
         return None
 
 
@@ -69,28 +85,20 @@ def run_transexion(spectra_list, model_path):
     print('  TransExION')
     print('=' * 60)
     try:
-        # TransExION uses matchms model format
-        import pickle
+        # TransExION model: try torch pickle
         import torch
 
-        with open(model_path, 'rb') as f:
-            model_data = pickle.load(f)
-
-        print(f'  Model loaded: {type(model_data)}')
+        model_data = torch.load(model_path, map_location='cpu', weights_only=False)
+        print(f'  TransExION model loaded: {type(model_data)}')
         if isinstance(model_data, dict):
             print(f'  Keys: {list(model_data.keys())[:10]}')
-
-        # Try to find similarity computation function
-        if hasattr(model_data, 'similarity'):
-            print('  Found .similarity method')
-        elif isinstance(model_data, dict) and 'model' in model_data:
-            print('  Found model key in dict')
-            sub = model_data['model']
-            print(f'  Sub-model type: {type(sub)}')
-
-        print(f'  Model file loaded successfully ({model_path})')
-        print(f'  Full inference requires TransExION GitHub code:')
-        print(f'  https://github.com/adremlab/TransExION (check for repo)')
+            # Try to find similarity function
+            for k in model_data:
+                if 'similarity' in str(k).lower():
+                    print(f'  Found similarity key: {k}')
+        elif hasattr(model_data, 'similarity'):
+            print(f'  Has similarity method')
+        print(f'  TransExION model ready.')
         return model_data
     except Exception as e:
         print(f'  TransExION loading error: {e}')
@@ -98,34 +106,29 @@ def run_transexion(spectra_list, model_path):
 
 
 def load_spectra_from_msp(msp_path, max_n=100):
-    """Load spectra from MSP file using matchms."""
-    try:
-        from matchms.importing import load_from_msp
-        spectra = list(load_from_msp(msp_path))
-        print(f'  Loaded {len(spectra)} spectra from {msp_path}')
-        if len(spectra) > max_n:
-            spectra = spectra[:max_n]
-        return spectra
-    except Exception as e:
-        print(f'  Error loading MSP: {e}')
-        return []
+    """Load spectra from MSP file (using our own parser, not matchms)."""
+    from dreams.models.mil_interpretable.train_mil_massbank import parse_msp
+    spectra = parse_msp(msp_path, max_spectra=max_n)
+    print(f'  Loaded {len(spectra)} spectra from {msp_path}')
+    return spectra
 
 
 def explain_top_match(query_idx, lib_idx, score, spectra):
     """Generate explanation for a top match."""
     q = spectra[query_idx]
     l = spectra[lib_idx]
-    q_mz = q.peaks.mz if hasattr(q, 'peaks') else []
-    l_mz = l.peaks.mz if hasattr(l, 'peaks') else []
-
+    q_peaks = q.get('peaks', [])
+    l_peaks = l.get('peaks', [])
     explanation = {
         'query_idx': int(query_idx),
         'library_idx': int(lib_idx),
         'score': float(score),
-        'query_precursor_mz': float(q.get('precursor_mz', 0)),
-        'library_precursor_mz': float(l.get('precursor_mz', 0)),
-        'n_query_peaks': len(q_mz),
-        'n_library_peaks': len(l_mz),
+        'query_name': q.get('Name', q.get('SMILES', '?')[:40]),
+        'library_name': l.get('Name', l.get('SMILES', '?')[:40]),
+        'query_precursor_mz': float(q.get('PrecursorMZ', 0) or 0),
+        'library_precursor_mz': float(l.get('PrecursorMZ', 0) or 0),
+        'n_query_peaks': len(q_peaks),
+        'n_library_peaks': len(l_peaks),
     }
     return explanation
 
@@ -163,7 +166,8 @@ def main():
         ms2ds_matrix = run_ms2deepscore(spectra, args.ms2deepscore_model)
     else:
         print(f'\n  MS2DeepScore model not found at {args.ms2deepscore_model}')
-        print(f'  Download from: https://zenodo.org/records/6339969')
+        print(f'  Download from Zenodo: MS2DeepScore_allGNPSpositive_10k_500_500_200.hdf5')
+        print(f'  Place in d:/DreaMS/data/')
 
     # Try TransExION
     transexion_model = None
@@ -189,9 +193,9 @@ def main():
                 explain_top_match(qi, int(ti), float(scores[ti]), spectra)
                 for ti in top_idx
             ]
-            print(f'\n  Query {qi}: {spectra[qi].get("name","?")}')
+            print(f'\n  Query {qi}: {spectra[qi].get("Name","?")}')
             for rank, ti in enumerate(top_idx):
-                print(f'    {rank+1}. {spectra[ti].get("name","?")}: '
+                print(f'    {rank+1}. {spectra[ti].get("Name","?")}: '
                       f'score={scores[ti]:.4f}')
 
     with open(out_dir / 'report.json', 'w') as f:
