@@ -1,0 +1,29 @@
+{
+  "total_mces_computed": 1933,
+  "positive_pairs": 452,
+  "negative_pairs": 875,
+  "mces_raw_stats": {
+    "min": 0,
+    "max": 46,
+    "mean": 5.836782203778172,
+    "median": 5.0
+  },
+  "positive_mces": {
+    "min": 3,
+    "max": 5,
+    "mean": 3.944690265489749
+  },
+  "negative_mces": {
+    "min": 6,
+    "max": 46,
+    "mean": 10.210857142766036
+  },
+  "positive_tanimoto": {
+    "mean": 0.57195,
+    "std": 0.16615532762517754
+  },
+  "negative_tanimoto": {
+    "mean": 0.3365686,
+    "std": 0.1581067038238417
+  }
+}
