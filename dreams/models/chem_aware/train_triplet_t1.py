@@ -46,6 +46,7 @@ def parse_args():
     p.add_argument('--n_peaks', type=int, default=128)
     p.add_argument('--val_every', type=int, default=1, help='Validate every N epochs')
     p.add_argument('--save_best_only', action='store_true', help='Only save best checkpoint')
+    p.add_argument('--auc_pairs', type=int, default=2000, help='Number of AUC eval pairs (0=disable)')
     return p.parse_args()
 
 
@@ -142,6 +143,50 @@ def main():
     if len(train_trip) == 0:
         print('ERROR: No valid training triplets! Check spectra loading.')
         return
+
+    # ---- 2b. Build fixed AUC evaluation set (T0 pos + T3 neg) ----
+    auc_eval = None
+    if args.auc_pairs > 0:
+        print(f'\n[2b] Building AUC eval set ({args.auc_pairs} pairs)...')
+        rng_auc = np.random.RandomState(12345)
+        with open('tasks/T0_consistency/test_cases/pairs.json') as f:
+            t0 = json.load(f)
+        with open('tasks/T3_unrelated/test_cases/pairs.json') as f:
+            t3 = json.load(f)
+
+        n_each = args.auc_pairs // 2
+        t0_pos = rng_auc.choice(t0['positive'], min(n_each, len(t0['positive'])), replace=False)
+        t3_neg = rng_auc.choice(t3['negative'], min(n_each, len(t3['negative'])), replace=False)
+
+        # Collect needed IKs + load spectra
+        auc_iks = set()
+        for p in t0_pos: auc_iks.add(p['ik'][:14])
+        for p in t3_neg:
+            auc_iks.add(p['ik_a'][:14]); auc_iks.add(p['ik_b'][:14])
+
+        # Build pairs: (ik_a, ik_b, label)
+        auc_pairs = []
+        for p in t0_pos:
+            ik = p['ik'][:14]
+            if ik in ik_to_spec: auc_pairs.append((ik, ik, 1))
+        for p in t3_neg:
+            ika = p['ik_a'][:14]; ikb = p['ik_b'][:14]
+            if ika in ik_to_spec and ikb in ik_to_spec: auc_pairs.append((ika, ikb, 0))
+
+        # Deduplicate IKs for AUC (unique spectra only)
+        auc_spec_iks = sorted(set(ik for a, b, _ in auc_pairs for ik in (a, b)))
+        auc_ik_to_idx = {ik: i for i, ik in enumerate(auc_spec_iks)}
+        auc_pair_indices = [(auc_ik_to_idx[a], auc_ik_to_idx[b]) for a, b, _ in auc_pairs]
+        auc_labels = np.array([l for _, _, l in auc_pairs])
+
+        auc_eval = {
+            'spec_iks': auc_spec_iks,   # ordered list of IKs
+            'pair_i': np.array([p[0] for p in auc_pair_indices]),
+            'pair_j': np.array([p[1] for p in auc_pair_indices]),
+            'labels': auc_labels,
+        }
+        print(f'  AUC eval: {len(auc_pairs)} pairs, {len(auc_spec_iks)} unique IKs, '
+              f'{auc_labels.sum():.0f}P + {len(auc_labels)-auc_labels.sum():.0f}N')
 
     # ---- 3. Load model (exact same logic as train_contrastive_v5.py main) ----
     print(f'[3] Loading DreaMS from {args.ckpt_path}...')
@@ -299,25 +344,53 @@ def main():
         # Validation triplet accuracy (cos+ > cos-)
         v_acc = sum(v_correct) / len(v_correct) if v_correct else 0.0
 
+        # AUC evaluation (fixed T0+T3 set, every val_every epochs)
+        auc_val = 0.0
+        if auc_eval is not None and (epoch + 1) % args.val_every == 0:
+            with torch.no_grad():
+                # Extract embeddings for AUC spectra
+                auc_embs = []
+                for ik in auc_eval['spec_iks']:
+                    st = ik_to_spec[ik].unsqueeze(0).to(device)
+                    auc_embs.append(model(st, None)[:, 0, :].cpu())
+                auc_embs = torch.cat(auc_embs, dim=0)
+
+                # Cosine similarity for all pairs
+                emb_i = auc_embs[auc_eval['pair_i']]
+                emb_j = auc_embs[auc_eval['pair_j']]
+                cos_sims = F.cosine_similarity(emb_i, emb_j, dim=-1).numpy()
+
+                try:
+                    from sklearn import metrics
+                    fpr, tpr, _ = metrics.roc_curve(auc_eval['labels'], cos_sims)
+                    auc_val = float(metrics.auc(fpr, tpr))
+                except Exception:
+                    auc_val = 0.5
+
         print(f'Epoch {epoch+1}: train_loss={tl:.4f} sep={ts:.4f} | '
-              f'val_loss={vl:.4f} sep={vs:.4f} acc={v_acc:.3f}')
+              f'val_loss={vl:.4f} sep={vs:.4f} acc={v_acc:.3f} auc={auc_val:.4f}')
 
         for arr, val in [(history['train_loss'], tl), (history['val_loss'], vl),
                           (history['train_sep'], ts), (history['val_sep'], vs),
                           (history['epoch'], epoch+1), (history['lr'], optimizer.param_groups[0]['lr'])]:
             arr.append(val)
         if 'val_acc' not in history: history['val_acc'] = []
+        if 'val_auc' not in history: history['val_auc'] = []
         history['val_acc'].append(v_acc)
+        history['val_auc'].append(auc_val)
 
-        # Save best by validation Separation (not loss — Sep is the key triplet metric)
-        is_best = vs > best_val_loss if best_val_loss != float('inf') else True
+        # Save best by AUC when available, else by val_sep
+        best_metric = auc_val if auc_eval is not None else vs
+        is_best = best_metric > best_val_loss if best_val_loss != float('inf') else True
         if is_best:
-            best_val_loss = vs
+            best_val_loss = best_metric
             ckpt_data = {'epoch': epoch, 'model_state_dict': model.state_dict(),
                         'optimizer_state_dict': optimizer.state_dict(),
-                        'val_sep': vs, 'val_acc': v_acc, 'history': history}
+                        'val_sep': vs, 'val_acc': v_acc, 'val_auc': auc_val,
+                        'history': history}
             torch.save(ckpt_data, save_dir/'best.pt')
-            print(f'  → Best (val_sep={vs:.4f}, val_acc={v_acc:.3f})')
+            metric_name = 'auc' if auc_eval is not None else 'sep'
+            print(f'  → Best ({metric_name}={best_metric:.4f}, sep={vs:.4f}, acc={v_acc:.3f})')
 
         if not args.save_best_only:
             torch.save({'epoch': epoch, 'model_state_dict': model.state_dict(),

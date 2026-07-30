@@ -39,7 +39,8 @@ python -u -m dreams.models.chem_aware.train_triplet_t1 \
     --margin 0.2 \
     --save_dir ./triplet_t1_checkpoints \
     --val_every 1 \
-    --save_best_only
+    --save_best_only \
+    --auc_pairs 2000
 
 echo "===== Job finished at $(date) ====="
 echo ""
