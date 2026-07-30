@@ -39,11 +39,13 @@ def parse_args():
     p.add_argument('--epochs', type=int, default=10)
     p.add_argument('--batch_size', type=int, default=32)
     p.add_argument('--lr', type=float, default=5e-6)
-    p.add_argument('--alpha', type=float, default=0.5, help='Triplet loss weight')
-    p.add_argument('--beta', type=float, default=0.01, help='Preservation loss weight')
-    p.add_argument('--margin', type=float, default=0.3, help='Triplet margin')
+    p.add_argument('--alpha', type=float, default=0.05, help='Triplet loss weight (v5 verified: 0.05)')
+    p.add_argument('--beta', type=float, default=0.02, help='Preservation loss weight (v5 verified: 0.02)')
+    p.add_argument('--margin', type=float, default=0.2, help='Triplet margin (v5 verified: 0.2)')
     p.add_argument('--save_dir', type=str, default='./triplet_t1_checkpoints')
     p.add_argument('--n_peaks', type=int, default=128)
+    p.add_argument('--val_every', type=int, default=1, help='Validate every N epochs')
+    p.add_argument('--save_best_only', action='store_true', help='Only save best checkpoint')
     return p.parse_args()
 
 
@@ -271,7 +273,7 @@ def main():
 
         # Validation
         model.eval()
-        v_losses, v_seps = [], []
+        v_losses, v_seps, v_correct = [], [], []
         with torch.no_grad():
             for start in range(0, len(val_trip), args.batch_size):
                 end = min(start + args.batch_size, len(val_trip))
@@ -284,32 +286,45 @@ def main():
                 emb = model(all_t, None)[:, 0, :]
                 loss_t = F.triplet_margin_loss(emb[:Bv], emb[Bv:2*Bv], emb[2*Bv:],
                                                 margin=args.margin, p=2)
-                cp = F.cosine_similarity(emb[:Bv], emb[Bv:2*Bv], dim=-1).mean()
-                cn = F.cosine_similarity(emb[:Bv], emb[2*Bv:], dim=-1).mean()
-                v_losses.append(loss_t.item()); v_seps.append((cp-cn).item())
+                # Per-triplet metrics
+                cp_all = F.cosine_similarity(emb[:Bv], emb[Bv:2*Bv], dim=-1)
+                cn_all = F.cosine_similarity(emb[:Bv], emb[2*Bv:], dim=-1)
+                v_losses.append(loss_t.item())
+                v_seps.extend((cp_all - cn_all).tolist())
+                v_correct.extend((cp_all > cn_all).tolist())
 
         tl, ts = np.mean(losses), np.mean(seps)
         vl, vs = np.mean(v_losses) if v_losses else 0, np.mean(v_seps) if v_seps else 0
-        print(f'Epoch {epoch+1}: train_loss={tl:.4f} sep={ts:.4f} | val_loss={vl:.4f} sep={vs:.4f}')
+
+        # Validation triplet accuracy (cos+ > cos-)
+        v_acc = sum(v_correct) / len(v_correct) if v_correct else 0.0
+
+        print(f'Epoch {epoch+1}: train_loss={tl:.4f} sep={ts:.4f} | '
+              f'val_loss={vl:.4f} sep={vs:.4f} acc={v_acc:.3f}')
 
         for arr, val in [(history['train_loss'], tl), (history['val_loss'], vl),
                           (history['train_sep'], ts), (history['val_sep'], vs),
                           (history['epoch'], epoch+1), (history['lr'], optimizer.param_groups[0]['lr'])]:
             arr.append(val)
+        if 'val_acc' not in history: history['val_acc'] = []
+        history['val_acc'].append(v_acc)
 
-        if vl < best_val_loss:
-            best_val_loss = vl
-            torch.save({'epoch': epoch, 'model_state_dict': model.state_dict(),
+        # Save best by validation Separation (not loss — Sep is the key triplet metric)
+        is_best = vs > best_val_loss if best_val_loss != float('inf') else True
+        if is_best:
+            best_val_loss = vs
+            ckpt_data = {'epoch': epoch, 'model_state_dict': model.state_dict(),
                         'optimizer_state_dict': optimizer.state_dict(),
-                        'val_loss': vl, 'history': history}, save_dir/'best_model.pt')
-            print(f'  → Best (val_loss={vl:.4f})')
+                        'val_sep': vs, 'val_acc': v_acc, 'history': history}
+            torch.save(ckpt_data, save_dir/'best.pt')
+            print(f'  → Best (val_sep={vs:.4f}, val_acc={v_acc:.3f})')
 
-        # Per-epoch checkpoint
-        torch.save({'epoch': epoch, 'model_state_dict': model.state_dict(),
-                    'history': history}, save_dir/f'epoch_{epoch+1}.pt')
+        if not args.save_best_only:
+            torch.save({'epoch': epoch, 'model_state_dict': model.state_dict(),
+                        'history': history}, save_dir/f'epoch_{epoch+1}.pt')
 
     torch.save({'model_state_dict': model.state_dict(), 'history': history}, save_dir/'final_model.pt')
-    print(f'\nDone. Best val_loss={best_val_loss:.4f}. Models in {save_dir}/')
+    print(f'\nDone. Best val_sep={best_val_loss:.4f}. Models in {save_dir}/')
 
 
 if __name__ == '__main__':

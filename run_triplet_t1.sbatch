@@ -15,29 +15,35 @@ echo "Started at $(date)"
 echo "Hostname: $(hostname)"
 nvidia-smi --query-gpu=name,memory.total,memory.free --format=csv,noheader
 
-# 数据准备（首次运行需要，后续可注释）
-# python build_annotated01.py
-# python -c "from tasks.build_utils import load_indices; load_indices(force_rebuild=True)"
-# python tasks/T1_near_isomers/code/build_test_cases.py --max_groups 2000 --max_pairs_per_group 20
-
-# Triplet 训练
-#   - 7030 train + 780 val triplets
-#   - Anchor+Positive: 同分子式 MCES[0,2] (近同分异构体)
-#   - Negative: MCES[6,10] (明确不同异构体)
-#   - Loss: L_mask + α·L_triplet + β·L_preservation
-#   - 全模型微调 lr=5e-6
+# T1 MCES Triplet 训练
+#   7030 train + 780 val triplets
+#   Anchor+Positive: 同分子式 MCES[0,2] (近同分异构体)
+#   Negative: MCES[6,10] (明确不同异构体)
+#   Loss: L_mask + α·L_triplet + β·L_preservation
+#
+# 参数选择（v5 方向二验证经验）:
+#   α=0.05  (v4的α=0.5导致坍缩到AUC=0.59)
+#   β=0.02  (preservation需足够强防嵌入漂移)
+#   margin=0.2 (v5验证最优值)
+#   lr=5e-6 (低学习率,防止灾难性遗忘)
+#   val_every=1 (每个epoch评估验证集Separation+Accuracy)
+#   save_best_only (只保存val_sep最高的checkpoint)
 
 python -u -m dreams.models.chem_aware.train_triplet_t1 \
     --ckpt_path ./dreams/models/pretrained/ssl_model_server.pt \
     --epochs 10 \
     --batch_size 32 \
     --lr 5e-6 \
-    --alpha 0.5 \
-    --beta 0.01 \
-    --margin 0.3 \
-    --save_dir ./triplet_t1_checkpoints
+    --alpha 0.05 \
+    --beta 0.02 \
+    --margin 0.2 \
+    --save_dir ./triplet_t1_checkpoints \
+    --val_every 1 \
+    --save_best_only
 
 echo "===== Job finished at $(date) ====="
+echo ""
+echo "Best checkpoint: ./triplet_t1_checkpoints/best.pt"
 echo ""
 echo "Resume:"
 echo "  python -m dreams.models.chem_aware.train_triplet_t1 --ckpt_path ... --resume_from ./triplet_t1_checkpoints/epoch_N.pt"
