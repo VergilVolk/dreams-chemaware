@@ -8,6 +8,7 @@ export PYTHONUNBUFFERED=1
 export PYTHONIOENCODING=utf-8
 
 cd /data02/run01/scv7tsl/DreaMS
+git pull
 export PYTHONPATH=$PWD:$PYTHONPATH
 
 echo "===== T1 Triplet Parameter Sweep ====="

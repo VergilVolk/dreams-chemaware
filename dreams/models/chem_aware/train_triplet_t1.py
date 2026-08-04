@@ -19,18 +19,7 @@ from collections import defaultdict
 import numpy as np
 from tqdm import tqdm
 
-# Bypass dreams __init__ chain (import only what we need)
-import importlib.util
-_dreams_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-def _load_module(name, rel_path):
-    spec = importlib.util.spec_from_file_location(name, os.path.join(_dreams_dir, rel_path))
-    mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
-    return mod
-
-_chem_rules = _load_module('chem_rules', 'models/chem_aware/chem_rules.py')
-ChemicalRuleEngine = _chem_rules.ChemicalRuleEngine
+# 化学规则由 ChemAwareDreaMS 内部管理，无需单独导入
 
 
 def parse_args():
@@ -188,18 +177,17 @@ def main():
         print(f'  AUC eval: {len(auc_pairs)} pairs, {len(auc_spec_iks)} unique IKs, '
               f'{auc_labels.sum():.0f}P + {len(auc_labels)-auc_labels.sum():.0f}N')
 
-    # ---- 3. Load model (exact same logic as train_contrastive_v5.py main) ----
-    print(f'[3] Loading DreaMS from {args.ckpt_path}...')
+    # ---- 3. Load ChemAwareDreaMS (化学规则注入, 模块一核心) ----
+    print(f'[3] Loading ChemAwareDreaMS from {args.ckpt_path}...')
     pkg = torch.load(args.ckpt_path, map_location='cpu', weights_only=False)
 
     if 'pytorch-lightning_version' in pkg:
-        from dreams.models.dreams.dreams import DreaMS
-        model = DreaMS.load_from_checkpoint(args.ckpt_path, map_location='cpu')
+        raise ValueError('Lightning checkpoint not supported for ChemAwareDreaMS. Use ssl_model_server.pt.')
     elif 'args' in pkg and 'state_dict' in pkg:
         from argparse import Namespace
         from dreams.utils.dformats import DataFormatA
         from dreams.utils.data import SpectrumPreprocessor
-        from dreams.models.dreams.dreams import DreaMS
+        from dreams.models.chem_aware.chem_aware_dreams import ChemAwareDreaMS
 
         state_dict = pkg['state_dict']
         recon_args = Namespace(**pkg['args'])
@@ -210,12 +198,17 @@ def main():
             if da in pkg['args']:
                 setattr(recon_args.dformat, da, pkg['args'][da])
         recon_args.d_graphormer_params = 0
+        # 启用化学注意力注入 (模块一核心)
+        recon_args.chem_attn = True
+        recon_args.chem_attn_tolerance = 0.02
+        recon_args.chem_attn_layer = -1  # 仅注入最后一层
 
         spec_preproc = SpectrumPreprocessor(dformat=recon_args.dformat,
                                             n_highest_peaks=recon_args.max_peaks_n)
-        model = DreaMS(recon_args, spec_preproc)
+        model = ChemAwareDreaMS(recon_args, spec_preproc)
         model.load_state_dict(state_dict, strict=False)
-        print(f'   Loaded {len(state_dict)} params')
+        # 新参数: chem_rule_engine.rule_weights_raw (335 dims) + chem_residual_scale (标量)
+        print(f'   Loaded {len(state_dict)} pretrained params + chemical attention (335 rules)')
     else:
         raise ValueError(f'Unknown checkpoint format. Keys: {list(pkg.keys())}')
 
@@ -230,12 +223,7 @@ def main():
     for p in model.parameters(): p.requires_grad = True
     print(f'  Params: {sum(p.numel() for p in model.parameters()):,}')
 
-    # ---- 4. Rule Engine ----
-    print('[4] Initializing ChemicalRuleEngine...')
-    engine = ChemicalRuleEngine(tolerance=0.02)
-    engine = engine.to(device)
-
-    # ---- 5. Training ----
+    # ---- 4. Training (化学规则由 ChemAwareDreaMS 内部注入) ----
     print(f'\n[5] Training: α={args.alpha} β={args.beta} margin={args.margin}')
     save_dir = Path(args.save_dir)
     save_dir.mkdir(parents=True, exist_ok=True)
