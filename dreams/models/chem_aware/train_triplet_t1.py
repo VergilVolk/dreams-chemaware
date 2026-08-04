@@ -30,8 +30,10 @@ def parse_args():
     p.add_argument('--lr', type=float, default=5e-6)
     p.add_argument('--alpha', type=float, default=0.05, help='Triplet loss weight (v5 verified: 0.05)')
     p.add_argument('--beta', type=float, default=0.02, help='Preservation loss weight (v5 verified: 0.02)')
-    p.add_argument('--margin', type=float, default=0.2, help='Triplet margin (v5 verified: 0.2)')
-    p.add_argument('--save_dir', type=str, default='./triplet_t1_checkpoints')
+    p.add_argument('--margin', type=float, default=0.4, help='Triplet margin (v2: 0.4 for MCES[3,5] hard negatives)')
+    p.add_argument('--triplet_dir', type=str, default='tasks/T1_v2_hard',
+                   help='Directory with triplets_train_v2.json and triplets_val_v2.json')
+    p.add_argument('--save_dir', type=str, default='./triplet_t1_v2_checkpoints')
     p.add_argument('--n_peaks', type=int, default=128)
     p.add_argument('--val_every', type=int, default=1, help='Validate every N epochs')
     p.add_argument('--save_best_only', action='store_true', help='Only save best checkpoint')
@@ -93,9 +95,11 @@ def main():
 
     # ---- 1. Load triplets ----
     print('[1] Loading triplets...')
-    with open('tasks/T1_near_isomers/test_cases/triplets_train.json') as f:
+    train_path = os.path.join(args.triplet_dir, 'triplets_train_v2.json')
+    val_path = os.path.join(args.triplet_dir, 'triplets_val_v2.json')
+    with open(train_path) as f:
         train_trip = json.load(f)
-    with open('tasks/T1_near_isomers/test_cases/triplets_val.json') as f:
+    with open(val_path) as f:
         val_trip = json.load(f)
     print(f'  Train: {len(train_trip)}  Val: {len(val_trip)}')
 
@@ -198,10 +202,11 @@ def main():
             if da in pkg['args']:
                 setattr(recon_args.dformat, da, pkg['args'][da])
         recon_args.d_graphormer_params = 0
-        # 启用化学注意力注入 (模块一核心)
+        # 启用化学注意力注入 (模块一核心) — 仅用主库 335 条规则
         recon_args.chem_attn = True
         recon_args.chem_attn_tolerance = 0.02
-        recon_args.chem_attn_layer = -1  # 仅注入最后一层
+        recon_args.chem_attn_layer = -1
+        recon_args.chem_attn_use_massbank = False  # 屏蔽 MassBank 噪声
 
         spec_preproc = SpectrumPreprocessor(dformat=recon_args.dformat,
                                             n_highest_peaks=recon_args.max_peaks_n)

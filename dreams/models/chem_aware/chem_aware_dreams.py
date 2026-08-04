@@ -65,6 +65,7 @@ class ChemAwareDreaMS(DreaMS):
         self.chem_attn_enabled = getattr(args, 'chem_attn', False)
         self.chem_attn_tolerance = getattr(args, 'chem_attn_tolerance', 0.02)
         self.chem_attn_layer = getattr(args, 'chem_attn_layer', -1)
+        self.chem_attn_use_massbank = getattr(args, 'chem_attn_use_massbank', False)  # 默认屏蔽 MassBank 噪声
 
         # ---- 调用父类初始化 ----
         super().__init__(args, spec_preproc)
@@ -73,7 +74,8 @@ class ChemAwareDreaMS(DreaMS):
         if self.chem_attn_enabled:
             self.chem_rule_engine = ChemicalRuleEngine(
                 tolerance=self.chem_attn_tolerance,
-                enable_categories=None  # 全部 6 类启用（NL/CF/ISO/NR/EE/HR）
+                enable_categories=None,  # 全部 6 类启用（NL/CF/ISO/NR/EE/HR）
+                use_massbank=self.chem_attn_use_massbank
             )
             # 化学残差的全局缩放因子（可学习，初始 1.0）
             self.chem_residual_scale = nn.Parameter(torch.tensor(1.0))

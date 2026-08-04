@@ -58,22 +58,29 @@ class ChemRule:
     meta: dict = field(default_factory=dict)  # 额外元信息（formula, mode, desc...）
 
 
-def _build_rule_list() -> List[ChemRule]:
+def _build_rule_list(use_massbank: bool = True) -> List[ChemRule]:
     """构建完整规则列表。
 
-    优先从同目录 chem_rules_data.json / chem_rules_massbank.json 加载扩展规则；
-    若二者都缺失或损坏，则回退到内联基线规则（127 条），保证引擎在任何环境下都能实例化。
+    优先从同目录 chem_rules_data.json 加载主规则库（335 条）；
+    若 use_massbank=True，额外加载 chem_rules_massbank.json（3,151 条）并合并去重；
+    若 JSON 缺失或损坏，则回退到内联基线规则（127 条）。
     """
     rules = _load_rules_from_json()
     if rules:
+        if use_massbank:
+            massbank_rules = _load_massbank_rules_json()
+            if massbank_rules:
+                rules.extend(massbank_rules)
+            rules = _dedup_rules(rules)
+            print(f"[chem_rules] 加载 {len(rules)} 条规则 (主库 {len(rules)-len(massbank_rules)}+MassBank {len(massbank_rules)}, 去重后)")
+        else:
+            print(f"[chem_rules] 加载 {len(rules)} 条规则 (仅主库, 已屏蔽 MassBank {_MASSBANK_RULES_JSON})")
+        return rules
+    if use_massbank:
         massbank_rules = _load_massbank_rules_json()
         if massbank_rules:
-            rules.extend(massbank_rules)
-        return _dedup_rules(rules)
-    massbank_rules = _load_massbank_rules_json()
-    if massbank_rules:
-        return _dedup_rules(massbank_rules)
-    print(f"[chem_rules] 未找到/无法加载 {os.path.basename(_RULES_JSON)} 与 {os.path.basename(_MASSBANK_RULES_JSON)}，回退到内联基线 127 条规则")
+            return _dedup_rules(massbank_rules)
+    print(f"[chem_rules] 未找到 JSON，回退到内联基线 127 条规则")
     return _build_baseline_rules()
 
 
@@ -303,13 +310,14 @@ class ChemicalRuleEngine(nn.Module):
     def __init__(
         self,
         tolerance: float = 0.02,
-        enable_categories: Optional[List[str]] = None
+        enable_categories: Optional[List[str]] = None,
+        use_massbank: bool = True  # False = 只用主库 335 条，屏蔽 MassBank 3,151 条噪声规则
     ):
         super().__init__()
         self.tolerance = tolerance
 
         # ---- 构建规则列表 ----
-        all_rules = _build_rule_list()
+        all_rules = _build_rule_list(use_massbank=use_massbank)
 
         # ---- 规则类别开关 ----
         if enable_categories is None:
