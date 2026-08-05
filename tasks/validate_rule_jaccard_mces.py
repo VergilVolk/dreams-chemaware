@@ -16,6 +16,7 @@ Task 0: Rule Jaccard vs MCES Correlation Validation (CRITICAL)
 import json, os, sys, csv, time
 from collections import defaultdict, Counter
 import numpy as np
+import torch
 from tqdm import tqdm
 
 sys.path.insert(0, '.')
@@ -50,7 +51,7 @@ print('  Scanning MGF for best spectra per IK...')
 ik_best_peaks = {}
 cur_ik = None; cur_peaks = []; cur_total_i = 0
 with open('data/annotated01.mgf', 'r', encoding='utf-8', errors='ignore') as f:
-    for line in tqdm(f, total=138_000_000, unit='lines', unit_scale=True):
+    for line in tqdm(f, unit='lines', unit_scale=True):
         line = line.strip()
         if not line:
             if cur_ik and len(cur_peaks) >= 3:
@@ -166,7 +167,7 @@ def compute_mces_approx(smi_a, smi_b):
     mol_b = Chem.MolFromSmiles(smi_b)
     if mol_a is None or mol_b is None: return None
     try:
-        mcs = rdFMCS.FindMCS([mol_a, mol_b], timeout=5,
+        mcs = rdFMCS.FindMCS([mol_a, mol_b], timeout=1,
                              bondCompare=rdFMCS.BondCompare.CompareOrderExact)
         if mcs.numBonds == 0:
             # No common substructure → return total bonds (maximum distance)
@@ -235,18 +236,26 @@ def get_rule_vectors_batch(peaks_list, n_highest=N_PEAKS):
 
     # Preprocess all spectra
     specs = []
-    for peaks in peaks_list:
-        arr = np.array(peaks, dtype=np.float32)
-        if len(arr) == 0: return None
-        arr = arr[arr[:, 0].argsort()]
-        if len(arr) > n_highest:
-            idx = np.argpartition(arr[:, 1], -n_highest)[-n_highest:]
-            arr = arr[idx]; arr = arr[arr[:, 0].argsort()]
-        max_i = arr[:, 1].max()
-        if max_i > 0: arr[:, 1] /= max_i
-        padded = np.zeros((n_highest, 2), dtype=np.float32)
-        n = min(len(arr), n_highest); padded[:n] = arr[:n]
-        specs.append(padded)
+    valid_indices = []  # track which spectra succeeded
+    for i, peaks in enumerate(peaks_list):
+        try:
+            arr = np.array(peaks, dtype=np.float32)
+            if len(arr) < 3: continue  # skip empty spectra
+            arr = arr[arr[:, 0].argsort()]
+            if len(arr) > n_highest:
+                idx = np.argpartition(arr[:, 1], -n_highest)[-n_highest:]
+                arr = arr[idx]; arr = arr[arr[:, 0].argsort()]
+            max_i = arr[:, 1].max()
+            if max_i > 0: arr[:, 1] /= max_i
+            padded = np.zeros((n_highest, 2), dtype=np.float32)
+            n = min(len(arr), n_highest); padded[:n] = arr[:n]
+            specs.append(padded)
+            valid_indices.append(i)
+        except Exception:
+            continue
+
+    if not specs:
+        return [None] * batch_size
 
     # Stack into batch tensor
     mz_batch = torch.as_tensor(np.stack([s[:, 0] for s in specs]), dtype=torch.float32)  # (B, n_peaks)
@@ -262,8 +271,12 @@ def get_rule_vectors_batch(peaks_list, n_highest=N_PEAKS):
             categories=None
         )
     # vec: (B, n_rules, n_peaks, n_peaks) → collapse to (B, n_rules)
-    hit = (vec.sum(dim=(2, 3)) > 0).numpy().astype(np.int8)
-    return [hit[i] for i in range(batch_size)]
+    hit_all = (vec.sum(dim=(2, 3)) > 0).numpy().astype(np.int8)
+    # Map back to original indices (some may have been skipped)
+    results = [None] * batch_size
+    for j, orig_idx in enumerate(valid_indices):
+        results[orig_idx] = hit_all[j]
+    return results
 
 # Collect all needed IKs
 needed_iks = set()
@@ -273,7 +286,6 @@ for a, b in sampled_pairs:
 # Compute rule vectors for all needed IKs — BATCHED
 print(f'  Computing rule vectors for {len(needed_iks)} IKs (batch_size=64)...')
 ik_to_rvec = {}
-import torch
 needed_list = sorted(needed_iks)
 BATCH = 64
 
