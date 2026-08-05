@@ -287,7 +287,7 @@ for a, b in sampled_pairs:
 print(f'  Computing rule vectors for {len(needed_iks)} IKs (batch_size=64)...')
 ik_to_rvec = {}
 needed_list = sorted(needed_iks)
-BATCH = 64
+BATCH = 8   # small: (8, 293, 60, 60) = 34MB, avoids memory thrashing
 
 for b_start in tqdm(range(0, len(needed_list), BATCH)):
     batch_iks = needed_list[b_start:b_start + BATCH]
