@@ -1,0 +1,421 @@
+"""
+Task 0: Rule Jaccard vs MCES Correlation Validation (CRITICAL)
+
+验证 335 条化学规则的 Jaccard 重叠度与分子结构 MCES 是否正相关。
+结果决定模块一微调用"规则对齐"还是"分子对齐"路线。
+
+步骤:
+  1. annotated01 → 按 InChIKey 去重 → 每个 IK 选总强度最大的谱图
+  2. 随机采样 5,000 对 → 覆盖不同 MCES 区间
+  3. MCES: 复用 T1 已有数据 + RDKit MCS 近似
+  4. 规则 Jaccard: ChemicalRuleEngine 335 维命中向量 → 交集/并集
+  5. 统计 + 可视化
+
+用法: python tasks/validate_rule_jaccard_mces.py
+"""
+import json, os, sys, csv, time
+from collections import defaultdict, Counter
+import numpy as np
+from tqdm import tqdm
+
+sys.path.insert(0, '.')
+from tasks.build_utils import load_indices
+from dreams.models.chem_aware.chem_rules import ChemicalRuleEngine
+from rdkit import Chem
+from rdkit.Chem import rdFMCS, AllChem, DataStructs
+from scipy.stats import pearsonr, spearmanr
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+
+rng = np.random.RandomState(42)
+OUT_DIR = 'data/validation/rule_mces_correlation'
+os.makedirs(OUT_DIR, exist_ok=True)
+
+N_PAIRS = 5000
+N_PEAKS = 128
+FP_BITS = 2048
+
+# ===================================================================
+# 1. Deduplicate: 1 spectrum per InChIKey (highest total intensity)
+# ===================================================================
+print('[1] Deduplicating annotated01 to molecule level...')
+idx = load_indices()
+ik_to_smi = idx['ik_to_smi']
+all_iks = sorted(ik_to_smi.keys())
+print(f'  Unique IKs: {len(all_iks)}')
+
+# Pick best spectrum per IK (highest total intensity)
+print('  Scanning MGF for best spectra per IK...')
+ik_best_peaks = {}
+cur_ik = None; cur_peaks = []; cur_total_i = 0
+with open('data/annotated01.mgf', 'r', encoding='utf-8', errors='ignore') as f:
+    for line in tqdm(f, total=138_000_000, unit='lines', unit_scale=True):
+        line = line.strip()
+        if not line:
+            if cur_ik and len(cur_peaks) >= 3:
+                if cur_ik not in ik_best_peaks or cur_total_i > ik_best_peaks[cur_ik][1]:
+                    ik_best_peaks[cur_ik] = (cur_peaks[:], cur_total_i)
+            cur_ik = None; cur_peaks = []; cur_total_i = 0; continue
+        if line.startswith('INCHIKEY='):
+            cur_ik = line[9:].strip()[:14]
+        elif line[0].isdigit() or (line[0] == '-' and len(line) > 1 and line[1].isdigit()):
+            p2 = line.split()
+            if len(p2) >= 2:
+                try:
+                    mz, intensity = float(p2[0]), float(p2[1])
+                    if mz > 0 and intensity > 0:
+                        cur_peaks.append((mz, intensity))
+                        cur_total_i += intensity
+                except: pass
+
+best_iks = sorted(ik_best_peaks.keys())
+print(f'  Best spectra: {len(best_iks)} IKs')
+
+# Filter to IKs with valid SMILES and fingerprint-able
+valid_iks = []
+for ik in best_iks:
+    smi = ik_to_smi.get(ik, '')
+    if not smi: continue
+    mol = Chem.MolFromSmiles(smi)
+    if mol is None: continue
+    valid_iks.append(ik)
+print(f'  Valid (SMILES parseable): {len(valid_iks)}')
+
+# ===================================================================
+# 2. Load existing T1 MCES data (reuse!)
+# ===================================================================
+print('\n[2] Loading existing MCES data from T1...')
+existing_mces = {}  # (ik_a, ik_b) sorted → mces_raw
+t1_pairs_path = 'tasks/T1_near_isomers/test_cases/pairs.json'
+t1_count = 0
+if os.path.exists(t1_pairs_path):
+    with open(t1_pairs_path) as f:
+        t1_data = json.load(f)
+    for p in t1_data['positive'] + t1_data['negative_hard'] + t1_data['negative_easy']:
+        if 'mces_raw' not in p: continue
+        a, b = p['ik_a'][:14], p['ik_b'][:14]
+        key = (a, b) if a < b else (b, a)
+        existing_mces[key] = p['mces_raw']
+        t1_count += 1
+print(f'  Loaded {t1_count} existing MCES values from T1 pairs.json')
+
+# ===================================================================
+# 3. Sample 5,000 pairs (stratified by estimated Tanimoto)
+# ===================================================================
+print(f'\n[3] Sampling {N_PAIRS} pairs...')
+
+# Pre-compute fingerprints for all valid IKs (needed for Tanimoto-based stratification)
+print('  Computing fingerprints...')
+ik_fp = {}
+for ik in tqdm(valid_iks):
+    smi = ik_to_smi[ik]
+    mol = Chem.MolFromSmiles(smi)
+    ik_fp[ik] = AllChem.GetMorganFingerprintAsBitVect(mol, 2, FP_BITS)
+print(f'  {len(ik_fp)} fingerprints computed')
+
+# Stratified sampling: aim for coverage across Tanimoto ranges
+# Compute Tanimoto for random pairs to estimate distribution
+print('  Stratified sampling...')
+n_sample_pre = 20000
+pre_tani = []
+pre_pairs = []
+while len(pre_pairs) < n_sample_pre:
+    ai, bi = rng.choice(len(valid_iks), 2, replace=False)
+    a, b = valid_iks[ai], valid_iks[bi]
+    key = (a, b) if a < b else (b, a)
+    if key in pre_pairs: continue
+    tan = DataStructs.TanimotoSimilarity(ik_fp[a], ik_fp[b])
+    pre_pairs.append(key)
+    pre_tani.append(tan)
+
+pre_tani = np.array(pre_tani)
+
+# Define strata
+strata = [(0, 0.025, 1000), (0.025, 0.1, 1500), (0.1, 0.3, 1500), (0.3, 1.01, 1000)]
+sampled_pairs = []
+for lo, hi, n_target in strata:
+    mask = (pre_tani >= lo) & (pre_tani < hi)
+    candidates = [pre_pairs[i] for i in range(len(pre_pairs)) if mask[i]]
+    print(f'    Tanimoto [{lo:.3f}, {hi:.3f}): {len(candidates)} candidates, target {n_target}')
+    if len(candidates) >= n_target:
+        idx = rng.choice(len(candidates), n_target, replace=False)
+        sampled_pairs.extend([candidates[i] for i in idx])
+    else:
+        sampled_pairs.extend(candidates)
+
+# If we don't have enough, fill with random
+while len(sampled_pairs) < N_PAIRS:
+    ai, bi = rng.choice(len(valid_iks), 2, replace=False)
+    a, b = valid_iks[ai], valid_iks[bi]
+    key = (a, b) if a < b else (b, a)
+    if key not in sampled_pairs:
+        sampled_pairs.append(key)
+
+sampled_pairs = sampled_pairs[:N_PAIRS]
+print(f'  Sampled: {len(sampled_pairs)} pairs')
+
+# ===================================================================
+# 4. MCES computation (reuse T1 + RDKit MCS fallback)
+# ===================================================================
+print('\n[4] Computing MCES for sampled pairs...')
+
+def compute_mces_approx(smi_a, smi_b):
+    """RDKit MCS-based MCES approximation: n_bonds_A + n_bonds_B - 2*n_bonds_MCS"""
+    mol_a = Chem.MolFromSmiles(smi_a)
+    mol_b = Chem.MolFromSmiles(smi_b)
+    if mol_a is None or mol_b is None: return None
+    try:
+        mcs = rdFMCS.FindMCS([mol_a, mol_b], timeout=5,
+                             bondCompare=rdFMCS.BondCompare.CompareOrderExact)
+        if mcs.numBonds == 0:
+            # No common substructure → return total bonds (maximum distance)
+            return mol_a.GetNumBonds() + mol_b.GetNumBonds()
+        # Get the MCS molecule to count bonds
+        mcs_mol = Chem.MolFromSmarts(mcs.smartsString)
+        n_bonds_mcs = mcs_mol.GetNumBonds() if mcs_mol else mcs.numBonds
+        mces_approx = mol_a.GetNumBonds() + mol_b.GetNumBonds() - 2 * n_bonds_mcs
+        return max(0, mces_approx)
+    except Exception:
+        return None
+
+pair_mces = {}; pair_smiles = {}
+t1_hits = 0; mcs_fallback = 0; mces_failed = 0
+
+for a, b in tqdm(sampled_pairs):
+    pair_smiles[(a, b)] = (ik_to_smi.get(a, ''), ik_to_smi.get(b, ''))
+
+    # Check T1 cache
+    if (a, b) in existing_mces:
+        pair_mces[(a, b)] = existing_mces[(a, b)]
+        t1_hits += 1
+    else:
+        smi_a = ik_to_smi.get(a, '')
+        smi_b = ik_to_smi.get(b, '')
+        mces_val = compute_mces_approx(smi_a, smi_b)
+        if mces_val is not None:
+            pair_mces[(a, b)] = mces_val
+            mcs_fallback += 1
+        else:
+            mces_failed += 1
+
+print(f'  MCES: {t1_hits} from T1 cache, {mcs_fallback} from RDKit MCS, {mces_failed} failed')
+
+# ===================================================================
+# 5. Rule Jaccard computation
+# ===================================================================
+print('\n[5] Computing rule Jaccard (ChemicalRuleEngine, 335-dim)...')
+
+# Initialize rule engine (335 rules, no MassBank noise)
+engine = ChemicalRuleEngine(tolerance=0.02, use_massbank=False)
+N_RULES = len(engine.rules)
+print(f'  Rules: {N_RULES}')
+
+def preprocess_spectrum(peaks, n_highest=N_PEAKS):
+    """Minimal preprocessing: sort by m/z, top N peaks, normalize, pad"""
+    arr = np.array(peaks, dtype=np.float32)
+    if len(arr) == 0: return None
+    arr = arr[arr[:, 0].argsort()]
+    if len(arr) > n_highest:
+        idx = np.argpartition(arr[:, 1], -n_highest)[-n_highest:]
+        arr = arr[idx]
+        arr = arr[arr[:, 0].argsort()]
+    max_i = arr[:, 1].max()
+    if max_i > 0: arr[:, 1] /= max_i
+    padded = np.zeros((n_highest, 2), dtype=np.float32)
+    n = min(len(arr), n_highest)
+    padded[:n] = arr[:n]
+    return padded
+
+def get_rule_vector(peaks):
+    """Compute 335-dim binary rule match vector for a single spectrum"""
+    spec_pp = preprocess_spectrum(peaks)
+    if spec_pp is None: return None
+    mz_t = torch.as_tensor(spec_pp[:, 0], dtype=torch.float32).unsqueeze(0)
+    pad = (mz_t == 0)
+    # Compute all-to-all m/z differences
+    mz_diffs = torch.abs(mz_t.unsqueeze(-1) - mz_t.unsqueeze(-2))
+    with torch.no_grad():
+        vec = engine.get_rule_match_vectors(
+            mz_diffs, mz_values=mz_t,
+            precursor_mz=mz_t[:, 0].unsqueeze(0),
+            padding_mask=pad,
+            categories=None  # all 6 categories
+        )
+    # vec shape: (1, n_rules, n_peaks, n_peaks) — does any peak pair match?
+    # Collapse: rule is "hit" if any peak pair matches
+    hit = (vec.sum(dim=(2, 3)) > 0).squeeze(0)  # (n_rules,)
+    return hit.numpy().astype(np.int8)
+
+# Collect all needed IKs
+needed_iks = set()
+for a, b in sampled_pairs:
+    needed_iks.add(a); needed_iks.add(b)
+
+# Compute rule vectors for all needed IKs
+print(f'  Computing rule vectors for {len(needed_iks)} IKs...')
+ik_to_rvec = {}
+import torch
+n_done = 0
+for ik in tqdm(sorted(needed_iks)):
+    peaks = ik_best_peaks.get(ik)
+    if peaks is None:
+        ik_to_rvec[ik] = None
+        continue
+    rvec = get_rule_vector(peaks[0])  # peaks[0] is the peak list
+    ik_to_rvec[ik] = rvec
+    n_done += 1
+    if n_done % 1000 == 0:
+        print(f'    {n_done}/{len(needed_iks)}', flush=True)
+
+print(f'  Computed: {sum(1 for v in ik_to_rvec.values() if v is not None)}/{len(needed_iks)}')
+
+# Compute Jaccard for each pair
+print('  Computing pair Jaccard...')
+pair_jaccard = {}
+for a, b in tqdm(sampled_pairs):
+    va = ik_to_rvec.get(a)
+    vb = ik_to_rvec.get(b)
+    if va is None or vb is None:
+        pair_jaccard[(a, b)] = None
+        continue
+    intersection = (va & vb).sum()
+    union = (va | vb).sum()
+    jac = intersection / union if union > 0 else 0.0
+    pair_jaccard[(a, b)] = float(jac)
+
+n_valid = sum(1 for v in pair_jaccard.values() if v is not None)
+print(f'  Valid Jaccard: {n_valid}/{len(sampled_pairs)}')
+
+# ===================================================================
+# 6. Save CSV + Statistics
+# ===================================================================
+print('\n[6] Saving results...')
+
+# sampled_pairs.csv
+with open(f'{OUT_DIR}/sampled_pairs.csv', 'w', newline='', encoding='utf-8') as f:
+    writer = csv.writer(f)
+    writer.writerow(['ik_a', 'ik_b', 'smiles_a', 'smiles_b', 'mces', 'jaccard'])
+    for a, b in sampled_pairs:
+        smi_a, smi_b = pair_smiles.get((a, b), ('', ''))
+        mces = pair_mces.get((a, b))
+        jac = pair_jaccard.get((a, b))
+        writer.writerow([a, b, smi_a[:120], smi_b[:120],
+                         f'{mces:.1f}' if mces is not None else '',
+                         f'{jac:.4f}' if jac is not None else ''])
+
+# pair_mces_jaccard.csv (only complete pairs)
+mces_arr = []; jac_arr = []
+with open(f'{OUT_DIR}/pair_mces_jaccard.csv', 'w', newline='', encoding='utf-8') as f:
+    writer = csv.writer(f)
+    writer.writerow(['ik_a', 'ik_b', 'mces', 'jaccard'])
+    for a, b in sampled_pairs:
+        mces = pair_mces.get((a, b))
+        jac = pair_jaccard.get((a, b))
+        if mces is not None and jac is not None:
+            writer.writerow([a, b, f'{mces:.1f}', f'{jac:.4f}'])
+            mces_arr.append(mces)
+            jac_arr.append(jac)
+
+mces_arr = np.array(mces_arr); jac_arr = np.array(jac_arr)
+n_complete = len(mces_arr)
+print(f'  Complete pairs (both MCES+Jaccard): {n_complete}')
+
+# Statistics
+r_val, p_val = pearsonr(mces_arr, jac_arr)
+rho, sp_val = spearmanr(mces_arr, jac_arr)
+print(f'\n  Pearson r:  {r_val:.4f} (p={p_val:.2e})')
+print(f'  Spearman ρ: {rho:.4f} (p={sp_val:.2e})')
+
+# By MCES group
+groups = [(0, 2, 'MCES 0-2 (near-isomers)'),
+          (3, 5, 'MCES 3-5 (analogs)'),
+          (6, 10, 'MCES 6-10 (different isomers)'),
+          (11, 999, 'MCES >10 (unrelated)')]
+print(f'\n  By MCES group:')
+group_stats = {}
+for lo, hi, label in groups:
+    mask = (mces_arr >= lo) & (mces_arr <= hi)
+    n_g = mask.sum()
+    if n_g > 0:
+        mean_j = jac_arr[mask].mean()
+        std_j = jac_arr[mask].std()
+        print(f'    {label}: n={n_g}  Jaccard mean={mean_j:.4f} std={std_j:.4f}')
+        group_stats[label] = {'n': int(n_g), 'jaccard_mean': float(mean_j), 'jaccard_std': float(std_j)}
+
+# correlation_report.json
+report = {
+    'n_pairs_sampled': N_PAIRS,
+    'n_pairs_complete': int(n_complete),
+    'n_rules': N_RULES,
+    'pearson_r': float(r_val),
+    'pearson_p': float(p_val),
+    'spearman_rho': float(rho),
+    'spearman_p': float(sp_val),
+    'mces_range': [float(mces_arr.min()), float(mces_arr.max())],
+    'jaccard_range': [float(jac_arr.min()), float(jac_arr.max())],
+    'jaccard_mean': float(jac_arr.mean()),
+    'jaccard_std': float(jac_arr.std()),
+    'by_mces_group': group_stats,
+    't1_cache_hits': t1_hits,
+    'mcs_fallback': mcs_fallback,
+    'mces_failed': mces_failed,
+}
+with open(f'{OUT_DIR}/correlation_report.json', 'w') as f:
+    json.dump(report, f, indent=2)
+
+# ===================================================================
+# 7. Plot
+# ===================================================================
+print('\n[7] Plotting...')
+fig, axes = plt.subplots(1, 2, figsize=(14, 6))
+fig.suptitle(f'Rule Jaccard vs MCES Correlation\n'
+             f'Pearson r={r_val:.4f}  Spearman ρ={rho:.4f}  N={n_complete}',
+             fontsize=13, fontweight='bold')
+
+# (a) Scatter
+ax = axes[0]
+ax.scatter(mces_arr, jac_arr, alpha=0.3, s=8, c='#3498db', edgecolors='none', rasterized=True)
+z = np.polyfit(mces_arr, jac_arr, 1)
+x_line = np.linspace(mces_arr.min(), mces_arr.max(), 100)
+ax.plot(x_line, np.polyval(z, x_line), 'r-', lw=2, label=f'Pearson r={r_val:.4f}')
+ax.set_xlabel('MCES (structural distance)'); ax.set_ylabel('Rule Jaccard')
+ax.set_title('(a) Rule Jaccard vs MCES')
+ax.legend(); ax.grid(True, alpha=0.3)
+
+# (b) Binned bar chart
+ax = axes[1]
+labels = []; means = []; stds = []
+for lo, hi, label in groups:
+    mask = (mces_arr >= lo) & (mces_arr <= hi)
+    if mask.sum() > 0:
+        labels.append(label.split('(')[0].strip())
+        means.append(jac_arr[mask].mean())
+        stds.append(jac_arr[mask].std())
+x_pos = np.arange(len(labels))
+bars = ax.bar(x_pos, means, yerr=stds, color=['#2ecc71', '#f39c12', '#e74c3c', '#95a5a6'],
+              capsize=5, alpha=0.8)
+ax.set_xticks(x_pos); ax.set_xticklabels(labels, rotation=15)
+ax.set_ylabel('Mean Rule Jaccard'); ax.set_title('(b) Jaccard by MCES Group')
+ax.grid(True, alpha=0.3, axis='y')
+# Add count labels
+for i, (lo, hi, label) in enumerate(groups):
+    mask = (mces_arr >= lo) & (mces_arr <= hi)
+    if mask.sum() > 0:
+        ax.text(i, means[i] + stds[i] + 0.005, f'n={mask.sum()}',
+                ha='center', fontsize=8)
+
+plt.tight_layout()
+plt.savefig(f'{OUT_DIR}/rule_jaccard_vs_mces.png', dpi=150, bbox_inches='tight')
+print(f'  Saved: {OUT_DIR}/rule_jaccard_vs_mces.png')
+
+print(f'\n=== VALIDATION COMPLETE ===')
+print(f'  Output: {OUT_DIR}/')
+print(f'  Key result: Pearson r={r_val:.4f}, Spearman ρ={rho:.4f}')
+print(f'  Interpretation: ', end='')
+if abs(r_val) > 0.5:
+    print('STRONG correlation → rules CAN guide structure-aware training')
+elif abs(r_val) > 0.3:
+    print('MODERATE correlation → rules partially reflect structure, may need augmentation')
+else:
+    print('WEAK correlation → rules alone insufficient, need molecular alignment strategy')
