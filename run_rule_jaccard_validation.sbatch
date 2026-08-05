@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --gpus=1
-#SBATCH --cpus-per-task=8
-#SBATCH --mem=64G
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=32G
 #SBATCH -o rule_jaccard_%j.out
 #SBATCH -e rule_jaccard_%j.err
 #SBATCH -t 06:00:00
