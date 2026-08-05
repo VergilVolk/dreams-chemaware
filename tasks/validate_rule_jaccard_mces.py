@@ -32,8 +32,8 @@ rng = np.random.RandomState(42)
 OUT_DIR = 'data/validation/rule_mces_correlation'
 os.makedirs(OUT_DIR, exist_ok=True)
 
-N_PAIRS = 5000
-N_PEAKS = 128
+N_PAIRS = 1000   # 500 → 1000: 足够 Pearson 检验, 100× 更快
+N_PEAKS = 60     # 论文默认, 60×59/2 = 1770 峰对 vs 128×127/2 = 8128
 FP_BITS = 2048
 
 # ===================================================================
@@ -227,46 +227,72 @@ def preprocess_spectrum(peaks, n_highest=N_PEAKS):
     padded[:n] = arr[:n]
     return padded
 
-def get_rule_vector(peaks):
-    """Compute 335-dim binary rule match vector for a single spectrum"""
-    spec_pp = preprocess_spectrum(peaks)
-    if spec_pp is None: return None
-    mz_t = torch.as_tensor(spec_pp[:, 0], dtype=torch.float32).unsqueeze(0)
-    pad = (mz_t == 0)
-    # Compute all-to-all m/z differences
-    mz_diffs = torch.abs(mz_t.unsqueeze(-1) - mz_t.unsqueeze(-2))
+def get_rule_vectors_batch(peaks_list, n_highest=N_PEAKS):
+    """Batch-compute 335-dim binary rule match vectors for multiple spectra.
+    Uses ChemicalRuleEngine's native batch support (much faster than per-spectrum loop)."""
+    batch_size = len(peaks_list)
+    if batch_size == 0: return []
+
+    # Preprocess all spectra
+    specs = []
+    for peaks in peaks_list:
+        arr = np.array(peaks, dtype=np.float32)
+        if len(arr) == 0: return None
+        arr = arr[arr[:, 0].argsort()]
+        if len(arr) > n_highest:
+            idx = np.argpartition(arr[:, 1], -n_highest)[-n_highest:]
+            arr = arr[idx]; arr = arr[arr[:, 0].argsort()]
+        max_i = arr[:, 1].max()
+        if max_i > 0: arr[:, 1] /= max_i
+        padded = np.zeros((n_highest, 2), dtype=np.float32)
+        n = min(len(arr), n_highest); padded[:n] = arr[:n]
+        specs.append(padded)
+
+    # Stack into batch tensor
+    mz_batch = torch.as_tensor(np.stack([s[:, 0] for s in specs]), dtype=torch.float32)  # (B, n_peaks)
+    pad_batch = (mz_batch == 0)
+    mz_diffs = torch.abs(mz_batch.unsqueeze(-1) - mz_batch.unsqueeze(-2))  # (B, n_peaks, n_peaks)
+    precursor = mz_batch[:, 0].unsqueeze(-1)  # (B, 1)
+
     with torch.no_grad():
         vec = engine.get_rule_match_vectors(
-            mz_diffs, mz_values=mz_t,
-            precursor_mz=mz_t[:, 0].unsqueeze(0),
-            padding_mask=pad,
-            categories=None  # all 6 categories
+            mz_diffs, mz_values=mz_batch,
+            precursor_mz=precursor,
+            padding_mask=pad_batch,
+            categories=None
         )
-    # vec shape: (1, n_rules, n_peaks, n_peaks) — does any peak pair match?
-    # Collapse: rule is "hit" if any peak pair matches
-    hit = (vec.sum(dim=(2, 3)) > 0).squeeze(0)  # (n_rules,)
-    return hit.numpy().astype(np.int8)
+    # vec: (B, n_rules, n_peaks, n_peaks) → collapse to (B, n_rules)
+    hit = (vec.sum(dim=(2, 3)) > 0).numpy().astype(np.int8)
+    return [hit[i] for i in range(batch_size)]
 
 # Collect all needed IKs
 needed_iks = set()
 for a, b in sampled_pairs:
     needed_iks.add(a); needed_iks.add(b)
 
-# Compute rule vectors for all needed IKs
-print(f'  Computing rule vectors for {len(needed_iks)} IKs...')
+# Compute rule vectors for all needed IKs — BATCHED
+print(f'  Computing rule vectors for {len(needed_iks)} IKs (batch_size=64)...')
 ik_to_rvec = {}
 import torch
-n_done = 0
-for ik in tqdm(sorted(needed_iks)):
-    peaks = ik_best_peaks.get(ik)
-    if peaks is None:
-        ik_to_rvec[ik] = None
-        continue
-    rvec = get_rule_vector(peaks[0])  # peaks[0] is the peak list
-    ik_to_rvec[ik] = rvec
-    n_done += 1
-    if n_done % 1000 == 0:
-        print(f'    {n_done}/{len(needed_iks)}', flush=True)
+needed_list = sorted(needed_iks)
+BATCH = 64
+
+for b_start in tqdm(range(0, len(needed_list), BATCH)):
+    batch_iks = needed_list[b_start:b_start + BATCH]
+    batch_peaks = []
+    valid_mask = []
+    for ik in batch_iks:
+        entry = ik_best_peaks.get(ik)
+        if entry is not None:
+            batch_peaks.append(entry[0])  # peaks
+            valid_mask.append(ik)
+        else:
+            ik_to_rvec[ik] = None
+
+    if batch_peaks:
+        rvecs = get_rule_vectors_batch(batch_peaks)
+        for ik, rv in zip(valid_mask, rvecs):
+            ik_to_rvec[ik] = rv
 
 print(f'  Computed: {sum(1 for v in ik_to_rvec.values() if v is not None)}/{len(needed_iks)}')
 
