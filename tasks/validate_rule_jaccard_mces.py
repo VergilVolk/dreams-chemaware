@@ -203,110 +203,20 @@ for a, b in tqdm(sampled_pairs):
 print(f'  MCES: {t1_hits} from T1 cache, {mcs_fallback} from RDKit MCS, {mces_failed} failed')
 
 # ===================================================================
-# 5. Rule Jaccard computation
+# 5. Rule Jaccard — load from precomputed cache (instant!)
 # ===================================================================
-print('\n[5] Computing rule Jaccard (ChemicalRuleEngine, 335-dim)...')
-
-# Initialize rule engine (335 rules, no MassBank noise)
-engine = ChemicalRuleEngine(tolerance=0.02, use_massbank=False)
-N_RULES = len(engine.rules)
-print(f'  Rules: {N_RULES}')
-
-def preprocess_spectrum(peaks, n_highest=N_PEAKS):
-    """Minimal preprocessing: sort by m/z, top N peaks, normalize, pad"""
-    arr = np.array(peaks, dtype=np.float32)
-    if len(arr) == 0: return None
-    arr = arr[arr[:, 0].argsort()]
-    if len(arr) > n_highest:
-        idx = np.argpartition(arr[:, 1], -n_highest)[-n_highest:]
-        arr = arr[idx]
-        arr = arr[arr[:, 0].argsort()]
-    max_i = arr[:, 1].max()
-    if max_i > 0: arr[:, 1] /= max_i
-    padded = np.zeros((n_highest, 2), dtype=np.float32)
-    n = min(len(arr), n_highest)
-    padded[:n] = arr[:n]
-    return padded
-
-def get_rule_vectors_batch(peaks_list, n_highest=N_PEAKS):
-    """Batch-compute 335-dim binary rule match vectors for multiple spectra.
-    Uses ChemicalRuleEngine's native batch support (much faster than per-spectrum loop)."""
-    batch_size = len(peaks_list)
-    if batch_size == 0: return []
-
-    # Preprocess all spectra
-    specs = []
-    valid_indices = []  # track which spectra succeeded
-    for i, peaks in enumerate(peaks_list):
-        try:
-            arr = np.array(peaks, dtype=np.float32)
-            if len(arr) < 3: continue  # skip empty spectra
-            arr = arr[arr[:, 0].argsort()]
-            if len(arr) > n_highest:
-                idx = np.argpartition(arr[:, 1], -n_highest)[-n_highest:]
-                arr = arr[idx]; arr = arr[arr[:, 0].argsort()]
-            max_i = arr[:, 1].max()
-            if max_i > 0: arr[:, 1] /= max_i
-            padded = np.zeros((n_highest, 2), dtype=np.float32)
-            n = min(len(arr), n_highest); padded[:n] = arr[:n]
-            specs.append(padded)
-            valid_indices.append(i)
-        except Exception:
-            continue
-
-    if not specs:
-        return [None] * batch_size
-
-    # Stack into batch tensor
-    mz_batch = torch.as_tensor(np.stack([s[:, 0] for s in specs]), dtype=torch.float32)  # (B, n_peaks)
-    pad_batch = (mz_batch == 0)
-    mz_diffs = torch.abs(mz_batch.unsqueeze(-1) - mz_batch.unsqueeze(-2))  # (B, n_peaks, n_peaks)
-    precursor = mz_batch[:, 0].unsqueeze(-1)  # (B, 1)
-
-    with torch.no_grad():
-        vec = engine.get_rule_match_vectors(
-            mz_diffs, mz_values=mz_batch,
-            precursor_mz=precursor,
-            padding_mask=pad_batch,
-            categories=None
-        )
-    # vec: (B, n_rules, n_peaks, n_peaks) → collapse to (B, n_rules)
-    hit_all = (vec.sum(dim=(2, 3)) > 0).numpy().astype(np.int8)
-    # Map back to original indices (some may have been skipped)
-    results = [None] * batch_size
-    for j, orig_idx in enumerate(valid_indices):
-        results[orig_idx] = hit_all[j]
-    return results
-
-# Collect all needed IKs
-needed_iks = set()
-for a, b in sampled_pairs:
-    needed_iks.add(a); needed_iks.add(b)
-
-# Compute rule vectors for all needed IKs — BATCHED
-print(f'  Computing rule vectors for {len(needed_iks)} IKs (batch_size=64)...')
-ik_to_rvec = {}
-needed_list = sorted(needed_iks)
-BATCH = 8   # small: (8, 293, 60, 60) = 34MB, avoids memory thrashing
-
-for b_start in tqdm(range(0, len(needed_list), BATCH)):
-    batch_iks = needed_list[b_start:b_start + BATCH]
-    batch_peaks = []
-    valid_mask = []
-    for ik in batch_iks:
-        entry = ik_best_peaks.get(ik)
-        if entry is not None:
-            batch_peaks.append(entry[0])  # peaks
-            valid_mask.append(ik)
-        else:
-            ik_to_rvec[ik] = None
-
-    if batch_peaks:
-        rvecs = get_rule_vectors_batch(batch_peaks)
-        for ik, rv in zip(valid_mask, rvecs):
-            ik_to_rvec[ik] = rv
-
-print(f'  Computed: {sum(1 for v in ik_to_rvec.values() if v is not None)}/{len(needed_iks)}')
+print('\n[5] Loading precomputed rule vectors from cache...')
+import torch
+CACHE_PATH = 'tasks/_cache/rule_vectors/ik_to_rvec.npz'
+if os.path.exists(CACHE_PATH):
+    cache = np.load(CACHE_PATH)
+    ik_to_rvec = {ik: cache[ik] for ik in cache.keys()}
+    N_RULES = ik_to_rvec[list(ik_to_rvec.keys())[0]].shape[0]
+    print(f'  Loaded {len(ik_to_rvec)} cached vectors ({N_RULES} rules each)')
+else:
+    print(f'  ERROR: Cache not found at {CACHE_PATH}')
+    print(f'  Run first: python tasks/precompute_rule_vectors.py')
+    sys.exit(1)
 
 # Compute Jaccard for each pair
 print('  Computing pair Jaccard...')
