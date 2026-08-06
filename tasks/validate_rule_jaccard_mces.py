@@ -44,23 +44,21 @@ print('[1] Loading indices...')
 idx = load_indices()
 ik_to_smi = idx['ik_to_smi']
 
+# Build 14-char → SMILES lookup (handles mixed key lengths in indices)
+smi_lookup = {}
+for ik, smi in ik_to_smi.items():
+    smi_lookup[ik[:14]] = smi
+_ = [smi_lookup.pop(k, None) for k in list(smi_lookup.keys()) if len(k) > 14]
+
 # Filter to IKs with valid SMILES; normalize to 14-char (matching rule vector cache)
 valid_iks = []
-for ik in ik_to_smi:
-    ik14 = ik[:14]
-    smi = smi_lookup[ik]
+for ik14, smi in smi_lookup.items():
     if not smi: continue
     mol = Chem.MolFromSmiles(smi)
     if mol is None: continue
     valid_iks.append(ik14)
 valid_iks = sorted(set(valid_iks))
 print(f'  Valid IKs (14-char): {len(valid_iks)}')
-
-# Build 14-char → SMILES lookup (handles mixed key lengths in indices)
-smi_lookup = {}
-for ik, smi in ik_to_smi.items():
-    smi_lookup[ik[:14]] = smi
-_ = [smi_lookup.pop(k, None) for k in list(smi_lookup.keys()) if len(k) > 14]
 
 # ===================================================================
 # 2. Load existing T1 MCES data (reuse!)
