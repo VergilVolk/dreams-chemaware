@@ -38,50 +38,21 @@ N_PEAKS = 60     # 论文默认, 60×59/2 = 1770 峰对 vs 128×127/2 = 8128
 FP_BITS = 2048
 
 # ===================================================================
-# 1. Deduplicate: 1 spectrum per InChIKey (highest total intensity)
+# 1. Load indices + filter to valid IKs (no MGF scan needed!)
 # ===================================================================
-print('[1] Deduplicating annotated01 to molecule level...')
+print('[1] Loading indices...')
 idx = load_indices()
 ik_to_smi = idx['ik_to_smi']
-all_iks = sorted(ik_to_smi.keys())
-print(f'  Unique IKs: {len(all_iks)}')
-
-# Pick best spectrum per IK (highest total intensity)
-print('  Scanning MGF for best spectra per IK...')
-ik_best_peaks = {}
-cur_ik = None; cur_peaks = []; cur_total_i = 0
-with open('data/annotated01.mgf', 'r', encoding='utf-8', errors='ignore') as f:
-    for line in tqdm(f, unit='lines', unit_scale=True):
-        line = line.strip()
-        if not line:
-            if cur_ik and len(cur_peaks) >= 3:
-                if cur_ik not in ik_best_peaks or cur_total_i > ik_best_peaks[cur_ik][1]:
-                    ik_best_peaks[cur_ik] = (cur_peaks[:], cur_total_i)
-            cur_ik = None; cur_peaks = []; cur_total_i = 0; continue
-        if line.startswith('INCHIKEY='):
-            cur_ik = line[9:].strip()[:14]
-        elif line[0].isdigit() or (line[0] == '-' and len(line) > 1 and line[1].isdigit()):
-            p2 = line.split()
-            if len(p2) >= 2:
-                try:
-                    mz, intensity = float(p2[0]), float(p2[1])
-                    if mz > 0 and intensity > 0:
-                        cur_peaks.append((mz, intensity))
-                        cur_total_i += intensity
-                except: pass
-
-best_iks = sorted(ik_best_peaks.keys())
-print(f'  Best spectra: {len(best_iks)} IKs')
 
 # Filter to IKs with valid SMILES and fingerprint-able
 valid_iks = []
-for ik in best_iks:
-    smi = ik_to_smi.get(ik, '')
+for ik in ik_to_smi:
+    smi = ik_to_smi[ik]
     if not smi: continue
     mol = Chem.MolFromSmiles(smi)
     if mol is None: continue
     valid_iks.append(ik)
-print(f'  Valid (SMILES parseable): {len(valid_iks)}')
+print(f'  Valid IKs: {len(valid_iks)}')
 
 # ===================================================================
 # 2. Load existing T1 MCES data (reuse!)
@@ -107,13 +78,22 @@ print(f'  Loaded {t1_count} existing MCES values from T1 pairs.json')
 print(f'\n[3] Sampling {N_PAIRS} pairs...')
 
 # Pre-compute fingerprints for all valid IKs (needed for Tanimoto-based stratification)
-print('  Computing fingerprints...')
-ik_fp = {}
-for ik in tqdm(valid_iks):
-    smi = ik_to_smi[ik]
-    mol = Chem.MolFromSmiles(smi)
-    ik_fp[ik] = AllChem.GetMorganFingerprintAsBitVect(mol, 2, FP_BITS)
-print(f'  {len(ik_fp)} fingerprints computed')
+print('  Computing fingerprints (cached)...')
+import pickle
+FP_CACHE = 'tasks/_cache/rule_vectors/ik_fp.pkl'
+if os.path.exists(FP_CACHE):
+    with open(FP_CACHE, 'rb') as f:
+        ik_fp = pickle.load(f)
+    print(f'  Loaded {len(ik_fp)} fingerprints from cache')
+else:
+    ik_fp = {}
+    for ik in tqdm(valid_iks):
+        smi = ik_to_smi[ik]
+        mol = Chem.MolFromSmiles(smi)
+        ik_fp[ik] = AllChem.GetMorganFingerprintAsBitVect(mol, 2, FP_BITS)
+    with open(FP_CACHE, 'wb') as f:
+        pickle.dump(ik_fp, f)
+    print(f'  Computed + cached {len(ik_fp)} fingerprints')
 
 # Stratified sampling: aim for coverage across Tanimoto ranges
 # Compute Tanimoto for random pairs to estimate distribution

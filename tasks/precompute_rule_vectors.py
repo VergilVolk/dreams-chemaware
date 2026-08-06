@@ -134,7 +134,13 @@ np.savez_compressed(f'{CACHE_DIR}/ik_to_rvec.npz', **{ik: rv for ik, rv in ik_to
 with open(f'{CACHE_DIR}/ik_list.json', 'w') as f:
     json.dump(sorted(ik_to_rvec.keys()), f)
 
+# Also save best peaks (avoid rescanning MGF)
+with open(f'{CACHE_DIR}/ik_best_peaks.json', 'w') as f:
+    # Only save peak count for validation, not full peak lists (too large)
+    json.dump({ik: len(peaks[0]) for ik, peaks in ik_best_peaks.items()}, f)
+
 print(f'  Saved: {len(ik_to_rvec)} rule vectors ({os.path.getsize(CACHE_DIR + "/ik_to_rvec.npz")/1e6:.1f}MB)')
+print(f'  Also: ik_best_peaks.json ({len(ik_best_peaks)} entries)')
 print(f'\nUsage in other scripts:')
 print(f'  data = np.load("{CACHE_DIR}/ik_to_rvec.npz")')
 print(f'  rvec_a = data[ik_a]  # 335-dim binary vector')
