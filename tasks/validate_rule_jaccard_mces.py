@@ -77,8 +77,18 @@ print(f'  Loaded {t1_count} existing MCES values from T1 pairs.json')
 # ===================================================================
 print(f'\n[3] Subset {N_SUBSET} molecules, stratified pair sampling...')
 
-# Pick random subset (much faster than 76K fingerprints)
-subset_iks = rng.choice(valid_iks, min(N_SUBSET, len(valid_iks)), replace=False)
+# Load rule vector cache first (to filter subset to only IKs with both SMILES + spectra)
+CACHE_PATH = 'tasks/_cache/rule_vectors/ik_to_rvec.npz'
+if not os.path.exists(CACHE_PATH):
+    print(f'ERROR: Run first: python tasks/precompute_rule_vectors.py'); sys.exit(1)
+cache = np.load(CACHE_PATH)
+cached_iks = set(cache.keys())
+print(f'  Rule vector cache: {len(cached_iks)} IKs')
+
+# Pick subset from IKs that have BOTH valid SMILES AND rule vectors
+eligible_iks = sorted(set(valid_iks) & cached_iks)
+print(f'  Eligible (SMILES + rule vectors): {len(eligible_iks)}')
+subset_iks = rng.choice(eligible_iks, min(N_SUBSET, len(eligible_iks)), replace=False)
 subset_iks = sorted(set(subset_iks))
 N_sub = len(subset_iks)
 print(f'  Subset: {N_sub} molecules → C({N_sub},2) = {N_sub*(N_sub-1)//2:,} candidate pairs')
@@ -155,17 +165,12 @@ for a, b in tqdm(sampled_pairs):
 print(f'  MCES: {t1_hits} from T1 cache, {mcs_fallback} from RDKit MCS, {mces_failed} failed')
 
 # ===================================================================
-# 5. Rule Jaccard — load from precomputed cache
+# 5. Rule Jaccard — use cache already loaded in step 3
 # ===================================================================
-print('\n[5] Loading rule vectors from cache...')
-CACHE_PATH = 'tasks/_cache/rule_vectors/ik_to_rvec.npz'
-if not os.path.exists(CACHE_PATH):
-    print(f'  ERROR: Cache not found. Run: python tasks/precompute_rule_vectors.py')
-    sys.exit(1)
-cache = np.load(CACHE_PATH)
+print('\n[5] Building rule vector lookup from cache...')
 ik_to_rvec = {ik: cache[ik] for ik in cache.keys()}
 N_RULES = ik_to_rvec[list(ik_to_rvec.keys())[0]].shape[0]
-print(f'  Loaded {len(ik_to_rvec)} rule vectors ({N_RULES} rules)')
+print(f'  {len(ik_to_rvec)} rule vectors ({N_RULES} rules)')
 
 # Filter pairs: only keep those with BOTH MCES and rule vectors
 valid_pairs = []
