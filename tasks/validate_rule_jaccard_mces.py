@@ -33,7 +33,7 @@ rng = np.random.RandomState(42)
 OUT_DIR = 'data/validation/rule_mces_correlation'
 os.makedirs(OUT_DIR, exist_ok=True)
 
-N_PAIRS = 1000   # 500 → 1000: 足够 Pearson 检验, 100× 更快
+N_SUBSET = 5000   # 子集大小, C(5000,2)=12.5M 足够覆盖所有 Tanimoto 区间
 N_PEAKS = 60     # 论文默认, 60×59/2 = 1770 峰对 vs 128×127/2 = 8128
 FP_BITS = 2048
 
@@ -73,67 +73,39 @@ if os.path.exists(t1_pairs_path):
 print(f'  Loaded {t1_count} existing MCES values from T1 pairs.json')
 
 # ===================================================================
-# 3. Sample 5,000 pairs (stratified by estimated Tanimoto)
+# 3. Sample N_SUBSET molecules + stratified pair sampling
 # ===================================================================
-print(f'\n[3] Sampling {N_PAIRS} pairs...')
+print(f'\n[3] Subset {N_SUBSET} molecules, stratified pair sampling...')
 
-# Pre-compute fingerprints for all valid IKs (needed for Tanimoto-based stratification)
-print('  Computing fingerprints (cached)...')
-import pickle
-FP_CACHE = 'tasks/_cache/rule_vectors/ik_fp.pkl'
-if os.path.exists(FP_CACHE):
-    with open(FP_CACHE, 'rb') as f:
-        ik_fp = pickle.load(f)
-    print(f'  Loaded {len(ik_fp)} fingerprints from cache')
-else:
-    ik_fp = {}
-    for ik in tqdm(valid_iks):
-        smi = ik_to_smi[ik]
-        mol = Chem.MolFromSmiles(smi)
-        ik_fp[ik] = AllChem.GetMorganFingerprintAsBitVect(mol, 2, FP_BITS)
-    with open(FP_CACHE, 'wb') as f:
-        pickle.dump(ik_fp, f)
-    print(f'  Computed + cached {len(ik_fp)} fingerprints')
+# Pick random subset (much faster than 76K fingerprints)
+subset_iks = rng.choice(valid_iks, min(N_SUBSET, len(valid_iks)), replace=False)
+subset_iks = sorted(set(subset_iks))
+N_sub = len(subset_iks)
+print(f'  Subset: {N_sub} molecules → C({N_sub},2) = {N_sub*(N_sub-1)//2:,} candidate pairs')
 
-# Stratified sampling: aim for coverage across Tanimoto ranges
-# Compute Tanimoto for random pairs to estimate distribution
-print('  Stratified sampling...')
-n_sample_pre = 20000
-pre_tani = []
-pre_pairs = []
-while len(pre_pairs) < n_sample_pre:
-    ai, bi = rng.choice(len(valid_iks), 2, replace=False)
-    a, b = valid_iks[ai], valid_iks[bi]
-    key = (a, b) if a < b else (b, a)
-    if key in pre_pairs: continue
-    tan = DataStructs.TanimotoSimilarity(ik_fp[a], ik_fp[b])
-    pre_pairs.append(key)
-    pre_tani.append(tan)
+# Compute fingerprints for subset only
+ik_fp = {}
+for ik in tqdm(subset_iks, desc='Fingerprints'):
+    mol = Chem.MolFromSmiles(ik_to_smi[ik])
+    ik_fp[ik] = AllChem.GetMorganFingerprintAsBitVect(mol, 2, FP_BITS)
 
-pre_tani = np.array(pre_tani)
-
-# Define strata
-strata = [(0, 0.025, 1000), (0.025, 0.1, 1500), (0.1, 0.3, 1500), (0.3, 1.01, 1000)]
+# Stratified sampling from subset
+strata = [(0, 0.05, 200), (0.05, 0.15, 250), (0.15, 0.35, 250), (0.35, 1.01, 300)]
 sampled_pairs = []
 for lo, hi, n_target in strata:
-    mask = (pre_tani >= lo) & (pre_tani < hi)
-    candidates = [pre_pairs[i] for i in range(len(pre_pairs)) if mask[i]]
-    print(f'    Tanimoto [{lo:.3f}, {hi:.3f}): {len(candidates)} candidates, target {n_target}')
-    if len(candidates) >= n_target:
-        idx = rng.choice(len(candidates), n_target, replace=False)
-        sampled_pairs.extend([candidates[i] for i in idx])
-    else:
-        sampled_pairs.extend(candidates)
+    n = 0; tried = 0
+    while n < n_target and tried < 100000:
+        ai, bi = rng.choice(N_sub, 2, replace=False)
+        a, b = subset_iks[ai], subset_iks[bi]
+        key = (a, b) if a < b else (b, a)
+        if key in sampled_pairs: continue
+        tan = DataStructs.TanimotoSimilarity(ik_fp[a], ik_fp[b])
+        if lo <= tan < hi:
+            sampled_pairs.append(key)
+            n += 1
+        tried += 1
+    print(f'    [{lo:.2f},{hi:.2f}): {n}/{n_target} (tried {tried})')
 
-# If we don't have enough, fill with random
-while len(sampled_pairs) < N_PAIRS:
-    ai, bi = rng.choice(len(valid_iks), 2, replace=False)
-    a, b = valid_iks[ai], valid_iks[bi]
-    key = (a, b) if a < b else (b, a)
-    if key not in sampled_pairs:
-        sampled_pairs.append(key)
-
-sampled_pairs = sampled_pairs[:N_PAIRS]
 print(f'  Sampled: {len(sampled_pairs)} pairs')
 
 # ===================================================================
@@ -273,7 +245,7 @@ for lo, hi, label in groups:
 
 # correlation_report.json
 report = {
-    'n_pairs_sampled': N_PAIRS,
+    'n_pairs_sampled': int(len(sampled_pairs)),
     'n_pairs_complete': int(n_complete),
     'n_rules': N_RULES,
     'pearson_r': float(r_val),
