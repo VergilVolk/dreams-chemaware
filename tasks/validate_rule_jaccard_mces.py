@@ -155,37 +155,38 @@ for a, b in tqdm(sampled_pairs):
 print(f'  MCES: {t1_hits} from T1 cache, {mcs_fallback} from RDKit MCS, {mces_failed} failed')
 
 # ===================================================================
-# 5. Rule Jaccard — load from precomputed cache (instant!)
+# 5. Rule Jaccard — load from precomputed cache
 # ===================================================================
-print('\n[5] Loading precomputed rule vectors from cache...')
-import torch
+print('\n[5] Loading rule vectors from cache...')
 CACHE_PATH = 'tasks/_cache/rule_vectors/ik_to_rvec.npz'
-if os.path.exists(CACHE_PATH):
-    cache = np.load(CACHE_PATH)
-    ik_to_rvec = {ik: cache[ik] for ik in cache.keys()}
-    N_RULES = ik_to_rvec[list(ik_to_rvec.keys())[0]].shape[0]
-    print(f'  Loaded {len(ik_to_rvec)} cached vectors ({N_RULES} rules each)')
-else:
-    print(f'  ERROR: Cache not found at {CACHE_PATH}')
-    print(f'  Run first: python tasks/precompute_rule_vectors.py')
+if not os.path.exists(CACHE_PATH):
+    print(f'  ERROR: Cache not found. Run: python tasks/precompute_rule_vectors.py')
     sys.exit(1)
+cache = np.load(CACHE_PATH)
+ik_to_rvec = {ik: cache[ik] for ik in cache.keys()}
+N_RULES = ik_to_rvec[list(ik_to_rvec.keys())[0]].shape[0]
+print(f'  Loaded {len(ik_to_rvec)} rule vectors ({N_RULES} rules)')
 
-# Compute Jaccard for each pair
-print('  Computing pair Jaccard...')
+# Filter pairs: only keep those with BOTH MCES and rule vectors
+valid_pairs = []
+n_miss_mces = 0; n_miss_rvec = 0
+for a, b in sampled_pairs:
+    if (a, b) not in pair_mces:
+        n_miss_mces += 1; continue
+    if a not in ik_to_rvec or b not in ik_to_rvec:
+        n_miss_rvec += 1; continue
+    valid_pairs.append((a, b))
+
+# Compute Jaccard for valid pairs
+print(f'  Valid pairs for Jaccard: {len(valid_pairs)} '
+      f'(miss MCES={n_miss_mces}, miss rvec={n_miss_rvec})')
+
 pair_jaccard = {}
-for a, b in tqdm(sampled_pairs):
-    va = ik_to_rvec.get(a)
-    vb = ik_to_rvec.get(b)
-    if va is None or vb is None:
-        pair_jaccard[(a, b)] = None
-        continue
+for a, b in tqdm(valid_pairs, desc='Jaccard'):
+    va = ik_to_rvec[a]; vb = ik_to_rvec[b]
     intersection = (va & vb).sum()
     union = (va | vb).sum()
-    jac = intersection / union if union > 0 else 0.0
-    pair_jaccard[(a, b)] = float(jac)
-
-n_valid = sum(1 for v in pair_jaccard.values() if v is not None)
-print(f'  Valid Jaccard: {n_valid}/{len(sampled_pairs)}')
+    pair_jaccard[(a, b)] = float(intersection / union) if union > 0 else 0.0
 
 # ===================================================================
 # 6. Save CSV + Statistics
@@ -209,13 +210,12 @@ mces_arr = []; jac_arr = []
 with open(f'{OUT_DIR}/pair_mces_jaccard.csv', 'w', newline='', encoding='utf-8') as f:
     writer = csv.writer(f)
     writer.writerow(['ik_a', 'ik_b', 'mces', 'jaccard'])
-    for a, b in sampled_pairs:
-        mces = pair_mces.get((a, b))
-        jac = pair_jaccard.get((a, b))
-        if mces is not None and jac is not None:
-            writer.writerow([a, b, f'{mces:.1f}', f'{jac:.4f}'])
-            mces_arr.append(mces)
-            jac_arr.append(jac)
+    for a, b in valid_pairs:
+        mces = pair_mces[(a, b)]
+        jac = pair_jaccard.get((a, b), 0.0)
+        writer.writerow([a, b, f'{mces:.1f}', f'{jac:.4f}'])
+        mces_arr.append(mces)
+        jac_arr.append(jac)
 
 mces_arr = np.array(mces_arr); jac_arr = np.array(jac_arr)
 n_complete = len(mces_arr)
