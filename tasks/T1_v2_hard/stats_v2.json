@@ -1,0 +1,17 @@
+{
+  "total_mces_computed": 6232,
+  "positive_pairs": 781,
+  "negative_hard": 784,
+  "negative_easy": 4087,
+  "triplets_train": 382,
+  "triplets_val": 36,
+  "positive_tanimoto": {
+    "mean": 0.7200935979513444,
+    "std": 0.1967498426266472
+  },
+  "neg_hard_tanimoto": {
+    "mean": 0.577156887755102,
+    "std": 0.20802932566158044
+  },
+  "recommended_margin": 0.4
+}

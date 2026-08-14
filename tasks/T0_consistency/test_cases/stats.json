@@ -1,0 +1,52 @@
+{
+  "total_spectra": 513617,
+  "total_inchikeys": 44300,
+  "multi_spectrum_inchikeys": 39045,
+  "dedup_removed": 63440,
+  "ik_spectrum_count_distribution": {
+    "2": 1937,
+    "3": 1564,
+    "4": 1159,
+    "5": 6286,
+    "6": 2346,
+    "7": 2203,
+    "8": 3510,
+    "9": 1128,
+    "10": 3333,
+    "11": 1621,
+    "12": 1729,
+    "13": 1943,
+    "14": 1015,
+    "15": 1369,
+    "16": 936,
+    "17": 801,
+    "18": 835,
+    "19": 575,
+    "20": 558,
+    "21": 429
+  },
+  "pairs": {
+    "positive_total": 56399,
+    "positive_cross_db": 4610,
+    "positive_same_db": 51789,
+    "negative_total": 10000,
+    "negative_hard_mass_proximate": 5000,
+    "negative_easy_random": 5000
+  },
+  "positive_source_distribution": {
+    "gnps": 62888,
+    "mona_pos": 3335,
+    "massbank": 7705,
+    "mona_neg": 4162
+  },
+  "positive_tanimoto_sample": {
+    "mean": 0.9836555469030075,
+    "std": 0.08819159424635106
+  },
+  "negative_mass_diff": {
+    "min": 0.0,
+    "max": 1898.5301513671877,
+    "mean": 204.1320162898784,
+    "median": 25.072286621093745
+  }
+}

@@ -1,16 +1,18 @@
 """
-预计算 ChemicalRuleEngine 335 维规则命中向量缓存。
+预计算 ChemicalRuleEngine 规则命中向量缓存。
 
 输出: tasks/_cache/rule_vectors/
-  ik_to_rvec.npz   — {ik14: 335-dim binary array}  每 IK 一套
-  ik_best_peaks.json — {ik14: [mz, intensity, ...]}  最佳谱图
+  ik_to_rvec.npz          — {ik14: N-dim binary array}  335 条主规则
+  ik_to_rvec_massbank.npz — {ik14: M-dim binary array}  全量 ~3,486 条规则
+  ik_best_peaks.json      — {ik14: n_peaks}  最佳谱图峰数
 
-耗时: ~30min (87K IKs × 335 rules × 60 peaks, batch=8)
+耗时: ~3min (335 rules) / ~5-8min (3,486 rules, batch=8)
 之后任何 pair 的 Jaccard 计算变成 instant bitwise AND/OR。
 
-用法: python tasks/precompute_rule_vectors.py
+用法: python tasks/precompute_rule_vectors.py                # 仅 335 主规则
+       python tasks/precompute_rule_vectors.py --use-massbank # 全量 ~3,486 条规则
 """
-import json, os, sys, time, gc
+import json, os, sys, time, gc, argparse
 from collections import defaultdict
 import numpy as np
 import torch
@@ -19,6 +21,11 @@ from tqdm import tqdm
 sys.path.insert(0, '.')
 from tasks.build_utils import load_indices
 from dreams.models.chem_aware.chem_rules import ChemicalRuleEngine
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--use-massbank', action='store_true',
+                    help='Include 3,151 MassBank rules (total ~3,486 rules)')
+args = parser.parse_args()
 
 rng = np.random.RandomState(42)
 CACHE_DIR = 'tasks/_cache/rule_vectors'
@@ -60,8 +67,10 @@ print(f'  {len(best_iks)} IKs with best spectra')
 # ===================================================================
 # 2. Initialize rule engine
 # ===================================================================
-print('[2] Initializing ChemicalRuleEngine (335 rules, no MassBank)...')
-engine = ChemicalRuleEngine(tolerance=0.02, use_massbank=False)
+use_mb = args.use_massbank
+mb_label = 'full ~3,486 rules (with MassBank)' if use_mb else '335 main rules (no MassBank)'
+print(f'[2] Initializing ChemicalRuleEngine ({mb_label})...')
+engine = ChemicalRuleEngine(tolerance=0.02, use_massbank=use_mb)
 n_rules = len(engine.rules)
 print(f'  {n_rules} rules')
 
@@ -128,7 +137,8 @@ print(f'  Rate: {n_done/elapsed:.0f} IKs/sec')
 # 4. Save
 # ===================================================================
 print(f'[4] Saving to {CACHE_DIR}/...')
-np.savez_compressed(f'{CACHE_DIR}/ik_to_rvec.npz', **{ik: rv for ik, rv in ik_to_rvec.items()})
+npy_name = 'ik_to_rvec_massbank.npz' if use_mb else 'ik_to_rvec.npz'
+np.savez_compressed(f'{CACHE_DIR}/{npy_name}', **{ik: rv for ik, rv in ik_to_rvec.items()})
 
 # Save IK list for loading order
 with open(f'{CACHE_DIR}/ik_list.json', 'w') as f:
@@ -139,8 +149,8 @@ with open(f'{CACHE_DIR}/ik_best_peaks.json', 'w') as f:
     # Only save peak count for validation, not full peak lists (too large)
     json.dump({ik: len(peaks[0]) for ik, peaks in ik_best_peaks.items()}, f)
 
-print(f'  Saved: {len(ik_to_rvec)} rule vectors ({os.path.getsize(CACHE_DIR + "/ik_to_rvec.npz")/1e6:.1f}MB)')
+print(f'  Saved: {len(ik_to_rvec)} rule vectors ({os.path.getsize(CACHE_DIR + "/" + npy_name)/1e6:.1f}MB)')
 print(f'  Also: ik_best_peaks.json ({len(ik_best_peaks)} entries)')
 print(f'\nUsage in other scripts:')
-print(f'  data = np.load("{CACHE_DIR}/ik_to_rvec.npz")')
-print(f'  rvec_a = data[ik_a]  # 335-dim binary vector')
+print(f'  data = np.load("{CACHE_DIR}/{npy_name}")')
+print(f'  rvec_a = data[ik_a]  # {n_rules}-dim binary vector')
