@@ -124,6 +124,7 @@ def main():
         ax2.set_title(f'A2 AdaCosine — Restart Points (Fold 0, {len(restarts)} restarts)')
         ax2.legend(fontsize=9); ax2.grid(True, alpha=0.3)
     fig_path2 = out_dir / 'a2_restarts.png'
+    
     plt.savefig(fig_path2, dpi=150)
     print(f'Saved: {fig_path2}')
 

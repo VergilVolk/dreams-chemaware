@@ -1,0 +1,1311 @@
+                       Article                                                           https://doi.org/10.1038/s41467-026-72149-6
+
+                       Structure-informed deep generation enables
+
+                       de novo metabolite annotation in untargeted
+
+                       metabolomics
+
+1234567890():,;        Received: 22 July 2025                 Hongmiao Wang1,2, Haosong Zhang 1,2 & Zheng-Jiang Zhu 1,3,4
+      1234567890():,;  Accepted: 7 April 2026
+                                                              Metabolite annotation, especially the discovery of unknown metabolites,
+                           Check for updates                  remains a fundamental challenge in mass spectrometry-based untargeted
+                                                              metabolomics due to limited reference mass spectra. Here we present Met-
+                                                              GenX, a structure-informed encoder-decoder neural network that enables
+                                                              efficient and controllable generation of metabolite structures directly from
+                                                              MS2 spectra. By reformulating the spectrum-to-structure task as a structure-
+                                                              to-structure generation problem, MetGenX significantly improves generation
+                                                              accuracy and chemical space coverage. In independent tests, it achieved top-1
+                                                              accuracy of 55.9% on 1388 NIST MS2 spectra and 68.5% on 1681 spectra from
+                                                              real biological samples, outperforming existing in silico tools. Its structure-
+                                                              informed design ensures robust performance across both positive and nega-
+                                                              tive ionization modes without retraining. Applying a multi-step annotation
+                                                              workflow to mouse liver untargeted metabolomics data, MetGenX identified
+                                                              two previously uncharacterized metabolites absent from major human meta-
+                                                              bolome databases. These results demonstrate MetGenX's strong potential to
+                                                              advance de novo metabolite annotation and facilitate the discovery of
+                                                              uncharacterized chemical entities.
+
+                       Untargeted metabolomics enables comprehensive and quantita-             Molecular networking approaches cluster experimental features
+                       tive profiling of metabolites in biological systems. However,     based on MS2 spectral similarity and leverage fragment-based sub-
+                       despite significant advances in instrumentation, accurate meta-   structure information from annotated neighbors to facilitate the dis-
+                       bolite annotation remains a major bottleneck, particularly in     covery of unknown metabolites8,9. These known structures provide
+                       liquid chromatography­mass spectrometry (LC­MS)-based             essential context for inferring related unknowns, enabling more
+                       workflows1,2. Library-based spectral matching remains the gold    informed and targeted annotation strategies. Using this approach,
+                       standard for annotation but is limited to known metabolites with  Quinn et. al. discovered a series of amino acid conjugations of host bile
+                       available reference spectra3,4. The annotation of unknown meta-   acids, which were enriched in patients with inflammatory bowel dis-
+                       bolites, including "known unknowns" (metabolites present in       ease or cystic fibrosis10. Alternatively, in silico prediction approaches--
+                       structural databases but lacking reference spectra) and "unknown  primarily based on machine learning and deep-learning--learn frag-
+                       unknowns" (metabolites with previously uncharacterized struc-     mentation patterns and rules from available reference spectra of
+                       tures), continues to pose a fundamental challenge5. To overcome   known metabolites. These methods enable either the forward predic-
+                       this, computational approaches such as molecular networking       tion of in silico MS2 spectra from molecular structures (e.g., CFM-ID11
+                       and in silico prediction have emerged as powerful and com-        and MS-FINDER12) or the inverse inference of structural representa-
+                       plementary strategies for annotating unknown metabolites6,7.      tions, such as molecular fingerprints, directly from experimental
+
+                       1Interdisciplinary Research Center on Biology and Chemistry, Shanghai Institute of Organic Chemistry, Chinese Academy of Sciences, Shanghai, China.
+                       2University of Chinese Academy of Sciences, Beijing, China. 3Shanghai Key Laboratory of Aging Studies, Shanghai, China. 4Shanghai Academy of Natural
+                       Sciences (SANS), Shanghai, China. e-mail: jiangzhu@sioc.ac.cn
+
+                       Nature Communications | (2026)17:5426                                                                                                                 1
+Article                                                                       https://doi.org/10.1038/s41467-026-72149-6
+
+MS2 spectra (e.g., CSI:FingerID13 and MIST14). However, most in silico        from MS2 spectra. It introduces a representation transformation
+tools rely heavily on existing structural databases, making it difficult to   strategy that, instead of directly encoding the spectrum for genera-
+identify metabolites with previously uncharacterized structures that          tion, first retrieves structurally similar metabolites via spectral simi-
+are absent from known chemical space. Furthermore, the effectiveness          larity search. These analogs serve as structure-informed templates to
+of in silico prediction is currently constrained by the limited availability  guide the generative model toward chemically plausible de novo
+of high-quality reference MS2 spectra15. As a result, the full potential of   structures, effectively integrating prior knowledge from known
+in silico prediction for metabolite annotation has yet to be fully            metabolites. The framework of MetGenX consists of three sequential
+realized.                                                                     modules: template search, template encoding, and structure genera-
+                                                                              tion (Fig. 1). In template search, the query MS2 spectrum is first
+      Recent advances in deep generation have enabled the discovery           encoded into a 512-dimensional spectral vector through textualization,
+of chemical structures beyond known chemical space, with growing              word embedding and pooling (Fig. 1a and Supplementary Fig. 1a). We
+applications in computational drug design16. Various models have              compared and optimized several methods for spectral embedding and
+been developed to generate molecules, which can be optimized for              template search. A Word2Vec model26 was ultimately selected for its
+specific targets using transfer learning, contrastive fine-tuning, and        rapid embedding speed and efficient template search, while main-
+reinforcement learning17­19. Recently, deep generative approaches             taining comparable structural similarity between the target structures
+have also been applied to metabolite annotation15,20,21. Encoder-             and retrieved templates (Supplementary Fig. 1b­e). This spectral vec-
+decoder neural networks were used to generate metabolite struc-               tor is then used to retrieve structurally similar compounds from a
+tures either from in silico predicted fingerprints (e.g., MSNovelist15) or    reference spectral database via cosine similarity-based match (Sup-
+directly from MS2 spectra (e.g., Spec2Mol20 and DiffMS21). Besides,           plementary Fig. 1f, g). These retrieved structures serve as templates to
+DeepMet22 predicted the existence of as-of-yet undiscovered meta-             guide de novo generation. To enable this, each structure template is
+bolites through a deep generative model. Unlike in silico prediction,         encoded into a 3898-dimensional feature vector, consisting of 3878
+deep generative models do not rely on structural databases as prior           bits for structural fingerprints, 10 bits for molecular formula, and 10
+knowledge, making it possible to discover metabolites beyond known            bits for formula differences (Fig. 1b and Supplementary Fig. 2). The
+chemical space. However, training such models requires large, high-           generated feature vectors from all retrieved templates are con-
+quality MS2 spectral datasets. It has been estimated that even by             catenated and fed into an encoder-decoder generative model for de
+combining all available reference spectral databases, the total would         novo structure generation. The encoder infers the concatenated fea-
+amount to only ~60,000 unique molecules15, one to two orders of               ture vector as a latent structural representation. Subsequently, this
+magnitude lower than the ~1­2 million structures typically required to        latent representation is decoded by a 6-layer transformer-based
+train deep generative models effectively23,24. As a result, current gen-      decoder to generate the final molecular structure in the form of a
+erative models often underperform compared to in silico prediction            SMILES (Simplified Molecular Input Line Entry System) string (Fig. 1c
+tools in metabolite annotation, largely due to limited training data and      and Supplementary Fig. 3a).
+challenges in model generalization across diverse chemical
+structures21.                                                                       MetGenX supports both database-restricted and database-free
+                                                                              generation modes for metabolite annotation (Fig. 1c). In the database-
+      Molecular networking approaches have demonstrated that in-              restricted mode, the model generates structures from a user-defined
+domain knowledge, such as fragment-substructure links from neigh-             database (referred to as the background database in MetGenX).
+boring known metabolites, can facilitate the discovery of unknowns25.         Potential candidates are first retrieved by matching the molecular
+Inspired by this, we hypothesized that incorporating structure-               formula of the target spectra to structures in the database. These
+informed knowledge into deep generation could improve de novo                 candidates are then used to guide the generative model. Thus, the
+annotation and overcome the generalization issues of models trained           model generates structures based on a user-defined structure data-
+on limited spectral data. In this work, we developed MetGenX, a               base rather than through an auto-regressive process. This mode offers
+structure-informed encoder-decoder neural network that enables effi-          high accuracy when prior knowledge of the target chemical space is
+cient and controllable metabolite generation from MS2 spectra.                available. In contrast, the database-free mode autoregressively gen-
+Instead of directly encoding a query MS2 spectrum, MetGenX adopts a           erates structures conditioned on a specified molecular formula (Sup-
+representation transformation strategy that first maps the query              plementary Fig. 3b). This open-ended approach enables the discovery
+spectrum to structurally similar metabolites through spectral similarity      of metabolites not present in existing databases. To further enhance
+search, and then uses these retrieved structures as templates to guide        annotation accuracy, a machine learning-based model re-ranks the
+de novo generation. This approach transforms the problem from                 generated candidates based on their structural similarity to the
+"spectrum-to-structure" to "structure-to-structure" generation, utiliz-       retrieved templates (Fig. 1c). Altogether, MetGenX establishes a flex-
+ing structure templates to bridge the gap between experimental data           ible, structure-informed deep generation framework that enables de
+and de novo structure generation, thereby improving model perfor-             novo metabolite annotation directly from MS2 spectra.
+mance. In independent tests, MetGenX achieves a top-1 accuracy of
+55.9% on 1388 MS2 spectra from the NIST library and 68.5% on 1681             The model training of MetGenX
+MS2 spectra from real biological samples, outperforming other in silico       MetGenX incorporates a representation transformation strategy that
+annotation tools in both accuracy and coverage. Notably, we applied           converts the generation task from "spectrum-to-structure" to
+MetGenX to untargeted metabolomics data from mouse liver tissue               "structure-to-structure." Accordingly, a two-step training process is
+and identified two previously uncharacterized metabolites that are            employed to achieve both "structure-to-structure" and "spectrum-to-
+absent from human metabolome databases. Together, MetGenX                     structure" generation, respectively (Fig. 2a, b). In the first step, a
+establishes a flexible, structure-informed neural network that advances       transformer-based encoder-decoder neural network is pretrained on
+de novo metabolite annotation with template guidance in untargeted            a structure database to perform a "structure-to-structure" generation
+metabolomics, enabling the discovery of previously unknown meta-              task (Fig. 2a). Since we focused on the metabolite annotation in
+bolites and offering a transformative approach to biological insight.         untargeted metabolomics data, the model was pretrained in biolo-
+                                                                              gically relevant structures. The pretraining structure database com-
+Results                                                                       prises 2.17 million compounds, including 0.52 million metabolites
+                                                                              and natural products curated from widely used resources such as
+The framework of MetGenX                                                      COCONUT27, HMDB28, NIST2029, and GNPS9, as reported by Khan
+MetGenX is a structure-informed encoder-decoder neural network
+that enables efficient and controllable metabolite generation directly
+
+Nature Communications | (2026)17:5426                                         2
+Article                                                                                                                                   https://doi.org/10.1038/s41467-026-72149-6
+
+         a Template search                                                     b               Template encoding                       c  Structure generation
+
+               Query MS2 spectrum                                                              Structure templates                        Encoder cell
+
+                             m/z              Intensity                                        NH2          NH2            NH2
+                               Embedding                            Intensity
+                                                                                         O                       ...           O                          Structural representation
+                    Peaks                                                         HO                                      O               database-restricted OR database-free
+                   (Np, 512)                                                                                O
+                                                                                                    H2N
+                               Pooling
+                                       (1,512)                                                 Encoding                                    COC(=O)CCN
+                                                                                                                                          CC(N)CC(=O)O
+                   Spectral vector                                                                                                         CNCCC(=O)O
+                                Similarity
+                                 search                                                                                             C
+
+                 Spectral database                                                Structure              Formulae     Formulae H          <b> C ( ... C N     <b> C ( ... C N
+                                                                                  (Nt , 3878)             (Nt ,10)                  O
+                                                                                                                          (Nt ,10)  N
+                                                                                                              +
+                                                                                                                                    P                           Decoder cell
+                                                                                                                                                              C ( ... C N <e>
+                                                                                                                                            Decoder cell
+                                                                                                                                          C ( ... C N <e>
+
+                                                                                  Feature                                                 Candidates Score    Candidates Score
+                                                                                   vectors
+                                                                                  (n, 3898)                                               CC(N)CC(=O)O -0.10 Re-rank                 2.38
+
+                                                                                         -NH2            O                C: 2            C(CC(=O)O)CN -0.15                         1.14
+
+                                                                                                                    C: 6                  COC(=O)CCN -0.20                           0.58
+
+Fig. 1 | The framework of MetGenX. a Template search: structural templates are                                            spectrum and also encoded as 10-bit vectors. c Structure generation: a structure-
+retrieved by performing a spectral similarity search against the query                                                    informed encoder-decoder neural network that supports both database-restricted
+MS2 spectrum. b Template encoding: each structure template is encoded into a                                              and database-free generation modes for metabolite annotation. A machine
+3898-dimensional feature vector, consisting of 3878 bits for structural fingerprints,                                     learning-based model re-ranks the generated candidates based on their structural
+10 bits for molecular formula, and 10 bits for formula differences. Formula differ-                                       similarity to the retrieved templates.
+ences were calculated by atom differences between the templates and the query
+
+et al.30, along with an additional 1.76 million biologically relevant                                                           To further enhance annotation accuracy, we developed a
+structures retrieved from PubChem31. To enable structure-informed                                                         machine learning-based re-ranking model that prioritizes generated
+generation, each query structure is first matched against the back-                                                       candidates according to their structural similarity to retrieved
+ground database (including 0.52 million metabolites and natural                                                           templates (Fig. 2c). The model is trained on generated
+products) to retrieve structurally similar templates based on struc-                                                      candidate­template pairs, with twelve characterization features
+tural similarity. These templates are then encoded and used to guide                                                      calculated for each pair and used as input features for a LightGBM
+de novo molecular generation. The pretraining process converged                                                           model. These features include the relationship between the gener-
+after 33 epochs training, with early stopping triggered if the valida-                                                    ated structures and their templates (distributions of spectral simi-
+tion loss did not improve for 5 consecutive epochs (see "Methods").                                                       larity scores and structure similarity scores, and number of
+In the second step, the pretrained model is further fine-tuned for the                                                    templates), model score, candidate rank and the molecular
+"spectrum-to-structure" generation task using a reference spectral                                                        descriptors for generated structures (molecular complexity, NP
+database (Fig. 2b). The fine-tuning is not intended to replicate pre-                                                     score and SMILES length), which were empirically selected to
+training, but rather to bridge the gap between structure and spectra,                                                     improve the ranking performance and ensure the reliability of the
+ensuring the model is well aligned and optimized for metabolite                                                           generated results. Since the re-ranking model depends on the tem-
+annotation from spectra. In this study, the NIST spectral database                                                        plates, the ability of MetGenX to fully explore previously unchar-
+comprising 23,213 compounds was utilized for fine-tuning. The                                                             acterized chemical scaffolds may be potentially limited. Feature
+metrics between the two datasets indicated the structural con-                                                            importance analysis revealed that scores related to structural simi-
+sistency between the pretraining and fine-tuning datasets, although                                                       larity contribute most significantly to model performance, under-
+some chemical subspaces remain uncovered (Supplementary Fig. 4).                                                          scoring the critical role of template-based structural information in
+The NIST spectral database was partitioned into three subsets: a                                                          candidate ranking (Supplementary Fig. 5d, e). Altogether, the
+training set (19,541 spectra), a validation set (2172 spectra), and a                                                     pretraining­finetuning framework combined with re-ranking
+testing set (1500 spectra). As outlined in the MetGenX framework                                                          enables MetGenX to achieve accurate and robust metabolite anno-
+(Fig. 1), each query spectrum was first encoded and used to retrieve                                                      tation, while also empowering the discovery of previously unchar-
+structure templates in a reference spectral database via spectral                                                         acterized metabolites.
+similarity search. These retrieved structures were then employed as
+templates to guide the de novo generation. The fine-tuning process                                                        The performance evaluation
+triggered with early stopping if no improvement in validation loss                                                        An independent testing set of 1500 spectra from the NIST spectral
+was observed for 5 consecutive epochs, and the model at epoch 4                                                           database was used to evaluate the performance of MetGenX (Fig. 3a).
+was selected as the best model. To evaluate the contribution of each                                                      None of these compounds were included in the model's training or
+model component, we conducted a series of ablation experiments                                                            optimization. As shown in Fig. 3b, the majority of spectra (92.5%)
+focusing on structure pretraining, template search, and formula                                                           successfully retrieved at least one structure template from the refer-
+constraint (Supplementary Fig. 5a­c). We assessed their impact on                                                         ence spectral database (the NIST training set). For each query spec-
+generation accuracy under both database-restricted and database-                                                          trum (n = 1388), candidate structures were firstly generated in the
+free settings. The results highlighted the critical roles of structure                                                    database-restricted mode and subsequently re-ranked using MetGenX.
+pretraining and template search, both of which significantly enhance                                                      The background database comprised 0.52 million chemical structures.
+the accuracy of generation.                                                                                               As shown in Fig. 3c, MetGenX achieved a top-1 accuracy of 48.9% and a
+
+Nature Communications | (2026)17:5426                                                                                                                                                      3
+Article                                                                                                           https://doi.org/10.1038/s41467-026-72149-6
+
+a        Pre-training
+
+   Structure database           Background                                                                        Encoder Decoder
+                                  database
+                                                                                          Structural                                              COC(=O)CCN
+                             0.52 M structures                                             similarity                                             (Probabilities)
+                                                                    COC(=O)CCN
+                                                                                                       Templates
+
+   2.17 M structures         Pubchem biological
+                                   database
+
+                              1.76 M structures
+
+b        Fine-tuning                                                                                                               Share weights
+                                                                                                                  Encoder Decoder
+          Spectral database  Training
+                             (19,541)            Intensity               Spectral                                                                 COC(=O)CCN
+                   NIST                                                  similarity                                                               (Probabilities)
+         (23,213 compounds)  Validation
+                              (2,172)                                                                  Templates
+
+                              Testing                               m/z
+                              (1,500)
+
+c                                               Feature extraction       Ranking features                         LightGBM model
+
+   Training of re-ranking model                                              Model score                                           Re-ranked candidates
+                  Candidates                                               Candidate rank                                                 Candidate score 1
+                                                                                                                                          Candidate score 2
+           CC(N)CC(=O)O Score 1                                            SMILES length                                                 Candidate score 3
+            COC(=O)CCN Score 2                                                Complexity
+            CNCCC(=O)O Score 3                                                 NP score
+
+                     Templates                                                  SSpectra
+                                                                               STemplates
+                                                                               NTemplates
+
+Fig. 2 | The model training of MetGenX. a, b Pretraining­finetuning framework:                         c Generated candidates are re-ranked using a LightGBM model based on their
+the generative model is first pretrained on a structure database with a total of 2.17                  structural similarity to retrieved templates. The model outputs candidate scores (S)
+million structures (a), and then fine-tuned by a spectral database from NIST (b).                      after ranking.
+
+top-3 accuracy of 71.8% prior to re-ranking. After re-ranking, perfor-                                 database-free mode (Fig. 3h). Similarly, the template search retrieved
+mance improved notably, with top-1 and top-3 accuracies increasing to                                  four structural templates, enabling the generation of 2-ethoxyaniline
+55.9% and 76.1%, respectively (Supplementary Data 1). Positional per-                                  as the top-1 candidate.
+formance was further evaluated using the relative rank position
+(RRP)32, with the density of RRP biased toward 1.0, indicating high                                          Additionally, we systematically investigated the relationship
+ranking accuracy (Fig. 3d). These results indicate that MetGenX is                                     between structure templates and model performance. In both
+capable of generating correct structures when prior knowledge of the                                   database-restricted and database-free generation modes, a larger
+target chemical space is available.                                                                    number of templates and higher structural similarity between the
+                                                                                                       templates and target structures were associated with the improved
+      To further assess MetGenX's ability to generate structures without                               accuracy of structure generation (Supplementary Fig. 6c­k). Across all
+constraint of a reference chemical space, we evaluated its performance                                 retrieved templates, the mean maximum similarity was 0.65, indicating
+in a database-free generation mode. As shown in Fig. 3e, MetGenX                                       that MetGenX could effectively retrieve at least one structurally rele-
+achieved a top-1 accuracy of 21.7% and a top-3 accuracy of 35.0% in the                                vant template for most spectra. The mean similarity across all retrieved
+NIST testing set (Supplementary Data 2). Although the information                                      templates was 0.43, reflecting moderate overall similarity across all
+contained in the query spectrum may be insufficient for the de novo                                    retrieved templates (Supplementary Fig. 6f). Specifically, we then
+generation of the exact structure, MetGenX is capable of generating                                    evaluated different thresholds of maximum spectral and structural
+structurally similar candidates. Among the top-3 candidates, 75.0%                                     similarity (Supplementary Fig. 6g, h). Maximum spectral similarity
+exhibited high structural similarity to the target structures, indicating                              showed no clear correlation with prediction correctness, whereas
+that the generated matches are meaningful and can offer valuable                                       maximum structural similarity exhibited strong discriminative power.
+insights for further discovery (Fig. 3f). We assessed the robustness of                                For example, when the maximum structural similarity exceeded 0.71
+model training by retraining the generative model with five random                                     (determined by Youden's J index), the probability of correct genera-
+seeds on the NIST dataset (Supplementary Fig. 6a, b). The consistent                                   tion markedly increased (true positive rate 0.60 and false positive rate
+results and low variance confirm the stability of the training process.                                0.33). These results indicated that a high maximum structural simi-
+                                                                                                       larity is needed for high-accurate structure generation. Overall, these
+      As a structure-informed generative model, MetGenX captures                                       results demonstrate that MetGenX achieves effective structure gen-
+domain knowledge from structure templates and generates corre-                                         eration for metabolite annotation and discovery through a structure-
+sponding structures. This principle is illustrated by examples shown in                                informed deep generation framework.
+Fig. 3g, h. For example, given the query spectrum of pyridoxamine,
+pyridoxine derivatives, such as pyridoxine and 4-methoxypyridoxine,                                    Annotation of metabolites in real biological samples
+were retrieved as templates from the reference spectral database.                                      We further evaluated the performance of MetGenX in annotating
+Using these templates as input, MetGenX successfully generated pyr-                                    metabolites using experimental spectra acquired from real biological
+idoxamine as the top-1 candidate in the database-restricted mode                                       samples (Fig. 4a). LC­MS-based untargeted metabolomics data were
+(Fig. 3g). Another example of 2-ethoxyaniline was generated in the
+
+Nature Communications | (2026)17:5426                                                                                                                              4
+Article                                                                                                                                                                             https://doi.org/10.1038/s41467-026-72149-6
+
+a                                                                                                                                                             b                         1000
+
+              Testing set                                                                                                                                                                          800
+
+   Intensity                                       Template                                               Re-ranking                                                                    Frequency  600
+                                                    search
+                                                                        Structure                                          Structure
+                                                                       generation                                         candidates                                                               400
+
+                         m/z                                                                                                                                                                       200
+
+                                                                                                                                 92.5% with                                                        0
+                                                                                                                                  templates                                                              1 2 3 4 5 6 7 8 9 10
+                                                                                                                                                                                                                 No. of templates
+
+c                                         Testing set (n=1388)          d                       Relative ranking position            e                        Testing set (n=1388)                 f                                     Generated similarity
+
+   100                                                                                   1000                                                   100                                                                           100
+                                                                                                 Median RRP: 1.00
+Accuracy (%)  75                                                           No. of spectra                                            Accuracy (%)  75                                              Cumulative proportion (%)                                       75.0%
+                                   76.1%                                                  800                                                           21.7%                                                                 75
+
+                                          (Top 3)                                          600                                                     50 (Top 1)    35.0%
+                                                                                                                                                                 (Top 3)
+              50                          55.9%                                                                                                                                                                               50
+
+                                          (Top 1)                                          400
+
+              25                                 Post re-ranking                           200                                                     25                 Post re-ranking                                         25           Top 1
+
+                                                 Prior re-ranking                                                                                                                                                                          Top 3
+
+                                                                                                                                                                      Prior re-ranking                                                     Top 5
+
+              0                                                                            0                                                       0                                                                          0
+               1 2 3 4 5 6 7 8 9 10                                                          0.0 0.2 0.4 0.6 0.8 1.0                                1 2 3 4 5 6 7 8 9 10
+                                                                                                                                                                                                                                   0.0 0.2 0.4 0.6 0.8 1.0
+                                                                                                              RRP
+                                          Top N                                                                                                                  Top N                                                             Max structure similarity
+
+   g                                      Query MS2 spectrum                                              Targeted structure         h Query MS2 spectrum                                                                                      Targeted structure
+                                                                                                                                                                                                                                                             NH2
+                         1.0                                                                                                              1.0                                                                                                                O
+
+              Intensity                                                                                              HO           N  Intensity                                                                                                         Rank 1
+
+                         0.5                                    Database-restricted                                  H2N                                                                Database-free
+                                                                                                                                                                                          generation
+                                                                        generation                                                                 0.5
+
+                                                                                                                          OH
+
+                         0.0              100 140 180                                                                                              0.0           100      140
+                               60              m/z                                                                                                       60
+
+                                                                                                                          Rank 1                                 m/z
+
+                                                   N                OH                                    O               Generation & Re-ranking                     Cl       NH2                                                     HO         Generation & Re-ranking
+                                                                                                                                             Template search                                                                  NO2 O
+                                                                                           H2N
+                         Template search                            O                                                                                                                                                                 N
+                                                                                                      H2N                                                                                                                             H
+                                                             OH                                                  OH                                                            O                                                   NO2
+
+                                                              0.55                                0.48                                                                                  O2N
+
+                                                                                                                                                                          0.56                                                     0.55
+
+                                                             O NH                          HO   N                                                                         NH                                                                O
+                                                                        O                                                                                                        N                                                      O
+                                                                                           HO
+                                                                                                                                                                                                                                    NN
+                                                   HN                                                 OH                                                                  0.41                                                      HH
+
+                                                           0.44                                 0.41                                                                                                                               0.40
+
+                                                                    Templates                                                                                                           Templates
+
+Fig. 3 | The performance evaluation of MetGenX. a An independent set of                                                              using MetGenX. f Cumulative percentages of maximum structural similarity
+1500 spectra from the NIST spectral database was used to evaluate the perfor-                                                        between generated structures (top-1, top-3 or top-5) and target structures. g, h Two
+mance of MetGenX. b Distribution of template numbers retrieved from the refer-                                                       generation examples: pyridoxamine (g) through the database-restricted mode, and
+ence spectral database. c Annotation accuracies of the database-restricted                                                           2-ethoxyaniline (h) through the database-free mode. Numbers below each template
+generation before and after re-ranking using MetGenX. d Distribution of relative                                                     indicate the spectral similarity between the query MS2 spectrum and the corre-
+ranking position (RRP). The orange line represents the density distribution of RRP.                                                  sponding templates. Source data are provided as a Source Data file for (b­f).
+e Annotation accuracies of the database-free generation before and after re-ranking
+
+collected from five sample types: cells, brain tissue, liver tissue,                                                                 d). Furthermore, we calculated the annotation accuracy counted by
+plasma, and urine. The metabolite annotation in biological samples                                                                   metabolites in Supplementary Fig. 7e. For the mean rank of these
+was performed based on matching m/z, RT, and MS/MS spectral                                                                          metabolites, MetGenX achieved a top-1 accuracy of 64.9% and a top-3
+similarity against in-house standard library curated from chemical                                                                   accuracy of 85.3%. Among the three major adducts, top-3 accuracies
+standards, representing level 1 annotation according to Metabolomics                                                                 reached 90.5% for [M+H]+, 76.8% for [M-HO+H]+, and 60.0% for [M
+Standards Initiative33 (Fig. 4b and Supplementary Data 3). Across these                                                              +Na]+ (Fig. 4d). Additionally, consistent annotation accuracy was
+samples, we identified 1720 spectra in total. MetGenX was then applied                                                               observed across a wide range of chemical subclasses. Notably, Met-
+to annotate these spectra. Here, the full NIST spectral dataset was used                                                             GenX performed especially well for lipids, likely due to their structural
+as the reference spectral database. Among them, 1681 spectra (97.7%)                                                                 regularity and the high availability of related templates (Fig. 4e). Fur-
+successfully retrieved at least one structure template from the refer-                                                               thermore, since the collision energy used for biological samples dif-
+ence spectral database and were subsequently used for structure                                                                      fered from the merged collision energies in the reference spectral
+generation (Fig. 4b and Supplementary Fig. 7a, b). Because most                                                                      database, we searched templates with spectra acquired at NCE30,
+metabolites in biological samples have been recorded in a structure                                                                  which better matched our experimental conditions. We found that
+database, we employed the database-restricted generation mode for                                                                    using NIST standard spectra acquired at NCE30 for template retrieval,
+annotation. The background database comprised 0.52 million chemi-                                                                    which matched the experimental conditions of biological samples,
+cal structures. For these spectra, MetGenX achieved a top-1 accuracy of                                                              improved generation coverage and accuracy (Supplementary
+68.5% and a top-3 accuracy of 89.2% (Fig. 4c and Supplementary Fig. 7c,                                                              Fig. 7f, g).
+
+Nature Communications | (2026)17:5426                                                                                                                                                                                                                                      5
+Article                                                                                                              https://doi.org/10.1038/s41467-026-72149-6
+
+a              Biological                                                                                            Standard library
+
+               samples                                             Untargted metabolomics data
+
+                                                                                                                                                                     Level 1 identification
+
+               Cell
+
+               Brain                                                                   PeakTable                                                                 Cross-validation
+                                                                                                                                                                           Generated structures
+               Liver                                                                          +                      MetGenX
+                                      LC-MS
+                                                                   Intensity             MS/MS
+               Plasma                                                                    spectra                     ICEBERG                           Comprasion
+                                                                                                                       CFM-ID                                  Annotated structures
+                                                                              m/z
+                                                                                                                     MSNovelist                e 100
+               Urine                                                                                                   MetFrag
+                                                                                                                      MSFinder
+
+b 1800                                c                                                     d 100             90.5%
+
+    1700       1720                      100
+
+                               1681                                                                       75         76.8%
+No. of spectra                                                 75                                                                                        75
+                                                 Accuracy (%)                               Accuracy (%)                                           Accuracy (%)
+                                                                              n=1681                                                 60.0%
+
+         1600                                                  50                                         50                                                     50
+
+                                                                              Top 1: 68.5%                                                                           Organonitrogen compounds
+
+                                                                              Top 3: 89.2%                                                                           Fatty Acyls
+                                                                                                          25
+   1500                                                        25                                                                                                25  Glycerophospholipids
+
+                                                                              Top 5: 94.5%                                                                           Carboxylic acids and derivatives
+
+   1400                                                        0                                          0                                                                       Organooxygen compounds
+                                                                    1 2 3 4 5 6 7 8 9 10
+               Total Generated                                                                                [M+H]+ [M-H2O+H]+ [M+Na]+                          0
+                                                                                                                                                                   1 2 3 4 5 6 7 8 9 10
+                                                                   Top N                                                               g 100                                       Top N
+
+f                              1200
+
+               No. of spectra  1000
+
+                               800
+
+                               600                                                                                                             75
+
+                               400                                                                                               Accuracy (%)
+
+                               200
+
+                               0                                                                                                               50                                 MetGenX
+
+ICEBERG 1682                                                                                                                                                                      ICEBERG
+MetGenX 1681
+CFM-ID 1529                                                                                                                                                                       CFM-ID
+MSNovelist 1477
+MetFrag 1371                                                                                                                                   25                                 MSNovelist
+MS-FINDER 1261
+                                                                                                                                                                                  MetFrag
+                        1000 0
+                   Annotated spectra                                                                                                                                              MS-FINDER
+
+                                                                                                                                               0
+                                                                                                                                                 1 2 3 4 5 6 7 8 9 10
+
+                                                                                                                                                                     Top N
+
+Fig. 4 | Annotation of metabolites in real biological samples. a Workflow for                             quartiles. Data points beyond the whiskers are plotted individually as outliers.
+metabolite annotation in biological samples with different tools. b Number of                             d, e Annotation accuracy stratified by adduct types (d) and chemical subclasses (e).
+annotated spectra across different samples using library-based spectral match                             f, g Comparison of annotation coverage (f) and annotation accuracy (g) across
+(level 1 annotation; blue) and MetGenX (orange). c Top-N accuracy of MetGenX                              different in silico annotation tools. Connected filled dots indicate the tools inclu-
+stratified by sample types. The large dot inside each box and orange line indicate                        ded, and bars show the shared spectra annotated by those tools. Source data are
+the overall accuracy combining all spectra. Box plots show the median (center line),                      provided as a Source Data file for (b­g). Illustrations in (a) created by BioRender.
+25th and 75th percentiles (box bounds). The whiskers extend to the most extreme                           Zhu, Z. (2026) https://BioRender.com/fgn01p9.
+data points within 1.5 × the interquartile range (IQR) from the lower and upper
+
+      We further benchmarked the performance of MetGenX against                                           outperforming other tools whose top-3 accuracies ranged from
+several widely used in silico annotation tools, including CFM-ID11, MS-                                   57.4% (MetFrag) to 81.0% (ICEBERG; Fig. 4g). The accuracy based on
+FINDER12, MetFrag34, MSNovelist15, and ICEBERG35 (Fig. 4a). To ensure                                     both the annotation results shared by all tools (shared annotations;
+a fair comparison, all tools used the same background database                                            Supplementary Fig. 8b) and the complete dataset (all inputted
+comprising 0.52 million chemical structures, which referred during                                        spectra; Supplementary Fig. 8c) showed consistently higher top-3
+model training. The background database was collected from the                                            accuracy than other tools in biological samples, demonstrating its
+public repository, such as COCONUT27, HMDB28, NIST2029, and                                               robustness across different evaluation conditions. This performance
+GNPS9, which were widely used in untargeted metabolomics studies.                                         advantage stems from the structure-informed generation framework
+Across the combined dataset, MetGenX outperformed all other tools                                         of MetGenX, which retrieves structurally similar templates to better
+in annotation accuracy (Fig. 4f, g). Annotation coverage was defined                                      accommodate diverse fragmentation patterns. Compared to deep
+as the number of MS2 spectra for which at least one valid and dis-                                        generative models like MSNovelist, a background database can nar-
+tinguishing candidate structure was successfully generated. Specifi-                                      row down the search space and enhance accuracy. Unlike prediction
+cally, MetGenX successfully annotated 1681 out of 1720 spectra                                            methods such as CFM-ID, ICEBERG, MS-FINDER, and MetFrag, Met-
+(97.7%), showing comparable annotation coverage with ICEBERG                                              GenX avoids the limitations of unmatched or unexplained fragment
+(1682, 97.8%) and significantly exceeding the performance of other                                        peaks, enabling both high coverage and accuracy. In addition, we
+tools, which annotated between 1261 (73.3%; MS-FINDER) and 1529                                           randomly selected ten metabolite examples annotated by MetGenX
+(88.9%; CFM-ID) spectra (Fig. 4f, Supplementary Fig. 8a). In terms of                                     that were absent from the NIST spectral database to demonstrate
+accuracy, MetGenX achieved a top-3 accuracy of 89.2%,                                                     successful structure generation (Supplementary Fig. 9). Altogether,
+
+Nature Communications | (2026)17:5426                                                                                                                                                                     6
+Article                                                                                                                                                               https://doi.org/10.1038/s41467-026-72149-6
+
+         a                                         b                                                      Testing set (n=576)                 c       Testing set (n=576)                d                            Biological samples
+
+                                MS2 Spectra           100                                                                                        100
+                              (Negative mode)
+                                                                                                                                                                                            100
+                 MetGenX
+                                                 No. of spectra                                       75                                         75Accuracy (%)37.7%                                              75
+                        (Trained on MS2 spectra                                         Accuracy (%)                     75.4%                                                                      Accuracy (%)(Top 3)                n=2319
+                             in positive mode)                                                                                                       22.9%
+                                                                                                                         (Top 3)                 50 (Top 1)                                                       50  Top 1: 60.7%
+                           Generated structures                                                       50
+
+         e                                                                                                       49.7%
+
+                                      1400                                                            25  (Top 1)                                25                                                                                    Top 3: 82.5%
+                                      1200                                                                                                                                                                        25
+                                      1000                                                                Post re-ranking                                    Post re-ranking
+                                                                                                                                                                                                                                       Top 5: 89.4%
+                                       800
+                                       600                                                                                  Prior re-ranking                           Prior re-ranking                           0
+                                       400                                                            0                                          0                                                                     1 2 3 4 5 6 7 8 9 10
+                                       200                                                                                                                                                                                         Top N
+                                                                                                        1 2 3 4 5 6 7 8 9 10                       1 2 3 4 5 6 7 8 9 10
+                                           0                                                                          Top N                                      Top N
+         ICEBERG 2409
+         MetGenX 2319                                                                                                                                                 f 100
+         CFM-ID 2196
+         MSNovelist 2106                                                                                                                                                            75
+         MS-FINDER 1668
+         MetFrag 1668                                                                                                                                                 Accuracy (%)  50                                MetGenX
+
+                                2000 0                                                                                                                                                                                ICEBERG
+                                Annotated spectra
+                                                                                                                                                                                                                      CFM-ID
+
+                                                                                                                                                                                    25                                MSNovelist
+
+                                                                                                                                                                                                                      MetFrag
+
+                                                                                                                                                                                                                      MS-FINDER
+
+                                                                                                                                                                                    0
+                                                                                                                                                                                      1 2 3 4 5 6 7 8 9 10
+
+                                                                                                                                                                                                          Top N
+
+Fig. 5 | Metabolite generation in negative ionization mode. a Workflow for                                                                    to the most extreme data points within 1.5 × the interquartile range (IQR) from the
+metabolite generation through MetGenX in negative mode without additional                                                                     lower and upper quartiles. Data points beyond the whiskers are plotted individually
+retraining. b, c Annotation accuracies of the database-restricted generation (b) and                                                          as outliers. e, f Comparison of annotation coverage (e) and annotation accuracy (f)
+database-free generation (c) before and after re-ranking using MetGenX. d Top-N                                                               across different in silico annotation tools. Connected filled dots indicate the tools
+accuracy of MetGenX stratified by sample types. The large dot inside each box and                                                             included, and bars show the shared spectra annotated by those tools. Source data
+orange line indicate the overall accuracy combining all spectra. Box plots show the                                                           are provided as a Source Data file for (b­f).
+median (center line), 25th and 75th percentiles (box bounds). The whiskers extend
+
+these results demonstrate the strong capability of MetGenX to                                                                                 and negative ionization modes observed in existing tools underscores
+annotate metabolites lacking reference tandem mass spectra.                                                                                   their limited generalizability. Compared to MSNovelist, MetGenX
+                                                                                                                                              achieved higher accuracy beyond the top-1 rank, reaching a top-3
+Metabolite generation in negative ionization mode                                                                                             accuracy of 82.5% versus 77.5%. Similar to positive ionization mode, the
+Metabolite annotation in negative ionization mode is crucial yet                                                                              accuracy based on both the annotation results shared by all tools
+remains uncharacterized in untargeted metabolomics. Most in silico                                                                            (shared annotations; Supplementary Fig. 8e) and the complete dataset
+tools face challenges in this mode due to the limited availability of                                                                         (all inputted spectra; Supplementary Fig. 8f) showed consistently
+reference spectra and insufficient training data. MetGenX addresses                                                                           higher top-3 accuracy than other tools in biological samples, demon-
+this limitation through its "structure-to-structure" generative frame-                                                                        strating its robustness across different evaluation conditions. Collec-
+work, which leverages retrieved structural templates to guide de novo                                                                         tively, these results demonstrate that MetGenX's structure-informed
+generation. This design allows the generative model to be applied                                                                             generative framework enables robust performance across ionization
+directly to different ionization modes without additional retraining                                                                          modes without the need for retraining.
+(Fig. 5a). To evaluate the generalization capability of MetGenX in
+negative ionization mode, we first tested it on an independent set from                                                                             To further verify the annotation performance in real biological
+the NIST spectral database (n = 653 spectra). Among them, 576 spectra                                                                         samples, we spiked 200 metabolite standards into mouse liver and
+(88.2%) had successfully retrieved at least one structure template from                                                                       NIST 1950 plasma samples. Among the 177 spiked metabolites detec-
+the reference spectral database. In database-restricted generation                                                                            ted and identified in mouse liver tissue, MetGenX achieved a top-1
+mode, MetGenX achieved a top-1 accuracy of 49.7% and a top-3                                                                                  accuracy of 76.8% and a top-3 accuracy of 92.1%, outperforming other
+accuracy of 75.4% after re-ranking (Fig. 5b and Supplementary Data 4).                                                                        tools, whose top-3 accuracies ranged from 59.9% to 80.2% (Supple-
+In database-free generation mode, the top-1 and top-3 accuracies were                                                                         mentary Fig. 7h). Similarly, for the 166 spiked metabolites detected and
+22.9% and 37.7%, respectively (Fig. 5c and Supplementary Data 5). The                                                                         identified in NIST plasma samples, MetGenX achieved a top-1 accuracy
+performance metrics closely matched those observed in positive                                                                                of 74.1% and a top-3 accuracy of 89.2%, exceeding the performance of
+ionization mode, further demonstrating MetGenX's robust general-                                                                              other tools, whose top-3 accuracies ranged from 60.2% to 75.9%
+ization across different ionization modes.                                                                                                    (Supplementary Fig. 7i). This spike-in validation results closely aligned
+                                                                                                                                              with those obtained from endogenous metabolites in biological sam-
+      We further assessed MetGenX and other in silico tools using                                                                             ples (top-3 accuracy of 89.2% and 82.5%, Figs. 4c and 5d), further
+experimental data from real biological samples (Fig. 5d­f, Supple-                                                                            confirming the robustness and reliability of MetGenX annotations.
+mentary Data 6). MetGenX successfully annotated 2319 out of 2417
+spectra (95.9%), achieving a top-1 accuracy of 60.7% and a top-3                                                                                    To further compare MetGenX with network-based methods, we
+accuracy of 82.5% (Fig. 5d). The annotation coverage of other tools                                                                           evaluated its performance against MetDNA3 across 20 diverse biolo-
+ranged from 1668 (69.0%; MetFrag) to 2409 (99.7%; ICEBERG) spectra                                                                            gical sample datasets. For MetDNA3, 30% of level 1 annotations were
+(Fig. 5e, Supplementary Fig. 8d). For top-3 accuracy, MetGenX sig-                                                                            used as seeds for network propagation, with the remaining 70%
+nificantly outperformed CFM-ID (53.0%), MetFrag (57.4%), MS-FINDER                                                                            reserved for validation under a 10-fold cross-validation, as previously
+(60.4%) and ICEBERG (71.2%). The performance gap between positive                                                                             reported36. For MetGenX, all annotated structures were excluded
+                                                                                                                                              during template search, and the same metabolic reaction network
+
+Nature Communications | (2026)17:5426                                                                                                                                                                                                                7
+Article                                                                     https://doi.org/10.1038/s41467-026-72149-6
+
+used by MetDNA3 was adopted as the background database for                  a synthesized chemical standard (Fig. 6f, Supplementary
+database-restricted generation. Across these datasets, MetGenX              Figs. 10g and 11a). Ap2I is a previously uncharacterized dinucleoside
+achieved higher annotation coverage (84.2% vs. 68.1%) but slightly          polyphosphate compound that is absent from PubChem. This meta-
+lower accuracy (78.1% vs. 84.4%) compared with MetDNA3 (Supple-             bolite was detected in multiple mouse tissues, with the highest
+mentary Fig. 7j, k). Considering all spectra, MetGenX achieved a higher     enrichment observed in the spleen and liver (Fig. 6g). To verify that
+overall identification rate than MetDNA3 (65.9% vs. 57.6%, Supple-          Ap2I represents a real metabolite in biological samples, several vali-
+mentary Fig. 7l). These results indicate that MetGenX's database-           dation experiments were performed. The synthetic Ap2I standard
+restricted mode provides broader annotation coverage, whereas               exhibited identical retention time and highly similar MS2 spectra to the
+MetDNA3 is better suited for high-confidence annotation. This differ-       biological peak in both ionization modes (Fig. 6f and Supplementary
+ence is expected, as MetDNA3 integrates multiple sources of con-            Fig. 11a). Mixing nucleotide precursors (AMP and IMP) did not yield any
+textual information (e.g., predicted retention time), while MetGenX         Ap2I signal in either positive and negative ionization mode (Supple-
+relies solely on MS2 spectra to rank candidates. Overall, these results     mentary Fig. 11b), indicating that Ap2I was not formed in the ion
+substantiate the practical value of MetGenX's database-restricted           source. Moreover, Ap2I showed distinct retention times from potential
+mode and clarify its complementary role relative to MetDNA in               dimer components (AMP, IMP, ADP, and ATP) in both ionization
+metabolite annotation.                                                      modes (Supplementary Fig. 11c). Furthermore, fragmentation-energy
+                                                                            ramping experiments showed that the precursor intensity of Ap2I
+Metabolite discovery in mouse liver tissue                                  decreased with increasing collision energy, accompanied by the
+To demonstrate MetGenX's applicability to both known unknown and            appearance of fragment ions, consistent with the fragmentation pat-
+unknown unknown metabolites, we analyzed untargeted metabo-                 terns observed using the chemical standard (Supplementary Fig. 12).
+lomics data from mouse liver. In positive ionization mode, 6564             Collectively, these results demonstrate that Ap2I is a true metabolite
+metabolic features were acquired with MS2 spectra, and 2979 of them         present in biological sample.
+were confidently assigned molecular formulae using SIRIUS37 (Fig. 6a,
+Supplementary Data 11). A multi-step annotation workflow was applied              Additionally, we quantified the concentration of two discovered
+to these spectra, proceeding sequentially through library-based spec-       metabolites in mouse liver tissue using the synthetic standards (Sup-
+tral matching, database-restricted generation, and database-free gen-       plementary Fig. 13). As a result, the mean concentrations were
+eration using MetGenX. Among the 2979 spectra, 516 were annotated           10.80 ± 0.10 pmol/mg tissue for adenosyl-cysteine and 2.97 ± 0.92
+through library-based spectral matching and classified as level 1           pmol/mg tissue for Ap2I. Together, these findings highlighted the
+annotations. The remaining 2463 spectra were subjected to database-         powerful capacity of MetGenX to uncover previously uncharacterized
+restricted generation with MetGenX. Among them, 2161 spectra                chemical entities and expand the metabolome.
+(87.74%) successfully retrieved at least one structural template. The
+database-restricted mode generated high-quality candidate structures              We further evaluated the annotation performances using a more
+for 541 spectra (candidate score > 1.2). The remaining spectra were         constrained or biologically relevant structural database36 containing
+annotated using database-free generation, resulting in 426 spectra          66,874 metabolites from NIST20, KEGG, HMDB and MetaCyc. Using
+with high-quality candidates and 1102 spectra with at least one valid       this database, 429 spectra were annotated in the database-restricted
+structure. A total of 394 spectra failed to yield valid structures, likely  mode, and 1640 spectra were annotated in the database-free mode.
+due to no suitable templates retrieved or incorrect formula assign-         The overall annotation coverage exhibited a similar distribution
+ments. Notably, the natural product scores38 of high-quality candidates     between the two databases (Supplementary Fig. 14). To assess the
+from both generation modes closely resembled those of standard              impact of background databases, we compared the database-
+annotations, indicating that MetGenX effectively generates                  restricted results annotated through a larger background database
+metabolite-like structures (Supplementary Fig. 10c).                        (541 spectra in total). After switching to the biologically relevant
+                                                                            database, 81.9% of the annotations remained consistent, while 18.1%
+      We further validated the unknown metabolites annotated by             had different annotation results across the top-3 annotations. This
+MetGenX in mouse liver. One feature (M371T394; m/z = 371.1131 Da;           finding highlights the importance of incorporating prior knowledge
+RT = 394 s) was assigned the molecular formula C13H18N6O5S and              and using a specific compound database to further improve annota-
+annotated as adenosyl-cysteine through database-restricted genera-          tion accuracy and reduce false discovery rates.
+tion (Fig. 6b). Notably, adenosyl-cysteine is a metabolite absent from
+major metabolome databases such as HMDB and KEGG. This candidate            Benchmark evaluation of MetGenX in public dataset
+was the top-1 ranked generated structure (candidate score = 2.0),           To further validate the generalization and scalability of MetGenX, we
+generated using a set of nucleotide-related templates (Supplementary        benchmarked MetGenX on the public spectral dataset
+Fig. 10d). The major fragments in the MS2 spectrum were manually            MassSpecGym39. Since MassSpecGym defines distinct tasks corre-
+interpreted, and the annotation was further confirmed using a syn-          sponding to different application scenarios, we retrained MetGenX
+thesized chemical standard (Fig. 6c and Supplementary Fig. 10e). This       following the standard MassSpecGym workflow and evaluated per-
+HMDB-absent metabolite was detected in different mouse tissues, with        formance under both database-restricted and database-free modes
+the highest enrichment observed in the kidney and liver tis-                with corresponding baseline models. In database-restricted mode,
+sue (Fig. 6d).                                                              molecular retrieval metrics in MassSpecGym were applied and Met-
+                                                                            GenX generated structures based on the MassSpecGym reference
+      Another feature (M678T439; m/z = 678.1066 Da; RT = 439 s) was         structure database. To ensure a fair and meaningful comparison, we
+assigned the molecular formula C20H25N9O14P2, which is not present in       aligned MetGenX with this retrieval task. Specifically, for each query
+the background database. Consequently, this feature was annotated           spectrum, MetGenX was constrained to generate and rank structures
+using database-free generation. Template search retrieved a set of          only from the same candidate lists provided by MassSpecGym. This
+nucleotide-related metabolites, suggesting that the unknown com-            restriction ensures that MetGenX and all baseline methods operate on
+pound is a nucleotide derivative (Supplementary Fig. 10f). MetGenX          an identical search space, effectively converting the database-
+subsequently generated adenosine 5'-diphosphate 5'-inosine (Ap2I) as        restricted generation into a molecular retrieval task. On the Mass-
+one of the top-3 candidate structures (candidate score = 2.6; Fig. 6e),     SpecGym testing set, MetGenX achieved a top-1 accuracy of 18.34%,
+which was prioritized for synthesis and validation based on its bio-        top-5 accuracy of 31.39% and top-20 accuracy of 48.43% (Supplemen-
+chemical plausibility. The major fragments in the MS2 spectrum were         tary Table 1). Compared with baseline models reported by Mass-
+manually interpreted, and the annotation was further confirmed using        SpecGym, the top-1 accuracy of MetGenX (18.34%) outperformed MIST
+
+Nature Communications | (2026)17:5426                                       8
+Article                                                                                                                        https://doi.org/10.1038/s41467-026-72149-6
+
+a                  Mouse liver tissue                                                                                    MetGenX
+
+   (6,564 features with MS2 spectra)                                      Library-based             Database-restricted                             Database-free
+                                                                          spectral match                  generation                                  generation
+
+                       Formula
+                      annotation
+
+                           Formula annotated                                        Spectral match                    Spectral match                   Spectral match
+                                  (2,979)                                                 (516)                             (516)                            (516)
+
+                                                                                     Unidentified                  Database-restricted              Database-restricted
+                                                                                        (2,463)                             (541)                            (541)
+
+                                                                                                                        Unidentified                   Database-free
+                                                                                                                           (1,922)                      (S>1.2; 426)
+
+                                                                                                                                                       Database-free
+                                                                                                                                                       (S1.2; 1,102)
+
+b               Adenosyl-cysteine             c                      1    Experiment                                           d9                   No generated
+                                                                                                                                                         (394)
+                                                                                          1                        Experiment       8
+                                                                                                                                                              nd nd nd
+         H2N        N               OH           Relative intensity  10                   0                                    Log10(Abundance)  7
+             N               O
+                        N                                                 Standard
+                   N                    NH2
+                           OS                                                                                                                    6
+                      HO
+                            OH
+                                                                                                                   Standard
+                                                                                          -1                                                     5
+                                                                     0
+
+                                                                     5.5  7.0       8.5       0          100 200 300 400                SKipLlBLdiruenvaineeerngyn
+                                                                                                                                                                  IntMeuHstsBWeicaAAnlreeTTt
+                                                                          RT (min)                       m/z (Da)
+
+e        Adenosine 5'-diphosphate             f                      1    Experiment                                              g8
+
+                                                                                          1                        Experiment
+
+                   5'-inosine                    Relative intensity                                                            Log10(Abundance)
+
+                                                                                                                                                 7
+
+                   HO      OH
+
+                   O  POP    O                                       10                   0                                                      6
+                      OO
+                                                                          Standard
+                      OH HO
+                O                 O
+
+            N OH                     N                                                                                                           5
+      N                                    N
+                           HO
+                 N
+                                HN                                   0                    -1                       Standard
+   H2N N
+                                    NO                               6.0  7.5       9.0             100  300       500   700                     4
+
+                                                                          RT (min)                       m/z (Da)                                Spleen
+                                                                                                                                                       HBLirevaaierrtn
+
+                                                                                                                                                                       IntKMieuLsdtsBWiuncAAnnleegyTeT
+
+Fig. 6 | Metabolites discovery in mouse liver tissue. a A multi-step annotation                     tissue. e Structure of adenosine 5'-diphosphate 5'-inosine (Ap2I). f Standard vali-
+workflow was applied to annotate untargeted metabolomics data of mouse liver                        dation of Ap2I using a chemical standard by retention time and MS2 spectral
+tissue. S indicates the candidate score of MetGenX. b Structure of adenosyl-                        matches. g Abundance distributions of Ap2I in different tissues of mice. nd not
+cysteine. c Standard validation of adenosyl-cysteine using a chemical standard by                   detected. Source data are provided as a Source Data file for (a, d and g). Illustrations
+retention time and MS2 spectral matches. d Abundance distributions of adenosyl-                     in (a) created by BioRender. Zhu, Z. (2026) https://BioRender.com/fgn01p9.
+cysteine in different tissues of mice. BAT brown adipose tissue, WAT white adipose
+
+(9.57%), DeepSets + Fourier features (6.56%), and Fingerprint FFN                                   higher than MADGEN40 (1.54%). Compared with DiffMS21, MetGenX
+(5.09%), demonstrating its high performance when annotating struc-                                  showed comparable performance with higher top-10 accuracy (4.62%
+tures within a defined chemical space. Alternatively, in database-free                              vs. 4.25%).
+mode, MetGenX generated structures without constraint of a refer-
+ence structure database and compared with baseline models reported                                        Additionally, we performed an additional experiment on the
+by literatures21,39. On the MassSpecGym testing set, MetGenX achieved                               MassSpecGym dataset by removing the similarity score threshold of
+a top-1 accuracy of 2.50% and top-10 accuracy of 4.62% (Supplemen-                                  0.4 in the template search of MetGenX and instead selected the ten
+tary Table 2). MetGenX outperformed other generative models,                                        structure templates with the highest similarity scores as inputs for de
+including MSNovelist, Spec2Mol and Neuraldecipher. Notably, these                                   novo structure generation of MetGenX. With this revision, all input
+generative models failed to generate any correct structures, with zero                              MS2 spectra could be annotated by MetGenX. This configuration is
+top-1 accuracy on the MassSpecGym testing set, which highlights the                                 denoted as MetGenX-Full. Although this leads to a modest perfor-
+inherent difficulty of structure generation in the MassSpecGym                                      mance decrease, MetGenX-Full still achieves accuracy comparable to
+dataset39. Moreover, the top-10 accuracy of MetGenX (4.62%) was                                     or outperforms other baseline models (Supplementary Tables 1 and 2).
+                                                                                                    Together, this demonstrates that MetGenX's performance is not driven
+
+Nature Communications | (2026)17:5426                                                                                                                                                                   9
+Article                                                                    https://doi.org/10.1038/s41467-026-72149-6
+
+by selective coverage. The MetGenX-Full model is provided only for         workflow combining the library-based spectral matching, database-
+the MassSpecGym benchmark to achieve complete annotation cov-              restricted generation, and database-free generation using MetGenX
+erage across all spectra. In practical applications, the template simi-    to analyze real untargeted metabolomics data from biological sam-
+larity cutoff remains necessary to ensure reliable structural generation.  ples (Fig. 6). The database-restricted mode enables reliable identifi-
+                                                                           cation of known metabolites, while the database-free mode explores
+      It is expected that MetGenX exhibits relatively lower absolute       chemical space beyond existing databases to predict structures
+accuracies on the MassSpecGym dataset. This is because the dataset         absent from known chemical space. Notably, although MetGenX
+enforces that no test molecule shares a maximum common edge                demonstrates strong annotation performance in terms of coverage
+substructure (MCES) smaller than 10 with any training molecule,            and accuracy, top-1 accuracy remains the most relevant metric for
+making template-based structure generation particularly challenging.       practical metabolite annotation workflows. Higher-rank accuracies
+Nevertheless, MetGenX maintained competitive performance across            (e.g., top-3 or top-10) are therefore primarily intended for metho-
+all evaluation metrics compared with other annotation tools, demon-        dological benchmarking.
+strating its robustness and generalizability across structurally diverse
+datasets.                                                                        Another key strength of MetGenX is its flexibility and transfer-
+                                                                           ability across diverse application scenarios. Built on a structure-to-
+Discussion                                                                 structure generation framework, MetGenX is compatible with a wide
+                                                                           range of experimental MS2 spectra and demonstrates strong gen-
+Metabolite annotation, especially for unknown metabolites, remains         eralization capabilities. In this study, we pretrained the model on a
+a fundamental challenge in untargeted metabolomics due to the              large molecular structure dataset and fine-tuned it for spectral
+limited availability of reference MS2 spectra and the vast structural      annotation tasks. Ablation experiments confirmed that pretraining
+diversity of the metabolome. To address this, we developed Met-            significantly improved downstream performance (Supplementary
+GenX, a structure-informed encoder-decoder neural network that             Fig. 5), underscoring the model's ability to transfer structural
+generates candidate metabolite structures guided by structurally           knowledge to MS2 spectrum-based annotation. Notably, despite
+similar templates. Inspired by molecular networking, MetGenX               being trained exclusively on tandem MS spectra from the positive
+reformulates the conventional spectrum-to-structure task into a            ionization mode, MetGenX generalized effectively to tandem MS
+structure-to-structure generation problem using a representation           spectra from the negative ionization mode without retraining. This
+transformation strategy. This enables the model to be trained on           highlights its robustness and adaptability, enabling seamless appli-
+over two million chemical structures, greatly exceeding the scale of       cation to new or customized spectral libraries without modifying the
+available reference MS2 spectra. As a result, it effectively bridges the   generative model. Furthermore, for MS2 spectra from different
+gap between sparse spectral data and the demands of a deep gen-            adducts, MetGenX processes all adduct types through a unified
+erative model. Structural templates enhance the fidelity of structure      workflow without explicitly encoding adduct types. Spectra are
+generation and enable a re-ranking model to prioritize chemically          searched against the spectral library based on spectral similarity, and
+plausible candidates. Unlike existing in silico tools that rely on direct  the retrieved templates guide structure generation through the
+interpretation of fragment peaks12,34, MetGenX infers structural           structure-informed model. This design enables MetGenX to gen-
+information based on structural similarity to known templates. By          eralize across adduct types and generate valid molecular structures
+leveraging prior structural knowledge embedded in these templates,         even for unseen adducts.
+MetGenX achieves higher annotation accuracy and broader meta-
+bolome coverage. MetGenX was designed to generate chemical                       In recently years, the network-based methods, such as MetDNA36
+structures from structural templates. Thus, the structural coverage        was applied in metabolite annotations through a given knowledge-
+of the spectral libraries used for template retrieval may limit its        based structural database. Those network-based approaches showed
+ability to produce metabolites with chemical structures that are           great complementary of our methods. On the one hand, adding rela-
+entirely outside known chemical space. Consequently, a small frac-         tionships between metabolites and unknown spectra in biological
+tion of spectra (<10%; Fig. 3b and Supplementary Fig. 7b) cannot be        samples may help to improve the annotation coverage and accuracy.
+processed without suitable templates in the spectral libraries. As         On the other hand, the generation model presents opportunities for
+spectral libraries such as NIST continue to expand and incorporate         enlarging knowledge databases of previously uncharacterized struc-
+more chemical standards, these limitations are expected to diminish,       tures. Moving forward, combining generative models with network-
+leading to improved generation coverage and accuracy.                      based metabolite annotation will be a promising approach for the
+                                                                           discovery of unknown metabolites.
+      A major advantage of MetGenX is its flexibility to support both
+database-restricted and database-free generations. In the database-              To demonstrate its real-world utility, we applied MetGenX to
+restricted generation, the model generates candidate structures            untargeted metabolomics data from mouse liver tissue using the multi-
+from a known structure database (0.52 million compounds), which            step annotation workflow. This analysis led to the identification of two
+narrows the search space and improves annotation accuracy. In              previously unreported metabolites (adenosyl-cysteine and adenosine
+contrast, the database-free generation enables MetGenX to generate         5-diphosphate 5-inosine) absent from major human metabolome
+compounds not found in any known chemical database, supporting             databases. These findings validate MetGenX's capability to uncover
+the discovery of previously uncharacterized metabolites. In this           metabolites absent in present database through structure generation.
+mode, the templates provide structural guidance rather than directly       Together, MetGenX establishes a flexible, knowledge-guided gen-
+selected as generated structures. This design preserves the de novo        erative framework for metabolite annotation and unknown metabolite
+nature during structure generation. Consequently, the performance          discovery, pushing the boundaries of current untargeted
+of the database-free mode is expectedly lower than that of the             metabolomics.
+database-restricted mode. In both modes, the retrieved templates
+serve only as guiding signals to inform the generative process rather      Methods
+than as direct structural sources. This unique design addresses lim-
+itations of traditional generative models and enhances the ability to      Ethical statement
+annotate unknown regions of the metabolome. This method is sui-            The animal experiments were compliant with the ethical guidelines of
+table for tasks with or without a targeted chemical space, and can be      the Institutional Animal Care and Use Committees of Interdisciplinary
+complementary in metabolite annotation in biological samples. To           Research Center on Biology and Chemistry, Shanghai Institute of
+demonstrate this utility, we implemented a multi-step annotation           Organic Chemistry, Chinese Academy of Sciences (approval research
+                                                                           project number: ECSIOC_2023-23).
+
+Nature Communications | (2026)17:5426                                      10
+Article                                                                     https://doi.org/10.1038/s41467-026-72149-6
+
+Preparation of the training data                                            fragment peaks with relative intensity below 1% were removed, and up
+The training of MetGenX consisted of two stages: pretraining on a           to the top 100 most intense peaks were retained. Neutral losses (NLs)
+structure dataset and fine-tuning on a spectral dataset (Fig. 2). The       between the precursor ion and each fragment were calculated, with
+pretraining structure dataset comprises 2.17 million compounds,             NLs constrained to under 200 Da. Both fragment peaks and NLs were
+including 0.52 million metabolites and natural products curated from        converted into textual tokens and embedded using a Word2Vec
+widely used resources such as COCONUT27, HMDB28, NIST2029, and              model26 (Supplementary Fig. 1a). For example, a fragment with m/z
+GNPS9, as reported by Khan et al.30, along with an additional 1.76 mil-     68.05 Da was converted to "peak@68.05" and a neutral loss with
+lion biologically relevant structures retrieved from PubChem31.             18.01 Da was converted to "nl@18.01". The Word2Vec model was
+All structures were deduplicated based on the first layer of the InChI-     unsupervised trained in 338,159 spectra from the NIST20 spectral
+Key, and their SMILES were standardized by removing stereochemical          database. The training parameters were as follows: sg = 0 (CBOW),
+information to obtain canonical SMILES.                                     negative = 5, vector_size = 512, window = 600, min_count = 10, alpha =
+                                                                            0.025, min_alpha = 0.0125 and epochs = 50. The model with the lowest
+      For fine-tuning, MS2 spectra acquired in positive ionization mode     training loss was selected for downstream use. After embedding, each
+using Orbitrap instruments were collected from the NIST20 spectral          spectrum was converted into a matrix of vectors with shape (Np, 512).
+database. MS2 spectra lacking InChIKey or mismatching between               Np denotes the number of peaks. This matrix was then pooled into
+molecular formula and SMILES were excluded. The dataset was further         spectral vector through weighted mean of intensity:
+curated using the following criteria: precursor m/z between 50 and
+1200, SMILES length less than 128 tokens, and elemental composition         Ws =  X  W t I0:5  ð1Þ
+limited to C, H, N, O, S, F, P, Cl, Br, and I. Only MS2 spectra corre-
+sponding to monoisotopic precursor ions were retained. For com-             Whereas Ws is the spectral vector, Wt represents the embedded vector
+pounds with multiple adduct forms, the preferred adducts were               of each peak, and I denotes the corresponding normalized intensity.
+selected in the following order: [M+H]+, [M+Na]+, [M-H2O+H]+ and
+others. Only one preferred adduct were selected per compound in the               Each spectrum in the spectral dataset was embedded into a fixed-
+training set. The distribution of adduct types is provided in Supple-       length spectral vector. To enable fast template search, the embedded
+mentary Table 3. Each spectrum was normalized to unit intensity and         vectors were indexed using Faiss (v1.8.0), and cosine similarity was
+denoised using an S/N threshold of 3. In total, 338,159 spectra were        used to compute pairwise spectral similarity. For the generation
+retained. Spectra acquired at different collision energies were merged      model, the number of retrieved templates was limited to a maximum
+following the previously reported method41. In brief, peaks within a        of 10 per spectrum to reduce computational load. Additionally, a
+0.01 Da window were merged, and their intensities were summed. The          similarity threshold of 0.4 was applied, under which 92.0% of spectra in
+merged spectra were then normalized again. Spectra from the same            the validation set were able to retrieve at least one template (Supple-
+compound across different energies were then merged, and a single           mentary Fig. 1f).
+representative spectrum was retained for each structure. The final
+curated spectral dataset included a total of 23,213 unique compounds              To identify the most suitable method for calculating spectral
+with corresponding MS2 spectra. The curated spectral dataset was            similarity, we evaluated five alternative search approaches alongside
+partitioned into three subsets: training, validation, and testing sets. To  our Word2Vec method (Supplementary Fig. 1b­e): modified cosine
+evaluate the annotation performance on previously unseen structures,        score8 (as implemented in GNPS), DreaMS43 (dreams v1.0.0), spectral
+a test set comprising 1500 MS2 spectra with [M+H]+ adducts was ran-         entropy44 (ms-entropy v1.3.3), MSBert45 (msbert v1.0), and
+domly selected. Both the selected spectra and their corresponding           MS2DeepScore46 (ms2deepscore v2.0.0). Detailed parameter settings
+structures were excluded from the pretraining and fine-tuning datasets      for each method are provided in Supplementary Table 5. Among these
+to ensure structure-disjoint training. The remaining spectra were ran-      methods, the Word2Vec model was ultimately selected for its rapid
+domly divided into training and validation sets at a 9:1 ratio. The         performance in both spectral embedding and similarity search, while
+training set included 19,541 merged MS2 spectra, which were used for        maintaining comparable structural similarity between the target
+both model training and template search. The validation set comprised       structures and retrieved templates.
+2172 merged MS2 spectra, which were used to monitor model per-
+formance and optimize the model.                                            (2) Template encoding. Template structures were encoded using
+                                                                            3878-bit molecular fingerprints defined by SIRIUS (v 5.8.1), which have
+      To assess the structural distribution between the pretraining         demonstrated the capacity to reflect the relationship between struc-
+structure dataset and the fine-tuning spectral dataset, the maximum         tures and MS2 spectra37. The molecular formulae of templates were
+Tanimoto similarity was calculated for each molecule in the fine-tuning     encoded as 10-bit vectors based on the counts of elements. Formula
+dataset against all structures in the pretraining dataset using RDKit       differences between the templates and the query spectrum were also
+2048-bit molecular fingerprints. Identical structures present in the        encoded as 10-bit vectors. All vectors were concatenated to form the
+fine-tuning dataset were excluded from the pretraining dataset during       final feature representation for input to the generative model (Sup-
+the calculation. Chemical space coverage was visualized using UMAP          plementary Fig. 2). Although MetGenX was trained on ten common
+projection (n_neighbors = 30, min_dist = 0.1). For visualization,           biological elements (C, H, N, O, S, F, P, Cl, Br, I), the framework is
+100,000 molecules were randomly sampled from the pretraining                modular and can be extended to additional element types when suf-
+structure dataset to represent its overall chemical diversity. Murcko       ficient spectral data become available.
+scaffold SMILES were used to calculate scaffold frequency and cover-
+age using RDKit (v2023.9.5) (Supplementary Fig. 4).                         (3) Structure generation. The deep generative model is built upon a
+                                                                            transformer-based sequence-to-sequence architecture (Supplemen-
+The workflow of MetGenX                                                     tary Fig. 3a). The extracted template features were first transformed
+The MetGenX workflow comprises three sequential modules: template           into a 512-dim matrix using a three-layer multilayer perceptron (MLP)
+search, template encoding, and structure generation, followed by a          module, which was pooled to extract high-level structural repre-
+machine learning-based re-ranking model. Detailed parameter settings        sentations. The encoded structural representations were subsequently
+for MetGenX are listed in the Supplementary Table 4.                        fed into a 6-layer transformer decoder cell, which proceeded auto-
+                                                                            regressively and generated the output SMILES sequence token by
+(1) Template search. The spectral embedding approach in MetGenX             token. At each decoding step, the hidden states of the decoder were
+was similar to previously reported strategies42. For each MS2 spectrum,     transformed into logits over the vocabulary via a language modeling
+
+Nature Communications | (2026)17:5426                                                          11
+Article                                                                     https://doi.org/10.1038/s41467-026-72149-6
+
+head. These logits were then converted to probability distributions         The training of MetGenX
+using a softmax function.                                                   The deep generative model of MetGenX was trained on 4 NVIDIA
+                                                                            GeForce RTX 4090 GPUs (CUDA version 12.6). The MetGenX
+      For molecular structure generation, SMILES strings were used to       employed a two-step training approach: pretraining on a structure
+represent chemical structures. A character-level tokenization strategy      dataset and fine-tuning on a spectral dataset (Fig. 2a). In the pretrain-
+was applied, in which each SMILES string was decomposed into atomic         ing stage, the model was trained using the curated structure dataset
+tokens (e.g., "C", "O", "N") and structural symbols (e.g., "(", "#", ")").  containing 2.17 million molecules. For each target structure, structure
+Notably, implicit hydrogen counts were annotated for each atom              templates were first retrieved from the background database (n = 0.52
+token for better formula constraint. For example, "C@3" indicates a         million compounds) based on structural similarity, computed using
+methyl group. All tokens were mapped to a 512-dimensional vector            RDKit 2048-bit molecular fingerprints with a Tanimoto similarity
+space using a trainable embedding layer.                                    threshold of 0.4. To avoid data leakage and overfitting, the identical
+                                                                            structures to the target structures were not used as templates during
+      For database-restricted generation, the search space was              template search. The templates were used as input to generate the
+restricted to candidate structures retrieved from a background              corresponding target structure in a "structure-to-structure" genera-
+database (containing 0.52 million metabolites and natural products).        tion task. Model training was guided by early stopping, which halted
+The next token was generated based on the given candidates,                 training if validation loss did not improve for 5 consecutive epochs.
+ensuring that each token in the output sequence was conditioned on          The pretrained model converged after 33 epochs training.
+candidate structures. For database-free generation, the next token
+was generated conditioned on the previously generated tokens.                     In the fine-tuning stage, the pretrained model was further opti-
+Generation was terminated when either the end-of-sequence token             mized for metabolite generation using a curated MS2 spectral dataset.
+<e> was produced or the sequence reached the maximum length of              For each MS2 spectrum, templates were retrieved from the training set
+128 tokens. At each step, the decoder produced a probability dis-           based on a spectral similarity threshold of 0.4 and used to guide
+tribution over possible next token. A formula-constrained beam              generation in a spectrum-to-structure task. Similarly, templates with
+search algorithm was applied with a beam width of k = 128 to sample         identical structures to the target structures were excluded. Early
+top-k candidate SMILES. To avoid unnecessary expansion of the               stopping was applied if the validation loss did not improve for 5 con-
+search space, the formula constraint was employed to verify for-            secutive epochs. The fine-tuned model converged after 4 epochs
+mulae at each decoding step. Tokens beyond the allowed elemental            training.
+composition were blocked from further expansion (Supplementary
+Fig. 3b). After generation, invalid SMILES strings or those not                   Both training stages used the AdamW optimizer with a weight
+matching the target formula were discarded. For each valid candi-           decay of 1 × 10-6. The learning rate was set to 0.01 with a linear warmup
+date, the sum of the probabilities across the sequence was calcu-           of 400 steps during pretraining, and to 5 × 10-5 during fine-tuning. The
+lated, normalized and used as the model score.                              batch size was consistently set to 32 for both stages. Detailed para-
+                                                                            meter settings for model training are listed in Supplementary Table 4.
+(4) Re-ranking model. The generated candidates were further re-             The cross-entropy loss was used as the loss function and calculated as
+ranked using a lightGBM-based model (Fig. 2b). For each candidate,          follows:
+structural similarities between the candidate structure and each of the
+retrieved templates were calculated. To describe the similarity, the        X
+maximum, mean, and minimum values of structural similarities were           L = À pðxÞ log qðxÞ  ð2Þ
+extracted as features. Similarly, the maximum, mean and minimum
+value of spectral similarities between the query spectrum and the           where pðxÞ represents the encoding of the correct token, and qðxÞ
+spectra of each template were calculated. Additional features included      denotes the predicted probability distribution.
+the natural product (NP) score38, molecular complexity47, SMILES
+length, template number, candidate rank and model score of each                   To evaluate the contribution of key components in the deep
+candidate. These features were combined to form the input feature           generative model, we conducted a series of ablation experiments using
+vector for the re-ranking model. The model output candidate scores          the fine-tuned model as the baseline. In the ablation setting, we indi-
+ranging from negative to positive infinity, with a higher candidate         vidually removed or modified core components to evaluate their
+score indicating higher confidence in the ranking (Fig. 2c).                impact on model performance (Supplementary Fig. 5a­c). First, to
+                                                                            examine the effect of pretraining, the model was trained directly on
+      To train the re-ranking model, we utilized candidates generated       the spectral dataset without weight initialization from the pretrained
+from the training and validation sets. The testing set was reserved         structure model (pretraining). Second, to assess the importance of
+exclusively for evaluating the final performance of both the generative     template search, retrieved templates were replaced with a random
+and re-ranking models to ensure no data leakage during evaluation.          selection of ten structures from the reference spectral database during
+Specifically, 2000 spectra were randomly sampled from the training          model training (template search). Third, in database-free generation,
+set to simulate targeted structural generation. During this process,        the formula constraint was removed in order to evaluate the role of
+templates were searched from the training set without excluding             formula-constrained decoding (formula constraint). All ablation
+identical structures to ensure adequate diversity. For the templates        models were trained under the same conditions as the baseline model,
+with an identical structure to the targeted structure, the spectral         ensuring that observed performance changes were directly attribu-
+similarity values were randomly assigned in the range of 0.7 to 1.0 to      table to the removal of each specific component.
+avoid overfitting. This procedure simulates experimental variability
+and enables the re-ranking model to learn a more realistic and robust       Evaluation metrics
+scoring behavior, rather than overfitting to idealized similarity values.   For metabolite annotation, Top-N accuracy was used to evaluate
+Altogether, 3995 spectra were collected for training the re-ranking         ranking performance, defined as the proportion of cases in which the
+model. The re-ranking model was trained to prioritize candidates with       correct structure appears within the top-N generated candidates.
+higher structural similarity using the candidate scores (S). To interpret   Structural correctness was determined by matching the first layer of
+the importance of each feature to the re-ranking model, we calculated       the InChIKey between each generated structure and the target struc-
+both split counts using the LightGBM package (v4.5.0) and SHAP              ture. In addition to exact correct matches, structural similarity was also
+values using the SHAP package (v0.46.0) in Python (Supplemen-               evaluated by calculating the Tanimoto similarity of 2048-bit RDKit
+tary Fig. 4b).                                                              molecular fingerprints between the generated structures and the tar-
+                                                                            get structure. Furthermore, the relative ranking position (RRP)
+
+Nature Communications | (2026)17:5426                                                            12
+Article                                                                     https://doi.org/10.1038/s41467-026-72149-6
+
+employed to describe the relative position of the truly annotated           Waters ACQUITY UPLC BEH Amide column (1.7 m particle size,
+structure across structures32.                                              100 mm length × 2.1 mm inner diameter) was used for HILIC, and a
+                                                                            Kinetex C18 column (2.6 m, 2.1 × 100 mm) was used for reverse phase
+         RRP = 1          BC À W C                                          (RP) separation. The column temperature was maintained at 25 °C, and
+                 2         TC À 1                                           a 2 L injection volume was commonly used. For HILIC separation, the
+                    1  À                 ð3Þ                                mobile phase A consisted of 25 mM ammonium hydroxide (NH4OH)
+                                                                            and 25 mM ammonium acetate (NH4OAc) in water, and B consisted of
+whereas BC represents the number of structures that have a higher           acetonitrile (ACN), in both the positive (ESI+) and negative (ESI-)
+score than the target structure, and WC represents the number of            modes. The flow rate was 0.5 mL/min, and the gradient was pro-
+structures that have a lower score. TC represent to the number of           grammed as follows: 0­0.5 min, 95% B; 0.5­7 min, 95% B to 65% B;
+generated structures. RRP of 1.0 means the target structure ranked          7­8 min, 65% B to 40% B; 8­9 min, 40% B; 9­9.1 min, 40% B to 95% B;
+first, RRP of 0 means the target structure ranked last. Higher RRP          and 9.1­12 min, 95% B. For RP separation, mobile phase A was 0.01%
+means better ranking performance for annotation.                            acetic acid in water, and B was a mixture of isopropyl alcohol and
+                                                                            acetonitrile (1:1), in both the positive (ESI+) and negative (ESI-) modes.
+Biological sample preparation and data acquisition                          The flow rate was 0.3 mL/min, and the gradient was programmed as
+A total of five biological sample types were analyzed: BV2 cells (n = 6;    follows: 0­1 min: 1% B; 1­8 min: 99% B; 8­9 min: 99% B; 9.0­9.1 min,
+biological replicates), mouse brain tissue (n = 6; biological replicates),  99% B to 1% B; and 9.1­12 min: 1% B. The LC­MS data were acquired in
+mouse liver tissue (n = 6; biological replicates), NIST human plasma        full scan mode with positive/negative ion polarity switch, and
+(n = 6; technical replicates), and NIST human urine (n = 6; technical       ddMS2 scans were applied to obtain MS2 spectra for all samples. The
+replicates). All sample preparation followed common protocols. The          ESI source parameters were as follows: spray voltage, 3500 V (positive)
+NIST human urine (SRM 3667) and NIST human plasma (SRM 1950)                or -2800 V (negative), respectively; sheath gas, 50 arbs; aux gas, 15
+reference materials were purchased from Ango Biotechnology Co.              arbs; sweep gas, 2 arbs; ion transfer tube temperature, 350 °C; vapor-
+(Shanghai, China). Human plasma or urine samples (100 µL) were              izer temperature, 400 °C for HILIC or 350 °C for RPLC analysis. Full MS
+extracted using MeOH (300 µL). After vortexing for 30 s, the samples        scan was set as follows: orbitrap resolution, 60,000; AGC target, 1e6;
+were subjected to sonication for 15 min and then incubated for 1 h at       maximum injection time, 100 ms; scan range, 70­1200 Da. The
+-20 °C, followed by centrifugation at 17,000×g for 15 min at 4 °C to        ddMS2 scan was set as: orbitrap resolution, 30,000; AGC target, 1e5;
+precipitate proteins. The resulting supernatants were collected,            maximum injection time, 60 ms; scan range, 50­1200 Da; top N, 6;
+transferred into LC sample vials and stored at -80 °C prior to LC­MS        isolation width, 1.0 m/z; collision energy mode, stepped; collision
+analysis. The 6-week-old male C57BL/6J mice (n = 6) were group-             energy type, normalized; HCD collision energies (%), 20-30-40;
+housed in a barrier facility under controlled conditions (at room           exclusion duration 4 s.
+temperature of 22 °C with 50% humidity and 12 h light/12 h dark
+cycles). The C57BL/6J strain was obtained from Vital River Laboratories           Raw LC­MS data files (.raw) were converted to.mzXML format for
+(Beijing, China). For metabolite extraction of mouse tissues, 20 mg of      MS1 and.mgf format for MS2. XCMS (v 3.12.0) was used for peak
+tissue was homogenized in 200 L of H2O under low temperature                detection, retention time correction, and peak alignment. The key
+conditions, continuously cooled using N2 gas flow from liquid nitro-        parameters were set as follows: Method: centWave; Peak width: min =
+gen. Subsequently, 800 L of MeOH:ACN (1:1, v/v) was added to                5, max = 30; S/N threshold: 3; Minimum fraction: 0.5. The metabolites
+200 L of the homogenate. The mixture was vortexed for 30 s and              in biological samples were annotated using MetDNA336 (v 3.1). The
+sonicated for 10 min in a 4 °C water bath. The samples were incubated       resulting peak tables and MS2 spectra were matched against an in-
+at -20 °C for 1 h to facilitate protein precipitation, followed by cen-     house MS2 spectral library and retention time (RT) library to achieve
+trifugation at 17,000×g for 15 min at 4 °C. The supernatant was col-        level 1 identification results. The in-house library consisted of RT and
+lected and evaporated to dryness at 4 °C using a vacuum concentrator.       MS/MS spectra acquired from purchased chemical standards. The
+Dried samples were stored at -80 °C prior to LC­MS analysis. BV2 cells      metabolite annotation was employed in identical experimental con-
+were plated in 6-cm dishes at ~2 × 106 cells per dish and cultured in       ditions between biological sample and in-house library. Matching tol-
+DMEM medium supplemented with 10% FBS and 1% penicillin/strep-              erances were defined as follows: MS1 match, 15 ppm; Retention time,
+tomycin. The extraction solution ACN/MeOH/H2O (2:2:1, v/v/v) was            25 s; MS2 match: dot product score > 0.8.
+pre-cooled at -80 °C for 1 h before use to ensure no ice formation.
+When cells reached the target density, the culture medium was com-          Annotation of metabolites in real biological samples
+pletely aspirated, and the cells were washed rapidly with 1 mL of 37 °C     To evaluate the performance of MetGenX on real biological samples,
+PBS. The dish was placed on dry ice, and 1000 L of pre-cooled               we first annotated MS2 spectra from five different sample types using
+extraction solution was added, followed by incubation at -80 °C for at      library-based spectral matching. Annotation results were manually
+least 40 min. During transfer, the dish was kept on dry ice. Cells were     checked to obtain level 1 identifications. Only metabolites present in
+then scraped and transferred into a 2-mL EP tube. Then an additional        the background database were retained for validation. In total, 1720
+500 L of extraction solution was used to rinse the dish. The combined       MS2 spectra were identified across these samples. MetGenX was sub-
+extract (1.5 mL total) was collected. The samples were vortexed for         sequently applied to annotate these spectra in database-restricted
+1 min at 4 °C and centrifuged at 17,000×g for 15 min at 4 °C to pellet      mode, using a background database containing 0.52 million chemical
+insoluble materials. The resulting supernatant was transferred to a new     structures. To ensure that template search matched the experimental
+EP tube and evaporated to dryness at 4 °C using a vacuum con-               conditions of biological samples, reference spectra were curated from
+centrator. Dried samples were stored at -80 °C until analysis. Prior to     the NIST database by selecting, for each compound, the MS2 spectrum
+LC­MS analysis, dried extracts of mouse tissue and BV2 cells were           acquired at a collision energy closest to normalized collision energy
+reconstituted in 100 L of ACN:HO (1:1, v/v), vortexed for 30 s, and         (NCE) 30%. This curated subset was used as the reference spectral
+sonicated for 10 min at 4 °C in a water bath. The reconstituted samples     database for template search, with a cosine similarity threshold of 0.4.
+were then centrifuged at 17,000×g for 15 min at 4 °C, and the resulting     Using this approach, 1681 out of 1720 spectra (97.7%) successfully
+supernatant was transferred into LC sample vials for analysis.              retrieved templates from the full NIST spectral dataset for generation.
+                                                                            Annotation performance was evaluated using annotation coverage
+      The untargeted metabolomics data were acquired by LC­MS               and top-N accuracy. Annotation coverage was defined as the number
+using a Vanquish UHPLC system coupled to an Orbitrap mass spec-             of MS2 spectra for which at least one candidate structure was
+trometer (Exploris 480, Thermo Fisher Scientific). For LC separation, a
+
+Nature Communications | (2026)17:5426                                       13
+Article                                                                   https://doi.org/10.1038/s41467-026-72149-6
+
+successfully generated. Top-N accuracy was calculated as the pro-         annotated metabolites were randomly selected as seed compounds to
+portion of correctly annotated spectra among these successfully           initiate network-based annotation propagation along the metabolic
+annotated cases. For spectra with multiple matched annotation             reaction network (MRN), while the remaining 70% were reserved for
+results, the best rank was used to compute the top-N accuracy.            validation under a 10-fold cross-validation approach. For MetGenX, the
+                                                                          database-restricted mode was applied using the same MRN (175,354
+      To benchmark annotation accuracy, MetGenX was compared with         metabolites) used by MetDNA3, which served as the background
+five widely used in silico MS2 annotation tools: CFM-ID11 (v 4.0),        database for a fair comparison. All annotated structures were excluded
+MetFrag34 (v 2.4.6-CL), MS-FINDER12 (v 3.6.1), ICEBERG35 (https://        during template search for each dataset. RT filtering was performed
+github.com/coleygroup/ms-pred), and MSNovelist15 (incorporated in         using predicted RT values with a 30% tolerance, based on the same
+SIRIUS v 6.0.6). To ensure a fair and consistent comparison, all          random forest model as MetDNA3. Annotation performance was
+methods were provided with the same background database as used           evaluated using coverage and top-3 accuracy, following the same
+by MetGenX. The correct molecular formula was assumed to be known         definitions and procedures as in this study and the MetDNA3 work36.
+for each MS2 spectrum. ICEBERG was retrained on the same dataset
+following the provided training protocols, whereas other tools were       Discovery of metabolites in liver sample
+used with their embedded pretrained models. Detailed parameter            The metabolomics dataset from mouse liver included 6564 metabolic
+settings for each tool are listed in Supplementary Table 6.               features with corresponding MS2 spectra acquired in positive ioniza-
+                                                                          tion mode. Molecular formulae were initially predicted using SIRIUS37
+Metabolite generation in negative ionization mode                         (v 6.0.6). The MS2 mass accuracy was set to 10 ppm, and adduct types
+MS2 spectra acquired in negative ionization mode using Orbitrap           were limited to [M+H]+ and [M+Na]+. To ensure high-confidence for-
+instruments were collected from the NIST20 spectral database and          mula annotations, only results meeting the following criteria were
+cleaned as for the positive mode. A Word2Vec model was trained on         retained: m/z error < 10 ppm, explained intensity > 0.8, and Zodiac
+129,489 MS2 spectra in negative mode, using the same parameters as        score  0.1, resulting in 2979 features with confident formula
+those applied in the positive mode. The generative model and re-          assignments.
+ranking model trained in the positive mode were directly applied for
+structure generation. For performance evaluation in the NIST spectral           A multi-step annotation workflow was then applied (Fig. 6a). First,
+database, shared metabolites between positive and negative ionization     MS2 spectra were matched against an in-house MS2 and retention time
+modes were identified from the testing set in positive mode. Subse-       library using previously described parameters, yielding 516 level 1
+quently, MS2 spectra acquired at different collision energies in nega-    annotations. The remaining spectra were annotated using MetGenX.
+tive mode for each compound were merged to construct the testing          During structure generation, templates were retrieved from the full
+set, including 653 merged MS2 spectra. Templates were retrieved from      NIST dataset acquired at NCE30, using a cosine similarity threshold of
+a reference spectral database of 7679 merged MS2 spectra. This setup      0.4. For high-quality candidate selection, a candidate score threshold
+ensured no structural overlap during the template search and gen-         (S) of 1.2 was applied. This threshold was empirically determined from
+eration process. The same configuration and background database as        metabolites identified in the mouse liver dataset, achieving a true
+in the positive mode were applied for both database-restricted and        positive rate of 0.80 and a false positive rate of 0.12 for distinguishing
+database-free generation.                                                 correct from incorrect annotations (Supplementary Fig. 10a, b). In
+                                                                          database-restricted generation, structure candidates were retrieved
+      For metabolite annotation in biological samples, a total of 2417    from the background database (0.52 million structures) based on the
+MS2 spectra from biological datasets were used for evaluation. The        predicted molecular formula, resulting in 541 spectra with high-
+same configuration and background database as in the positive mode        confidence candidates (S > 1.2). The remaining spectra were annotated
+were applied during structure generation. Templates were retrieved        using database-free generation, resulting in 426 spectra with high-
+from the full NIST spectral dataset comprising 9826 merged spectra        quality candidates and 1102 spectra with at least one valid structure.
+acquired at a collision energy closest to NCE 30%, using a cosine simi-
+larity threshold of 0.4. In database-restricted mode, MetGenX success-          The adenosyl-cysteine is validated with chemical standards
+fully annotated 2319 spectra. Comparison with other in silico annotation  through chemical syntheses, as previous reported route49. The Ap2I is
+tools was conducted using the same procedures as in the positive mode.    validated with chemical standards through chemical syntheses as
+                                                                          below: AMP (347 mg, 1 mmol) was dissolved in 10 mL of t-BuOH, fol-
+Spike-in experiments                                                      lowed by dropwise addition of morpholine (5 eq.). The reaction mix-
+To evaluate the annotation performance of MetGenX in real biological      ture was first stirred at room temperature for 15 min and then set to
+samples, 200 metabolite standards were spiked into mouse liver and        reflux. Dicyclohexylcarbodiimide (DCC, 824 mg, 4 eq.) was dissolved in
+NIST 1950 plasma samples. The list of spiked metabolites followed our     10 mL of t-BuOH and was added dropwise to the reaction mixture
+previously reported study48, and detailed compound information was        under reflux every 10 min. After 2 h, DCC addition was complete, and
+provided in Supplementary Data 12. Untargeted metabolomics ana-           reflux was continued for another 5 min. After the reaction was com-
+lyses were performed under the same LC­MS conditions as those used        pleted, the mixture was cooled to rt and volatiles were removed under
+for biological samples. The spike-in metabolites were identified by       vacuum. The residue was treated with 2 mL of water. Solids were
+matching m/z values, retention times (RT), and MS2 spectra with those     removed by filtration, and the aqueous layer was concentrated under
+of the corresponding chemical standards to obtain level 1 annotation.     vacuum to yield the crude product. The crude product was dissolved
+For MetGenX, annotation accuracy was calculated across all detected       in water, and automated flash column chromatography was performed
+metabolites, using the minimum annotation rank obtained from dif-         using a Teledyne ISCO CombiFlash Companion system with a RediS-
+ferent LC­MS methods to eliminate duplicated metabolites. For other       epRf reverse-phase C18 column, packed with 40 g silicagel by using
+annotation tools, the parameters were kept identical to those listed in   100 mM NH4HCO3: acetonitrile (98%:2% to 85%:15%) as an eluent with a
+Supplementary Table 6 to annotate the corresponding experimental          flow rate of 40 mL/min to get 150 mg AMP-morpholine. The 5 mL tube
+MS2 spectra of the spiked metabolites in both positive and negative       was charged with AMP-morpholine (0.05 mmol, 1 eq.). The coupling
+ionization modes.                                                         IMP (0.05 mmol, 1 eq.) was added, along with MgCl2 · (H2O)6
+                                                                          (0.076 mmol, 15.2 mg, 1.5 eq.), tetrazole (0.1 mmol, 7 mg, 2 eq.), H2O
+Comparison with the network-based annotation method                       (0.3 mmol, 31.2 L, 6 eq.) and a 50 mm stainless steel ball. The ball mill
+MetGenX was compared with MetDNA3 across 20 biological sample             was set to vibrate at a frequency of 30 Hz for 90 min, after which time
+datasets as described previously36. For MetDNA3, 30% of level 1           the jar was left to cool down to room temperature. Once the jar was
+
+Nature Communications | (2026)17:5426                                     14
+Article                                                                        https://doi.org/10.1038/s41467-026-72149-6
+
+opened, the product was dissolved in water, and purified by prep-              Code availability
+HPLC by using 100 mM formic acid: acetonitrile (98%:2% to 85%:15%) as
+an eluent with a flow rate of 10 mL/min to get 5 mg Ap2I product. The          MetGenX is written in the Python language (v 3.12.6). The source code
+structure was confirmed by nuclear magnetic resonance spectroscopy             of MetGenX is freely available on GitHub [https://github.com/
+(1H NMR, 400 MHz, D2O) (ppm) = 8.13 (d, J = 24 Hz, 1H), 8.10 (s, 1H),          ZhuMetLab/MetGenX] under the CC BY-NC-ND 4.0 License. The
+7.94 (d, J = 16 Hz, 1H), 7.90 (s, 1H), 5.84 (d, J = 12 Hz, 2H), 4.48­4.43 (m,  model weights and database are available in Zenodo [https://doi.org/
+2H), 4.33­4.32 (m, 2H), 4.25­4.19 (m, 4H), 4.13­4.09 (m, 2H).                  10.5281/zenodo.18907370].
+
+Benchmarking in MassSpecGym datasets                                           References
+MetGenX was evaluated on the MassSpecGym dataset following the
+training-testing split for fair comparison with previously reported            1. Chaleckis, R., Meister, I., Zhang, P. & Wheelock, C. E. Challenges,
+baselines39. The model was initialized with weights pretrained on a                  progress and promises of metabolite annotation for LC-MS-based
+structure dataset and subsequently fine-tuned on MassSpecGym                         metabolomics. Curr. Opin. Biotechnol. 55, 44­50 (2019).
+within the MetGenX framework (Fig. 2a, b). During pretraining, Met-
+GenX was trained on compounds from HMDB28, DSSTOX50,                           2. Domingo-Almenara, X., Montenegro-Burke, J. R., Benton, H. P. &
+COCONUT27, and MOSES24, as curated by DiffMS21. To prevent data                      Siuzdak, G. Annotation: a computational solution for streamlining
+leakage, all molecules overlapping with the MassSpecGym validation                   metabolomics analysis. Anal. Chem. 90, 480­489 (2018).
+and test sets were explicitly removed. Structure templates were
+retrieved from the MassSpecGym training set based on structural                3. Alseekh, S. et al. Mass spectrometry-based metabolomics: a guide
+similarity using a Tanimoto similarity threshold of 0.4. During fine-                for annotation, quantification and best reporting practices. Nat.
+tuning, template search was also restricted to spectra in the training               Methods 18, 747­756 (2021).
+set with a spectral similarity threshold of 0.4. Spectra collected under
+different collision energies, instrument types, and adduct forms were          4. Kind, T. et al. Identification of small molecules using accurate mass
+treated as independent entries and were not merged during model                      MS/MS search. Mass Spectrom. Rev. 37, 513­532 (2018).
+training or evaluation. Duplicate templates with identical structures
+were removed by retaining only the search result with the highest              5. da Silva, R. R., Dorrestein, P. C. & Quinn, R. A. Illuminating the dark
+score, and up to 10 templates were retained for model training and                   matter in metabolomics. Proc. Natl. Acad. Sci. USA 112,
+structure generation. The re-ranking model was not incorporated                      12549­12550 (2015).
+during benchmarking to reduce computational overhead and ensure
+comparable evaluation. In addition, we evaluated a MetGenX-Full                6. Aksenov, A. A., da Silva, R., Knight, R., Lopes, N. P. & Dorrestein, P. C.
+model where the similarity threshold in the template search of Met-                  Global chemical analysis of biology by mass spectrometry. Nat.
+GenX was removed and ten structure templates were selected with the                  Rev. Chem. 1, 0054 (2017).
+highest similarity scores as inputs for MetGenX, enabling full-spectrum
+coverage across the dataset. For both training stages, the batch size          7. Cai, Y., Zhou, Z. & Zhu, Z.-J. Advanced analytical and informatic
+was set to 64, and the learning rate was adjusted to 5 × 10-6 using the              strategies for metabolite annotation in untargeted metabolomics.
+Adam optimizer (weight decay = 1 × 10-6) to accommodate different                    Trends Anal. Chem. 158, 116903 (2023).
+dataset scales. All other hyperparameters were kept identical to those
+listed in Supplementary Table 4. Model performance was evaluated               8. Watrous, J. et al. Mass spectral molecular networking of living
+using the standard MassSpecGym benchmark metrics.                                    microbial colonies. Proc. Natl. Acad. Sci. USA 109,
+                                                                                     E1743­E1752 (2012).
+Reporting summary
+Further information on research design is available in the Nature              9. Wang, M. et al. Sharing and community curation of mass spectro-
+Portfolio Reporting Summary linked to this article.                                  metry data with global natural products social molecular net-
+                                                                                     working. Nat. Biotechnol. 34, 828­837 (2016).
+Data availability
+                                                                               10. Quinn, R. A. et al. Global chemical effects of the microbiome
+Unless otherwise stated, all data supporting the results of this study               include new bile-acid conjugations. Nature 579, 123­129 (2020).
+can be found in the article, supplementary, and source data files. The
+NIST20 database used in this study is a commercial resource and                11. Wang, F. et al. CFM-ID 4.0: more accurate ESI-MS/MS spectral
+cannot be publicly redistributed. Access can be obtained by purchas-                 prediction and compound identification. Anal. Chem. 93,
+ing the NIST Mass Spectral Library from NIST. The structure generation               11692­11700 (2021).
+and metabolite annotation results are provided in Supplementary
+Data 1­6. All MS2 spectral datasets used to evaluate MetGenX are               12. Tsugawa, H. et al. Hydrogen rearrangement rules: computational
+provided in Supplementary Data 7­10, including the compound                          MS/MS fragmentation and structure elucidation using MS-FINDER
+information from the NIST testing set and MS2 spectra from biological                software. Anal. Chem. 88, 7946­7958 (2016).
+samples. MS2 spectra from the mouse liver metabolomics dataset are
+provided in Supplementary Data 11. Detailed compound information               13. Dührkop, K., Shen, H., Meusel, M., Rousu, J. & Böcker, S.
+and annotation results of spike-in experiments are provided in Sup-                  Searching molecular structure databases with tandem mass
+plementary Data 12. The raw data files of BV2 cells, mouse brain tissue,             spectra using CSI:FingerID. Proc. Natl. Acad. Sci. USA 112,
+mouse liver tissue, NIST human plasma, and NIST human urine from                     12580­12585 (2015).
+the Orbitrap instrument can be accessed at the MassIVE repository
+[https://massive.ucsd.edu/ProteoSAFe/dataset.jsp?accession=                    14. Goldman, S. et al. Annotating metabolite mass spectra with
+MSV000097913]. The raw data files of spike-in experiments can be                     domain-inspired chemical formula transformers. Nat. Mach. Intell.
+accessed at the MassIVE repository [https://massive.ucsd.edu/                        5, 965­979 (2023).
+ProteoSAFe/dataset.jsp?accession=MSV000101078]. Source data are
+provided with this paper.                                                      15. Stravs, M. A., Dührkop, K., Böcker, S. & Zamboni, N. MSNovelist: de
+                                                                                     novo structure generation from mass spectra. Nat. Methods 19,
+                                                                                     865­870 (2022).
+
+                                                                               16. Du, Y. et al. Machine learning-aided generative molecular design.
+                                                                                     Nat. Mach. Intell. 6, 589­604 (2024).
+
+                                                                               17. Wang, J. et al. Multi-constraint molecular generation based on
+                                                                                     conditional transformer, knowledge distillation and reinforcement
+                                                                                     learning. Nat. Mach. Intell. 3, 914­922 (2021).
+
+                                                                               18. Lee, S. et al. Molecule generation with fragment retrieval aug-
+                                                                                     mentation. In Proc. 38th International Conference on Neural Infor-
+                                                                                     mation Processing Systems (NeurIPS, 2025).
+
+                                                                               19. Popova, M., Isayev, O. & Tropsha, A. Deep reinforcement learning
+                                                                                     for de novo drug design. Sci. Adv. 4, eaap7885 (2018).
+
+                                                                               20. Litsa, E. E., Chenthamarakshan, V., Das, P. & Kavraki, L. E. An end-to-
+                                                                                     end deep learning framework for translating mass spectra to de-
+                                                                                     novo molecules. Commun. Chem. 6, 132 (2023).
+
+Nature Communications | (2026)17:5426                                          15
+Article                                                                       https://doi.org/10.1038/s41467-026-72149-6
+
+21. Bohde, M. M., Wang, R., Ji, S. & Coley, C. W. DiffMS: diffusion           43. Bushuiev, R. et al. Self-supervised learning of molecular repre-
+      generation of molecules conditioned on mass spectra. In Proc.                 sentations from millions of tandem mass spectra using DreaMS.
+      42nd International Conference on Machine Learning (PMLR, 2025).               Nat. Biotechnol. https://doi.org/10.1038/s41587-025-02663-
+                                                                                    3 (2025).
+22. Qiang, H. et al. Language model-guided anticipation and discovery
+      of mammalian metabolites. Nature 651, 211­220 (2026).                   44. Li, Y. et al. Spectral entropy outperforms MS/MS dot product
+                                                                                    similarity for small-molecule compound identification. Nat. Meth-
+23. Brown, N., Fiscato, M., Segler, M. H. S. & Vaucher, A. C. GuacaMol:             ods 18, 1524­1531 (2021).
+      benchmarking models for de novo molecular design. J. Chem. Inf.
+      Model. 59, 1096­1108 (2019).                                            45. Zhang, H. et al. MSBERT: embedding tandem mass spectra into
+                                                                                    chemically rational space by mask learning and contrastive learn-
+24. Polykovskiy, D. et al. Molecular Sets (MOSES): a benchmarking                   ing. Anal. Chem. 96, 16599­16608 (2024).
+      platform for molecular generation models. Front. Pharmacol. 11,
+      565644 (2020).                                                          46. Huber, F., van der Burg, S., van der Hooft, J. J. J. & Ridder,
+                                                                                    L. MS2DeepScore: a novel deep learning similarity measure
+25. Bittremieux, W. et al. Open access repository-scale propagated                  to compare tandem mass spectra. J. Cheminform. 13, 84
+      nearest neighbor suspect spectral library for untargeted metabo-              (2021).
+      lomics. Nat. Commun. 14, 8488 (2023).
+                                                                              47. Bertz, S. H. The first general index of molecular complexity. J. Am.
+26. Mikolov, T., Chen, K., Corrado, G. & Dean, J. Efficient estimation of           Chem. Soc. 103, 3599­3601 (1981).
+      word representations in vector space. In Proc. 1st International
+      Conference on Learning Representations, Workshop Track                  48. Shen, X. et al. Metabolic reaction network-based recursive meta-
+      (ICLR, 2013).                                                                 bolite annotation for untargeted metabolomics. Nat. Commun. 10,
+                                                                                    1516 (2019).
+27. Sorokina, M., Merseburger, P., Rajan, K., Yirik, M. A. & Steinbeck, C.
+      COCONUT online: collection of open natural products database. J.        49. Miles, R. W. et al. S-homoadenosyl-L-cysteine and S-
+      Cheminform. 13, 2 (2021).                                                     homoadenosyl-L-homocysteine. Synthesis and binding studies of
+                                                                                    hon-hydrolyzed substrate analogues with S-adenosyl-L-
+28. Wishart, D. S. et al. HMDB 5.0: the Human Metabolome Database for               homocysteine hydrolase. J. Org. Chem. 67, 8258­8260 (2002).
+      2022. Nucleic Acids Res. 50, D622­D631 (2022).
+                                                                              50. Grulke, C. M., Williams, A. J., Thillanadarajah, I. & Richard, A. M.
+29. Wallace, W. E. & Moorthy, A. S. NIST mass spectrometry data center              EPA's DSSTox database: history of development of a curated
+      standard reference libraries and software tools: application to               chemistry resource supporting computational toxicology research.
+      seized drug analysis. J. Forensic Sci. 68, 1484­1493 (2023).                  Comput. Toxicol. 12, 100096 (2019).
+
+30. Faizan-Khan, M. et al. ChemEmbed: a deep learning framework for           Acknowledgements
+      metabolite identification using enhanced MS/MS data and multi-
+      dimensional molecular embeddings. Brief. Bioinform. 27,                 The work was supported by the National Key R&D Program of China
+      bbag054 (2026).                                                         (2022YFC3400702), National Natural Science Foundation of China
+                                                                              (22425404), Shanghai Key Laboratory of Aging Studies (19DZ2260400),
+31. Kim, S. et al. PubChem 2025 update. Nucleic Acids Res. 53,                Shanghai Municipal Science and Technology Major Project, and
+      D1516­D1525 (2025).                                                     Shanghai Basic Research Pioneer Project. Z.-J.Z. is supported by the
+                                                                              SANS Exploration Scholar Fund.
+32. Gerlich, M. & Neumann, S. MetFusion: integration of compound
+      identification strategies. J. Mass Spectrom. 48, 291­298 (2013).        Author contributions
+
+33. Sumner, L. W. et al. Proposed minimum reporting standards for             Z.-J.Z. and H.W. conceived the idea and designed the algorithm and
+      chemical analysis Chemical Analysis Working Group (CAWG)                software. H.W. contributed to the model training, evaluation and
+      Metabolomics Standards Initiative (MSI). Metabolomics 3,                developed the MetGenX package. H.W. and H.Z. performed the sample
+      211­221 (2007).                                                         preparation, data acquisition and processing for biological samples.
+                                                                              H.W. and Z.-J.Z. wrote the manuscript. Z.-J.Z. supervised the project. We
+34. Ruttkies, C., Schymanski, E. L., Wolf, S., Hollender, J. & Neumann, S.    thank Dr. Nan Liu and Jinxin Li for their assistance in synthesizing the
+      MetFrag relaunched: incorporating strategies beyond in silico           chemical standards.
+      fragmentation. J. Cheminform. 8, 3 (2016).
+                                                                              Competing interests
+35. Goldman, S., Li, J., Strazar, M. & Coley, C. W. Generating molecular
+      fragmentation graphs with autoregressive neural networks. Anal.         The authors declare no competing interests.
+      Chem. 96, 3419­3428 (2024).
+                                                                              Additional information
+36. Zhang, H., Zeng, X., Yin, Y. & Zhu, Z.-J. Knowledge and data-driven
+      two-layer networking for accurate metabolite annotation in untar-       Supplementary information The online version contains
+      geted metabolomics. Nat. Commun. 16, 8118 (2025).                       supplementary material available at
+                                                                              https://doi.org/10.1038/s41467-026-72149-6.
+37. Dührkop, K. et al. SIRIUS 4: a rapid tool for turning tandem mass
+      spectra into metabolite structure information. Nat. Methods 16,         Correspondence and requests for materials should be addressed to
+      299­302 (2019).                                                         Zheng-Jiang Zhu.
+
+38. Ertl, P., Roggo, S. & Schuffenhauer, A. Natural product-likeness          Peer review information Nature Communications thanks the anon-
+      score and its application for prioritization of compound libraries. J.  ymous reviewers for their contribution to the peer review of this work. A
+      Chem. Inf. Model. 48, 68­74 (2008).                                     peer review file is available.
+
+39. Bushuiev, R. et al. MassSpecGym: a benchmark for the discovery            Reprints and permissions information is available at
+      and identification of molecules. In Proc. 38th Conference on Neural     http://www.nature.com/reprints
+      Information Processing Systems, Datasets and Benchmarks Track
+      (NeurIPS, 2024).                                                        Publisher's note Springer Nature remains neutral with regard to jur-
+                                                                              isdictional claims in published maps and institutional affiliations.
+40. Wang, Y. et al. Mass-Spec attends to de novo molecular generation.
+      In Proc. 13th International Conference on Learning Representations
+      (ICLR, 2025).
+
+41. Böcker, S. & Dührkop, K. Fragmentation trees reloaded. J. Che-
+      minform. 8, 5 (2016).
+
+42. Huber, F. et al. Spec2Vec: improved mass spectral similarity scor-
+      ing through learning of structural relationships. PLoS Comput. Biol.
+      17, e1008724 (2021).
+
+Nature Communications | (2026)17:5426                                         16
+Article                                                                       https://doi.org/10.1038/s41467-026-72149-6
+
+Open Access This article is licensed under a Creative Commons
+Attribution-NonCommercial-NoDerivatives 4.0 International License,
+which permits any non-commercial use, sharing, distribution and
+reproduction in any medium or format, as long as you give appropriate
+credit to the original author(s) and the source, provide a link to the
+Creative Commons licence, and indicate if you modified the licensed
+material. You do not have permission under this licence to share adapted
+material derived from this article or parts of it. The images or other third
+party material in this article are included in the article's Creative
+Commons licence, unless indicated otherwise in a credit line to the
+material. If material is not included in the article's Creative Commons
+licence and your intended use is not permitted by statutory regulation or
+exceeds the permitted use, you will need to obtain permission directly
+from the copyright holder. To view a copy of this licence, visit http://
+creativecommons.org/licenses/by-nc-nd/4.0/.
+
+© The Author(s) 2026
+
+Nature Communications | (2026)17:5426                                         17
+

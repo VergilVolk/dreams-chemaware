@@ -1,0 +1,664 @@
+Predicting Network Activity from High Throughput
+Metabolomics
+
+Shuzhao Li1,2*, Youngja Park3,4, Sai Duraisingham1,2, Frederick H. Strobel5, Nooruddin Khan1,2,
+Quinlyn A. Soltow3, Dean P. Jones3, Bali Pulendran1,2
+
+1 Emory Vaccine Center, Emory University, Atlanta, Georgia, United States of America, 2 Yerkes National Primate Research Center, Emory University, Atlanta, Georgia,
+United States of America, 3 Department of Medicine, Emory University, Atlanta, Georgia, United States of America, 4 College of Pharmacy, Korea University, Seoul, South
+Korea, 5 Mass Spectrometry Center, Emory University, Atlanta, Georgia, United States of America
+
+    Abstract
+     The functional interpretation of high throughput metabolomics by mass spectrometry is hindered by the identification of
+     metabolites, a tedious and challenging task. We present a set of computational algorithms which, by leveraging the
+     collective power of metabolic pathways and networks, predict functional activity directly from spectral feature tables
+     without a priori identification of metabolites. The algorithms were experimentally validated on the activation of innate
+     immune cells.
+
+   Citation: Li S, Park Y, Duraisingham S, Strobel FH, Khan N, et al. (2013) Predicting Network Activity from High Throughput Metabolomics. PLoS Comput Biol 9(7):
+   e1003123. doi:10.1371/journal.pcbi.1003123
+   Editor: Christos A. Ouzounis, The Centre for Research and Technology, Hellas, Greece
+   Received November 7, 2012; Accepted May 15, 2013; Published July 4, 2013
+   Copyright: ß 2013 Li et al. This is an open-access article distributed under the terms of the Creative Commons Attribution License, which permits unrestricted
+   use, distribution, and reproduction in any medium, provided the original author and source are credited.
+   Funding: Work supported by grants from US National Institutes of Health AG038746, ES016731 (to DPJ); U19AI090023, U54AI057157, R37AI48638, R37DK057665,
+   U19AI057266, PO1A1096187 (to BP); Scripps CHAVI-ID Award (UM1AI100663 to BP); and the Bill and Melinda Gates Foundation (to BP). The funders had no role in
+   study design, data collection and analysis, decision to publish, or preparation of the manuscript.
+   Competing Interests: The authors have declared that no competing interests exist.
+   * E-mail: shuzhao.li@gmail.com
+
+Introduction                                                                  Even though they are a perfect match in theory, metabolomics
+                                                                           and genome-scale metabolic models have had little overlap so far.
+   Knowledge of many metabolic pathways has accumulated over               The use of metabolomics in building metabolic models is rare [21],
+the past century. For instance, glycolysis, citric acid cycle and          due to the scarcity of well annotated metabolomics data. The
+oxidative phosphorylation fuel cellular processes through the              application of genome-scale metabolic models to metabolomics
+generation of adenosine triphosphate; glycans and cholesterols not         data is not common either [22]. The limited throughput of
+only serve as structural blocks but also mediate intercellular             targeted metabolomics usually does not motivate large scale
+communication. In fact, metabolites pervade every aspect of life           network analysis. Untargeted metabolomics cannot move onto
+[1,2]. Their roles are increasingly appreciated, as advancing tools        pathway and network analysis without knowing the identity of
+allow deeper scientific investigations. The most notable progresses        metabolites.
+in recent years come from metabolomics and genome-scale
+metabolic models.                                                             A typical work flow of untargeted metabolomics is illustrated in
+                                                                           Figure 1A. After ionized molecules are scanned in the spectrom-
+   Metabolomics is the emerging field of comprehensive profiling           eter, the spectral peaks are extracted, quantified and aligned into a
+of metabolites. As metabolites are the direct readout of functional        feature table. At this point, each feature is identified by a mass-to-
+activity, metabolomics fills in a critical gap in the realm of systems     charge ratio (m/z) and retention time in chromatography, but its
+biology, complementing genomics and proteomics [3­6]. The                  chemical identity is not known. To assign a spectral feature to a
+technical platforms of metabolomics are mainly based on mass               bona fide metabolite, it usually involves tandem mass spectrometry
+spectromety and nuclear magnetic resonance [4,7]. Among them,              to examine the fragmentation pattern of a specific feature, or
+untargeted LC/MS (liquid chromatography coupled mass spec-                 coelution of isotopically labeled known references - both are
+trometry), especially on high resolution spectrometers, produces           inherently low throughput. Considerable effort is needed to build a
+unparalleled throughput, measuring thousands of metabolite                 spectral library, which is often of limited size and interoperability.
+features simultaneously [5,8­10].                                          Thus, metabolite identification forms the bottleneck of untargeted
+                                                                           metabolomics [23].
+   On the other hand, genome-scale metabolic models have been
+largely driven by genomics, as the total list of metabolic enzymes of         A number of informatics tools have been developed for LC/MS
+a species can be derived from its genome sequence [11,12]. The             metabolomics, ranging from feature extraction [24­26], pathway
+reconstruction of microbial metabolic network models is an                 analysis and visualization [27­29] to work flow automation [30­
+established process [13,14]. Intense manual curation, however,             32]. Yet, whereas pathway and network analysis is concerned, the
+was required in the building of two high-quality human models              existing tools require identified metabolites to start with. Compu-
+[15,16], which were followed by a number of derivatives [17­20].           tational prediction of metabolite identity, based on m/z alone, is
+The coverage of these metabolic models greatly exceeds the                 deemed inadequate as a single m/z feature can match multiple
+conventional pathways.                                                     metabolites even with high instrumental accuracy [33,34], and
+
+PLOS Computational Biology | www.ploscompbiol.org                       1  July 2013 | Volume 9 | Issue 7 | e1003123
+                                                                         Functional Analysis for Metabolomics
+
+  Author Summary                                                            In this paper, we report a novel approach of predicting network
+                                                                         activity from untargeted metabolomics without upfront identifica-
+  Mass spectrometry based untargeted metabolomics can                    tion of metabolites, thus greatly accelerating the work flow. This is
+  now profile several thousand of metabolites simultaneous-              possible because the collective power in metabolic networks helps
+  ly. However, these metabolites have to be identified before            resolve the ambiguity in metabolite prediction. We will describe
+  any biological meaning can be drawn from the data.                     the computational algorithms, and demonstrate their application
+  Metabolite identification is a challenging and low through-            to the activation of innate immune cells.
+  put process, therefore becomes the bottleneck of the filed.
+  We report here a novel approach to predict biological                  Results
+  activity directly from mass spectrometry data without a
+  priori identification of metabolites. By unifying network                 Full MS scan in an untargeted metabolomics experiment gives
+  analysis and metabolite prediction under the same                      the most power of high throughput profiling, producing several
+  computational framework, the organization of metabolic                 thousand of features routinely. Our goal is to predict biological
+  networks and pathways helps resolve the ambiguity in                   activity in a network of metabolites directly from the feature table,
+  metabolite prediction to a large extent. We validated our              bypassing the bottleneck of metabolite identification (Figure 1A).
+  algorithms on a set of activation experiment of innate                 As illustrated in Figure 1B, each spectral feature can match to
+  immune cells. The predicted activities were confirmed by               several metabolite candidates, albeit the true identity is not known.
+  both gene expression and metabolite identification. This               The conventional work flow is to identify each metabolite
+  method shall greatly accelerate the application of high                experimentally before mapping them onto metabolic pathways/
+  throughput metabolomics, as the tedious task of identi-                networks. Instead of treating metabolite identification and
+  fying hundreds of metabolites upfront can be shifted to a              metabolic pathway/network analysis as two separate steps, we
+  handful of validation experiments after our computational              argue that there is collective power in the organization of
+  prediction.                                                            metabolic networks, which can be leveraged when the two steps
+                                                                         are unified under one theoretical framework. In other words, if a
+multiple forms of the same metabolite often exist in the mass            list of significant spectral features reflects a biological activity, the
+spectra [35]. Although automated MS/MS (tandem mass spec-                true metabolites they represent should show enrichment on a local
+trometry) search in databases is improving the efficiency of             structure in the metabolic network [22], while the falsely matched
+metabolite identification [36,37], this requires additional targeted     metabolites are distributed more randomly. This gives us a means
+experiments and relies on extensive databases, where data from           to predict functional activities without upfront identification of
+different platforms often do not match. How to bring untargeted          metabolites (Figure 1C).
+metabolomics data to biological interpretation remains a great
+challenge.                                                                  The software implementation of our approach is named
+                                                                         mummichog (mummichog is an American Indian term for by groups,
+
+Figure 1. Mummichog redefines the work flow of untargeted metabolomics. A) In the work flow of untargeted metabolomics, the
+conventional approach requires the metabolites to be identified before pathway/network analysis, while mummichog (blue arrow) predicts
+functional activity bypassing metabolite identification. B) Each row of dots represent possible matches of metabolites from one m/z feature, red the
+true metabolite, gray the false matches. The conventional approach first requires the identification of metabolites before mapping them to the
+metabolic network. C) mummichog maps all possible metabolite matches to the network and looks for local enrichment, which reflects the true
+activity because the false matches will distribute randomly.
+doi:10.1371/journal.pcbi.1003123.g001
+
+PLOS Computational Biology | www.ploscompbiol.org                     2  July 2013 | Volume 9 | Issue 7 | e1003123
+                                                                                                           Functional Analysis for Metabolomics
+
+also name of a small fish which live by groups). From user input,             3. Structural modules are identified within these subnetworks
+mummichog requires two lists of m/z features, the significant list Lsig          according to Newman's spectral split algorithm [43]. This
+(e.g. selected by univariate statistics) and the reference list Lref (all        creates many modules of different sizes.
+features detected in the MS experiment). From the m/z features in
+Lsig, mummichog computes all possibly matched metabolites, and                4. Both subnetworks from Step 2 and modules from Step 3 are
+searches the reference metabolic network for all the modules that                compiled into a set of candidate modules (graphs),
+can be formed by these tentative metabolites. Random lists of m/z                G1,G2,:::,Gn. Each graph is cleaned of protruding edges if
+features are drawn from Lref many times to estimate the null                     such edges do not connect input metabolites therefore not
+distribution of module activities. The statistical significance of               contributing to the activity score.
+modules from Lsig can then be calculated on this null distribution.
+In return, the predicted metabolites in these significant modules             5. The activity score should reflect both the enrichment of ``input
+(and similarly for pathways) are more likely to be true, and they                metabolites'' and the modularity. Activity score of a candidate
+form the ``activity network'' for this particular experiment.                    module is computed as follows: For a subgraph G, activity
+                                                                                 score
+   Details of module analysis, pathway analysis and activity
+network are given below, after a treatment of the reference                   A^ ~Q: NI,G ,                                          ð1Þ
+metabolic network model.                                                                                   NG
+
+The reference metabolic network model                                         where NG is the number of metabolites in G, NI,G the number
+   The genome-scale human metabolic network in mummichog is                   of ``input metabolites'' in G, Q the adjusted Newman-Girvan
+                                                                              modularity:
+based on KEGG [38], UCSD Recon1 [15] and Edinburgh human
+metabolic network [16]. The integration process was described                      rffiffiffiffiffiffiffi     X  ki  kj )  ,  i,j[G  ð2Þ
+previously [39]. The organization of metabolic networks has been              Q~ NI :( EG                  {
+described as hierarchical and modular [40]. When we perform a                 NG m i,j 2m 2m
+hierarchical clustering on the metabolic reactions in our network,
+its modular structure is clear (Figure 2A). This modular                         where ki is the network degree of metabolite i, m the total
+organization, as reported previously [41], often but not always                  number of edges in the metabolic network M, EG the total
+correlates with conventional pathways (Figure 2B).                               number of edges in G, NI the number of ``input metabolites''.
+                                                                                 The original Newmarn-Gffiffiffiffiiffirffiffivan modularity has a bias towards
+   The module definition in this work is adopted from Newman                     larger modules. The NI is added to reduce this bias.
+and Girvan [42,43], where a module is a subnetwork that shows
+more internal connections than expected randomly in the whole                                                 NG
+network. Modules are less biased than pathways, which are
+defined by human knowledge and conventions, and outgrown by                   6. A list of permutation features (equal length to Lsig) is generated
+genome-scale metabolic networks. Activity of modules may exist                   by randomly sampling Lref . The activity scores of modules
+within and in between pathways. Deo et al [22] convincingly                      from this permutation list are computed as in Steps 1­5.
+demonstrated the advantage of unbiased module analysis over
+pathways. On the other hand, pathways have built-in human                     7. Repeat Step 6 many times to populate a list of scores from
+knowledge, which may be more sensitive under certain scenarios.                  random modules. Using maximum likelihood estimation, these
+Pathway analysis and module analysis are rather complementary,                   scores are modeled as a Gamma distribution (this is the null
+and both are included in mummichog.                                              distribution), and a cumulative distribution function (CDF) is
+                                                                                 calculated.
+   The reference metabolic network model contains both metab-
+olites and enzymes. Since metabolomics only measures metabo-                  8. The p-value for each module from input metabolites is
+lites, the model is converted to a metabolite centric network for                calculated on the CDF of null distribution.
+statistical analysis. Enzymes are only added later in the visualiza-
+tion step to aid user interpretation.                                         Pathway analysis
+                                                                                 The basic test for pathway enrichment here is Fisher's exact test
+Module analysis
+   Within the predefined reference metabolic network model M,                 (FET), which is widely used in transcriptomic analysis. The
+                                                                              concept of FET is, when we select k features (Lsig) from a total of
+mummichog searches for all modules that can be built on user input            N features (Lref ), and find m of the k features present on a
+data, and compute their activity scores. This process is repeated             pathway of size P, the chance of getting m in theory can be
+many times for the permutation data to estimate the background                estimated by enumerating the combinations of k, N and P.
+null distribution. Finally, the statistical significance of modules
+based on user data is calculated on the null distribution. The                   To apply FET to an enrichment test of metabolic features on
+specific steps are as follows:                                                pathways, we need to understand the additional layer of
+                                                                              complexity. Our metabolic features can be enumerated either in
+ 1. A list of ``input metabolites'' is tentatively computed from the          the m/z feature space or in the metabolite (true compound) space.
+    significant list of m/z features, Lsig. The m/z - metabolite              Since metabolic pathways are defined in the metabolite space,
+    matching considers all common isotopic derivatives and                    either way needs to factor in the many-to-many mapping between
+    adducts.                                                                  m/z features and metabolites (Figure S1). This mapping is
+                                                                              effectively covered in our permutation procedure, which starts
+ 2. From M, all subnetworks that can connect the input                        from the m/z features and reruns the mapping every time. The
+    metabolites from Step 1 within one reaction are extracted.                overall significance of a pathway enrichment is estimated based on
+    This is repeated for subnetworks within two, three and four               a method by Berriz et al [44], which ranks the p-value from real
+    reactions (by four steps M should be exhausted, see Figure 2C).           data among the p-values from permutation data to adjust for type
+    These subnetworks contain both ``input metabolites'' and other            I error. Finally, a more conservative version of FET, EASE, is
+    metabolites from M.                                                       adopted to increase the robustness [45]. The key idea of EASE is
+
+PLOS Computational Biology | www.ploscompbiol.org                          3  July 2013 | Volume 9 | Issue 7 | e1003123
+                                                                            Functional Analysis for Metabolomics
+
+Figure 2. Modular organization of human metabolic network. A) Hierarchical clustering of the network by the steps between 4204 metabolic
+reactions, where the warmer color codes for fewer steps. Each red island represents a cluster of closely connected reactions. B) An insert by the while
+arrow in A. This demonstrates that network modules and pathways correlate with but not equate to each other. C) When measured by reaction steps
+between metabolites, most metabolites are connected in no more than four steps. This serves as a practical guide in searching subnetworks in the
+total metabolic network.
+doi:10.1371/journal.pcbi.1003123.g002
+
+to take out one hit from each pathway, thus preferentially penalize             al. Using maximum likelihood estimation, these p-values are
+pathways with fewer hits. The specific steps are as follows:                    modeled as a Gamma distribution (this is the null distribution),
+                                                                                and a cumulative distribution function (CDF) is calculated.
+ 1. A list of permutation features (equal length to Lsig) is generated       3. Perform Step 1 on the significant feature list Lsig, and calculate
+    by randomly sampling Lref . This list is mapped to a list of                FET p-value and EASE score for each pathway. An adjusted p-
+    tentative metabolites. These metabolites are looked up in each              value per pathway is calculated based on the EASE score and
+    metabolic pathway. For each pathway, a FET right-tail p-value               CDF from Step 2. Both FET p-value and adjusted p-value are
+    is calculated.                                                              reported for each pathway.
+
+ 2. Repeat Step 1 many times to populate a list of p-values of all          Data driven activity network
+    pathways under all permutations (null distribution). Slightly              Both the module analysis and pathway analysis above serve
+    different from Berriz et al [44], all p-values not just the minimal
+    p-values in each permutation are used. This is because the size         as a framework to estimate the significance of functional
+    and organization of metabolic pathways vary greatly, a                  activities. In return, the predicted metabolites in significant
+    different situation from the large gene categories in Berriz et
+
+PLOS Computational Biology | www.ploscompbiol.org                        4  July 2013 | Volume 9 | Issue 7 | e1003123
+                                                                         Functional Analysis for Metabolomics
+
+activities are more likely to be real. Mummichog collects these             The cell extracts from our activation experiment were
+metabolites, and look up all their isotopic derivatives and              analyzed by LC/MS metabolomics, and yielded 7,995 spectral
+adducts in Lref . A confidence rating system is applied to filter        features (denoted as Lref ) after quality control. Among them,
+for qualified metabolites. For instance, if both the single-             601 features were significantly different between the infected
+charged 12C form M+H[1+] and the 13C form M(C13)+H[1+]                   samples and both the baseline and time-matched mock controls
+are present, this metabolite prediction carries a high confi-            (pv0:05, student t-test; denoted as Lsig). Using Lsig and Lref ,
+dence. All the qualified metabolites carry over their connec-            mummichog computes significant pathways and modules and the
+tions in the reference metabolic network, and form the                   activity network.
+``activity network'' for this specific experiment (e.g. Figure 3).
+                                                                            Viral infection induced a massive shift of metabolic
+   The activity network gears towards a quality and clear view of        programs in moDCs (pathways in Table S1, modules in Figure
+user data, as modules and pathways can be redundant and                  S2). The predicted activity network is shown in Figure 3A, and
+fragmented. It also accentuates the activity in a specific               we will focus our investigation on a small subnetwork
+experimental context, in contrast to the generic nature of the           (Figure 3B), which includes the metabolisms of nucleotides,
+reference metabolic network.                                             glutathione/glutathione disulfide and arginine/citrulline. Nu-
+                                                                         cleotides are required for viral replication, and the hijacking of
+   We next illustrate the application of these algorithms to a novel     host nucleotide metabolism by virus has been well described
+set of immune cell activation data, and two published data sets on       [52­54]. Glutathione is best known as intracellular antioxi-
+human urinary samples and yeast mutants.                                 dant, where it is oxidized to glutathione disulfide (GSSG).
+                                                                         However, our data show that both glutathione and GSSG are
+Application to the activation of innate immune cells                     depleted in activated moDCs, departing from this conventional
+   The innate immunity plays a critical role in regulating the           wisdom. The across-the-board depletion is consistent with the
+                                                                         down-regulation of genes for glutathione synthesis (Figure 4B).
+adaptive immunity, and the field was recognized by the 2011              Our data support the notion that glutathione is released by
+Nobel Prize in Physiology or Medicine [46]. According to the             dendritic cells and conditions the extracellular microenviron-
+nature of stimuli, innate immune cells direct different                  ment during their interaction with T cells [55­57]. Arginine is
+downstream molecular programs, which are still under                     known to be an important regulator in innate immune
+intense scientific investigation [47,48]. In this study, we              response [58,59]. Arginine metabolism can lead to two
+examine the metabolome of human monocyte-derived den-                    pathways: to ornithine (catalyzed by arginase) or to citrulline
+dritic cells (moDC) under the stimulation of yellow fever virus          (catalyzed by nitric oxide synthase). The decrease of arginine
+(YF17D, a vaccine strain). We have shown previously that                 and increase of citrulline suggests the latter pathway, which is
+yellow fever virus activates multiple toll-like receptors, and           the main reaction of producing intracellular nitric oxide. We
+induces cellular stress responses [49­51]. This data set is, to          indeed detected the inhibition of eNOS and iNOS expression
+our knowledge, the first high throughput metabolomics on                 later (Figure 4C), a well documented feedback effect by nitric
+any immune cells (macrophages were previously studied by                 oxide [60]. We also performed tandem mass spectrometry on
+limited throughput).
+
+Figure 3. Metabolic activity network in dendritic cells stimulated by yellow fever virus. A) Prediction by mummichog directly from m/z
+feature tables (cell extracts after 6 hours of infection). Metabolites are colored according to log2 fold change. A high resolution copy is given in Figure
+S9. B) Further investigation was focused on the subnetwork on the right. Glutamate was not significantly altered, but included for network
+connectivity.
+doi:10.1371/journal.pcbi.1003123.g003
+
+PLOS Computational Biology | www.ploscompbiol.org                     5  July 2013 | Volume 9 | Issue 7 | e1003123
+                                                                          Functional Analysis for Metabolomics
+
+Figure 4. Gene expression confirms the activity network. A) Cytokines secreted after infection (ELISA) indicate the activation of innate
+immune programs. B) Down-regulation of transcripts of GCLC, GCLM (subunits of gamma-glutamylcysteine synthetase) and GSS (glutathione
+synthetase), the key enzymes for glutathione synthesis. C) Nitric oxide has feedback inhibition on the expression of eNOS and iNOS (nNOS was not
+detected). Gene expression was assayed by quantitative RT-PCR. Infected samples were compared to mocks by student's t-test (n = 3).
+doi:10.1371/journal.pcbi.1003123.g004
+
+the metabolites in Figure 3B, using authentic chemicals as                agreed between mummichog and the original annotation
+references. All the metabolites, except glutamylcysteine and              (Figure 6). There is an option in mummichog to enforce the
+thyroxine, were confirmed (Figure 5, Figure S3).                          presence of M+H[+] form (for positive mode, M2H[2] for
+                                                                          negative mode) in metabolite prediction. With this option, 3
+   The depletion of arginine and accumulation of citrulline in            out of 44 metabolites were not in the original annotation, and
+moDC was also triggered by dengue virus but not by                        the remaining 41 metabolites were in 100% agreement.
+lipopolysaccharide (LPS, Figure S4). It is known that iNOS is
+induced in dendritic cells by LPS but not by virus [47,61]. Our              The mummichog algorithms are not tied to a specific metabolic
+data suggest a different nitric oxide pathway in viral infection,         model. We adopted the yeast metabolic model from BioCyc
+driven by constitutive nitric oxide synthases. The intracellular          database [11] for the yeast data [64], to predict an activity network
+nitric oxide has a fast turnover and we did not detect its                contrasting mutant and wild type strains. This data set was only
+accumulation by fluoremetric assays (data not shown). We                  annotated for 101 metabolites through the authors' local library.
+previously demonstrated that the phosphorylation of EIF2A was             As a result, the majority of metabolites in the predicted network by
+induced by YF17D [50]. An upstream mechanism is now                       mummichog were not found in the original annotation. Out of the
+suggested by this metabolomic experiment, as both the produc-             remaining 28 metabolites, 24 (86%) were agreed between
+tion of nitric oxide and depletion of arginine induce the activity of     mummichog and the original annotation (Figure 6). Enforcing
+EIF2A kinases [62].                                                       the presence of primary ion M2H[2] (data collected in negative
+                                                                          ion mode) had little effect to the result, since the original
+Evaluation on human urine data and yeast data                             annotation was already biased to metabolites that are ionized
+   The nature of metabolomics data often varies by platforms and          easily.
+
+sample types. We thus extend our mummichog approach to two                   These results show that the prediction by mummichog is robust
+published data sets on human urinary samples [63] and on yeast            cross platforms and sample types.
+cell extracts [64]. Both data sets carry metabolite annotation by
+the original authors, which can be used to evaluate the prediction        Discussion
+by mummichog.
+                                                                             We have described the computational method of mummichog and
+   The human urinary data contained both formal identifica-               its application to three case studies. While the description was
+tion by matching to local library of chemical references and              intended to be concise, computational metabolomics is compli-
+putative identification by combining multiple public resources            cated and facing challenges from many fronts. Quantification and
+[63]. We used mummichog to investigate the gender difference in           feature selection, the steps upstream of mummichog, can still be
+this data set, and predicted an activity network of 45                    problematic. Data from in vivo studies often involve multivariate
+metabolites. Among them, 13 were not found in the original                analysis, where validation is particularly challenging. In this
+annotation. For the remaining metabolites, 97% (31/32) were
+
+PLOS Computational Biology | www.ploscompbiol.org                      6  July 2013 | Volume 9 | Issue 7 | e1003123
+                                                                          Functional Analysis for Metabolomics
+
+Figure 5. Identification of metabolites by tandem mass spectrometry. Arginine is shown as an example while the full data are given in
+Figure S3. From top to bottom: the fragmentation pattern (MS2 followed by MS3 on peak 157) from biological sample, from biological sample
+
+spiked with authentic chemical and from authentic chemical reference.
+
+doi:10.1371/journal.pcbi.1003123.g005
+
+section, we discuss several confounding factors that are relevant to      smaller pathways. This creates some model dependency in the
+our approach.                                                             pathway analysis, but little effect to the ``activity network'', as
+                                                                          mummichog is more network centric. The two test cases in Figure 6
+Impact of metabolic models                                                also indicate that these models tend to capture more information
+   Critical to the success of mummichog is the integration of genome-     than conventional annotations.
+
+scale metabolic models. We have used in this study a recent                  However, as mentioned earlier, the new data from metabolomic
+human metabolic model. An alternative human model from                    studies are yet to be integrated into these genome-scale metabolic
+BioCyc [11] produced comparable results (Figure S6). The                  models. For example, a number of metabolites in metabolomics
+coverage of the models in all three case studies is shown in              databases [36,65,66] are not in any of these metabolic models. In
+Table 1. These genome-scale metabolic models are more extensive           general, the features from a high resolution profiling experiment
+than conventional pathways, and were shown to capture activities          by far exceed the current annotations in metabolite databases.
+in between pathways [22]. The pathway organizations differ                This leads to a de facto filtering when data are run on mummichog
+between the two human models, as the BioCyc model tends to use            (similiar situation in database searches). Meanwhile, the features
+
+PLOS Computational Biology | www.ploscompbiol.org                      7  July 2013 | Volume 9 | Issue 7 | e1003123
+                                                                                                     Functional Analysis for Metabolomics
+
+Figure 6. Application of mummichog to additional data sets.                    Robust design of the algorithms
+Metabolite prediction by mummichog is in good agreement with                      As lessons learned from transcriptomics, pathway and network
+annotation in the original studies, 97% for the human urine data [63]
+and 86% for the yeast data [64]. The metabolites not in the original           analysis not only provides functional context, but also the
+annotation (yellow) can not be compared. The ``-z'' option in                  robustness to counteract noises at individual feature level, which
+mummichog enforces the presence of primary ion (M+H[+] for positive            are commonly seen in omics experiments. Similarly, the prediction
+mode, M2H[2] for negative mode). This shifts the coverage in the               on activity by mummichog is tolerant to errors at individual feature
+huamn data set, but not much for the yeast data of limited annotation.         level. In the moDC data, we chose Lsig by a cutoff value p~0:05.
+doi:10.1371/journal.pcbi.1003123.g006                                          When we vary this cutoff from 0:001 to 0:2, the program returned
+                                                                               networks of a stable set of metabolites (Figure S7).
+that can be mapped to the current metabolic model are more
+likely to be biologically relevant. This ``filtering'' is pertinent to the        The module finding procedure in the program was designed to
+metabolic model, not to mummichog algorithms - mummichog still has             extensively sample subnetwork structures. Among the modules will
+to choose the true metabolites from multiple possible candidates               be many variations, but the subsequenct ``activity network'' will
+(Figure S1B).                                                                  collapse on stable results. In deed, we tested an alternative
+                                                                               algorithm of modularization [67], and it returned almost identical
+   It will be an important future direction to advance metabolic               predicted networks, in spite of moderately different intermediate
+modeling with the chemical data. We also expect the metabolic                  modules (Figure S8).
+models to improve on lipid annotation, physiological context and
+tissue specificity.                                                               In theory, there are merits to incorporate a statistical matrix
+                                                                               from the feature selection step prior to mummichog's analysis and
+                                                                               mass flow balance of metabolic reactions [22,68]. While these are
+                                                                               appealing directions for future research, the current version of
+                                                                               mummichog confers some practical robustness, such as tolerance to
+                                                                               technological noise and biological sampling limitation. For
+                                                                               example, mass balance is almost impossible within serum or urine
+                                                                               samples, because the reactions producing these metabolites are
+                                                                               likely to occur in other tissues.
+
+                                                                                  The number of overlap metabolites is used in the enrichment
+                                                                               calculation in both module analysis and pathway analysis.
+                                                                               Sometimes, a single m/z feature may match to several metabolites
+                                                                               in the same module/pathway, inflating the overlap number. Thus,
+                                                                               mummichog always compares the number of overlap metabolites
+                                                                               and the number of corresponding m/z features, and uses the
+                                                                               smaller number for enrichment calculation, since the smaller
+                                                                               number is more likely to be true.
+
+                                                                                  The size of each metabolic pathway is defined by the number of
+                                                                               metabolites in the pathway. mummichog uses only the metabolites
+                                                                               that can be matched in Lref to define a pathway size, because this
+                                                                               reflects the analytical coverage of the experiment and Lsig is
+                                                                               confined by the same coverage. Overall, mummichog uses the whole
+                                                                               feature list from an experiment for resampling, therefore the
+                                                                               computation of statistical significances effectively circumvents
+                                                                               analytical biases.
+
+Table 1. How metabolomics data match metabolic models.
+
+number of reactions                                human model                 human model (BioCyc)  yeast model (BioCyc)
+metabolite edges
+number of metabolites                              4204                        2091                  1034
+number of metabolites with exact mass              18504                       14100                 6962
+                                                   3565                        1536                  811
+                                                   2016                        1308                  742
+
+case moDC: reference features                      7713                        7713
+case moDC: tentatively matched metabolites         1384                        874
+case urine: reference features                     10248                       10248
+case urine: tentatively matched metabolites        1453                        930
+case yeast: reference features
+case yeast: tentatively matched metabolites                                                          5366
+                                                                                                     533
+
+The top section gives statistics of each of the three metabolic models. The bottom section gives the specific number of measured features and tentative metabolite
+matches in each study case. These tentative matches contain excessive ambiguity, which mummichog aims to resolve.
+doi:10.1371/journal.pcbi.1003123.t001
+
+PLOS Computational Biology | www.ploscompbiol.org                           8         July 2013 | Volume 9 | Issue 7 | e1003123
+                                                                          Functional Analysis for Metabolomics
+
+Acceleration of untargeted metabolomics                                   removed if their intensity is below 10,000 in every sample class.
+   In spite of the fantastic progress in mass spectrometry, these are     Missing intensity values were imputed to 1000. The intensities
+                                                                          were log2 transformed. Low quality features were further filtered
+the early days of metabolomics. Effective computational integra-          out if their averaged in-class coefficient of variation was greater
+tion of resources, the combination of cheminformatics and                 than 0.2. Averaged ion intensity over three machine replicates was
+bioinformatics, will greatly benefit the field [69,70]. As data           used for subsequent analysis. These 7,995 features constituted the
+accumulate, further method refinement will become possible.               reference list Lref . No normalization was used because total ion
+                                                                          counts in all samples were very similar. Student's t-test was used to
+   Mummichog presents a practical solution of one-step functional         compare infected samples (at 6 hr) versus mock infections (at 6 hr),
+analysis, bypassing the bottleneck of upfront metabolite identifi-        and infected samples (at 6 hr) versus baseline controls (at 0 hr).
+cation. It trades off some sensitivity in the conventional approach       Features with pv0:05 in both tests were included in the significant
+for the much accelerated work flow of high throughput LC/MS               list Lsig. The feature table, Lref , Lsig and predictions are given in
+metabolomics. Mummichog is not designed to replace tandem mass            Dataset S1.
+spectrometry in metabolite identification. It is the biological
+activity not metabolites per se that mummichog predicts. Even with        Gene expression by QPCR
+some errors on individual metabolites, as long as the biology is             For gene expression quantification, mRNA was extracted by
+pinpointed to a subnetwork structure, investigators can focus on a
+handful of validations, steering away from the lengthy conven-            RNeasy Mini Kit (Qiagen) according to manufacturer's protocol,
+tional work flow.                                                         where the cell lysate was homogenized by QIAshredder spin
+                                                                          columns. Reverse transcription was performed with SuperScript
+   In conclusion, we have demonstrated that mummichog can                 III reverse transcriptase and oligo-dT (Invitrogen) according to
+successfully predict functional activity directly from a spectral         manufacturer's recommendation. Real-time PCR was performed
+feature table. This benefits from the convergence of genome-scale         on a MyiQ Icycler (BioRad), using SYBR Green SuperMix
+metabolic models and metabolomics. Mummichog will continue to             (Quanta Biosciences). The PCR protocol used 95uC 3 mins; 40
+improve as the metabolic network models evolve. We expect this            cycles of 95uC 30 seconds and 60uC for 60 seconds. The amplicons
+method to greatly accelerate the application of high throughput           were verified by melting curves. Quantafication was performed by
+metabolomics. The mummichog software is available at http://atcg.         the DCt method, normalized by b2 microglobulin levels. The
+googlecode.com.                                                           primer sequences are given in Table S2.
+
+Methods                                                                   Analysis of human urine and yeast data
+                                                                             Data on human urinary samples [63] were retrieved from
+Cell culture and infection
+   Human peripheral blood mononuclear cells (PBMCs) were                  MetaboLights server [71]. The positive ion feature table for study
+                                                                          ``439020'' contained 14,720 features. A feature is only included if
+isolated from Buffy coats by separation over a Lymphoprep                 its ion intensity is above 100,000 in 5 or more samples. This leaves
+gradient. CD14+ monocytes were isolated from the PBMCs with               11,086 features, which consist Lref for this study. Data were
+MACS beads (Miltenyi Biotec, Auburn, CA) and cultured for 7               normalized by total ion counts. We next compared the metabolite
+days with 20 ng/ml GM-CSF and 40 ng/ml IL-4 (Peprotech,                   difference between females (8 samples of low testosterone
+Rocky Hill, NJ). MoDCs were then harvested, washed twice and              glucuronide level) and males (11 samples of high testosterone
+resuspended in serum-free medium.                                         glucuronide level). Lsig is consisted of 524 features (pv0:01 by
+                                                                          student t-test). The original authors annotated 3,689 metabolite
+   MoDCs (2:106) were stimulated in triplicate in 48-well plates in       features, and their annotation was used to compare with the
+a 200 mL volume with Yellow Fever virus (M.O.I. of 1), or mock            prediction by mummichog.
+infected. After 2 hrs, 800 mL of 10% FBS-RPMI was added to all
+wells. MoDCs were harvested at 6 hr or 24 hr after infection and             The yeast data [64] were downloaded from MAVEN website
+centrifuged. Supernatants were aspirated, and dry cell pellets were       [32] in mzXML format. Feature extraction was performed in
+frozen at 280uC. Supernatants of moDC cultures were assayed for           MAVEN through two approaches: targeted approach and
+the concentration of IL-6 and TNF using ELISA kits (BD, San               untargeted approach. The targeted approach used chemical
+Diego, CA). Three biological replicates were used for LC/MS and           library from the same lab and produced 177 annotated features,
+QPCR.                                                                     which corresponded to 101 metabolites. The untargeted approach
+                                                                          extracted 6318 features without annotation. After the same
+Mass spectrometry                                                         processing procedure as in our moDC data, Lref contained 5707
+   Full scan LC/MS (m/z range 85­2000) was performed                      features. We thus used mummichog to predict on the untargeted
+                                                                          data, and compared the result to MAVEN annotation. The Lsig
+essentially as previously described [8]. Cell extracts or superna-        consisted of 426 features that were significantly different between
+tants were treated with acetonitrile (2:1, v/v) and centrifuged at        the prototrophic wild type and the auxotrophic mutant (pv10{4
+14,0006 g for 5 min at 4uC to remove proteins. Samples were               by student t-test). The yeast metabolic model was compiled from
+maintained at 4uC in an autosampler until injection. A Thermo             BioCyc data [11].
+Orbitrap-Velos mass spectrometer (Thermo Fisher, San Diego,
+CA) coupled with anion exchange chromatography was used for               Supporting Information
+data collection, via positive-ion electrospray ionization (ESI).
+Metabolites of interest were identified by tandem mass spectrom-          Dataset S1 Metabolomics feature table and mummichog
+etry on a LTQ-FTMS, where the biological sample, biological               predictions. This file contains LC/MS Metabolomics feature table
+sample spiked in with authentic chemical and authentic chemical           from the moDC experiment, Lsig, Lref and predicted metabolites in
+reference were run sequentially. The MS2 and MS3 were done in             the activity networks of moDC activation. Metabolite predictions on
+the ion trap of the LTQ-FTMS, with an isolation width of 1 amu            the human urine data and yeast data are also included.
+and a normalized collision energy of 35 eV.                               (ZIP)
+
+   The LC/MS data were processed with apLCMS program [25]
+for feature extraction and quantification. Significant features were
+also verified by inspecting the raw data (Figure S5). Features were
+
+PLOS Computational Biology | www.ploscompbiol.org                      9  July 2013 | Volume 9 | Issue 7 | e1003123
+                                                                                      Functional Analysis for Metabolomics
+
+Figure S1 Many-to-many relationship in m/z feature to                                 agreed to and not in the original annotation are 39 and 4,
+metabolite matching. A) Among m/z features in Lref, about                             respectively.
+1400 can be matched to various metabolites. B) For the 77                             (TIF)
+metabolites in the activity network (Figure 3A), on average, about
+five metabolites share the same m/z features. Mummichog chooses                       Figure S7 The prediction of mummichog is robust from
+the most likely metabolites based on their network activities and                     the cutoff of input significant features, Lsig. The x-axis
+spectral patterns.                                                                    shows the different number of input features by varying p-values.
+(TIF)                                                                                 The 601 features by pv0:05 were presented in the main text, and
+                                                                                      are used as reference here. The y-axis shows the number of
+Figure S2 Example of module analysis. Five significant                                metabolites in predicted networks. All blue bars show the number
+modules were identified (pv0:05, default parameters) in moDC                          of overlap metabolites in predicted networks, compared to those
+infected by yellow fever virus for 6 hours. This shows module 1,                      from pv0:05.
+with 34 metabolites, p = 5.19E-7. This is one of the figures                          (TIF)
+automatically generated by mummichog, metabolites colored by
+log2 fold change, with connecting enzymes shown as EC numbers.                        Figure S8 Details of module analysis. Using the moDC
+(TIF)                                                                                 data with default parameters, mummichog produces 22 modules
+                                                                                      from user data and 2406 random modules by permutation. A)
+Figure S3 Tandem mass spectrometry data for the                                       shows the distribution of all module sizes. B) Black horizontal bars
+metabolites in Figure 3B. MS2 on the left and MS3 on the                              show the distribution of activity scores from random modules, and
+right. Each run contained sequentially: top) the candidate                            the black line is the fitted Gamma distribution. The red vertical
+metabolite in cell extract, middle) cell extract spiked in with pure                  bars show the activity scores of modules from user data, where
+chemical reference, bottom) pure chemical reference alone. MS3                        those on the right are more statistically significant. C) and D)
+data were also obtained for major MS2 peaks except for Inosine.                       follow the same format as A) and B), but use an alternative
+Elution peaks of these samples in liquid chromatography were also                     algorithm for module finding [67], which produces 84 modules
+matched.                                                                              from user data and 5097 random modules by permutation.
+(PDF)                                                                                 (TIF)
+
+Figure S4 The depletion of arginine and accumulation                                  Figure S9 High resolution copy of Figure 3A.
+of citrulline was also observed in moDCs stimulated by                                (TIF)
+dengue virus, but not by LPS. Cells and supernatant were
+collect after 6 hours of infection and measured by LC/MS.                             Table S1 Pathway analysis by mummichog revealed a
+Representative of two experiments.                                                    number of pathways activated in the infection of moDCs
+(TIF)                                                                                 by yellow fever virus. Activities in many of these pathways are
+                                                                                      also identified in the significant network modules.
+Figure S5 Verification of metabolite quantification.                                  (PDF)
+Glutathione is used as an example (m/z 308.0896, M+H[1+]).
+Left panel shows intensities of three biological replicates. The                      Table S2 Primer sequences and references for quanti-
+arrows point to the corresponding signals in plots of LC retention                    tative PCR.
+time (x-axis) vs m/z (y-axis), where a large peak is seen in YF17D                    (PDF)
+sample but missing in Mock sample. In the LC-m/z plots, each dot
+represents a raw data point in a single scan; warmer color codes                      Acknowledgments
+for higher ion intensity.
+(TIF)                                                                                 We thank Bill Liang, ViLinh Tran, Raghu Tadagavadi, Rajesh Nair, and
+                                                                                      Young-Mi Go for technical assistance.
+Figure S6 Validation of mummichog on the human
+urine data set (Roux et al 2012), using metabolic model                               Author Contributions
+from BioCyc database. Mummichog predicts a network of 60
+metabolites, in which 19 are not found in the original annotation.                    Conceived and designed the experiments: SL DPJ BP. Performed the
+Thirty nine of the remaining 41 are agreed to the original                            experiments: SL YP SD FHS NK QAS. Analyzed the data: SL FHS.
+annotation. By enforcing the presence of M+H[+] ion (-z option),                      Contributed reagents/materials/analysis tools: DPJ BP. Wrote the paper:
+the predicted network contains 43 metabolite. The numbers of                          SL. Developed mummichog algorithms and software: SL Participated in
+                                                                                      software design: FHS QAS DPJ.
+References
+                                                                                       8. Soltow Q, Strobel F, Mansfield K, Wachtman L, Jones D (2011) High-
+ 1. Biswas S, Mantovani A (2012) Orchestration of metabolism by macrophages.               performance metabolic profiling with dual chromatography-fourier-transform
+     Cell metabolism 15: 432­437.                                                          mass spectrometry (dc-ftms) for study of the exposome. Metabolomics 9: 132­
+                                                                                           143.
+ 2. DeBerardinis R, Thompson C (2012) Cellular metabolism and disease: what do
+     metabolic outliers teach us? Cell 148: 1132­1144.                                 9. Park Y, Lee K, Soltow Q, Strobel F, Brigham K, et al. (2012) High-performance
+                                                                                           metabolic profiling of plasma from seven mammalian species for simultaneous
+ 3. Breitling R, Vitkup D, Barrett M (2008) New surveyor tools for charting                environmental chemical surveillance and bioeffect monitoring. Toxicology 295:
+     microbial metabolic maps. Nature Reviews Microbiology 6: 156­161.                     47­55.
+
+ 4. Kaddurah-Daouk R, Kristal B, Weinshilboum R (2008) Metabolomics: a global         10. Roede J, Park Y, Li S, Strobel F, Jones D (2012) Detailed mitochondrial
+     biochemical approach to drug response and disease. Annu Rev Pharmacol                 phenotyping by high resolution metabolomics. PloS ONE 7: e33020.
+     Toxicol 48: 653­683.
+                                                                                      11. Caspi R, Altman T, Dreher K, Fulcher C, Subhraveti P, et al. (2012) The
+ 5. Patti G, Yanes O, Siuzdak G (2012) Metabolomics: the apogee of the omics               metacyc database of metabolic pathways and enzymes and the biocyc collection
+     trilogy. Nature Reviews Molecular Cell Biology 13: 263­269.                           of pathway/genome databases. Nucleic Acids Research 40: D742­D753.
+
+ 6. Bordbar A, Mo M, Nakayasu E, Schrimpe-Rutledge A, Kim Y, et al. (2012)            12. Oberhardt M, Palsson B, Papin J (2009) Applications of genome-scale metabolic
+     Model-driven multi-omic data analysis elucidates metabolic immunomodulators           reconstructions. Molecular Systems Biology 5: 320.
+     of macrophage activation. Molecular Systems Biology 8: 558.
+                                                                                      13. Thiele I, Palsson B (2010) A protocol for generating a high-quality genome-scale
+ 7. Kind T, Wohlgemuth G, Palazoglu M, Barupal D, Shahbaz S, et al. (2010)                 metabolic reconstruction. Nature Protocols 5: 93­121.
+     Managing complexity-how many platforms do we need for metabolomics?
+     Journal of Biomolecular Techniques 21: S6.
+
+PLOS Computational Biology | www.ploscompbiol.org                                 10  July 2013 | Volume 9 | Issue 7 | e1003123
+                                                                                            Functional Analysis for Metabolomics
+
+14. Henry C, DeJongh M, Best A, Frybarger P, Linsay B, et al. (2010) High-                  43. Newman M (2006) Modularity and community structure in networks.
+     throughput generation, optimization and analysis of genome-scale metabolic                   Proceedings of the National Academy of Sciences 103: 8577­8582.
+     models. Nature Biotechnology 28: 977­982.
+                                                                                            44. Berriz G, King O, Bryant B, Sander C, Roth F (2003) Characterizing gene sets
+15. Duarte N, Becker S, Jamshidi N, Thiele I, Mo M, et al. (2007) Global                         with funcassociate. Bioinformatics 19: 2502­2504.
+     reconstruction of the human metabolic network based on genomic and bibliomic
+     data. Proceedings of the National Academy of Sciences 104: 1777.                       45. Hosack D, Dennis Jr G, Sherman B, Lane H, Lempicki R, et al. (2003)
+                                                                                                 Identifying biological themes within lists of genes with ease. Genome Biol 4:
+16. Ma H, Sorokin A, Mazein A, Selkov A, Selkov E, et al. (2007) The edinburgh                   R70.
+     human metabolic network reconstruction and its functional analysis. Molecular
+     Systems Biology 3: 135.                                                                46. Paul W (2011) Bridging innate and adaptive immunity. Cell 147: 1212­1215.
+                                                                                            47. Amit I, Garber M, Chevrier N, Leite A, Donner Y, et al. (2009) Unbiased
+17. Livnat Jerby T, Ruppin E (2010) Computational reconstruction of tissue-specific
+     metabolic models: application to human liver metabolism. Molecular Systems                  reconstruction of a mammalian transcriptional network mediating pathogen
+     Biology 6: 401.                                                                             responses. Science 326: 257.
+                                                                                            48. Pulendran B, Li S, Nakaya H (2010) Systems vaccinology. Immunity 33: 516­
+18. Sigurdsson M, Jamshidi N, Steingrimsson E, Thiele I, Palsson B (2010) A                      529.
+     detailed genome-wide reconstruction of mouse metabolism based on human                 49. Querec T, Bennouna S, Alkan S, Laouar Y, Gorden K, et al. (2006) Yellow fever
+     recon 1. BMC Systems Biology 4: 140.                                                        vaccine yf-17d activates multiple dendritic cell subsets via tlr2, 7, 8, and 9 to
+                                                                                                 stimulate polyvalent immunity. The Journal of experimental medicine 203: 413­
+19. Bordbar A, Feist A, Usaite-Black R, Woodcock J, Palsson B, et al. (2011) A                   424.
+     multi-tissue type genome-scale metabolic network for analysis of whole-body            50. Querec T, Akondy R, Lee E, Cao W, Nakaya H, et al. (2009) Systems biology
+     systems physiology. BMC Systems Biology 5: 180.                                             approach predicts immunogenicity of the yellow fever vaccine in humans.
+                                                                                                 Nature Immunology 10: 116­125.
+20. Agren R, Bordel S, Mardinoglu A, Pornputtapong N, Nookaew I, et al. (2012)              51. Pulendran B (2009) Learning immunology from the yellow fever vaccine: innate
+     Reconstruction of genome-scale active metabolic networks for 69 human cell                  immunity to systems vaccinology. Nature Reviews Immunology 9: 741­747.
+     types and 16 cancer types using init. PLoS Computational Biology 8: e1002518.          52. Lembo D, Gribaudo G, Hofer A, Riera L, Cornaglia M, et al. (2000) Expression
+                                                                                                 of an altered ribonucleotide reductase activity associated with the replication of
+21. Plata G, Hsiao T, Olszewski K, Llina´s M, Vitkup D (2010) Reconstruction and                 murine cytomegalovirus in quiescent fibroblasts. Journal of virology 74: 11557­
+     ux-balance analysis of the plasmodium falciparum metabolic network. Molecular               11565.
+     Systems Biology 6: 408.                                                                53. Gribaudo G, Riera L, Lembo D, De Andrea M, Gariglio M, et al. (2000) Murine
+                                                                                                 cytomegalovirus stimulates cellular thymidylate synthase gene expression in
+22. Deo R, Hunter L, Lewis G, Pare G, Vasan R, et al. (2010) Interpreting                        quiescent cells and requires the enzyme for replication. Journal of virology 74:
+     metabolomic profiles using unbiased pathway models. PLoS Computational                      4979­4987.
+     Biology 6: e1000692.                                                                   54. Vastag L, Koyuncu E, Grady S, Shenk T, Rabinowitz J (2011) Divergent effects
+                                                                                                 of human cytomegalovirus and herpes simplex virus-1 on cellular metabolism.
+23. Dunn W, Erban A, Weber R, Creek D, Brown M, et al. (2012) Mass appeal:                       PLoS Pathogens 7: e1002124.
+     metabolite identification in mass spectrometry-focused untargeted metabolo-            55. Peterson J, Herzenberg L, Vasquez K, Waltenbaugh C (1998) Glutathione levels
+     mics. Metabolomics 9: 44­66.                                                                in antigen-presenting cells modulate th1 versus th2 response patterns.
+                                                                                                 Proceedings of the National Academy of Sciences 95: 3071.
+24. Smith C, Elizabeth J, O'Maille G, Abagyan R, Siuzdak G (2006) Xcms:                     56. Angelini G, Gardella S, Ardy M, Ciriolo M, Filomeni G, et al. (2002) Antigen-
+     processing mass spectrometry data for metabolite profiling using nonlinear peak             presenting dendritic cells provide the reducing extracellular microenvironment
+     alignment, matching, and identification. Analytical chemistry 78: 779­787.                  required for t lymphocyte activation. Proceedings of the National Academy of
+                                                                                                 Sciences 99: 1491­1496.
+25. Yu T, Park Y, Johnson J, Jones D (2009) aplcmsadaptive processing of high-              57. Yan Z, Garg S, Kipnis J, Banerjee R (2009) Extracellular redox modulation by
+     resolution lc/ms data. Bioinformatics 25: 1930­1936.                                        regulatory t cells. Nature chemical biology 5: 721­723.
+                                                                                            58. Bronte V, Zanovello P (2005) Regulation of immune responses by l-arginine
+26. Pluskal T, Castillo S, Villar-Briones A, Oresic M (2010) Mzmine 2: modular                   metabolism. Nature Reviews Immunology 5: 641­654.
+     framework for processing, visualizing, and analyzing mass spectrometry-based           59. Morris Jr S (2010) Arginine: master and commander in innate immune
+     molecular profile data. BMC bioinformatics 11: 395.                                         responses. Science Signalling 3: pe27.
+                                                                                            60. Kopincova´ J, Pu´zserova´ A, Berna´tova´ I (2011) Biochemical aspects of nitric
+27. Xia J, Wishart D (2010) Metpa: a web-based metabolomics tool for pathway                     oxide synthase feedback regulation by nitric oxide. Interdisciplinary toxicology
+     analysis and visualization. Bioinformatics 26: 2342­2344.                                   4: 63­68.
+                                                                                            61. Serbina N, Salazar-Mather T, Biron C, Kuziel W, Pamer E (2003) Tnf/inos-
+28. Cottret L, Wildridge D, Vinson F, Barrett M, Charles H, et al. (2010)                        producing dendritic cells mediate innate immune defense against bacterial
+     Metexplore: a web server to link metabolomic experiments and genome-scale                   infection. Immunity 19: 59­70.
+     metabolic networks. Nucleic acids research 38: W132­W137.                              62. Tong L, Heim R, Wu S (2011) Nitric oxide: A regulator of eukaryotic initiation
+                                                                                                 factor 2 kinases. Free Radical Biology and Medicine 50: 1717­1725.
+29. Gao J, Tarcea V, Karnovsky A, Mirel B, Weymouth T, et al. (2010) Metscape: a            63. Roux A, Xu Y, Heilier JF, Olivier MF, Ezan E, et al. (2012) Annotation of the
+     cytoscape plug-in for visualizing and interpreting metabolomic data in the                  human adult urinary metabolome and metabolite identification using ultra high
+     context of human metabolic networks. Bioinformatics 26: 971­973.                            performance liquid chromatography coupled to a ltq-orbitrap mass spectrom-
+                                                                                                 eter. Analytical Chemistry 84: 6429­37.
+30. Xia J, Wishart D (2011) Web-based inference of biological patterns, functions           64. Clasquin MF, Melamud E, Singer A, Gooding JR, Xu X, et al. (2011)
+     and pathways from metabolomic data using metaboanalyst. Nature Protocols 6:                 Riboneogenesis in yeast. Cell 145: 969­980.
+     743­760.                                                                               65. Smith C, Maille G, Want E, Qin C, Trauger S, et al. (2005) Metlin: a metabolite
+                                                                                                 mass spectral database. Therapeutic drug monitoring 27: 747.
+31. Kastenmu¨ller G, Ro¨misch-Margl W, Wa¨ gele B, Altmaier E, Suhre K (2010)               66. Cui Q, Lewis I, Hegeman A, Anderson M, Li J, et al. (2008) Metabolite
+     metap-server: a web-based metabolomics data analysis tool. Journal of                       identification via the madison metabolomics consortium database. Nature
+     Biomedicine and Biotechnology 2011.                                                         biotechnology 26: 162­164.
+                                                                                            67. Rivera CG, Vakil R, Bader JS (2010) Nemo: network module identification in
+32. Melamud E, Vastag L, Rabinowitz J (2010) Metabolomic analysis and                            cytoscape. BMC bioinformatics 11: S61.
+      visualization engine for lcms data. Analytical chemistry 82: 9818­9826.               68. Dittrich MT, Klau GW, Rosenwald A, Dandekar T, Mu¨ller T (2008) Identifying
+                                                                                                 functional modules in protein­protein interaction networks: an integrated exact
+33. Kind T, Fiehn O (2006) Metabolomic database annotations via query of                         approach. Bioinformatics 24: i223­i231.
+     elemental compositions: mass accuracy is insufficient even at less than 1 ppm.         69. Rogers S, Scheltema RA, Girolami M, Breitling R (2009) Probabilistic
+     BMC bioinformatics 7: 234.                                                                   assignment of formulas to mass peaks in metabolomics experiments. Bioinfor-
+                                                                                                  matics 25: 512­518.
+34. Kind T, Fiehn O (2007) Seven golden rules for heuristic filtering of molecular          70. Gaquerel E, Kuhl C, Neumann S (2013) Computational annotation of plant
+     formulas obtained by accurate mass spectrometry. BMC bioinformatics 8: 105.                 metabolomics profiles via a novel network-assisted approach. Metabolomics doi:
+                                                                                                 10.1007/s11306-013-0504-2.
+35. Brown M, Dunn W, Dobson P, Patel Y, Winder C, et al. (2009) Mass                        71. Haug K, Salek RM, Conesa P, Hastings J, de Matos P, et al. (2013)
+     spectrometry tools and metabolite-specific databases for molecular identification           Metabolightsan open-access general-purpose repository for metabolomics studies
+     in metabolomics. Analyst 134: 1322­1332.                                                    and associated meta-data. Nucleic Acids Research 41: D781­D786.
+
+36. Wishart D, Knox C, Guo A, Eisner R, Young N, et al. (2009) Hmdb: a
+     knowledgebase for the human metabolome. Nucleic Acids Research 37: D603­
+     D610.
+
+37. Tautenhahn R, Cho K, Uritboonthai W, Zhu Z, Patti G, et al. (2012) An
+     accelerated workow for untargeted metabolomics using the metlin database.
+     Nature Biotechnology 30: 826­828.
+
+38. Kanehisa M, Goto S, Hattori M, Aoki-Kinoshita K, Itoh M, et al. (2006) From
+     genomics to chemical genomics: new developments in KEGG. Nucleic Acids
+     Research 34: D354.
+
+39. Li S, Pozhitkov A, Ryan R, Manning C, Brown-Peterson N, et al. (2010)
+     Constructing a fish metabolic network model. Genome Biology 11: R115.
+
+40. Ravasz E, Somera A, Mongru D, Oltvai Z, Baraba´si A (2002) Hierarchical
+     organization of modularity in metabolic networks. Science 297: 1551­1555.
+
+41. Ma H, Zhao X, Yuan Y, Zeng A (2004) Decomposition of metabolic network
+     into functional modules based on the global connectivity structure of reaction
+     graph. Bioinformatics 20: 1870­1876.
+
+42. Newman M, Girvan M (2004) Finding and evaluating community structure in
+     networks. Physical Review E 69: 26113.
+
+PLOS Computational Biology | www.ploscompbiol.org                                       11  July 2013 | Volume 9 | Issue 7 | e1003123
+

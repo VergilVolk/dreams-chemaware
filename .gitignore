@@ -172,3 +172,12 @@ tasks/_cache/
 
 # Large generated metadata dumps (not source)
 tasks/T0_consistency/test_cases/spectra_meta.json
+
+# Scratch / output dumps (not source, not docs)
+massive_datasets_tmp.json
+massive_index.json
+gnps_result.html
+render.js
+dreams_fullspectrum.json
+dreams_zeroshot_baseline.json
+tasks/ms2ds_scores_T*.json

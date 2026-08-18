@@ -1,0 +1,1395 @@
+nature metabolism
+
+Article                                                                   https://doi.org/10.1038/s42255-024-01118-4
+
+Spatial single-cell isotope tracing reveals
+
+heterogeneity of de novo fatty acid synthesis
+
+in cancer
+
+Received: 16 August 2023            Elena Buglakova 1,2, Måns Ekelöf 1, Michaela Schwaiger-Haber 3,4,5,
+Accepted: 26 July 2024              Lisa Schlicker 6, Martijn R. Molenaar 1, Mohammed Shahraz1, Lachlan Stuart1,
+Published online: 9 September 2024  Andreas Eisenbarth 1, Volker Hilsenstein 1, Gary J. Patti 3,4,5,
+                                    Almut Schulze 6 , Marteinn T. Snaebjornsson 6 &
+    Check for updates               Theodore Alexandrov 1,7,8,9,10,11
+
+                                    While heterogeneity is a key feature of cancer, understanding metabolic
+                                    heterogeneity at the single-cell level remains a challenge. Here we present
+                                    13C-SpaceM, a method for spatial single-cell isotope tracing that extends the
+                                    previously published SpaceM method with detection of 13C6-glucose-derived
+                                    carbons in esterified fatty acids. We validated 13C-SpaceM on spatially
+                                    heterogeneous models using liver cancer cells subjected to either
+                                    normoxia-hypoxia or ATP citrate lyase depletion. This revealed substantial
+                                    single-cell heterogeneity in labelling of the lipogenic acetyl-CoA pool and in
+                                    relative fatty acid uptake versus synthesis hidden in bulk analyses. Analysing
+                                    tumour-bearing brain tissue from mice fed a 13C6-glucose-containing diet,
+                                    we found higher glucose-dependent synthesis of saturated fatty acids and
+                                    increased elongation of essential fatty acids in tumours compared with
+                                    healthy brains. Furthermore, our analysis uncovered spatial heterogeneity
+                                    in lipogenic acetyl-CoA pool labelling in tumours. Our method enhances
+                                    spatial probing of metabolic activities in single cells and tissues, providing
+                                    insights into fatty acid metabolism in homoeostasis and disease.
+
+Lipids are a complex class of biomolecules involved in multiple cellular        Most lipids are synthesized from fatty acids (Fig. 1a) that differ
+functions as structural components of cellular membranes, energy          in their length and degree of saturation, which is the number of dou-
+source and signalling molecules1­5. Altered lipid metabolism is a hall-   ble bonds in the hydrocarbon chain11. Fatty acid biosynthesis uses
+mark of cancer, as it supports rapid growth and survival and mediates     acetyl-CoA as a substrate to generate palmitate (16:0), a 16-carbon satu-
+oxidative stress resistance6­9, and is affected by nutrient and oxygen    rated fatty acid (SFA) that can be further elongated and/or desaturated
+limitations in the tumour microenvironment10. Cancer cells may adopt      and subsequently incorporated into the lipidome. Fatty acid desatu-
+different routes for lipid provision, thus inducing selective metabolic   ration is critical for cell survival, as the mono-unsaturated fatty acid
+dependencies that could be targeted for cancer therapy.                   (MUFA) oleate protects cancer cells from lipotoxicity and endoplasmic
+
+1Structural and Computational Biology Unit, European Molecular Biology Laboratory (EMBL), Heidelberg, Germany. 2Cell Biology and Biophysics Unit, EMBL,
+Heidelberg, Germany. 3Department of Chemistry, Washington University in St. Louis, St. Louis, MO, USA. 4Center for Metabolomics and Isotope Tracing,
+Washington University in St. Louis, St. Louis, MO, USA. 5Department of Medicine, Washington University in St. Louis, St. Louis, MO, USA. 6Division of Tumor
+Metabolism and Microenvironment, German Cancer Research Center (DKFZ) and DKFZ-ZMBH Alliance, Heidelberg, Germany. 7Metabolomics Core Facility,
+EMBL, Heidelberg, Germany. 8Molecular Medicine Partnership Unit, EMBL and Heidelberg University, Heidelberg, Germany. 9BioStudio, BioInnovation Institute,
+Copenhagen, Denmark. 10Department of Pharmacology, University of California San Diego, La Jolla, CA, USA. 11Department of Bioengineering, University of
+
+California San Diego, La Jolla, CA, USA. e-mail: almut.schulze@dkfz-heidelberg.de; m.snaebjoernsson@dkfz-heidelberg.de; talexandrov@health.ucsd.edu
+
+Nature Metabolism | Volume 6 | September 2024 | 1695­1711                 1695
+Article                                                                                                                                                                                                https://doi.org/10.1038/s42255-024-01118-4
+
+a        Glucose                               Acetate                                      Other carbon                                    Fatty acids
+                                               Acetate                                          sources                                     Fatty acids
+         Glucose
+                                                  ACSS2                                     Other carbon
+                                                                                               sources
+
+         Pyruvate
+
+         Pyruvate
+
+         AcCoA                                                                                                                                            Desaturation
+                                                                                                                                                           elongation Free fatty
+                                                                                            FASN                                                                                                                                                  Lipids
+                                                                                                                                                                               acid pool
+                Citrate    Citrate ACLY                                   Cytosolic AcCoA
+                                                                                  pool                                        Palmitate pool
+         TCA                -KG
+                  -KG    Glutamate
+                         Glutamine
+
+b                        Glutamine                                                                                                                Fatty acid
+                                                                                                                                            fragments of whole
+  72 h in medium with        Total cell lipids
+       13C6-glucose          m/z 600­1,000                                                                                                           lipids
+                             negative mode
+
+                                                                                            HCD                                             Palmitate                                                         Mass analysis               Cells
+                                                                                            AIF                                                                                                O              m/z 100­400                               Ion 1
+                                                                                                                                                                                                                                                            Ion 2
+                                                                                                                                       H3C                                                             O­                       Ion images                     I                   m/z
+                                                                                                                                                                                                                                                                    ...
+                                       O                  O                                                                                 Stearate                                                                                                                        Ion M
+                                                                                                                                                                                                    O
+                         H3C              O            O    P  O
+                                H3C                       O­
+                                               OH                         NH2
+                            H3C
+                         H3C              O                                                                                                                                                            O­
+
+                            H3C                                                                                                        H3C
+                         H3C
+                                               O                     O                                                                      Oleate
+                                                    O
+                                                                  O    P  OH                                                                                    O
+                                                                     O­
+                                                       OH
+                                                                                                                                       H3C
+                                                                                                                                                                                                       O­
+                                                   O
+
+                                       O                  O                O                                                                Palmitoleate O
+                                            O                        H
+Control Perturbed                                      O    P  O                                                                                                                                          O­
+                                                          O­                    OH
+                                               OH                           NH2
+
+GFP­     GFP+                             O                                                                                            H3C
+
+                                                                                                          O                   O
+                                                                                                               O
+                                                                                       H3C                                 O    P  OH
+                                                                                    H3C                                       O­
+                                                                                                                  OH
+
+                                                                                                          O
+
+c        Pre-MALDI       Microscopy
+         microscopy      channels
+
+                         Segmentation
+
+                                                                                                                                                                                                                                                  Ions
+
+                                                                                                                                                                                                              Normalization
+
+                                                                                                             Registration                                                                                                                 Cell 1
+                                                                                                                                                                                                                                          Cell 2
+                   AM position
+                   assignment                                                                                                                                                                                                                ...
+
+                                                       +                                                                                                                                                                                  Cell N
+
+       Post-MALDI                                                                                                             The combination of wide-range isolation of parent lipid ions followed by HCD
+       microscopy                                                                                                             fragmentation and selective isolation of fatty acid fragments allows high-
+                                                                                                                              sensitivity measurements of fatty acids incorporated into lipids, conceptually
+Fig. 1 | 13C-SpaceM workflow as applied to interrogate de novo fatty acid                                                     similar to bulk extractions followed by saponification but with the benefit of
+synthesis. a, Generation of cytoplasmic acetyl-CoA (AcCoA) and subsequent                                                     retained spatial information and the exclusion of free fatty acids. c, Integration
+fatty acid and lipid synthesis from stable isotope labelled 13C6-glucose. Glucose-                                            of microscopy and imaging MS in 13C-SpaceM to obtain single-cell profiles. Pre-
+derived pyruvate is metabolized in the mitochondria and exported to the                                                       MALDI microscopy and post-MALDI microscopy images containing information
+cytoplasm in the form of citrate. ACLY converts citrate to acetyl-CoA, thereby                                                about the cell outlines and areas ablated by MALDI imaging are registered.
+contributing to the cytoplasmic (lipogenic) AcCoA pool. De novo fatty acid                                                    Ion intensities from MALDI imaging are assigned to single cells through a
+synthesis by fatty acid synthase (FASN) results in the formation of palmitate                                                 normalization procedure. AM, ablation mark; HCD, higher-energy collisional
+(C16:0), which is either further modified or directly incorporated into cellular                                              dissociation; -KG, -ketoglutarate.
+lipids. Exogenously taken up fatty acids are also incorporated into cellular
+lipids but are not labelled. b, Using AIF imaging MS for 13C-SpaceM. Cells are
+grown in medium supplemented with uniformly labelled 13C6-glucose for 72h.
+
+reticulum stress inhibits apoptosis and promotes ferroptosis resist-                                                          (TCA) cycle to produce citrate, which serves as a substrate for ATP citrate
+ance12­17. Hypoxic and Ras-transformed cells take up MUFA to support                                                          lyase (ACLY) to generate acetyl-CoA. Under hypoxic conditions, glu-
+proliferation and survival18.                                                                                                 tamine can substitute as a precursor for acetyl-CoA synthesis through
+                                                                                                                              reductive carboxylation of glutamate19,20. Furthermore, hypoxic can-
+      The cytoplasmic (lipogenic) acetyl-CoA pool used as substrate                                                           cer cells can also use acetate via acetyl-CoA synthetase 2 (ACSS2) to
+for fatty acid synthesis can be derived from different precursors. In                                                         generate acetyl-CoA21,22. As ACLY and ACSS2 have also been found to
+normoxia, glucose-derived carbons are used by the tricarboxylic acid
+
+Nature Metabolism | Volume 6 | September 2024 | 1695­1711                                                                                                                                                                                                                          1696
+Article                                                                            https://doi.org/10.1038/s42255-024-01118-4
+
+provide substrates for histone acetylation23,24, modulation of acetyl-CoA          individual cells and for quantifying fluorescence and morphometric
+metabolism can also affect gene expression programmes in cancer cells.             properties of single cells31. To allow the selective interrogation of fatty
+                                                                                   acids esterified in cellular lipids, we included AIF-MS, where lipids in
+      The advent of single-cell tools has enabled the analysis of indi-            the range of 600­1,000m/z ionized in negative mode were simultane-
+vidual cells within heterogenic populations25. Although single-cell                ously fragmented and then the fragments in the range of 100­400m/z
+transcriptomics and proteomics has provided insights into the het-                 were detected. The negative ion mode was chosen, as it allows detec-
+erogeneity of transcriptional and translational programmes, these                  tion of fatty acid RCOO- ions. By performed imaging MS with the same
+methods are insufficient to reveal the dynamics of lipid metabolism.               mass range and ionization mode but without AIF, we detected a total
+For example, expression of carnitine palmitoyltransferase 1 (CPT1) can             of 64 lipid species from several lipid classes, including phosphatidic
+support either catabolic or anabolic metabolic programmes in cancer                acids, phosphatidylinositols (PI), phosphatidylethanolamines (PE) and
+cells26. Thus far, probing metabolism at the single-cell level has been            phosphatidylserines (PS). Peaks putatively annotated (corresponding
+challenging due to the lack of technologies available for single-cell              to the Level 2 identification guidelines from the Metabolomics Stand-
+metabolomics27. Different experimental methods have been applied to                ards Initiative) from these classes cover a majority of ions isolated in
+evaluate the heterogeneity of lipid metabolism in cancer cells, includ-            all experiments. The presence of the majority of these lipids was con-
+ing metabolic sensors for malonyl-CoA28 or dendrimers to evaluate                  firmed by bulk liquid chromatography (LC)­MS/MS (Supplementary
+fatty acid uptake29. A recent study applied dielectric barrier discharge           Tables 1 and 2). The relative abundances of 11 abundant fatty acids
+ionization on single cells to determine alterations in lipid metabolism            identified using AIF-MS were closely matched by bulk MS analysis fol-
+upon ACLY inhibition in pancreatic cancer cells30. However, these                  lowing saponification (Extended Data Fig. 1), confirming representative
+methods do not provide sufficient molecular resolution to interrogate              coverage. The MALDI-AIF imaging workflow allows the quantification
+acetyl-CoA metabolism.                                                             of all isotopologues detected for fatty acids produced using AIF of
+                                                                                   lipids isolated at a fixed mass range of 600­1,000 m/z in the negative
+      We previously developed a spatially resolved mass spectrom-                  mode (Fig. 1b). Registration of microscopy images with MS images
+etry (MS) pipeline for the detection of intracellular metabolites at a             was conducted using SpaceM31 modified to include normalization and
+single-cell resolution31. Stable isotope tracing has emerged as a pow-             natural isotope abundance correction before the signal was assigned
+erful approach to determine the contribution of different metabolic                to individual cells (Fig. 1c).
+precursors to the cytoplasmic acetyl-CoA pool19,21,32,33. We now describe
+13C-SpaceM, a single-cell method that combines stable isotope tracing                    To validate 13C-SpaceM, we used a spatially heterogeneous model
+with the detection of fatty acids derived from selected lipid classes in           containing co-plated cells previously cultured under either normoxia
+a spatially resolved manner, using matrix-assisted laser desorption/               (20% O2) or hypoxia (0.5% O2). As fatty acid synthesis exclusively utilizes
+ionization (MALDI) in combination with all-ion fragmentation (AIF).                the cytoplasmic acetyl-CoA pool, analysis of the isotopologue distri-
+Like in the original SpaceM method, we integrate MALDI and micros-                 bution of fatty acids allows the assessment of changes in the relative
+copy data and furthermore, perform mathematical modelling of the                   contribution of different substrates to the cytoplasmic acetyl-CoA
+isotopologue distribution of the labelled fatty acids.                             pool21. Murine liver cancer cells were cultured in normoxia or hypoxia
+                                                                                   in medium containing U-13C-glucose for 72h to achieve isotopic steady
+      We applied this method to interrogate the effect of hypoxia or               state for palmitate. Pre-MALDI microscopy images overlaying the
+genetic depletion of ACLY on de novo fatty acid synthesis in murine liver          brightfield and green fluorescent protein (GFP) channels for the nor-
+cancer cells, revealing substantial heterogeneity in the contribution of           moxic (GFPneg) and hypoxic (GFPpos) cells demonstrated equal propor-
+glucose to the cytoplasmic acetyl-CoA pool at the single-cell level. We            tions of both cell populations (Fig. 2a, first panel). Cell segmentation
+also applied the MALDI-AIF methodology together with mathematical                  and quantification of GFP provided single-cell fluorescence intensi-
+modelling to interrogate tissue sections of mouse brains harbour-                  ties (Fig. 2a, second panel). After applying an intensity threshold, the
+ing GL261 glioma cells at near-single-cell resolution. This analysis               fraction of unlabelled palmitate (M+0) was determined in a pixelated
+revealed substantial spatial heterogeneity in isotopologue distribu-               manner and calculated for single cells (Fig. 2a, third and fourth panels).
+tion of de novo synthesized fatty acids, which provides a proxy for the            Mass spectra collected at representative pixels from individual cells
+labelling degree in the lipogenic acetyl-CoA pool. Overall, our method             showed labelled palmitate isotopologues (M>0) only in a normoxic
+opens new avenues to interrogate spatial heterogeneity in fatty acid               cell, while the peak for unlabelled palmitate (M+0) was predominant
+synthesis and acetyl-CoA metabolism in cancer cells.                               in the hypoxic cell (Fig. 2b). Thus, 13C-SpaceM was able to accurately
+                                                                                   measure differences in isotopologue patterns of palmitate in response
+Results                                                                            to environmental perturbation at the single-cell level.
+
+13C-SpaceM resolves metabolic states of single cells                                     We also interrogated each condition separately by using
+We developed 13C-SpaceM for single-cell isotope tracing into fatty acids.          mono-plated cultures. Figure 2c shows a single-cell scatter-plot
+It builds upon SpaceM, a method for single-cell metabolomics integrat-
+ing imaging MS and microscopy for assigning imaging MS pixels to
+
+Fig. 2 | Validating 13C-SpaceM by interrogating de novo fatty acid synthesis       fraction of unlabelled palmitate for single cells. Different colours are used to
+in spatially heterogeneous normoxia-hypoxia model. a, Illustration of              show cells with different true state label, known from the growth conditions for
+microscopy and imaging MS data from the model of co-plated primary murine          the particular well, and different cell state assigned using GFP signal. Prediction
+liver cancer cells originally cultured under normoxia (GFPneg) and hypoxia         accuracy refers to the prediction of the true state based on the isotopologue
+(GFPpos). The GFP signal was used for discerning the culturing conditions (white   distributions. d, Same analysis as in c for spatially heterogeneous co-plated cells
+and green cell outlines show normoxic and hypoxic cells, respectively). The        from both conditions. In this case accuracy refers to prediction of the cell state
+normalized intensities of the M+0 isotope of palmitate (representing the fraction  assigned using GFP signal. e, Confusion matrices for the prediction of culture
+of unlabelled palmitate) are shown for MALDI imaging pixels and as assigned        condition based on 13C-SpaceM or GFP in cells grown separately and comparison
+to the single cells. b, Mass spectra for individual pixels mapped to cells from    of the two predictions for co-plated cells. f, Comparison of single-cell versus bulk
+a normoxic cell (white outline) and a hypoxic cell (green outline). The peaks      intensities for the M+0 isotope of palmitate. Single-cell intensities are from the
+corresponding to palmitate isotopologues are marked by grey or green dots.         spatially heterogeneous co-plated model. Bulk intensities are from cells of each
+c, Discerning cells cultured under normoxia versus hypoxia using 13C-SpaceM for    mono-cultured condition subjected to total fatty acid analysis by saponification
+the cells mono-plated for each culturing condition. Scatter-plot and histograms    followed by LC­MS. For single-cell data, black lines show average values. For bulk
+show the values of the GFP reporter (ground truth for telling the condition)       data, data are displayed as mean±s.d. across three replicates.
+and the normalized intensity of the M+0 isotope of palmitate representing the
+
+Nature Metabolism | Volume 6 | September 2024 | 1695­1711                          1697
+Article                                                                                                                                                                                                                                                                                                                                                                                               https://doi.org/10.1038/s42255-024-01118-4
+
+a                                                                                                                            Cell segmentation and                                                                                                           Normalized palmitate M + 0                                                                                                                        Normalized palmitate M + 0
+                                                                                                                              cell type assignment                                                                                                                intensity in each AM                                                                                                                                intensity per cell
+              Transmission + GFP                                                                                                                                                                                                                                   after thresholding                                                                                                                                                                               1.0
+                                                                                                                                  GFPpos--hypoxia                                                                                                                                                                    1.0
+                                                                                                                                GFPneg--normoxia                                                                                                                                                                                                                                                                                                                    0.8
+                                                                                                                                                                                                                                                                                                                     0.8
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                    0.6
+                                                                                                                                                                                                                                                                                                                     0.6
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                    0.4
+                                                                                                                                                                                                                                                                                                                     0.4
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                    0.2
+                                                                                                                                                                                                                                                                                                                     0.2
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                    0
+                                                                                                                                                                                                                                                                                                                     0                                                                                               GFPpos--hypoxia
+                                                                                                                                                                                                                                                                    GFPpos--hypoxia                                                                                                                                GFPneg--normoxia
+                                                                                                                                                                                                                                                                   GFPneg--normoxia
+
+b                                                                                                                                                  c                                                                                             Hypoxia/normoxia in                                                                                            d
+                                                                                                                                                                                                                                                     separate wells
+ 2,000                                                                                                                                                   1.0                                                                                                                                                                                                                             Mixture of cells grown in
+  1,500                                                                     GFPneg--normoxia                                                                                                                                                                                                                                                                                              hypoxia and normoxia
+  1,000
+                                                                                                                                                    Normalized palmitate M + 0 intensity  0.9                                                                                                                                                                   Normalized palmitate M + 0 intensity1.0
+    500                                                                                                                                                                                                                                                                                                                                                                           Low
+        0                                                                                                                     0.8                                                                                                                                                       0.5%O2, GFPhigh                                                                           High
+                                                                   GFPpos--hypoxia                                                                                                                                                                                                      0.5%O2, GFPlow
+  ­500                                                                                                                                                                                                                                                                                  20%O2, GFPhigh                                                               0.9
+­1,000                                                                                                                        0.7                                                                                                                                                       20%O2, GFPlow
+­1,500                                                                                                                                                                                                                                                                                                                                                               0.8
+­2,000                                                                                                                        0.6
+­2,500                                                                                                                                                                                                                                                                                                                                                               0.7
+                                                 255               260                  265                270                        275                                                 0.5
+       250                                                                                                                                                                                                                                                                                                                                                           0.6
+                                                                                                                                                                                          0.4
+                                                                            m/z                                                                                                               2.0 2.2 2.4 2.6 2.8 3.0 3.2 3.4                                                                                                                                        0.5
+                                                                                                                                                                                                             log(GFP intensity)
+                                                                                                                                                                                                     Classi cation accuracy: 100%                                                                                                                                    0.4
+                                                                                                                                                                                                                                                                                                                                                                          2.0 2.2 2.4 2.6 2.8 3.0 3.2 3.4
+                                                                                                                                                                                                                                                                                                                                                                                        log(GFP intensity)
+                                                                                                                                                                                                                                                                                                                                                                                Classi cation accuracy: 87%
+
+e                                                                                                                                                                                                                                             Prediction of the GFP state,                                                                                                                                                 Prediction of the GFP state,
+                                                                                                                                                                                                                                                                                                                                                                                                                                 mixture of cells in
+                      Prediction of the condition,                                                                                                                            cells grown separately
+                          cells grown separately                                                                                                200                                                                                                                                                                                                                                                                           hypoxia and normoxia
+
+                                                                                                                                                                                                                                           160                                                                                                                                                                                                                                       500
+
+                                                                                                                                                175                                                                                                                                                                                                             13C-SpaceM prediction                                                                                                                             400
+                                                                                                                                                                                                                                           140
+
+                Hypoxia                                         202                                     0                                       150                                                                         High                       125                                    77                                                                                                         High                       443                                     219
+                                                                                                                                                                                                                                                                                                                                                     Number of cells120
+                                                                                                                                                                                                                                                                       Number of cells
+True label                                                                                                                                      125                                       Number of cells       True label                                                                                                           100                                                                                                                                                                          300
+
+                                                                                                                                                100                                                                                                                                                                                  80
+
+                                                                                                                                                75                                                                                                                                                                                   60                                                                                                                                                             200
+
+            Normoxia                                               0                                171                                         50                                                                          Low                           2                                   169                                    40                                                                  Low                           17                                   516
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    100
+                                                                                                                                                25
+                                                                                                                                                                                                                                                                                                                                     20
+
+                                                                                                                                                0
+
+                                                             Hypoxia                             Normoxia                                                                                                                                              High                                   Low                                                                                                                                   High                                    Low
+
+                                                             13C-SpaceM prediction                                                                                                                                                                  GFP-based prediction                                                                                                                                                            GFP-based prediction
+
+f                                                                                                                                                                                                                           Isotopologue distributions of palmitate
+
+             1.0                                                                     Normoxia                                                                                                                   1.0                                                   Hypoxia                                                                                                                                                                   Bulk MS
+            0.8
+            0.6                                                                                                                                                                                                                                                                                                                                                 1.0                                                                                                         Condition
+            0.4                                                                                                                                                                                                                                                                                                                                                                                                                                                                  Normoxia
+                Normalized intensity                                                                                                                                                      Normalized intensity  0.8                                                                                                                       Normalized intensity  0.8
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 Hypoxia
+
+                                                                                                                                                                                                                0.6                                                                                                                                             0.6
+
+                                                                                                                                                                                                                0.4                                                                                                                                             0.4
+
+                                      0.2                                                                                                                                                                       0.2                                                                                                                                             0.2
+
+                                      0                                                                                                                                                                         0                                                                                                                                               0
+
+                                              +  0  +  1  +  2  +  3  +  4  +  5  +  6  +  7  +  8  +9  +  10  +  11  +  12  +  13 +  14 +  15  +  16                                                                          +  0  +  1  +  2  +  3  +  4  +  5  +  6  +  7  +  8  +  9  +  10  + 11  +  12  +  13+  14  +  15  +  16                                                                  +  0  +  1  +  2  +  3  +  4  +  5  +  6  +  7  +  8  +  9  +  10  + 11  +  12  +  13+  14 +  15  +  16
+                                                 M     M     M     M     M     M     M     M     M   M     M      M      M      M     M     M                                                                                     M     M     M     M     M     M     M     M     M     M     M    M       M      M    M      M                                                                             M     M     M     M     M     M     M     M     M     M     M    M       M      M    M     M
+                                           M                                                                                                                                                                                M                                                                                                                                                                         M
+
+Nature Metabolism | Volume 6 | September 2024 | 1695­1711                                                                                                                                                                                                                                                                                                                                                                                                                                                              1698
+Article                                                                           https://doi.org/10.1038/s42255-024-01118-4
+
+displaying log (GFP intensity) as ground-truth readout characteristic             palmitate isotopologue distribution between AIF and saponification,
+of condition versus normalized palmitate M+0 intensity calculated                 confirming that both methods interrogate the same lipid pools. We also
+using single-cell isotopologue profiles. Cells cultured in hypoxia dis-           compared isotopologue distribution of other fatty acids (myristate,
+played normalized M+0 intensities close to 0.9, indicating that only a            palmitoleate, stearate and oleate) obtained by imaging MS with bulk
+small amount of palmitate was synthesized from glucose. This reflects             analysis and found an overall concordance between the two methods
+either a low rate of de novo fatty acid synthesis or a switch to other            (Extended Data Fig. 2b,c). Notably, the M+2 isotopologue for stearate
+substrates21. Normoxic cells showed lower normalized M+0 intensi-                 and oleate, generated by the elongation of unlabelled precursor, could
+ties, with more heterogeneity compared with hypoxic cells (Fig. 2c).              be detected using both methods. The slightly lower intensity for the
+Heterogeneity could not be attributed to differences in cell size distri-         M+0 isotopologues obtained using 13C-SpaceM could thus either be
+bution (Extended Data Fig. 1c) or other morphometric parameters. In               caused by differences in interrogated lipids (Supplementary Table 1)
+the co-plated model, cells assigned to the hypoxic condition (log10 GFP           or underrepresentation of low abundance isotopologues due to lower
+intensity >3) showed a large fraction of unlabelled palmitate (normal-            sensitivity of imaging MS. Overall, we conclude that 13C-SpaceM can
+ized M+0 intensity around 0.9) (Fig. 2d), whereas cells with log10 GFP            be used to determine glucose contribution to fatty acid synthesis by
+intensity <3 displayed a mixed phenotype (normalized M+0 intensity                providing isotopologue distributions reflecting palmitate labelling as
+between 0.4­0.8) (Fig. 2d). This was most likely caused by a propor-              key readout of this pathway at single-cell level.
+tion of hypoxic cells having lost GFP expression, potentially due to
+promoter silencing. Overall, we observed a strong similarity between              Quantifying acetyl-CoA labelling degree in single cells
+mono- and co-plated cultures (Fig. 2c,d), although separation of the              We next investigated the effect of genetically disrupting components
+two populations was less obvious after co-plating. This could indicate            of acetyl-CoA metabolism on fatty acid isotopologue profiles detected
+an error due to co-sampling of neighbouring normoxic cells, causing               using 13C-SpaceM. ACLY catalysers the conversion of cytoplasmic citrate
+a slight increase in intensities of labelled isotope peaks and reducing           generated from glucose or glutamine into acetyl-CoA (Fig. 1a). We there-
+the unlabelled fraction. However, the presence of two distinct clusters           fore engineered cells to express short hairpin RNAs (shRNA) targeting
+indicates that this error was small, allowing a clear separation between          murine ACLY under the control of a doxycycline-inducible promoter.
+the two phenotypes.                                                               The same promoter also drives expression of a GFP reporter allowing
+                                                                                  identification of shRNA-expressing cells. We used two non-overlapping
+      We quantified the capacity of 13C-SpaceM to discern the two                 shRNA sequences (ACYL knockdown (ACLYkd) oligonucleotide (oligo)
+phenotypes in an unbiased manner by assigning the conditions to single            1 and ACLYkd oligo 2) as well as a non-targeting control. Silencing was
+cells using GFP (log10 GFP intensity >3 indicating hypoxia). When levels          achieved by treating cells with 1µgml-1 of doxycycline for 72h, with
+of unlabelled palmitate were used as classifier, classification accuracy          both shRNA sequences resulting in a comparable level of ACLY deple-
+of 87% was achieved. We furthermore investigated the potential of                 tion (Extended Data Fig. 3a).
+13C-SpaceM in predicting condition based on isotopologue profiles
+from other fatty acids (16:0, 16:1, 18:0, 18:1 and 14:0). Using a logistic              We induced ACLY silencing in cells cultured in the presence of
+regression classifier, we could predict the growth condition with per-            U-13C-labelled glucose and interrogated them with 13C-SpaceM or bulk
+fect accuracy (Fig. 2e, left). In contrast, using GFP alone resulted in           MS. Figure 3a shows isotopologue distribution for palmitate in the cells
+nearly 25% false negatives for the same population (Fig. 2e, middle),             expressing non-targeting shRNA and after knockdown of ACLY induced
+whereas the prediction based on 13C-SpaceM (Fig. 2e, right) returned a            by the two oligonucleotides. For the control cells, isotopologue distri-
+similar number of false negatives derived from GFP (22%). Overall, the            bution peaks at M+10 in both bulk and single-cell analyses (Fig. 3a, left).
+high prediction accuracy of 13C-SpaceM validates the capacity of this             Pseudo-bulk analysis of 13C-SpaceM data showing averages across all
+method to identify changes in glucose contribution to palmitate and               single cells indicates a higher M+0 fraction compared with the bulk
+thus determine metabolic activity in a spatially heterogeneous model              analysis (normalized peak intensity of 0.6 compared with 0.3). This is
+at single-cell resolution.                                                        in line with the results for the normoxia-hypoxia model in Fig. 2f and,
+                                                                                  as discussed earlier, can be explained by differences in the specific lipid
+      As additional validation, we compared single-cell isotopologue              pools interrogated by the two methods. ACLY silencing using either
+profiles with bulk measurements of lipids extracted from pooled cells,            oligo induced a marked shift in isotopologue distribution, with lower
+using a method for the isolation of major phospholipids, neutral lipids           mass isotopologues being increased (Fig. 3a, middle and right). This is
+and ceramides34,35. Lipids were subjected to alkaline hydrolysis (saponi-         in line with our expectation that ACLY silencing reduces the contribu-
+fication) to release fatty acids and palmitate isotopologue distribu-             tion of glucose to the cytoplasmic acetyl-CoA pool.
+tion was determined by LC­MS. Bulk analysis of palmitate showed
+an overall level of similarity with the pseudo-bulk data determined                     The distribution of the pseudo-bulk intensities across the iso-
+by 13C-SpaceM (Fig. 2f). However, there was a difference in the M+0               topologues detected after ACLY silencing using oligo 1 suggested the
+fraction detected in normoxic cells between bulk and pseudo-bulk                  presence of two populations with distinct responses to gene silencing.
+analysis, potentially due to chemical hydrolysis releasing fatty acids            We therefore used the power of single-cell analysis to deconvolve pal-
+from a wider variety of lipids. We therefore applied AIF to bulk LC­MS            mitate labelling in individual cells from the three conditions (control,
+analysis, using negative mode and mass range (600­1,000m/z) as used               ACLYkd oligo 1 and ACLYkd oligo 2). We calculated the acetyl-CoA pool
+in imaging MS (Extended Data Fig. 2a). This revealed a high similarity in         labelling degree for each cell by applying a binomial model (described
+
+Fig. 3 | Single-cell quantitative analysis of lipogenic acetyl-CoA production     isotopic peaks. Legend shows parameters of the binomial model fit. c, Single-cell
+and heterogeneity. a, Comparison of bulk (top) and single-cell (bottom) analysis  analysis of the estimated acetyl-CoA pool labelling degree (p) as calculated using
+of isotopologue distribution for palmitate after 72h of ACLY gene silencing and   the fatty acid labelling binominal model for the three conditions: control (grey),
+culture in the presence of 13C6-glucose. Bulk data, generated by saponification   ACLYkd oligo 1 (blue) and ACLYkd oligo 2 (orange). Green dashed line shows
+and subsequent LC­MS, are displayed as mean±s.d. across three replicates. For     95% quantile of the GFP intensity distribution in the control condition, which
+single-cell data, generated by MALDI with AIF, black lines show average values.   was used to classify cells as GFPpos versus GFPneg. d, Spatial metabolic imaging
+b, Normalized single-cell isotopologue distributions for two individual cells,    of de novo fatty synthesis for the control, ACLYkd oligo 1 and ACLYkd oligo 2
+one from the control and the other from ACLYkd oligo 1 (shown as bar plots).      conditions. Abundance of different palmitate isotopologue peaks is displayed
+Lines show fit of the fatty acid labelling binomial model: horizontal lines for   in different channels: M+0 (blue), M+2 (green) and M+8 (red). Each channel is
+M+0 showing an estimated uptake and connected lines for M+2i showing              normalized to the TIC.
+(1-uptake)×binomial(i), where i is a variable from 1 to 8 indicating the even
+
+Nature Metabolism | Volume 6 | September 2024 | 1695­1711                         1699
+Article                                                                                                                                                                                                                                                                                                                     https://doi.org/10.1038/s42255-024-01118-4
+
+in Methods), with the estimated value p quantifying the fraction of                                                                                                                                                                                         the number of carbon atoms in each fatty acid, for example n=8 for
+labelled acetyl-CoA derived from glucose in the cytosolic acetyl-CoA                                                                                                                                                                                        palmitate). Figure 3b shows examples of such modelling for two cells,
+pool. This model can be applied to each single-cell profile of isotopic                                                                                                                                                                                     a control cell (grey) and an ACLYkd oligo 2 cell (blue). As expected, the
+intensities of any fatty acid by estimating p, which leads to best approxi-                                                                                                                                                                                 ACLYkd cell demonstrates a lower acetyl-CoA pool labelling degree
+mation of the data (the number of acetyl-CoA units, n, is equal to half                                                                                                                                                                                     (p=0.43 versus 0.61).
+
+a                                                                                                                                                                                                        Isotopologue distributions of palmitate
+
+               1.0                                                                                                                                                          1.0                                                                                                                                            1.0                                                                                                     Condition
+                                                                                                                                             Condition                                                                                                                                Condition                                                                                                                                    ACLYkd Ol. 2
+              0.8
+                                                                                                                                               Control                                                                                                                                 ACLYkd Ol. 1
+                                                                                                                                                                           0.8                                                                                                                                            0.8
+                            Normalized intensity                                                                                                                           Normalized intensity                                                                                                                             Normalized intensity
+                                                  0.6                                                                                                                                            0.6                                                                                                                                              0.6
+
+                                                  0.4                                                                                                                                            0.4                                                                                                                                              0.4
+
+                                                  0.2                                                                                                                                            0.2                                                                                                                                              0.2
+
+                                                       0                                                                                                                                         0                                                                                                                                                0
+
+                                                  1.0                                                                                                                                            1.0                                                                                                                                              1.0
+
+                                                                                                                                                Condition                                                                                                                             Condition                                                                                                                                    Condition
+
+                                                                                                                                                Control                                                                                                                                   ACLYkd Ol. 1                                                                                                                             ACLYkd Ol. 2
+
+                            Normalized intensity  0.8                                                                                                                      Normalized intensity  0.8                                                                                                                        Normalized intensity  0.8
+
+                                                  0.6                                                                                                                                            0.6                                                                                                                                              0.6
+
+                                                  0.4                                                                                                                                            0.4                                                                                                                                              0.4
+
+                                                  0.2                                                                                                                                            0.2                                                                                                                                              0.2
+
+                                                       0                                                                                                                                         0                                                                                                                                                0
+
+                                                             +  0   +  1  +  2  +  3  +  4  +  5  +  6  +  7  +  8  +9  +  10  +  11  +  12  +  13  +  14  +  15  +  16                                  +  0   +  1  +  2  +  3  +  4  +          5  +  6  +  7  +  8  +9  +  10  +  11  +  12  +  13  +  14  +  15 +  16                                +  0   +  1  +  2  +  3  +  4  +  5  +  6  +  7  +  8  +9  +  10  +  11  +  12  +  13  +  14  +  15  +  16
+                                                                 M     M     M     M     M     M     M     M     M  M      M      M      M      M      M      M                                              M     M     M     M     M             M     M     M     M   M     M      M      M      M      M      M                                           M     M     M     M     M     M     M     M     M  M      M      M      M      M      M      M
+                                                          M                                                                                                                                           M                                                                                                                                                M
+
+b                                                 0.6
+
+                            Normalized intensity  0.5                                                                                                                                                              GFP positive cell
+                                                                                                                                                                                                                   Fit: uptake = 0.58, p = 0.43
+                                                  0.4                                                                                                                                                              GFP negative cell
+                                                                                                                                                                                                                   Fit: uptake = 0.52, p = 0.61
+
+                                                  0.3
+
+                                                  0.2
+
+                                                  0.1
+
+                                                       0
+
+                                                                  +0              +1       +2          +3          +4        +5 +6                       +7            +8    +9                    + 10    + 11      + 12        + 13 + 14                       + 15     + 16
+                                                                M               M        M           M           M         MM                          M             M     M                     M       M         M           MM                              M        M
+
+c                                                                                                                                                                                                                                 d                            Replicate 1                                              Replicate 2                                       Replicate 3
+
+     0.8                                                                                                                                        Condition                                                                            Control                                                                                                                                                                                       M + 8 (8× gain)
+     0.7                                                                                                                                        Control                                                                                                                                                                                                                                                                            M + 2 (4× gain)
+     0.6                                                                                                                                        Aclykd Ol. 1                                                                                                                                                                                                                                                                       M+0
+                                                                                                                                                Aclykd Ol. 2
+
+AcCoA pool labeling degree  0.5                                                                                                                                                                                                      ACLYkd Ol. 1
+
+                            0.4
+
+                            0.3
+
+                            0.2                                                                                                                                                                                                      ACLYkd Ol. 2
+
+                            0.1                                                                                                                                                                                                                                                                                                                                                                   200 µM
+
+                                                  1.0               1.5                  2.0                  2.5                 3.0                      3.5             4.0
+
+                                                                                      log(GFP intensity)
+
+Nature Metabolism | Volume 6 | September 2024 | 1695­1711                                                                                                                                                                                                                                                                                                                                                                                                  1700
+Article                                                                                   https://doi.org/10.1038/s42255-024-01118-4
+
+      Acetyl-CoA pool labelling degree (p) for all single cells in the three              13C-SpaceM differentiates fatty acids by relative uptake
+populations was plotted against the intensities of the GFP knockdown                      We next considered that when isotopic steady state for a given fatty acid
+reporter (Fig. 3c). This showed a clear difference between the control                    pool has been reached and the labelling degree of lipogenic acetyl-CoA
+cells and cells with ACLY knockdown, with knockdown resulting in                          is sufficient (distribution of labelled isotopologues does not overlap
+lower values of p (histogram peak in control at 0.6 compared with                         with M+0), 13C-SpaceM data could be used to determine the relative
+0.35 in ACLYkd oligo 1 and 0.4 in ACLYkd oligo 2). Moreover, the dif-                     uptake of different fatty acids compared with their de novo synthesis
+ferences between the two ACLY knockdown conditions were also                              at a single-cell level. For each fatty acid, this was achieved by first per-
+clearly visible. Oligo 1 resulted in a bimodal distribution of the values                 forming natural isotope correction, normalizing all isotopologue peaks
+of p, with a visibly higher variance (values ranging from 0.2 to 0.65).                   to the sum of all peaks, approximating isotopologue intensities with
+A bimodal distribution in single-cell results often indicates the pres-                   the binomial model described in Methods, and taking the value of the
+ence of two subpopulations. Notably, one mode of the distribution for                     `uptake' from the model. Figure 4a, top, shows single-cell values of the
+the acetyl-CoA pool labelling degree in the ACLYkd oligo 1 condition                      relative uptake for the detected fatty acids: SFAs myristate, palmitate,
+displayed values for p in the range of 0.5­0.6 that overlapped with                       stearate as well as MUFAs palmitoleate and oleate, as determined in
+the values exhibited by control cells (p=0.5­0.7). This can be inter-                     the control liver cancer cells. The levels of relative uptake at 60­90%
+preted as the presence of a subpopulation of `poorly silenced' cells,                     (and thus de novo synthesis of 10­40%) are close to the reported rate
+where the knockdown was not sufficiently induced. Indeed, ACLYkd                          of 30% of de novo lipogenesis in patients with non-alcoholic fatty liver
+oligo 1 cells with high values of p (above 0.5) also display GFP intensi-                 disease36. The two MUFAs, palmitoleate and oleate, showed a substan-
+ties similar to those of wild-type cells, possibly due to the loss of the                 tially higher relative uptake compared with the corresponding SFAs
+doxycycline-inducible expression cassette. The second mode of the                         palmitate and stearate. This indicates that these cells mostly utilize
+distribution of the acetyl-CoA pool labelling degree (p) for ACLYkd                       uptake rather than de novo synthesis to obtain MUFAs. The results on
+oligo 1 cells had a much lower value (p=0.35). This was clearly below                     the average levels were confirmed in the bulk LC­MS-based isotope
+the mode of the distribution of p for ACLYkd oligo 2 cells (p=0.42).                      tracing (Fig. 4a, bottom).
+This indicates the presence of a `strongly silenced' subpopulation of
+ACLYkd oligo 1 cells in which silencing was highly efficient, resulting in                      We next investigated the relationships between the relative
+a strong reduction of acetyl-CoA labelling. This was contrasted by the                    uptake of different fatty acids in the same cells. This was conducted
+results using oligo 2, where the acetyl-CoA pool labelling degree (p)                     by plotting and analysing the single-cell values of relative uptake for
+as well as GFP reporter intensity displayed more homogenous values.                       each fatty acid versus the others. This analysis showed no correlation
+Thus, 13C-SpaceM was able to detect heterogeneity in ACLY knockdown                       of the relative uptake of myristate with any of the other fatty acids
+cells and identify different subpopulations.                                              (Fig. 4b, first column). This lack of correlation is expected, as myristate
+                                                                                          was reported to be produced by de novo FA synthesis only to a small
+      Spatial information provided by 13C-SpaceM offers another view                      degree. Instead, myristate is mainly generated by the shortening of
+at cellular heterogeneity. Figure 3d shows ion images for three iso-                      palmitate via peroxisomal -oxidation or the elongation of lauric
+topologue peaks of palmitate (M+0 in blue, M+2 in green and M+8                           acid37. In contrast, single-cell relative uptake values for palmitate,
+in red) for the three conditions (control, ACLYkd oligo 1 and ACLYkd                      palmitoleate, stearate and oleate showed strong positive correlations
+oligo 2). The M+2 peak was chosen as the most discriminative for                          (Fig. 4b, columns 2­4). Thus, we can differentiate fatty acids by their
+the phenotype of low acetyl-CoA labelling specific to the `strongly                       sources specifically by exogenous uptake versus de novo synthesis.
+silenced' population among ACLYkd oligo 1 cells. The M+8 peak was                         The lack of correlation for the single-cell uptake values for myristate
+chosen as a representative for the control condition where fatty acids                    likely reflects the specific mechanism of production or uptake of this
+contain a high proportion of 13C. Thus, the difference between M+2                        fatty acid. Together, these data show that 13C-SpaceM can be used to
+and M+8, as shown in Fig. 3a, can serve as an indicator of the rela-                      determine relative uptake versus synthesis of different fatty acids at
+tive contribution of glucose to the cytoplasmic acetyl-CoA pool and                       the single-cell level (Fig. 4c). However, it should be noted that this
+thus be used to display heterogeneity. The data were acquired with a                      estimation may only apply to the lipid pools queried by the MALDI
+pixel size of 10µm with cells having an average area of 550µm2, cor-                      imaging MS method used here, as the relative contribution of fatty
+responding to 12 pixels per average cell. Ion images for ACLYkd oligo                     acids that are derived from uptake may well differ between lipid classes
+1 showed a marked heterogeneity in the intensities of M+2 and M+8                         and/or pools.
+isotopic peaks for palmitate that visualizes the presence of two dis-
+tinct subpopulations in this condition. Notably, the observation that                           Next, we investigated the effect of ACLYkd on fatty acid uptake.
+these two subpopulations were spatially heterogeneous ruled out a                         Spatial analysis and visualization demonstrated a strong single-cell
+batch effect or technical artifacts and indicates a single-cell effect. In                heterogeneity in the relative uptake of either palmitate or oleate in a
+contrast, ACLYkd oligo 2 cells showed a more homogenous distribu-                         mixed population of control and ACLYkd oligo 2 cells (Fig. 4d,e). More
+tion of palmitate M+8 and an overall lower abundance of the M+2                           detailed and quantified analysis, by plotting the single-cell relative
+peak. This degree of single-cell and spatial heterogeneity cannot be                      uptake values separately for control and ACLYkd oligo 2, showed that
+revealed through bulk analysis, demonstrating the unique advantages                       ACLY-silenced cells increased the uptake of palmitate (histogram peak
+of the 13C-SpaceM method.                                                                 at 0.55 in control compared with 0.61 in ACLYkd), with each popula-
+                                                                                          tion displaying a unimodal symmetric distribution (Fig. 4f). Oleate
+
+Fig. 4 | 13C-SpaceM differentiates fatty acids by their relative uptake in                pixel. Pixels with the total intensity of the fatty acid isotopes below the set limit
+single cells. a, Fatty acid uptake in the control cells as determined for myristate,      of detection (1,000) are shown in black. Cell outlines are green for GFPpos cells
+palmitate, palmitoleate, stearate and oleate; SFAs in green and unsaturated fatty         (control) and white for GFPneg cells (Aclykd.oligo2). Pixels are coloured according
+acids in blue. Single-cell data with each point representing a cell, black horizontal     to the normalized M+0 describing the uptake contribution for a given fatty acid.
+lines showing median values (top). Data from bulk stable isotope tracing                  Image shows representative section of one out of six replicates. e, Same analysis
+(bottom). b, Correlation of uptake of different fatty acids. Dashed line represents       as in d for oleate. f, Single-cell analysis of changes in fatty acid uptake upon ACLY
+the diagonal. For each pair of fatty acids, the linear fit is shown as a grey line, with  knockdown for palmitate, palmitoleate, stearate and oleate. Dashed lines are the
+the fit parameters shown in the legend. c, Diagram showing mechanisms involved            diagonal. For each condition the linear fit is shown in the corresponding colour,
+in fatty acid synthesis, desaturation and uptake. d, Spatial metabolic imaging            with the fit parameters shown in the legend. FATP, fatty acid transport proteins;
+of the palmitate uptake (normalized M+0 fraction) in co-plated cells from                 LDLR, low density lipoprotein receptor; SCD, stearoyl-CoA desaturase.
+control and ACLYkd oligo 2 populations. Each square corresponds to one MALDI
+
+Nature Metabolism | Volume 6 | September 2024 | 1695­1711                                 1701
+Article                                                                                                                                                                   https://doi.org/10.1038/s42255-024-01118-4
+
+uptake, which was already higher compared with palmitate uptake in                                  single-cell relative uptake values for the ACLYkd population, with more
+the control cells, was also increased after ACLY knockdown (histogram                               cells showing high relative uptake values. This indicates that some cells
+peak at 0.85 in control compared with 0.95 in ACLYkd). In addition, we                              of the population respond to ACLY silencing by selectively inducing the
+observed an asymmetric (skewed) unimodal distribution of the oleate                                 uptake of MUFAs, such as oleate.
+
+a                                                              b                                                                                                               c                                                  CD36 LDLR
+
+                                                                         1.0                                                                                                                                  FATP
+
+        1.0                                                    Palmitate     0.8
+                                                                  C16:0
+        0.8                                                                  0.6                                                                                                                                                  Fatty acid
+                                                                                                                                                                                                                                    uptake
+
+Uptake  0.6                                                                  0.4  y = 0.18x + 0.45                                                                                                            Stearate            SCD     Oleate
+                                                                                      R2 = 0.09                                                                                                               (C18:0)             SCD     (C18:1)
+
+        0.4                                                                  1.0                                                                                                  De novo                      ELOVL                        ELOVL
+                                                                                                                                                                                  synthesis
+                                                                                                                                                                                                                                       Palmitoleate
+        0.2                                                    Stearate      0.8                                                                                               AcCoA               FASN       Palmitate                    (C16:1)
+                                                                  C18:0                                                                                                                                        (C16:0)
+
+        0                                                                    0.6
+
+             Myristate Palmitate Stearate Palmitoleate Oleate                0.4  y = 0.32x + 0.45  y = 1.24x + ­0.06                                                                                         Peroxisome          Myristate
+                                                                                                         R2 = 0.58                                                                                                                 (C14:0)
+                 C14:0 C16:0 C18:0  C16:1 C18:1                                   R2 = 0.11
+
+        1.0                                                                  1.0
+
+        0.8                                                    Palmitoleate  0.8
+                                                                  C16:1
+Uptake  0.6                                                                  0.6
+        0.4
+                                                                             0.4  y = 0.41x + 0.57  y = 1.01x + 0.26                                                      y = 0.67x + 0.39
+                                                                                      R2 = 0.14         R2 = 0.31                                                             R2 = 0.36
+
+        0.2                                                                  1.0
+
+        0                                                      Oleate        0.8
+                                                                  C18:1
+             Myristate Palmitate Stearate Palmitoleate Oleate                0.6
+
+                 C14:0 C16:0 C18:0  C16:1 C18:1
+
+                                                                             0.4  y = 0.27x + 0.64           y = 1.01x + 0.24                                                    y = 0.65x + 0.39           y = 0.51x + 0.38
+                                                                                      R2 = 0.10                  R2 = 0.53                                                            R2 = 0.58                  R2 = 0.45
+
+                                                                                  0.4 0.6 0.8 1.0   0.4 0.6 0.8 1.0                                                       0.4 0.6 0.8 1.0          0.4 0.6 0.8 1.0
+                                                                                                          Palmitate                                                              Stearate              Palmitoleate
+                                                                                        Myristate            C16:0                                                                 C18:0                    C16:1
+                                                                                          C14:0
+
+d                Palmitate uptake distribution                               e    Oleate uptake distribution
+
+                                                                                                                                                                          1.0
+                                                                                                                                                                          0.8
+                                                                                                                                                                          0.6
+                                                                                                                                                                          0.4
+                                                                                                                                                                          0.2
+                                                                                                                                                                          0
+
+                                                            50 µm                                                            50 µm
+                                                                        1.0
+f                                                                                                                                                                    1.0
+
+      1.0
+
+Palmitoleate C16:1 uptake                                                                                                                                            0.9
+                                                                       Stearate C18:0 uptake
+                                                                                                                                                Oleate C18:1 uptake0.80.8
+
+                                                                                                                                                                     0.8
+
+        0.6                                                    0.6                                                                                                   0.7
+
+        0.4                                                    0.4                                                                                                   0.6
+
+        0.2                    Control                         0.2                          Control                                                                  0.5
+                               ACLYkd Ol.2                                                   ACLYkd Ol.2                                                                                             Control
+          0                    y = 0.52x + 0.37, R2 = 0.47       0
+              0                y = 0.55x + 0.43, R2 = 0.50           0                         y = 1.11x + 0.02, R2 = 0.57                                           0.4          ACLYkd Ol.2
+                                                                                               y = 1.26x + ­0.05, R2 = 0.73                                                       y = 1.01x + 0.24, R2 = 0.53
+                 0.2 0.4 0.6 0.8 1.0
+                                                                                  0.2 0.4 0.6 0.8 1.0                                                                                                y = 0.91x + 0.32, R2 = 0.58
+                  Palmitate C16:0 uptake                                                                                                                             0.3
+                                                                                     Palmitate C16:0 uptake
+                                                                                                                                                                     0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0
+
+                                                                                                                                                                               Palmitate C16:0 uptake
+
+Nature Metabolism | Volume 6 | September 2024 | 1695­1711                                                                                                                                                                                     1702
+Article                                                                                 https://doi.org/10.1038/s42255-024-01118-4
+
+Tissue heterogeneity of fatty acid and acetyl-CoA synthesis                             the post-translational modification of important signalling proteins39,
+Our results have shown that combining MALDI imaging MS with AIF to                      this finding suggests that glioma tumours may selectively upregu-
+detect esterified fatty acids instead of the lower-abundant free fatty                  late myristate synthesis to promote their growth. In contrast, the two
+acids substantially increases sensitivity and allows the analysis of iso-               MUFAs, palmitoleate (16:1) and oleate (18:1), showed a higher relative
+topologue distribution to assess cytoplasmic acetyl-CoA labelling at                    abundance of the M+0 isotopologue (Extended Data Fig. 4a,b). In
+the level of single cells. This prompted us to apply this methodology to                addition, stearate and oleate exhibited a pronounced abundance of the
+tumour tissue sections at a near single-cell spatial resolution, to inves-              M+2 isotopologue, indicative of elongation from unlabelled precur-
+tigate whether metabolic constraints imposed by the tumour microen-                     sors (palmitate and palmitoleate, respectively). This was in line with
+vironment, such as differential access to nutrients and/or oxygen result                the previous analysis demonstrating prominent fatty acid elongase
+in intra-tumoural heterogeneity in terms of glucose contribution to the                 activity in these tumours38.
+cytosolic acetyl-CoA pool or the relative contribution of fatty acid uptake
+versus de novo synthesis. We analysed brain tissue sections from mice                         To analyse this in more detail, we calculated the fraction of all 13C
+that had been orthotopically implanted with GL261 glioma cells express-                 isotopologues of the total 1 - (M + 0)/n(M + n) , representing the
+ing mutant isocitrate dehydrogenase 1 (IDH1) and red fluorescent protein                fraction of the respective fatty acid that was derived from de novo
+(RFP). The mice were fed either an unlabelled or U-13C-glucose-containing               synthesis. This revealed that the majority of palmitate in the tumour
+liquid diet for 48h before tissue collection. Sections from the same tissue             was derived from de novo fatty acid synthesis within the timeframe of
+samples had been analysed previously using MALDI- and DESI-imaging                      the 13C labelling (Fig. 5c). In contrast, the fraction of palmitoleate
+MS to study the incorporation of glucose-derived carbons into various                   derived from de novo fatty acid synthesis was lower (Fig. 5c), despite
+different metabolites including free (non-esterified) fatty acids38. That               palmitoleate being enriched in the tumour tissue (Fig. 5b). Oleate
+analysis revealed spatial differences in isotopologue distribution of free              showed a higher labelling degree than palmitoleate (Fig. 5c), but this
+palmitate and stearate between tumour and non-tumour regions of the                     was mostly linked to the high proportion of the M+2 isotopologue
+brain, but did not provide sufficient spatial resolution to fully appreciate            (Fig. 5c and Extended Data Fig. 4a,b), which is formed by elongation of
+intra-tumoural heterogeneity38.                                                         unlabelled palmitoleate. Considering that the tumour-bearing mice
+                                                                                        were fed a 13C-glucose diet for only 48h38, it is likely that isotopic steady
+      We first applied our methodology to analyse the esterified fatty                  state for these fatty acids was not reached and thus any exact quanti-
+acid composition in brain sections from tumour-bearing mice that                        fication of the contribution of de novo synthesis or uptake in the
+were fed a 12C-glucose diet. Comparison of the total ion count (TIC)                    tumour is not possible. Nevertheless, we found that the pool sizes for
+with brightfield and fluorescent imaging revealed high ion counts                       palmitate, stearate and oleate were in a similar range, whereas the pool
+throughout the whole brain, including the tumour area (Fig. 5a). The                    size of palmitoleate was far smaller (Fig. 5c, bottom row). Thus, the low
+tumour area (Fig. 5a, TIC plot, boxed) was analysed using a higher reso-                fraction of palmitoleate and oleate derived from de novo synthesis was
+lution (10µm pixel size) compared with the rest of the tissue section                   not due to their pool sizes being larger relative to that of their precur-
+(50µm). Spatial analysis of different fatty acids revealed a high amount                sors. This indicates that these fatty acids are not derived from de novo
+of heterogeneity in fatty acid abundances in the non-tumour-bearing                     synthesis within the timeframe of the labelling but rather originate
+hemisphere, with individual structures such as the corpus callosum                      from uptake. These findings suggest that tumours have limited
+and anterior commissure identified based on their fatty acid compo-                     9-desaturase activity, provided by stearoyl-CoA desaturase and rely
+sition alone, with both regions being high in oleate (18:1) and low in                  on the microenvironment for the provision of MUFAs.
+palmitate (16:0), stearate (18:0) and arachidonate (20:4) relative to
+surrounding brain tissue (Fig. 5b). While palmitate, stearate, oleate                         We next used the isotopologue distribution of palmitate to calcu-
+and arachidonate were present at similar levels both in tumours and                     late the fraction of the cytosolic acetyl-CoA pool derived from glucose
+the surrounding brain, myristate (14:0) and palmitoleate (16:1) were                    on a pixel-by-pixel basis, similar to the in vitro analysis (Fig. 3c), to gen-
+substantially increased in the tumour tissue. Notably, the essential                    erate a spatial representation of acetyl-CoA labelling in the tumour. This
+fatty acids linoleate (18:2) and /-linolenate (18:3) were also selectively              revealed a significant degree of spatial intra-tumoural heterogeneity,
+higher in the tumour compared with the rest of the brain tissue (Fig. 5b).              with glucose contribution to the cytosolic acetyl-CoA pool (p) ranging
+                                                                                        from 0.45 to 0.70 (Fig. 5d). It should be noted that the observed vari-
+      We next analysed tissues from tumour-bearing mice that had                        ability in p was not due to differences in TIC, which was quite uniform
+been fed a diet containing U-13C-glucose for 48h and determined                         across the sample (Fig. 5d). Close inspection of selected areas with high
+the isotopologue distribution of the five major esterified fatty acids                  and low p further highlighted the differences in palmitate isotopologue
+derived from de novo fatty acid synthesis selectively in the tumour                     distribution (Fig. 5e). Thus, MALDI imaging MS coupled with AIF is
+tissue (Fig. 5c and Extended Data Fig. 4a,b). The three SFAs, myristate                 capable of determining the labelling degree of the cytosolic acetyl-CoA
+(14:0), palmitate (16:0) and stearate (18:0), showed a high relative                    pool to visualize spatial intra-tumoural metabolic heterogeneity in
+abundance of 13C incorporation, with isotopologue distributions peak-                   tissue sections at near-single-cell resolution.
+ing at M+10, M+12 and M+14, respectively (Extended Data Fig. 4a,b).
+These results suggest that myristate was almost exclusively derived                     Characterizing essential fatty acid metabolism in glioma
+from de novo fatty acid synthesis, as the intensity of M+0 was very low                 Our finding that the essential fatty acids linoleate (18:2) and
+compared with the other isotopologues. As myristate is important for                    /-linolenate (18:3) accumulate exclusively in the tumour (Fig. 5b)
+
+Fig. 5 | 13C-SpaceM reveals intra-tumoural heterogeneity of fatty acid                  image) for each fatty acid is shown above the image. ac, anterior commissure;
+synthesis at a near-single-cell resolution. a, Left to right: brightfield image         cc, corpus callosum. c, Fractions of palmitate, palmitoleate, stearate and oleate
+of a cryosection from the brain of a tumour-bearing mouse after orthotopic              derived from fatty acid synthesis during the labelling period (48h) visualized
+implantation of GL261 glioma cells. Visualization of RFP-expressing glioma cells        by displaying the sum of all labelled isotopologues as a fraction of the sum of all
+in the brain. Staining of the cryosection with 4,6-diamidino-2-phenylindole             isotopologues (1-(M+0)/n(M+n)) (top). The unlabelled isotopologue (M+0)
+(DAPI) overlapped with the RFP and brightfield channels. Visualization of TIC           for palmitate, palmitoleate, stearate and oleate normalized to the TIC (middle).
+obtained by MALDI imaging MS and AIF. Square denotes a region where data were           Sum of all isotopologues shown as a fraction of the TIC; scale bar shows fraction
+acquired at a near-single-cell resolution (10µm pitch as opposed to 50µm pitch          of TIC (bottom). d, Visualization of the TIC and the degree of labelling of the
+for the rest of the section). Scale bar ends at the highest point of intensity in the   cytoplasmic acetyl-CoA pool (p) in the tumour. e, Isotopologue distributions
+image. b, Visualization of the localization of ten different esterified fatty acids in  derived from a high and a low p area of the tumour (marked by yellow and black
+a section from a tumour-bearing brain. NL value (highest signal intensity in the        squares in d, respectively).
+
+Nature Metabolism | Volume 6 | September 2024 | 1695­1711                               1703
+Article                                                                                                                                                https://doi.org/10.1038/s42255-024-01118-4
+
+raised the question whether these fatty acids are also processed fur-      roles in cancer3. We therefore analysed the specific isotopologue dis-
+ther, as their derivatives serve as precursors for the synthesis of lipid  tributions of several derivatives of essential fatty acids, namely 20:3,
+mediators, such as prostaglandins and leukotrienes that play important     20:4, 20:5, 22:4 and 22:5 (Fig. 6a). We found that the M+2 isotopologue
+
+         a     Bright eld                                  RFP                     DAPI/RFP/bright eld                                                                                          TIC
+
+                                                                                                                                                                               0                                                         1.4 × 106
+
+         b     NL = 1.0 × 104            NL = 1.3 × 105               NL = 1.4 × 104                                                NL = 1.2 × 105                                          NL = 1.3 × 105
+                                                       cc                                                                                        cc                                                       cc
+
+         14:0                      16:0            ac           16:1                                                18:0                      ac                            18:1                                           ac
+                   NL = 4.5 × 104                                         NL = 9.7 × 103                                            NL = 4.9 × 104
+                                         NL = 1.2 × 103                                                                                                                                     NL = 1.5 × 103
+                                                                                                                                                 cc
+
+         18:2                      18:3                         20:3                                                20:4                            ac                      20:5
+
+                                                                                                                                                                                     0                                                       NL
+
+         c
+
+         16:0 (1 ­ (M + 0)/n(M + n)) 18:0 (1 ­ (M + 0)/n(M + n)) 16:1 (1 ­ (M + 0)/n(M + n)) 18:1 (1 ­ (M + 0)/n(M + n))
+
+                                                                                                                                     0                                               100%
+                                                                                                                                 18:1 (M + 0/TIC)
+         16:0 (M + 0/TIC)          18:0 (M + 0/TIC)             16:1 (M + 0/TIC)
+
+                                                                                                                                             0                                              NL
+
+         16:0 (n(M + n)/TIC)       18:0 (n(M + n)/TIC)          16:1 (n(M + n)/TIC)                                              18:1 (n(M + n)/TIC)
+
+         0.200
+              0.175
+                    0.150
+                          0.125
+                                0.100
+                                     0.075
+                                           0.050
+                                                 0.025
+                                                      0
+                                                           0.16
+                                                                 0.14
+                                                                      0.12
+                                                                            0.10
+                                                                                 0.08
+                                                                                       0.06
+                                                                                            0.04
+                                                                                                  0.02
+                                                                                                       0
+                                                                                                           0.035
+                                                                                                                 0.030
+                                                                                                                        0.025
+                                                                                                                              0.020
+                                                                                                                                     0.015
+                                                                                                                                           0.010
+                                                                                                                                                  0.005
+                                                                                                                                                        0
+                                                                                                                                                              0.200
+                                                                                                                                                                    0.175
+                                                                                                                                                                         0.150
+                                                                                                                                                                               0.125
+                                                                                                                                                                                    0.100
+                                                                                                                                                                                         0.075
+                                                                                                                                                                                               0.050
+                                                                                                                                                                                                    0.025
+                                                                                                                                                                                                          0
+
+         d                                                                 e                                                                                                                                     Condition
+                                                                                                                                                                                                                     High p
+                           TIC                         p                         40Fractional abundance (%)                                                                                                          Low p
+                                                                                 35
+                                                                                 30
+
+                                                                                                             25
+
+                                                                                                             20
+
+                                                                                                             15
+
+                                                                                                             10
+
+                                                                                                             5
+
+            0                      6.6 × 105 0.45               0.70                                         0
+
+                                                                                                                    +  0   +  1  +  2  +  3  +  4   +  5  +  6  +  7  +  8  +  9  +  10  +  11  +            12  +  13  +  14  +  15  +  16
+                                                                                                                        M     M     M     M      M     M     M     M     M     M      M     M                M      M       M     M
+                                                                                                                 M
+
+                                                                                                                                                Isotopologue number
+
+Nature Metabolism | Volume 6 | September 2024 | 1695­1711                                                                                                                                                                                           1704
+Article                                                                                                                                                                      https://doi.org/10.1038/s42255-024-01118-4
+
+         a       M+0            M+1            M+2     M+3                          M+4                                                           b
+
+                                               8       FADS1                                                                                            n6                                                                n3
+                                               6
+         20:3                                             *                                                                                          Linoleic acid (18:2) O                                               -linolenic acid (18:3) O
+
+                                                                                                                                                                                OH                                                                                         OH
+
+                                                                                                                                                        FADS2                                                                          FADS2
+
+                                                                                                                                                     -linolenic acid (18:3)  O
+
+         20:4                                                                                                                                                                                                         OH  Acetyl-CoA ELOVL5
+
+                                                                                                                                                      Acetyl-CoA ELOVL5                                                    Eicosatetraenoic acid (20:4)
+
+                                                                                                                                                  Dihomogamma-linolenic acid (20:3)                                                                                           O
+                                                                                                                                                                                                                  O
+
+         20:5                                                                                                                                                                       OH                                                                 OH
+
+                                                                                                                                                        FADS1                                                                 FADS1
+
+         22:4                                                                                                                                            Arachidonic acid (20:4) O                                        Eicosapentaenoic acid (20:5) O
+
+                                                                                                                                                                                                                OH                                                                        OH
+
+                                                                                                                                                     Acetyl-CoA ELOVL5                                                       Acetyl-CoA ELOVL5
+
+                                                                                                                                                     Adrenic acid (22:4) O                                                Docosapentaenoic acid n3 (22:5) O
+
+                                                                                                                                                                                     OH                                                                                                       OH
+
+                                                                                                                                                     Acetyl-CoA ELOVL2/FADS2/
+
+         22:5                                                                                                                                        Acetyl-CoA beta-ox
+
+                                                                                                                                                  Docosapentaenoic acid n6 (22:5) O
+
+                                                                                                                                                                                     OH
+
+                 0% 100% 0%                                                         100%
+
+         c               FADS2                                                                                                                                  ELOVL5
+
+             10             *                                                                                                                                  *
+
+                                                                                                                                               8
+
+         Expression -log2(TPM + 1)8                                                                                                            6
+                                                              Expression -log2(TPM + 1)
+                                                                                                                    Expression -log2(TPM + 1)64
+
+                                                                                                                                               4
+
+            4
+
+                                               2                                                                                               2
+
+            2
+
+            0         T  N                     0    T      N                                                                                   0     T      N
+
+                                  LGG                              LGG                                                                                             LGG
+                 (num(T) = 518; num(N) = 207)     (num(T) = 518; num(N) = 207)                                                                    (num(T) = 518; num(N) = 207)
+
+Fig. 6 | Glioma tumours differentially process n3 and n6 essential fatty acids.     FADS2 and ELOVL5 in low-grade glioma (LGG) samples from The Cancer Genome
+a, Isotopologue distribution for the polyunsaturated fatty acids 20:3, 20:4, 20:5,  Atlas (TCGA) (n=518) and corresponding normal brain (from the Genotype-
+22:4 and 22:5. Scale bar shows the fraction of each isotopologue from the sum of    Tissue Expression (GTEx) project) (n=207). Analysis was performed using
+all isotopologues for each fatty acid. b, Schematic of the omega-3 and omega-6      GEPIA2 with a P value cutoff of 0.01 (in all cases (indicated by a single asterisk),
+polyunsaturated fatty acids biosynthesis pathways. Carbon atoms added from          the P values were below this cutoff) using one-way analysis of variance and the
+acetyl-CoA by fatty acid elongation are indicated in red. c, Comparison of RNA      results presented as a boxplot.
+expression for enzymes involved in the processing of essential fatty acids, FADS1,
+
+fractions of all except 20:5 were enriched in the tumours (the pool size            be used to study fatty acid uptake, acetyl-CoA metabolism, and activ-
+for these fatty acids was either similar or higher in the tumour region             ity of de novo fatty acid synthesis in single cells. In tissue sections of
+relative to the brain, which excludes the possibility of this being an              mouse glioma, we could show spatial intra-tumour heterogeneity of
+artifact of not having reached isotopic steady state). This suggests                acetyl-CoA synthesis. The novelty of this method lies in employing
+that glioma tumours not only take up essential fatty acids from the                 AIF-MS combined with mathematical modelling for isotopologue
+microenvironment but also process these further by elongation and                   analysis of labelled fatty acids. Using AIF helps to enhance the sen-
+desaturation. The enzymes required for essential fatty acid metabo-                 sitivity of the analysis at high spatial resolution, while mathematical
+lism, fatty acid elongase 5 (ELOVL5), fatty acid desaturase 1 (FADS1)               modelling provides quantitative information on lipogenic acetyl-CoA
+and fatty acid desaturase 2 (FADS2) are upregulated in low-grade                    pool labelling. Our development addresses the need to investigate
+glioma (Fig. 6b,c). Our data also suggest differences in the processing             the activity of metabolic pathways by resolving single-cell and spatial
+of omega-3 and omega-6 essential fatty acids, as eicosapentaenoic acid              heterogeneity with high molecular sensitivity.
+(20:5), a PUFA exclusive to the omega-3 branch (Fig. 6b), shows no label
+incorporation (Fig. 6a). This suggests that the tumour mostly engages               Discussion
+in the processing of omega-6 essential fatty acids, which can give rise
+to pro-inflammatory lipid mediators, such as prostaglandin E2 (PGE2).               The advance of spatial and single-cell -omics technologies has
+                                                                                    revolutionized biology and provided insights into the genetic and
+      Taken together, we have presented 13C-SpaceM, a sensitive and                 phenotypic heterogeneity of cell populations at the levels of tissues,
+robust method for spatial isotope tracing into esterified fatty acids in            organs and whole organisms25. This is of particular importance in
+single cells, and used a similar methodology to analyse tissue sections             cancer, as tumours consist of multiple sub-clones of cancer cells as
+at near single-cell resolution. We demonstrated how this method can                 well as a highly diverse population of stromal cells that can change
+
+Nature Metabolism | Volume 6 | September 2024 | 1695­1711                                                                                                                                                                                                                                         1705
+Article                                                                       https://doi.org/10.1038/s42255-024-01118-4
+
+in a spatial and temporal manner40. Complementing the paradigm of                   Fatty acid uptake via the scavenging receptor CD36 has been
+genetic heterogeneity41, the concept of metabolic heterogeneity and           shown to facilitate metastasis formation and stem cell phenotypes
+plasticity in cancer is emerging42­44, particularly as the metabolic state    in cancer51,52. We therefore used 13C-SpaceM to determine the relative
+of cancer cells is influenced by non-genetic factors, including nutrients     proportion of de novo synthesis and uptake of five non-essential fatty
+and oxygen in the tumour microenvironment42. Recent technologi-               acids at single-cell level. This revealed substantial heterogeneity in
+cal advances in MS, including electrospray ionization (ESI), MALDI or         the relative uptake of different fatty acids, with a higher proportion
+dielectric barrier discharge ionization in combination with advanced          of uptake for palmitoleate and oleate compared with palmitate, sug-
+computational methods enabled the detection of polar metabolites              gesting high demand for MUFAs. Moreover, ACLY silencing caused a
+and lipids from single cells30,31,45. While these methods have provided       general shift from de novo synthesis to uptake of palmitate and oleate,
+unprecedented insight into the metabolic states of single cells, they         consistent with a recent single-cell lipidomics study observing reduced
+fail to capture dynamic metabolic processes or flexibility of the meta-       levels of PC species containing saturated and MUFAs upon chemical
+bolic network. Stable isotope tracing has emerged as gold-standard to         inhibition of ACLY in pancreatic cancer cells30.
+reveal metabolic activity in cells and tissues in bulk46 and in a spatially
+resolved manner38,47, but was so far not demonstrated in single cells,              We also applied our methodology to brain sections from mice
+mostly due to sensitivity limits.                                             bearing glioma xenografts, enabling the visualization of different
+                                                                              esterified fatty acids in tumour and non-tumour tissue. This revealed
+      We developed 13C-SpaceM, a method to combine stable isotope             highly selective partitioning of individual fatty acid species to specific
+tracing with spatial single-cell metabolomics to monitor de novo fatty        brain structures, which could be further explored by integrating our
+acid biosynthesis at single-cell resolution. 13C-SpaceM builds upon the       results with spatial transcriptomics data from the brain atlas26 or future
+previously published SpaceM method31 with several modifications,              correlative studies combining imaging MS and other spatial omics
+including additional data analysis for the quantification of multiple         techniques. We also used tissue from mice fed a liquid diet containing
+isotopologues of fatty acids. In particular, we included a binomial           U-13C-glucose for 48h to achieve deep labelling of the entire metabolic
+model to determine the labelling degree of the lipogenic acetyl-CoA           network, including lipids53. Isotopologue analysis revealed a strong
+pool from fatty acid isotopologue data for individual cells48. The use        induction of synthesis of SFAs, myristate, palmitate and stearate, in
+of AIF to release esterified fatty acids results in high sensitivity and      tumour tissue compared with the surrounding brain, thus confirming
+resolution. Nevertheless, this largely restricts our analysis to fatty acids  previous results obtained in the same model38. This is in agreement
+released from a subset of lipid classes that are effectively ionized in       with previous studies indicating that fatty acid synthesis is required for
+negative mode, primarily acidic glycerophospholipids. Despite these           brain metastasis in breast and other cancers54,55. However, by compar-
+limitations, this approach is sufficient to determine the contribution of     ing isotopologue patterns between saturated and MUFAs, we found
+a labelled substrate (for example glucose) into the lipogenic acetyl-CoA      that tumours contained a high proportion of MUFA not derived from
+pool based on isotopologue distribution of fatty acids, which was a           de novo synthesis, suggesting that these may be taken up. This was
+major aim of this study.                                                      unexpected, as it has been proposed that MUFAs are relatively scarce
+                                                                              in in the brain microenvironment, making desaturation an essential
+      We validated the ability of 13C-SpaceM to detect changes in             metabolic requirement for brain metastasis55. Monitoring metabolism
+glucose-dependent fatty acid synthesis at single-cell resolution by           using 13C-imaging MS coupled to AIF thus provides insight into dynamic
+co-plating cells from different metabolic states (hypoxia/normoxia).          fatty acid provision in tumour and healthy tissues.
+This model was chosen as hypoxia leads to a global reprogramming of
+lipid metabolism10. Spatial single-cell isotope tracing by 13C-SpaceM               In addition, we used the palmitate isotopologue distribution to
+clearly separated the two cell populations based on the strong                determine acetyl-CoA labelling in tumour tissue in a spatial manner.
+increase in palmitate M+0 fraction in hypoxic cells. This is caused by        This revealed substantial spatial heterogeneity, possibly caused by
+inhibition of pyruvate dehydrogenase49, leading to reduced flux of            differences in local availability of nutrients and oxygen in different
+glucose carbons into the TCA cycle and subsequently the lipogenic             tumour areas or by genetic heterogeneity of the implanted cells. The
+acetyl-CoA pool. Hypoxia also promotes the reductive carboxyla-               observed differences in palmitate isotopologue pattern, increase in
+tion of glutamine19,20 and synthesis of acetyl-CoA from acetate21,22. In      M+0 and shift toward isotopologues with lower mass were remarkably
+addition, hypoxia reduces fatty acid synthesis and stimulates fatty           similar to those observed after exposure of cancer cells to experimental
+acid uptake18,50 which also increases the proportion of the palmitate         hypoxia or silencing of ACLY. It has been shown that ACLY promotes
+M+0 fraction.                                                                 cell migration in glioblastoma through mechanisms involving histone
+                                                                              modification56. Moreover, a recent spatial transcriptomics and prot-
+      We also assessed the application of 13C-SpaceM to monitor the           eomics study defined hypoxia as a major driver of long-range tissue
+effect of genetic perturbations of the metabolic network. Bulk and            organization in glioma57. It will be interesting to integrate 13C-SpaceM
+single-cell analyses revealed a marked shift in palmitate isotopologue        data with other spatial approaches to obtain deeper insight into mecha-
+distribution following silencing of ACLY, the enzyme catalysing the           nisms of metabolic heterogeneity in cancer.
+conversion of citrate to acetyl-CoA. Using a binomial model to quantify
+fractional labelling from the isotopologue distribution21, we estimated             Finally, we applied our methodology to analyse the metabolism
+the labelling degree of acetyl-CoA in control and ACLY-silenced single        of essential fatty acids in glioma. Notably, tumours showed evidence
+cells. In agreement with previous studies using bulk analysis in ACLY         for elongation and desaturation of omega-6 essential fatty acids. This
+wild-type versus knockout mouse embryo fibroblasts23, silencing of            agrees with elevated expression enzymes responsible for the metabo-
+ACLY caused a reduction in the fractional labelling of acetyl-CoA from        lism of omega-6 essential fatty acids observed in human low-grade
+glucose but only a minor increase in the M+0 fraction of palmitate.           glioma. Altered fatty acid metabolism is a hallmark of glioma58 and
+This suggests that other substrates, such as acetate, are used to syn-        an increase in the ratio of omega-3 and omega-6 fatty acids has been
+thesize acetyl-CoA when ACLY is absent23. We also revealed substantial        described as a marker of aggressive disease59.
+heterogeneity in fractional labelling of lipogenic acetyl-CoA within the
+ACLY-silenced cell populations, suggesting differences in efficiency                Our results present 13C-SpaceM as a methodology for spatial
+of the shRNA sequences completely obscured in the bulk analysis.              single-cell isotope tracing, able to monitor de novo fatty acid syn-
+As acetyl-CoA is also a substrate for protein post-translational modi-        thesis, composition of lipogenic acetyl-CoA and fatty acid uptake in
+fication, methods to quantify acetyl-CoA synthesis from different             heterogenous cell populations exposed to genetic and environmental
+substrates at single-cell level can provide insight into genetic and          perturbations. Through additional modifications of this approach,
+environmental factors that drive heterogeneity in cancer.                     for example by applying different metabolic tracers or by selecting
+                                                                              specific subsets of lipids using ion mobility separation, 13C-SpaceM
+
+Nature Metabolism | Volume 6 | September 2024 | 1695­1711                     1706
+Article                                                                       https://doi.org/10.1038/s42255-024-01118-4
+
+could provide more specific information about lipid metabolism at             Proteins were separated by SDS­PAGE and blotted onto PVDF mem-
+single-cell resolution. Furthermore, with increased spatial resolution        brane (Immobilon), treated with blocking solution (5% BSA) and incu-
+of MALDI imaging, and by complementing the analysis with single-cell          bated with primary and secondary antibodies in 5% BSA. Signals were
+segmentation in microscopy images, this method could be extended              detected on a ChemiDoc (Bio-Rad). Antibodies used were anti-ACLY
+to single-cell isotope tracing in tissue sections. Finally, results can also  (Cell Signalling, 4331) at 1:100 dilution and anti--tubulin (Cell Signal-
+be integrated with other spatial omics data, such as transcriptomics or       ling, 2148) at 1:5,000 dilution.
+proteomics, to obtain deeper insight into the metabolic programmes
+of cells and tissues.                                                         ACLY knockdown
+                                                                              For the ACLY knockdown, we used the same primary murine liver
+Limitations                                                                   cancer cells as in the hypoxia model. shRNA sequences targeting
+Fatty acids analysed using the MALDI-AIF method applied here are              murine ACLY or non-targeting controls were cloned into LT3-GEPIR
+derived from a subset of lipids that are effectively ionized in the negative  (Addgene); the shRNA sequences used were (TGCTGTTGACAGTGA
+mode. Some abundant lipid species, including phospatidylcholines,             GCGACCGCAGCAAAGATGTTCAGTATAGTGAAGCCACAGATGTATACT
+triglycerides and sphingomyelins, are underrepresented. Compar-               GAACATCTTTGCTGCGGCTGCCTACTGCCTCGGA), (TGCTGTTGAC
+ing data from MALDI-AIF with bulk MS after saponification revealed            AGTGAGCGAACCAGTGTCTACTTATGTCAATAGTGAAGCCACAGATGTAT
+high concordance, indicating that fatty acids in the lipids sampled           TGACATAAGTAGACACTGGTCTGCCTACTGCCTCGGA) and (TGCTGTTG
+by MALDI-AIF are representative of the total lipidome. Notably, iso-          ACAGTGAGCGCAGGAATTATAATGCTTATCTATAGTGAAGCCACAGATG
+topologue distribution of fatty acids derived from de novo synthesis          TATAGATAAGCATTATAATTCCTATGCCTACTGCCTCGGA) for ACLYkd
+faithfully reflects labelling degree of the lipogenic acetyl-CoA pool at      oligo 1, oligo 2 and non-targeting control, respectively. Lentiviral par-
+isotopic steady state independently of the identity of sampled lipids.        ticles were produced in HEK293 cells after transient transfection of
+However, the selectivity of the MALDI-AIF method has to be considered         the packaging vectors psPAX.2 and pMD.G2 (Addgene, #12260 and
+for the estimation of fatty acid uptake, as the proportion of fatty acids     #12259). After viral transduction, liver cancer cells were selected with
+derived from uptake may differ depending on lipid class. In addition,         puromycin and used at low passage. Induction of shRNA expression was
+our methodology can only provide information on relative substrate            achieved by treating cells with 1µgml-1 doxycycline (Sigma) for 72h.
+contribution to the lipogenic acetyl-CoA pool as opposed to absolute          For stable isotope tracing, cells were cultured in glucose-free DMEM
+contribution, as the size of this pool cannot be quantified. Increased        supplemented with U13C6-glucose (Cambridge Isotope laboratory) and
+relative contribution from one substrate can either be caused by an           1mM acetate for 72 h.
+increase in absolute contribution or by reduced contribution from
+another source. This limitation could be partially overcome by measur-        Analysis of fatty acids and lipids using LC­MS
+ing relative contribution of several substrates in parallel. It also has to   For bulk LC­MS, cells were washed with cold 154mM ammonium
+be considered that different fatty acid pools may reach isotopic steady       acetate, snap frozen in liquid nitrogen and collected in methanol:H2O
+state at different times after label addition. Accurate quantification        (80:20, v/v) with added standards (for fatty acids, 10µl 100µM
+of the relative contribution of de novo synthesis and uptake for dif-         palmitate-2,2-D2 (Eurisotop, DLM-1153-0)/1×106 cells For lipids
+ferent fatty acid species may require previous determination of time          (SPLASH LIPIDOMIX, Avanti Polar Lipids, 330707-1EA) 10l per sam-
+required to reach isotopic steady state. In the case of the in vivo model,    ple). Subsequently, 30l 0.2M HCl, 2×100l CHCl3 and 2×100l H2O
+isotopic steady state was likely not reached for fatty acids within the       was then added with vortexing in between. The suspension was centri-
+48-h labelling period38. Thus, labelling data need to be interpreted          fuged at 16,000g for 5min at room temperature, the lower lipid phase
+under consideration of pool size data. Of note, this limitation does          was then washed with synthetic polar phase (CH3Cl:methanol:H2O,
+not apply to the assessment of substrate contribution to the lipogenic        58:33:8, v/v/v) and evaporated to dryness under N2 at 45°C. For lipid-
+acetyl-CoA pool, as isotopic steady state for this pool is reached within     omics the samples were resuspended and subjected to LC­MS analysis.
+a few hours of labelling32.                                                   For fatty acid analysis lipid extract was saponified by resuspension in
+                                                                              methanol:H2O (80:20, v/v) containing 0.3M KOH, heating at 80°C for
+Methods                                                                       1h and washed twice with 0.5ml hexane. After addition of 50l formic
+                                                                              acid, fatty acids were subsequently extracted twice with 0.5ml hexane
+Cell culture for the normoxia-hypoxia model                                   and evaporated to dryness under N2 at 45°C. For LC­MS analysis the
+Primary murine liver cancer cells derived from a Myc- and Akt-driven          fatty acids, were dissolved in 100l isopropanol and 5l of each sample
+tumour model (MycOE; AktMyr; Tp53-/-)15 were a gift from D. Dauch (Uni-       was applied to a C8 column (Accucore C8 column, 2.6-µm particle size,
+versity of Tübingen). HEK293 cells were from ATCC and used at low             50×2.1mm, Thermo Fisher Scientific) at 40°C, with mobile phase A
+passage. Cells were cultured in glucose-free DMEM (Sigma Aldrich) sup-        consisting of 0.1% formic acid in CH3CN:H2O (10:90, v/v) and solvent
+plemented with 1mM acetate, 2mM glutamine and 10% dialysed FCS                B consisting of 0.1% formic acid in CH3CN:H2O (90:10, v/v). The flow
+after addition of 25mM of either 12C-glucose (Sigma) or U-13C-glucose         rate was maintained at 350lmin-1 and eluent was directed to the
+(Cambridge Isotopes) in a 37°C incubator with 5% CO2 either under             ESI source of a mass spectrometer from 3min to 27min after sample
+normoxia (20% O2) or hypoxia (0.5% O2) for 72h. The time point of 72h         injection. MS analysis was performed on a Q Exactive Plus Orbitrap
+was chosen to make sure that isotopic steady state for palmitate had          mass spectrometer (Thermo Fisher Scientific) applying the following
+been reached. Hypoxic conditions (0.5% O2) were induced in a hypoxia          settings: sheath gas, 30; spray voltage, 2.6kV. Capillary temperature
+workstation (H35, Don Whitley). The cells cultured under hypoxic              320°C, aux gas heater temperature: 120°C and S-lens voltage was
+conditions were modified to express GFP as a marker. For co-plating           55. A full scan range from 150 to 460 (m/z) in negative ion mode was
+experiments, normoxic and hypoxic cells were detached using trypsin,          used. The resolution was set at 70,000. The maximum injection time
+mixed using 10,000 cells of each condition, plated on the same glass          was 100ms with an AGC target of 1×106. For lipidomic analysis, lipids
+slide and allowed to attach for 3h before fixation.                           were separated on a C8 column (Accucore C8 column, 2.6µm particle
+                                                                              size, 50×2.1mm, Thermo Fisher Scientific) mounted on an Ulitmate
+Western blot analysis                                                         3000 HPLC (Thermo Fisher Scientific) and heated to 40°C. The mobile
+Cells were lysed in RIPA buffer (150mM NaCl, 50mM Tris, pH 8.0, 1%            phase buffer A consisted of 0.1% formic acid in CH3CN:H2O (10:90,
+(v/v) NP-40, 0.5% (w/v) sodium deoxycholate and 0.1% (w/v) SDS) with          v/v) and buffer B consisted of 0.1% formic acid in CH3CN:IPOH:H2O
+protease and phosphatase inhibitors for 30min and cleared by cen-             (45:45:10, v/v/v). After injection of a 3-µl lipid sample, 20% solvent B
+trifugation. Proteins were quantified using BCA (Thermo Scientific).
+
+Nature Metabolism | Volume 6 | September 2024 | 1695­1711                     1707
+Article                                                                     https://doi.org/10.1038/s42255-024-01118-4
+
+was maintained for 2min, followed by a linear increase to 99.5% B within    MALDI imaging of single-cell samples
+5min, which was maintained for 27min. After returning to 20% B within       The MALDI matrix 1,5-diaminonaphthalene (DAN) was applied to a sur-
+1min, the column was re-equilibrated at 20% B for 5min, resulting in a      face density of 3gm-2 immediately before MALDI analysis using a TM
+total run time of 40min. The flow rate was maintained at 350µlmin-1         sprayer (HTX Technologies). Atmospheric pressure MALDI imaging was
+and the eluent was directed to the ESI source of the QE Plus from 2 to      performed using an AP-SMALDI5 ion source (TransMIT) coupled to a Q
+35min. MS analysis was performed on a Q Exactive Plus mass spectrom-        Exactive Plus Orbitrap mass spectrometer (Thermo Fisher Scientific).
+eter (Thermo Fisher Scientific) applying the following settings: scan       Raster pitch was 10×10m, with the laser attenuator angle set to 33°.
+settings, scan range of 200­1,600m/z in full MS mode with switching         The MS method used was set up as AIF in negative ion mode, with an
+polarities (neg/pos) and data-dependent fragmentation; resolution of        isolation range of 600­1,000m/z and a scan range of 100­400m/z at
+70,000, AGC target of 1E6; max. injection time of 50ms. HESI source         140,000 resolution with 500ms maximum ion injection time. Frag-
+parameters: sheath gas of 30; aux gas of 10; sweep gas of 3; spray voltage  mentation was performed using higher-energy collisional dissociation
+of 2.5kV; capillary temperature of 320°C; S-lens RF level of 55.0; aux      at a normalized collision energy (NCE) of 25. This energy level was
+gas heater temperature of 55°C; fragmentation settings: resolution of       determined by a manual stepped collision energy experiment, where
+17,500; AGC target of 1E5; and max. injection time of 50ms. Peaks cor-      we saw no improvement in fatty acid signal/noise by going as high as
+responding to the calculated fatty acid or lipid masses (±5ppm) were        45 NCE. Only one collision energy can be used per ion injection and one
+integrated using El-Maven (https://resources.elucidata.io/elmaven)          ion injection was performed per pixel. Thus, data acquisition for this
+and correction for natural 13C isotopic abundance was conducted             type of experiment is limited to one collision energy.
+using IsoCorrectoR60.
+                                                                            SpaceM analysis
+Analysis of fatty acid distribution and isotopologue                        The 13C-SpaceM method is based on SpaceM described in detail previ-
+distribution by direct infusion MS                                          ously31. The key differences are in using AIF (see `MALDI imaging of
+For the analysis of fatty acid distribution and isotopologue dis-           single-cell samples' section) and processing obtained profiles (see the
+tribution using direct infusion, saponified fatty acids, collected          respective section of Methods). In brief, SpaceM integrates microscopy
+as described above, were resuspended in 50:50 solution A and B              images and the MALDI images by detecting the MALDI ablation marks,
+(A, H2O:ACN:isopropanol 2:10:88 and B, H2O:ACN 60:40 both with              overlaying them with the segmented cells and performing ablation
+10mM ammonium acetate). Samples were injected by direct infusion at         marks-cells deconvolution by applying a mathematical formula. This
+20lmin-1 for 2min whereas spectra were acquired for a total of 8min         results in single-cell profiles of molecules detected by the MALDI imag-
+(3min before and after injection to establish baseline) using the follow-   ing MS.
+ing scan parameters: full MS scan range of 69­1,000m/z, AGC target
+1×106, resolution of 70,000 in negative mode, maximum injection time        Constructing single-cell isotopologue profiles. MALDI images for
+100ms. HESI source parameters were as follows, sheath gas flow rate 6,      unlabelled samples were annotated with METASPACE62 at 5% false dis-
+spray voltage 3.20kV, S-lens RF level 50 and aux gas temperature 120°C.     covery rate to determine the most abundant detected fatty acids. For
+For AIF, samples were not saponified and lipid extract was resuspended      each fatty acid, intensities corresponding to theoretical isotopologue
+the same as described above. All parameters were the same except            peak masses were extracted. Raw intensities were normalized for natu-
+that the scan type was AIF, precursor masses were collected in the          ral isotope abundance using IsoCor63, after which every isotopologue
+range of 600­1,000m/z, the scan range was 200­350m/z, fragmenta-            distribution was normalized by its sum. Ablation marks with a total raw
+tion was carried out using CE of 50 and the maximum injection time          intensity of less than 200 for a given fatty acid were removed from the
+was 200ms.                                                                  analysis. Ablation marks which had at least 30% overlap with the cell mask
+                                                                            were considered intracellular. After normalizing spectra in each pixel,
+Microscopy                                                                  the median of values in the intracellular ablation marks was assigned as a
+After cell culturing, the cells were washed with PBS, fixed using Histofix  single-cell readout for each isotopologue peak. The resulting single-cell
+(Roth, 87.3) for 10min, stained using 4,6-diamidino-2-phenylindole          isotopologue distribution for every fatty acid was normalized by its sum
+(DAPI), washed 3× in PBS and then desiccated in a Lab Companion Cabi-       again. Scanpy v.1.8.1 (ref. 64) was used for all single-cell data analysis.
+net Vacuum Desiccator for 30min at room temperature and -0.08MPa.
+Pre-MALDI brightfield and fluorescent microscopy (620 and 460nm)            Calculation of single-cell features. For each well of a multi-well
+images were obtained with a DS-Qi2 camera (Nikon Instruments) with          slide, the median intensity of the GFP channel outside the cell masks
+a Plan Fluor ×10 (numerical aperture of 0.30) objective (Nikon Instru-      was subtracted from the image and the logarithm of the maximum
+ments) mounted on a Ti-E inverted microscope (Nikon Instruments).           GFP intensity inside the cell mask was used to characterize single-cell
+The pixel size was 0.64m. For the hypoxia experiment, additional            GFP signal. Both in normoxia/hypoxia and in ACLYkd experiments, the
+pre-desiccation microscopy images were collected. Rigid registration        95th percentile of the GFP signal in the GFP-negative wells was used as
+of pre-desiccation and post-desiccation microscopy images was per-          a threshold to assign cells to either GFP-positive or GFP-negative state.
+formed using the Affinder plugin in Napari (https://www.napari-hub.
+org/plugins/affinder). The cells were imaged in brightfield micros-               In addition to the normalized isotopologue peak intensities, a
+copy after MALDI imaging, using the same microscopy setup and               binomial model for the fatty acid synthesis described previously32
+parameters.                                                                 was used. Fatty acids are synthesized by randomly taking two-carbon
+                                                                            monomers from the cytosolic acetyl-CoA pool. Therefore, if the frac-
+Microscopy image analysis                                                   tion of labelled monomers equals p, the probability that a given fatty
+Cells in the brightfield channel of pre-MALDI microscopy were seg-          acid has 2i labelled carbons can be described with the following model:
+mented using a custom Cellpose model61 trained on manually anno-
+tated fragments of images. Since the primary cell culture contains cells                            Pbinom (k) = (nk)pk(1 - p)n-k, k = 0, 1, ... , n
+of varying size, segmentation for the largest cells had to be manually
+corrected. Ablation marks were detected in the post- MALDI micros-                                    I0 = Uptake + (1 - uptake) × Pbinom(0)
+copy by manually fitting a grid of circular shapes. Registration of the
+pre- and post-MALDI images was carried out using the SpaceM software                                Ii = (1 - uptake) × Pbinom(i), i = 1, 2, ... , n
+tool as previously published31.
+
+Nature Metabolism | Volume 6 | September 2024 | 1695­1711                   1708
+Article                                                                         https://doi.org/10.1038/s42255-024-01118-4
+
+where uptake is the fraction of the unlabelled FA directly taken from the       the rest of the tissue section). The same normalization and AcCoA pool
+medium, p is the labelling degree of cytosolic acetyl-CoA pool and n is         labelling degree modelling was applied as for the cells and figures
+the number of acetyl-CoA molecules used for the synthesis (number of            were exported as spatial heatmaps using the same custom script as
+carbons in the fatty acid/2). Longer fatty acids can be synthesized both        for single-cell data
+using labelled palmitate made by the cell de novo and unlabelled palmi-
+tate; therefore, we used a modified model for stearate and oleate (C18):        Statistics and reproducibility
+                                                                                No statistical method was used to predetermine sample size. No
+                          I0 = Uptake + (1 - uptake) × Pbinom (0)               statistical method was used to determine sample size. Single-cell
+                                                                                experiments were performed on a single biological replicate, cov-
+           I1 = (1 - uptake) × (uptakeC16 + (1 - uptakeC16) × Pbinom (1))       ering between 900­2,000 cells per condition. The variance was a
+                                                                                result of different cell densities for the same imaged area. The mouse
+            Ii = (1 - uptake) × (1 - uptakeC16) × Pbinom(i), i = 2, 3, ... , n  experiments were performed on four different mice, plus one animal
+                                                                                without the isotope labelling treatment for use as control. This sample
+where uptakeC16 is the fraction of palmitate (C16) taken from the               number was determined by sample availability from a previous study
+medium.                                                                         and no sample size dependent statistics were used. There were no
+                                                                                relevant sample groups in this study for which randomization was
+      Fitting a binomial model to the single-cell isotopologue distri-          applicable. One out of six technical replicates for the co-cultured
+butions allows summarizing them as two numbers: uptake, which                   cells (wild-type and ACLYkd oligo 2) was excluded as it did not pass
+characterizes the fraction of the fatty acid which was not synthesized          quality control. Investigators were not blinded to allocation during
+de novo but directly taken from the medium and acetyl-CoA pool label-           experiments and outcome assessment. No animals were excluded from
+ling degree p, which describes relative contribution of the labelled            the analysis.
+substrate to the fatty acid synthesis compared with other carbon sub-
+strates consumed by the cell. The limitation of this method is that if          Reporting summary
+overall substrate usage is very low, such as in the hypoxia/normoxia            Further information on research design is available in the Nature
+experiment, it becomes impossible to reliably fit a binomial distribu-          Portfolio Reporting Summary linked to this article.
+tion and estimate the uptake fraction, therefore it was only used for
+the ACLYkd experiment data analysis.                                            Data availability
+
+Orthotopic glioma mouse model                                                   All MALDI data in this paper are available at https://metaspace2020.
+Tissue sections were prepared from mouse brains used for a previ-               eu/project/buglakova-2024. Raw data and the final single-cell data are
+ous study38. The experiments were approved by the Institutional Ani-            available through accession no. S-BSST1436. Source data are provided
+mal Care and Use Committee at Washington University (assurance                  with this paper.
+no. A338101, protocol 19-0930 and 22-0304) and were performed
+in accordance with the recommendations in the Guide for the Care                Code availability
+and Use of Laboratory Animals of the National Institutes of Health
+(NIH). In brief, murine glioma cells (GL261-RFP, transduced with IDH1           The code for producing the results and figures is available at https://
+R132H) were implanted into female mice (C57BL/6J, 8 weeks old). After           github.com/Buglakova/13C-SpaceM.
+8 days, mice were fed a liquid diet containing unlabelled glucose or
+U-13C-labelled glucose (Cambridge Isotope Laboratories) ad libitum              References
+for 48h as previously described38,53. Brains were embedded in 5% wt.
+carboxymethyl cellulose in water and stored at -80°C. The 10-µm thick           1. Harayama, T. & Riezman, H. Understanding the diversity of
+sections were collected on Superfrost Plus slides (Thermo Fisher Sci-                 membrane lipid composition. Nat. Rev. Mol. Cell Biol. 19,
+entific), dried under vacuum, stored at -80°C and shipped on dry-ice.                 281­296 (2018).
+Serial 10-µm thick tissue sections were mounted on Superfrost Plus
+slides in Fluoroshield mounting medium with DAPI (aqueous, Abcam)               2. Farese, R. V. Jr & Walther, T. C. Lipid droplets finally get a little
+and used for fluorescence microscopy to verify tumour location on a                   R-E-S-P-E-C-T. Cell 139, 855­860 (2009).
+Leica DMi8 Thunder Imager (RFP, excitation 540­580, DC 585, emission
+592­668 and exposure 1.3s; DAPI, excitation 375­435, DC 455, emission           3. Wang, D. & Dubois, R. N. Eicosanoids and cancer. Nat. Rev. Cancer
+450­490, exposure 59ms)38.                                                            10, 181­193 (2010).
+
+MALDI tissue imaging                                                            4. Park, J. B. et al. Phospholipase signalling networks in cancer.
+Imaging of brain sections was performed using the same sample prepa-                  Nat. Rev. Cancer 12, 782­792 (2012).
+ration method and instrumentation described for single cells. For each
+whole-brain section, one image of the tumour and immediate environ-             5. Vanhaesebroeck, B., Stephens, L. & Hawkins, P. PI3K signalling:
+ment was first acquired at 10×10µm pitch, followed by an image of the                 the path to discovery and understanding. Nat. Rev. Mol. Cell Biol.
+rest of the tissue section at 50µm pitch. The laser attenuation angle                 13, 195­203 (2012).
+was set to 32°, the isolation range was 600­1,600m/z, product scan
+range 100­600m/z and the NCE set to 30.                                         6. Currie, E., Schulze, A., Zechner, R., Walther, T. C. & Farese, R. V. Jr.
+                                                                                      Cellular fatty acid metabolism and cancer. Cell Metab. 18, 153­161
+Data analysis for tissue imaging                                                      (2013).
+Each tissue image was converted to the imzML format and annotated
+with METASPACE62 in the same way as the single-cell data. Compared              7. Rohrig, F. & Schulze, A. The multifaceted roles of fatty acid
+with processing data from the cells, no cell segmentation was per-                    synthesis in cancer. Nat. Rev. Cancer 16, 732­749 (2016).
+formed and all data analysis was performed on single MALDI pixels
+(with the pitch of 10µm within the tumour area and with 50µm within             8. Snaebjornsson, M. T., Janaki-Raman, S. & Schulze, A. Greasing
+                                                                                      the wheels of the cancer machine: the role of lipid metabolism in
+                                                                                      cancer. Cell Metab. 31, 62­76 (2020).
+
+                                                                                9. Koundouros, N. & Poulogiannis, G. Reprogramming of fatty acid
+                                                                                      metabolism in cancer. Br. J. Cancer 122, 4­22 (2020).
+
+                                                                                10. Munir, R., Lisec, J., Swinnen, J. V. & Zaidi, N. Lipid metabolism
+                                                                                      in cancer cells under metabolic stress. Br. J. Cancer 120,
+                                                                                      1090­1098 (2019).
+
+                                                                                11. Peck, B. & Schulze, A. Lipid desaturation - the next step in
+                                                                                      targeting lipogenesis in cancer? FEBS J. 283, 2767­2778
+                                                                                      (2016).
+
+Nature Metabolism | Volume 6 | September 2024 | 1695­1711                       1709
+Article                                                                      https://doi.org/10.1038/s42255-024-01118-4
+
+12. Griffiths, B. et al. Sterol regulatory element binding                   35. Tumanov, S. & Kamphorst, J. J. Recent advances in expanding
+      protein-dependent regulation of lipid synthesis supports cell                the coverage of the lipidome. Curr. Opin. Biotechnol. 43, 127­133
+      survival and tumor growth. Cancer Metab. 1, 3 (2013).                        (2017).
+
+13. Young, R. M. et al. Dysregulated mTORC1 renders cells critically         36. Donnelly, K. L. et al. Sources of fatty acids stored in liver and
+      dependent on desaturated lipids for survival under tumor-like                secreted via lipoproteins in patients with nonalcoholic fatty liver
+      stress. Genes Dev. 27, 1115­1131 (2013).                                     disease. J. Clin. Invest. 115, 1343­1351 (2005).
+
+14. Williams, K.J. et al. An essential requirement for the SCAP/SREBP        37. Rioux, V., Catheline, D. & Legrand, P. In rat hepatocytes, myristic
+      signaling axis to protect cancer cells from lipotoxicity. Cancer             acid occurs through lipogenesis, palmitic acid shortening and
+      Res. https://doi.org/10.1158/0008-5472.can-13-0382-t (2013).                 lauric acid elongation. Animal 1, 820­826 (2007).
+
+15. Rudalska, R. et al. LXR activation and Raf inhibition trigger lethal     38. Schwaiger-Haber, M. et al. Using mass spectrometry imaging to
+      lipotoxicity in liver cancer. Nat. Cancer 2, 201­217 (2021).                 map fluxes quantitatively in the tumor ecosystem. Nat. Commun.
+                                                                                   14, 2876 (2023).
+16. Peck, B. et al. Inhibition of fatty acid desaturation is detrimental to
+      cancer cell survival in metabolically compromised environments.        39. Martin, D. D., Beauchamp, E. & Berthiaume, L. G. Post-translational
+      Cancer Metab. 4, 6 (2016).                                                   myristoylation: fat matters in cellular life and death. Biochimie 93,
+                                                                                   18­31 (2011).
+17. Magtanong, L. et al. Exogenous monounsaturated fatty acids
+      promote a ferroptosis-resistant cell state. Cell Chem. Biol. 26,       40. Li, Z., Seehawer, M. & Polyak, K. Untangling the web of
+      420­432 e429 (2019).                                                         intratumour heterogeneity. Nat. Cell Biol. 24, 1192­1201 (2022).
+
+18. Kamphorst, J. J. et al. Hypoxic and Ras-transformed cells                41. Hausser, J. & Alon, U. Tumour heterogeneity and the evolutionary
+      support growth by scavenging unsaturated fatty acids from                    trade-offs of cancer. Nat. Rev. Cancer 20, 247­257 (2020).
+      lysophospholipids. PNAS 110, 8882­8887 (2013).
+                                                                             42. Kim, J. & DeBerardinis, R. J. Mechanisms and implications of
+19. Metallo, C. M. et al. Reductive glutamine metabolism by IDH1                   metabolic heterogeneity in cancer. Cell Metab. 30, 434­446
+      mediates lipogenesis under hypoxia. Nature 481, 380­384 (2011).              (2019).
+
+20. Wise, D. R. et al. Hypoxia promotes isocitrate                           43. Demicco, M., Liu, X. Z., Leithner, K. & Fendt, S. M. Metabolic
+      dehydrogenase-dependent carboxylation of alpha-ketoglutarate                 heterogeneity in cancer. Nat. Metab. 6, 18­38 (2024).
+      to citrate to support cell growth and viability. PNAS 108, 19611­
+      19616 (2011).                                                          44. Davis, R. T. et al. Transcriptional diversity and bioenergetic shift
+                                                                                   in human breast cancer metastasis revealed by single-cell RNA
+21. Kamphorst, J. J., Chung, M. K., Fan, J. & Rabinowitz, J. D.                    sequencing. Nat. Cell Biol. 22, 310­320 (2020).
+      Quantitative analysis of acetyl-CoA production in hypoxic cancer
+      cells reveals substantial contribution from acetate. Cancer Metab.     45. Fujii, T. et al. Direct metabolomics for plant cells by live single-cell
+      2, 23 (2014).                                                                mass spectrometry. Nat. Protoc. 10, 1445­1456 (2015).
+
+22. Schug, Z. T. et al. Acetyl-CoA synthetase 2 promotes acetate             46. Jang, C., Chen, L. & Rabinowitz, J. D. Metabolomics and isotope
+      utilization and maintains cancer cell growth under metabolic                 tracing. Cell 173, 822­837 (2018).
+      stress. Cancer Cell 27, 57­71 (2015).
+                                                                             47. Wang, L. et al. Spatially resolved isotope tracing reveals tissue
+23. Zhao, S. et al. ATP-citrate lyase controls a glucose-to-acetate                metabolic activity. Nat. Methods 19, 223­230 (2022).
+      metabolic switch. Cell Rep. 17, 1037­1052 (2016).
+                                                                             48. Kharroubi, A. T., Masterson, T. M., Aldaghlas, T. A., Kennedy, K. A.
+24. Bulusu, V. et al. Acetate recapturing by nuclear acetyl-CoA                    & Kelleher, J. K. Isotopomer spectral analysis of triglyceride fatty
+      synthetase 2 prevents loss of histone acetylation during oxygen              acid synthesis in 3T3-L1 cells. Am. J. Physiol. 263, E667­E675
+      and serum limitation. Cell Rep. 18, 647­658 (2017).                          (1992).
+
+25. Heath, J. R., Ribas, A. & Mischel, P. S. Single-cell analysis tools      49. Kim, J. W., Tchernyshyov, I., Semenza, G. L. & Dang, C. V. HIF-
+      for drug discovery and development. Nat. Rev. Drug Discov. 15,               1-mediated expression of pyruvate dehydrogenase kinase: a
+      204­216 (2016).                                                              metabolic switch required for cellular adaptation to hypoxia. Cell
+                                                                                   Metab. 3, 177­185 (2006).
+26. Yao, Z. et al. A high-resolution transcriptomic and spatial atlas of
+      cell types in the whole mouse brain. Nature 624, 317­332 (2023).       50. Bensaad, K. et al. Fatty acid uptake and lipid storage induced
+                                                                                   by HIF-1alpha contribute to cell growth and survival after
+27. Duncan, K. D., Fyrestam, J. & Lanekoff, I. Advances in mass                    hypoxia-reoxygenation. Cell Rep. 9, 349­365 (2014).
+      spectrometry based single-cell metabolomics. Analyst 144,
+      782­793 (2019).                                                        51. Samovski, D., Jacome-Sosa, M. & Abumrad, N. A. Fatty acid
+                                                                                   transport and signaling: mechanisms and physiological
+28. Ellis, J. M. & Wolfgang, M. J. A genetically encoded metabolite                implications. Annu. Rev. Physiol. https://doi.org/10.1146/
+      sensor for malonyl-CoA. Chem. Biol. 19, 1333­1339 (2012).                    annurev-physiol-032122-030352 (2022).
+
+29. Guo, Z. et al. Single-cell profiling of fatty acid uptake using          52. Pascual, G. et al. Targeting metastasis-initiating cells through the
+      surface-immobilized dendrimers. J. Am. Chem. Soc. 143, 11191­                fatty acid receptor CD36. Nature 541, 41­45 (2017).
+      11198 (2021).
+                                                                             53. Sun, R. C. et al. Noninvasive liquid diet delivery of stable isotopes
+30. Liu, Q. et al. High-throughput single-cell mass spectrometry                   into mouse models for deep metabolic network tracing. Nat.
+      reveals abnormal lipid metabolism in pancreatic ductal                       Commun. 8, 1646 (2017).
+      adenocarcinoma. Angew. Chem. Int. Ed. Engl. 60, 24534­24542
+      (2021).                                                                54. Jin, X. et al. A metastasis map of human cancer cell lines. Nature
+                                                                                   588, 331­336 (2020).
+31. Rappez, L. et al. SpaceM reveals metabolic states of single cells.
+      Nat. Methods 18, 799­805 (2021).                                       55. Ferraro, G. B. et al. Fatty acid synthesis is required for breast
+                                                                                   cancer brain metastasis. Nat. Cancer 2, 414­428 (2021).
+32. Tumanov, S., Bulusu, V. & Kamphorst, J. J. Analysis of fatty acid
+      metabolism using stable isotope tracers and mass spectrometry.         56. Lee, J. V. et al. Acetyl-CoA promotes glioblastoma cell adhesion
+      Methods Enzymol. 561, 197­217 (2015).                                        and migration through Ca(2+)-NFAT signaling. Genes Dev. 32,
+                                                                                   497­511 (2018).
+33. Mullen, A. R. et al. Reductive carboxylation supports growth in
+      tumour cells with defective mitochondria. Nature 481, 385­388          57. Greenwald, A. C. et al. Integrative spatial analysis reveals a
+      (2012).                                                                      multi-layered organization of glioblastoma. Cell 187, P2485­2501.
+                                                                                   e26 (2024).
+34. Bligh, E. G. & Dyer, W. J. A rapid method of total lipid extraction
+      and purification. Can. J. Biochem Physiol. 37, 911­917 (1959).         58. Miska, J. & Chandel, N. S. Targeting fatty acid metabolism in
+                                                                                   glioblastoma. J. Clin. Invest. 133, e163448 (2023).
+
+Nature Metabolism | Volume 6 | September 2024 | 1695­1711                    1710
+Article                                                                      https://doi.org/10.1038/s42255-024-01118-4
+
+59. Elsherbiny, M. E., Emara, M. & Godbout, R. Interaction of brain          on single-cell metabolomics incubated at the BioInnovation Institute.
+      fatty acid-binding protein with the polyunsaturated fatty acid         G.J.P. is a scientific advisory board member for Cambridge Isotope
+      environment as a potential determinant of poor prognosis in            Laboratories, has collaborative research agreements with Bruker
+      malignant glioma. Prog. Lipid Res. 52, 562­570 (2013).                 Corporation and Thermo Scientific and is the chief scientific officer of
+                                                                             Panome Bio. The other authors declare no competing interests.
+60. Heinrich, P. et al. Correcting for natural isotope
+      abundance and tracer impurity in MS-, MS/MS- and                       Additional information
+      high-resolution-multiple-tracer-data from stable isotope labeling
+      experiments with IsoCorrectoR. Sci. Rep. 8, 17910 (2018).              Extended data is available for this paper at
+                                                                             https://doi.org/10.1038/s42255-024-01118-4.
+61. Stringer, C., Wang, T., Michaelos, M. & Pachitariu, M. Cellpose: a
+      generalist algorithm for cellular segmentation. Nat. Methods 18,       Supplementary information The online version
+      100­106 (2021).                                                        contains supplementary material available at
+                                                                             https://doi.org/10.1038/s42255-024-01118-4.
+62. Palmer, A. et al. FDR-controlled metabolite annotation for
+      high-resolution imaging mass spectrometry. Nat. Methods 14,            Correspondence and requests for materials should be addressed to
+      57­60 (2017).                                                          Almut Schulze, Marteinn T. Snaebjornsson or Theodore Alexandrov.
+
+63. Millard, P. et al. IsoCor: isotope correction for high-resolution MS     Peer review information Nature Metabolism thanks Giovanni
+      labeling experiments. Bioinformatics 35, 4484­4487 (2019).             D'Angelo and the other, anonymous, reviewer(s) for their contribution
+                                                                             to the peer review of this work. Primary Handling Editor: Alfredo
+64. Wolf, F. A., Angerer, P. & Theis, F. J. SCANPY: large-scale single-cell  Giménez-Cassina in collaboration with the Nature Metabolism team.
+      gene expression data analysis. Genome Biol. 19, 15 (2018).
+                                                                             Reprints and permissions information is available at
+Acknowledgements                                                             www.nature.com/reprints.
+
+We thank I. Germer and A. B. Chaves-Filho for technical assistance. We       Publisher's note Springer Nature remains neutral with regard to
+also thank L. Zender and D. Dauch for providing murine liver cancer          jurisdictional claims in published maps and institutional affiliations.
+cell lines (University Hospital Tübingen). A.S. and M.T.S. acknowledge
+funding from the German Research Foundation (FOR-2314 and                    Open Access This article is licensed under a Creative Commons
+SCHU 2670-1/2). G.J.P. acknowledges the NIH grant R35 ES028365.              Attribution 4.0 International License, which permits use, sharing,
+T.A. acknowledges funding from the European Research Council                 adaptation, distribution and reproduction in any medium or format,
+(Consolidator grant agreement no. 773089 and Proof-of-Concept                as long as you give appropriate credit to the original author(s) and the
+grant agreement no. 101101077), Swiss National Science Foundation            source, provide a link to the Creative Commons licence, and indicate
+(grant PROMETEX) and Michael J. Fox Foundation. E.B. acknowledges            if changes were made. The images or other third party material in this
+support by the Joachim Herz Foundation through an Add-on                     article are included in the article's Creative Commons licence, unless
+Fellowship for Interdisciplinary Life Science.                               indicated otherwise in a credit line to the material. If material is not
+                                                                             included in the article's Creative Commons licence and your intended
+Author contributions                                                         use is not permitted by statutory regulation or exceeds the permitted
+                                                                             use, you will need to obtain permission directly from the copyright
+T.A., E.B., M.T.S. and A.S. conceptualized the study and experimental        holder. To view a copy of this licence, visit http://creativecommons.
+design. M.T.S., E.B., M.E., L. Schlicker, M.R.M., M.S., L. Stuart, A.E. and  org/licenses/by/4.0/.
+V.H. conducted experiments and analysed data. M.S.-H. and G.J.P.
+designed the in vivo labelling experiments and prepared the in vivo          © The Author(s) 2024
+samples. T.A., E.B., M.E., M.T.S. and A.S. wrote the paper with critical
+input from all authors.
+
+Competing interests
+
+T.A. declares having a patent on single-cell metabolomics as well as
+being the scientific lead and receiving consultancy fees at a startup
+
+Nature Metabolism | Volume 6 | September 2024 | 1695­1711                    1711
+Article                                                                           https://doi.org/10.1038/s42255-024-01118-4
+
+Extended Data Fig. 1 | a) Box plots displaying mean and distribution of           acids released from total lipids isolated by saponification from normoxic cells
+normalized intensities of 11 different fatty acids detected by 13C-SpaceM in      and quantified using bulk MS with direct infusion. Error bars reflect standard
+normoxic and hypoxic cells. The box shows the quartiles of the dataset. Whiskers  deviation of the mean calculated from three biological replicates. c) Histogram
+extend to show the range from Q1 ­ 1.5 IQR to Q3+1.5 IQR, where IQR is the inter  of the distribution of cell area as determined by imaging for cells cultured in
+quartile distance. The points that do not fall inside this range are considered   normoxia and hypoxia.
+to be outliers and are shown explicitly. b) Normalized intensities of 12 fatty
+
+Nature Metabolism
+Article                                            https://doi.org/10.1038/s42255-024-01118-4
+
+Extended Data Fig. 2 | See next page for caption.
+Nature Metabolism
+Article                                                                                                         https://doi.org/10.1038/s42255-024-01118-4
+
+Extended Data Fig. 2 | a) Comparison of isotopologue profiles of palmitate     stearate and oleate derived using 13C-SpaceM from cells cultured in normoxia.
+determined by bulk mass spectrometry after saponification (left graph) and     Black lines show average values. c) Isotopologue profiles for myristate,
+all-ion fragmentation (right graph) from cells cultured in normoxia. Error     palmitoleate, stearate and oleate derived using bulk MS after saponification
+bars reflect standard deviation of the mean calculated from three biological   from cells cultured in normoxia. Error bars reflect standard deviation of the mean
+replicates. b) Single-cell isotopologue profiles for myristate, palmitoleate,  calculated from three biological replicates.
+
+Nature Metabolism
+Article            https://doi.org/10.1038/s42255-024-01118-4
+
+Extended Data Fig. 3 | a) Immunoblot of protein lysates showing efficiency of ACLY knockdown using two shRNA sequences (ACLYkd oligo1 and ACLYkd oligo 2)
+compared to non-targeting control (shNT). Tubulin B (TUBB) is shown as loading control. This is an n=1 western blot from a representative experiment using this
+knock down system for ACLY depletion.
+
+Nature Metabolism
+Article                                                                             https://doi.org/10.1038/s42255-024-01118-4
+
+Extended Data Fig. 4 | a) Isotopologue fractional images for myristate (14:0),      myristate (14:0), palmitate (16:0), palmitoleate (16:1), stearate (18:0) and oleate
+palmitate (16:0), palmitoleate (16:1), stearate (18:0) and oleate (18:1) in tumour  (18:1) in tumour tissue (tumour #2) from a mouse orthotopically implanted
+tissue (tumour #1) from a mouse orthotopically implanted with GL261 IDH1            with GL261 glioma cells and fed with a liquid diet containing U-13C6-Glucose for
+mutant glioma cells and fed with a liquid diet containing U-13C6-Glucose for        48hours. Colours represent fraction of each isotopologue of the sum of the all
+48hours. Colours represent fraction of each isotopologue of the sum of              isotopologues for each fatty acid.
+all isotopologues for each fatty acid. b) Isotopologue fractional images for
+
+Nature Metabolism
+

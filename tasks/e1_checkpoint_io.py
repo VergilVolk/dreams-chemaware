@@ -56,6 +56,10 @@ def torch_load_compat(path: str | Path, map_location: str | torch.device = "cpu"
 
 
 def checkpoint_kind(package: dict[str, Any]) -> str:
+    if package.get("format") == "chemaware_multitask_head_v1":
+        return "chemaware_multitask_head"
+    if package.get("format") == "causal_chemmask_head_v1":
+        return "causal_chemmask_head"
     if package.get("format") == "counterfactual_dreams_v1":
         return "counterfactual_dreams"
     if package.get("format") == "e1_identity_v1":
@@ -75,9 +79,7 @@ def checkpoint_kind(package: dict[str, Any]) -> str:
 
 
 def official_backbone_state(package: dict[str, Any]) -> dict[str, torch.Tensor]:
-    if package.get("format") == "counterfactual_dreams_v1":
-        return package["backbone_state_dict"]
-    if package.get("format") == "official_embedding_slim_v1":
+    if package.get("format") in {"counterfactual_dreams_v1", "official_embedding_slim_v1", "e1_identity_v1"}:
         return package["backbone_state_dict"]
     return {
         key.removeprefix("backbone."): value
@@ -87,9 +89,9 @@ def official_backbone_state(package: dict[str, Any]) -> dict[str, torch.Tensor]:
 
 
 def official_head_state(package: dict[str, Any]) -> dict[str, torch.Tensor]:
-    if package.get("format") == "counterfactual_dreams_v1":
+    if package.get("format") in {"causal_chemmask_head_v1", "chemaware_multitask_head_v1"}:
         return package["head_state_dict"]
-    if package.get("format") == "official_embedding_slim_v1":
+    if package.get("format") in {"counterfactual_dreams_v1", "official_embedding_slim_v1", "e1_identity_v1"}:
         return package["head_state_dict"]
     return {
         key.removeprefix("head."): value

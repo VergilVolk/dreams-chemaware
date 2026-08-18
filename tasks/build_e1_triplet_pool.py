@@ -32,6 +32,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--fold", choices=("train", "val"), required=True)
     parser.add_argument("--adduct", default="[M+H]+")
     parser.add_argument("--mass-window-da", type=float, default=0.05)
+    parser.add_argument(
+        "--mass-window-ppm", type=float, default=0.0,
+        help="Query-centred ppm window; when positive, overrides --mass-window-da "
+             "and also filters same-identity positive edges.",
+    )
     parser.add_argument("--peak-hash-mz-tol", type=float, default=0.01)
     parser.add_argument("--peak-hash-intensity-tol", type=float, default=0.01)
     parser.add_argument("--max-positive-candidates", type=int, default=0)
@@ -85,7 +90,7 @@ def describe_counts(values: list[int]) -> dict[str, float]:
 
 def main() -> None:
     args = parse_args()
-    if args.mass_window_da <= 0:
+    if args.mass_window_da <= 0 and args.mass_window_ppm <= 0:
         raise ValueError("--mass-window-da must be positive")
 
     output = args.output
@@ -96,7 +101,10 @@ def main() -> None:
     print(f"Data:   {args.data}")
     print(f"Fold:   {args.fold}")
     print(f"Adduct: {args.adduct}")
-    print(f"Window: +/- {args.mass_window_da:.5f} Da")
+    if args.mass_window_ppm > 0:
+        print(f"Window: +/- {args.mass_window_ppm:.3f} ppm (query-centred)")
+    else:
+        print(f"Window: +/- {args.mass_window_da:.5f} Da")
 
     with h5py.File(args.data, "r") as handle:
         folds = decode_array(handle["fold"][:])
@@ -161,15 +169,25 @@ def main() -> None:
         positive = same_ik[
             (same_ik != local_anchor) & (hashes[same_ik] != hashes[local_anchor])
         ]
+        if args.mass_window_ppm > 0:
+            positive_tolerance = precursor_mz[local_anchor] * args.mass_window_ppm * 1e-6
+            positive = positive[
+                np.abs(precursor_mz[positive] - precursor_mz[local_anchor])
+                <= positive_tolerance
+            ]
         if len(positive) == 0:
             skipped_no_positive += 1
             continue
 
+        negative_tolerance = (
+            precursor_mz[local_anchor] * args.mass_window_ppm * 1e-6
+            if args.mass_window_ppm > 0 else args.mass_window_da
+        )
         left = np.searchsorted(
-            sorted_mz, precursor_mz[local_anchor] - args.mass_window_da, side="left"
+            sorted_mz, precursor_mz[local_anchor] - negative_tolerance, side="left"
         )
         right = np.searchsorted(
-            sorted_mz, precursor_mz[local_anchor] + args.mass_window_da, side="right"
+            sorted_mz, precursor_mz[local_anchor] + negative_tolerance, side="right"
         )
         negative = mz_order[left:right]
         negative = negative[
@@ -214,6 +232,11 @@ def main() -> None:
         "fold": args.fold,
         "adduct": args.adduct,
         "mass_window_da": args.mass_window_da,
+        "mass_window_ppm": args.mass_window_ppm,
+        "window_protocol": (
+            "query_centred_ppm_positive_and_negative"
+            if args.mass_window_ppm > 0 else "fixed_da_negative_only"
+        ),
         "seed": args.seed,
         "selected_spectra": int(len(selected)),
         "unique_molecules": int(len(set(inchikeys))),

@@ -13,8 +13,8 @@ RAW = ROOT / "dreams/models/pretrained/ssl_model_server.pt"
 OFFICIAL = ROOT / "dreams/models/pretrained/embedding_model.ckpt"
 OFFICIAL_SLIM = ROOT / "data/e1/official_embedding_slim.pt"
 DATA = ROOT / "data/models/MassSpecGym_MurckoHist_split.hdf5"
-TRAIN_POOL = ROOT / "data/e1/e1_train_triplet_pool.npz"
-VAL_POOL = ROOT / "data/e1/e1_val_triplet_pool.npz"
+TRAIN_POOL = ROOT / "data/e1/e1_train_triplet_pool_10ppm.npz"
+VAL_POOL = ROOT / "data/e1/e1_val_triplet_pool_10ppm.npz"
 
 
 def parse_args() -> argparse.Namespace:
@@ -56,7 +56,7 @@ def build_pools(args: argparse.Namespace, only_if_missing: bool = False) -> None
             continue
         run([
             PYTHON, "tasks/build_e1_triplet_pool.py", "--data", str(DATA),
-            "--fold", fold, "--adduct", "[M+H]+", "--mass-window-da", "0.05",
+            "--fold", fold, "--adduct", "[M+H]+", "--mass-window-ppm", "10",
             "--output", str(output),
         ], args.dry_run)
 

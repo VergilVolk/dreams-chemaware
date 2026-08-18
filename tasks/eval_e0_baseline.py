@@ -310,7 +310,25 @@ def main():
         checkpoint_format = checkpoint_kind(pkg)
         head_state = None
 
-        if checkpoint_format in ('e1_identity', 'counterfactual_dreams'):
+        if checkpoint_format == 'causal_chemmask_head':
+            base_path = Path(pkg.get('base_checkpoint', ''))
+            if not base_path.exists():
+                raise FileNotFoundError(
+                    f"Causal head base checkpoint is unavailable: {base_path}"
+                )
+            base_package = torch_load_compat(base_path, map_location='cpu')
+            architecture_path = Path(
+                pkg.get('config', {}).get('architecture_ckpt', DEFAULT_CKPT)
+            )
+            if not architecture_path.exists():
+                architecture_path = DEFAULT_CKPT
+            args_package = torch_load_compat(architecture_path, map_location='cpu')
+            state_dict = official_backbone_state(base_package)
+            head_state = pkg['head_state_dict']
+            n_highest_peaks = int(pkg.get('config', {}).get('n_highest_peaks', 100))
+            print('  Checkpoint format: causal ChemMask head on frozen official DreaMS')
+            print(f'  Frozen backbone checkpoint: {base_path}')
+        elif checkpoint_format in ('e1_identity', 'counterfactual_dreams'):
             architecture_path = Path(pkg.get('architecture_checkpoint', DEFAULT_CKPT))
             if not architecture_path.exists():
                 architecture_path = DEFAULT_CKPT

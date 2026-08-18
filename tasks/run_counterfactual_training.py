@@ -8,6 +8,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import torch
+
 
 ROOT = Path(__file__).resolve().parent.parent
 PYTHON = sys.executable
@@ -44,6 +46,8 @@ def train(stage: str, resume: Path | None, args: argparse.Namespace) -> Path:
         "--device", args.device,
     ]
     command.append("--amp" if args.amp else "--no-amp")
+    if args.smoke:
+        command += ["--max-train-batches", "20", "--max-val-batches", "20"]
     if resume is not None:
         command += ["--resume", str(resume)]
     run(command, args.dry_run)
@@ -56,7 +60,7 @@ def evaluate(stage: str, ckpt: Path, args: argparse.Namespace) -> Path:
         PYTHON, "tasks/evaluate_counterfactual_checkpoint.py",
         "--checkpoint", str(ckpt), "--output-dir", str(output),
         "--device", args.device, "--batch-size", str(args.eval_batch_size),
-        "--bootstrap", str(args.bootstrap),
+        "--bootstrap", str(1000 if args.smoke else args.bootstrap),
     ]
     command.append("--amp" if args.amp else "--no-amp")
     run(command, args.dry_run)
@@ -97,16 +101,38 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--min-preservation", type=float, default=0.98)
     parser.add_argument("--eval-batch-size", type=int, default=32)
     parser.add_argument("--bootstrap", type=int, default=10000)
-    parser.add_argument("--device", default="cuda")
+    parser.add_argument("--device", default="auto",
+                        help="auto (default) resolves to cuda if available, else cpu")
     parser.add_argument("--amp", action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument("--smoke", action="store_true",
+                        help="Quick CPU smoke test: 1 epoch, 20 train/val batches, 1000 bootstrap")
     parser.add_argument("--dry-run", action="store_true")
     return parser.parse_args()
 
 
+def resolve_device(requested: str) -> str:
+    if requested == "auto":
+        return "cuda" if torch.cuda.is_available() else "cpu"
+    if requested.startswith("cuda") and not torch.cuda.is_available():
+        raise RuntimeError("--device cuda requested but CUDA is unavailable; use --device cpu")
+    return requested
+
+
 def main() -> None:
     args = parse_args()
+    args.device = resolve_device(args.device)
+    if args.amp and args.device != "cuda":
+        print("AMP is not available on CPU; disabling automatic mixed precision.", flush=True)
+        args.amp = False
+    print(f"Device: {args.device} | AMP: {args.amp}", flush=True)
+    if args.smoke:
+        args.epochs = 1
+        print("Smoke mode: 1 epoch, 20 train/val batches, 1000 bootstrap", flush=True)
     if args.stage == "check":
-        run([PYTHON, "tasks/check_counterfactual_training.py"], args.dry_run)
+        check_cmd = [PYTHON, "tasks/check_counterfactual_training.py"]
+        if args.device == "cpu":
+            check_cmd.append("--allow-cpu")
+        run(check_cmd, args.dry_run)
         return
     stages = [args.stage] if args.stage != "aggressive" else ["head", "last1", "last2"]
     previous_checkpoint = None

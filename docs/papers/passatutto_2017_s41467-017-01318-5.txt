@@ -1,0 +1,861 @@
+            ARTICLE
+
+            DOI: 10.1038/s41467-017-01318-5  OPEN
+
+            Significance estimation for large scale
+
+            metabolomics annotations by spectral matching
+
+            Kerstin Scheubert1, Franziska Hufsky1,2, Daniel Petras 3,4, Mingxun Wang3, Louis-Félix Nothias3,4,
+            Kai Dührkop1, Nuno Bandeira3,4, Pieter C. Dorrestein3,4 & Sebastian Böcker1
+
+1234567890  The annotation of small molecules in untargeted mass spectrometry relies on the matching of
+            fragment spectra to reference library spectra. While various spectrum-spectrum match
+            scores exist, the field lacks statistical methods for estimating the false discovery rates (FDR)
+            of these annotations. We present empirical Bayes and target-decoy based methods to
+            estimate the false discovery rate (FDR) for 70 public metabolomics data sets. We show that
+            the spectral matching settings need to be adjusted for each project. By adjusting the scoring
+            parameters and thresholds, the number of annotations rose, on average, by +139% (ranging
+            from -92 up to +5705%) when compared with a default parameter set available at GNPS.
+            The FDR estimation methods presented will enable a user to assess the scoring criteria for
+            large scale analysis of mass spectrometry based metabolomics data that has been essential
+            in the advancement of proteomics, transcriptomics, and genomics science.
+
+            1 Chair for Bioinformatics, Friedrich Schiller University Jena, Jena 07743, Germany. 2 RNA Bioinformatics and High Throughput Analysis, Friedrich Schiller
+            University Jena, Jena 07743, Germany. 3 Collaborative Mass Spectrometry Innovation Center, Skaggs School of Pharmacy and Pharmaceutical Sciences,
+            University of California, La Jolla, San Diego, CA 92093, USA. 4 Skaggs School of Pharmacy and Pharmaceutical Sciences, University of California, La Jolla, San
+
+            Diego, CA 92093, USA. Correspondence and requests for materials should be addressed to S.Böc. (email: sebastian.boecker@uni-jena.de)
+
+            NATURE COMMUNICATIONS | 8: 1494 | DOI: 10.1038/s41467-017-01318-5 | www.nature.com/naturecommunications  1
+ARTICLE                                                                   NATURE COMMUNICATIONS | DOI: 10.1038/s41467-017-01318-5
+
+Untargeted mass spectrometric (MS) analysis of small                      the MS/MS data analysis platform Global Natural Product Social
+         molecules is important in our understanding of (bio)             Molecular Networking (GNPS, http://gnps.ucsd.edu)9, to
+         chemical processes in the environment, ocean, and indi-          demonstrate that FDR estimations need to be used to guide
+vidual organisms1­7. In untargeted mass spectrometry experi-              scoring parameters. To validate the FDR approach and how it
+ments, tandem MS (MS/MS) spectra are collected of molecules               performs for spectral annotation with real large scale untargeted
+present in the analytical sample. To annotate these unknowns, the         mass spectrometry data, we performed FDR controlled spectral
+MS/MS spectra are compared against a library of reference MS/             library matching with 70 data sets from GNPS, consisting of
+MS spectra8­11. At present, spectrum­spectrum matches of                  thousands of LC­MS runs. This revealed that there is no universal
+unknown and library spectra are scored but this score alone               scoring criteria that can control the FDR in all data sets. This
+provides no statement about statistical accuracy of that assign-          adaptive approach shows promise to both, increase identifications
+ment. Without statistical techniques in place to estimate false           and curb false positives in large scale metabolomics experiments.
+discovery rates of identifications, researchers do not have a guide       The FDR estimation has now been implemented as a tool called
+to set appropriate scoring criteria, unlike in proteomics, peptidic       passatutto, named after a food mill used to remove unwanted
+small molecule identification, transcriptomics, and genomics              particles commonly used in Italian kitchens. Ultimately, passa-
+where statistical assessment and false discovery calculations for         tutto provides experimentalists with an high-throughput measure
+annotations are the norm12­15. In metabolomics, probabilistic             of confidence in MS/MS-based annotations by reporting an FDR,
+assignments of molecular formulas has been done but this does             to guide the selection of scoring parameters for a project com-
+not provide structure identifications which are critical to biolo-        patible with large scale MS/MS based untargeted metabolomics
+gical understanding16, 17. This leads untargeted liquid chroma-           projects.
+tography tandem mass spectrometry (LC­MS/MS) based
+metabolomics or any other small molecule based untargeted mass            Results
+spectrometry analysis to yield identification results where errors        Construction of FDR estimation approaches. Our first method
+rates are uncontrolled. This can lead to a lack of sensitivity or         that we assessed uses an empirical Bayes approach24 whereas the
+worse: rampant false discoveries and ultimately incorrect                 second, third and fourth FDR estimation methods rely on the
+interpretations.                                                          target-decoy approach, using different decoy databases
+                                                                          (Fig. 1a­d). Although the generation of "random" MS/MS spectra
+   To compound the challenge, due to advances in instrumenta-             for small molecules is conceptually more challenging than for
+tion and the re-emergence of appreciation in the function of small        peptides25, it became possible with recent methodological
+molecules, the scientific community is producing more and more            advances9, 26­28. To estimate the FDR using a decoy database,
+untargeted mass spectrometry data. These LC­MS/MS based                   three strategies were devised to create the decoy MS/MS library
+experiments are now commonly applied in medicine, life science,           (Fig. 1b­d), where the first two methods are spectrum-based
+agriculture toxicology, exposomics, ocean and forensic research to        while the third is fragmentation tree-based23, 24. To show com-
+name a few. Modern instruments generated hundreds to thou-                patibility with different spectral matching scoring schemes, we
+sands of MS/MS spectra from a single sample,and collectively tens         present results for the MassBank scoring11 and the GNPS
+of millions of MS/MS spectra for large scale projects. There are          scoring9, 29, both of which utilize modified versions of the cosine
+also a growing number of MS/MS spectra available in public                similarity (also known as normalized dot product).
+spectral libraries8, 9, 11, 18, 19. To most in the scientific community,
+including mass spectrometrists and metabolomics investigators                For the naive decoy spectral library, we use all possible
+themselves, it often comes as a surprise that there is no sig-            fragment ions from the reference library of spectra and then
+nificance estimation in metabolomics annotations yet, like it has         randomly add these ions to the decoy spectral library, until each
+been adopted, and thereby advanced, in the fields of proteomics,          decoy spectrum reaches the desired number of fragment ions that
+genomics and transcriptomics. While guidelines and rules have             mimics the corresponding library spectrum (Fig. 1b). This
+been established by the metabolomics standards initiative20, to           method is presented as a baseline evaluation of the other, more
+report annotation of molecules from MS-based metabolomics                 intricate methods. The second method is similar to the naive
+data20, they are not commonly reported in the majority of                 method, as we create the decoy spectral library through choosing
+metabolomics studies. Manual validation at the scale of tens of           fragment ions that co-appear in the spectra from the target
+thousands to millions of spectra library matches is not realistic to      spectral library (Fig. 1c): In this spectrum-based approach, we
+do for each large scale experiment, and automated solutions for           start with an empty set of fragment ion candidates. First, the
+the annotations that enable downstream analysis such as pathway           precursor fragment ion of the target spectrum is added to the
+mapping, xenobiotic metabolism, chemical ecology, and ulti-               decoy spectrum. For each fragment ion added to the decoy
+mately prioritization for manual validation are needed; but this          spectrum, we choose all spectra from the target spectral library
+process starts with annotations21.                                        which contain this fragment ion, within a mass range of 5 p.p.m.
+                                                                          From these spectra, we uniformly draw (all fragment ions have
+   Large scale non-targeted LC­MS/MS experiments result in                the same probability to be drawn) five fragment ions that are
+hundreds to thousands of query spectra from a single chroma-              added to the fragment ion candidate set; we use all fragment ions
+tographic run. For molecular annotation, these MS/MS spectra              in case there are fewer than five. We draw a fragment ion from
+are typically searched against a spectral library, which in turn,         the fragment ion candidate set and add it to the decoy spectrum,
+results in spectral library hits that are sorted by score. Using a        then proceed as described above until we reach the desired
+decoy spectral library to estimate FDR is common in proteomics;           number of fragment ions that mimics the corresponding library
+there, the decoy database is often a (pseudo-)reverse peptide             spectrum. The two-step process of first drawing candidates, then
+database or a shuffled database12, 22, 23. The reason why target-         drawing the actual decoy spectrum was introduced to better
+decoy approaches for FDR estimation have not been applied so              mimic fragmentation cascades and dependencies between frag-
+far to metabolomics, are the difficulties in generating decoy             ments. Furthermore, it prevents that fragment-rich spectra
+libraries; small molecules are diverse in structure, and shuffling or     dominate the process. Out of the five added candidate fragment
+reversing a database is not possible. Therefore, alternative stra-        ions, between zero and five end up in the final decoy spectrum.
+tegies needed to be developed for FDR estimation. Here we                 Fragment ions with mass close (5 p.p.m.) to a previously added
+present and assessed four possible solutions.Ultimately we
+implemented one method, the re-rooted fragmentation tree, in
+
+2        NATURE COMMUNICATIONS | 8: 1494 | DOI: 10.1038/s41467-017-01318-5 | www.nature.com/naturecommunications
+NATURE COMMUNICATIONS | DOI: 10.1038/s41467-017-01318-5                                                                                      ARTICLE
+
+a
+
+     False discovery rate estimation
+
+                                                                      List of query spectra
+
+                                             Query 1                  Query 5                            Query n
+
+Target spectral                                                       Target spectral                   Computation of      Decoy spectral
+     library                                                               library                  decoy spectral library       library
+
+                                                   (noise filtering)  (noise filtered)            Spectrum- Fragmentation
+                                             via fragmentation trees                                based tree-based
+
+                                                                             Empirical                   Target-decoy
+                                                                    Bayes approach                         approach
+
+                         Density of spectra  False positives                            Sorted list of metabolite-spectrum matches with FDR
+                                             True positives
+
+                                                                                        MSM of query 10  MSM of query n     MSM of query 2
+                                                                                                  0             0.01               0.64
+
+Target-decoy approach:                       Score
+
+b                        Set of all peaks from                                                                                                    Decoy
+      Naive method       the target database                                                                                                 spectral library
+
+            Target
+       spectral library
+
+                         Add parent peak
+
+c                                             Set of peaks            Add peaks of all spectra                                               #peaks as in target spectrum
+                                             of all spectra           containing the added peak
+  Spectrum-based method                      containing the                                                                                                        Decoy
+                                              added peak                                                                                                     spectral library
+       Target spectral
+             library
+
+                         add parent peak                                                                                                     #peaks as in target spectrum
+
+d
+      Fragmentation tree-based method
+
+Target spectral                              Target FT library                                                       Decoy FT library             Decoy
+     library                                                                                                        C7H9NO                   spectral library
+                                                                                           C7H9NO
+                                              C7H9NO                Choose new root     CO
+                                             H2O CO
+
+                                             NH3              C2H2                      H2O              Rearrange
+                                                              NH3                       C6H7NO­1
+
+                                                                                        !
+
+Fig. 1 False discovery rate estimation. a Overview. The empirical Bayes approach estimates FDRs from a two-component mixture of distributions
+representing true and false hits (positive identifications). In the target-decoy approach, query spectra are searched against a target and decoy spectral
+library, and FDRs are estimated from the merged and sorted list of spectrum matches. b­d To construct a decoy spectral library, we implemented three
+methods. b Naive method: randomly adding fragment ions from the reference library to the decoy spectrum. c Spectrum-based method: fragment ions are
+iteratively added to the decoy spectrum, conditional on fragment ions that have previously been added. d Fragmentation tree-based method: a
+fragmentation tree is computed from the target spectrum, its root is relocated. New formulas of fragments are calculated according to the losses in the
+tree. Fragments with invalid formulas are relocated
+
+NATURE COMMUNICATIONS | 8: 1494 | DOI: 10.1038/s41467-017-01318-5 | www.nature.com/naturecommunications                                                                        3
+ARTICLE                                                                                                                                                       NATURE COMMUNICATIONS | DOI: 10.1038/s41467-017-01318-5
+
+   p -values
+
+                 a                                           b                                                                                                             c                                                             d               qq-plot
+
+                          True & false identifications                   True identifications                                                                                         False identifications                                         False identifications
+   Unfiltered                                                            Estimated p -value
+      target spectral library1                                  1        Estimated p -value                                                                                1                                                                1.0
+
+          (empirical Bayes0.8                                0.8                                                                                                           0.8                                                              0.75
+             approach)
+                   Frequency0.6                              0.6                                                                                                           0.6                                                              0.5
+
+                             0.00.4                          0.4
+                                  0.1
+                                       0.2
+                                            0.3
+                                                 0.4
+                                                       0.5
+                                                            0.6
+                                                                 0.7
+                                                                      0.8
+                                                                           0.9
+                                                                                1.0
+                                                                                            0.0
+                                                                                                 0.1
+                                                                                                      0.2
+                                                                                                            0.3
+                                                                                                                 0.4
+                                                                                                                      0.5
+                                                                                                                           0.6
+                                                                                                                                0.7
+                                                                                                                                     0.8
+                                                                                                                                           0.9
+                                                                                                                                                1.0
+                                                                                                                                                            0.0
+                                                                                                                                                                 0.1
+                                                                                                                                                                      0.2
+                                                                                                                                                                           0.3
+                                                                                                                                                                                0.4
+                                                                                                                                                                                     0.5
+                                                                                                                                                                                           0.6
+                                                                                                                                                                                                0.7
+                                                                                                                                                                                                     0.8
+                                                                                                                                                                                                          0.9
+                                                                                                                                                                                                               1.0
+
+                                                                                                                                                                                                                      Cumulated frequency
+                    0.2                                      0.2                                                                                                           0.4
+                                                                                                                                                                                                                                              0.25
+
+                                                                                                                                                                           0.2
+
+                       0                                        0                                                                                                          0                                                                0.0
+
+                                                                                                                                                                                                                                                    0.0 0.25 0.5 0.75 1.0
+
+                                Estimated p -value                                                                                                                                    Estimated p -value                                            Estimated p -value
+
+                    e                                        f                                                                                                             g                                                             h
+
+                                                                                                                                                                             1                                                                 1.0
+                                                                                                                                                                           0.8                                                               0.75
+                                                                                                                                                                           0.6
+                                                                                                                                                                           0.4                                                                 0.5
+                                                                                                                                                                           0.2                                                               0.25
+
+                                                                                                                                                                             0                                                                 0.0
+                                                                                                                                                                                                                                                    0.0 0.25 0.5 0.75 1.0
+                                                                                                                                                                                               Estimated p -value                                     Estimated p -value
+   Noise-filtered      1                                        1
+      target spectral library
+          (fragmentation tree-based0.8                       0.8
+             target-decoy approach)
+                    0.6                                      0.6
+                   Frequency
+                             0.00.4                          0.4
+                                  0.1
+                                       0.20.2                0.2
+                                            0.3
+                                                 0.40           0
+                                                       0.5
+                                                            0.6
+                                                                 0.7
+                                                                      0.8
+                                                                           0.9
+                                                                                1.0
+                                                                                            0.0
+                                                                                                 0.1
+                                                                                                      0.2
+                                                                                                            0.3
+                                                                                                                 0.4
+                                                                                                                      0.5
+                                                                                                                           0.6
+                                                                                                                                0.7
+                                                                                                                                     0.8
+                                                                                                                                           0.9
+                                                                                                                                                1.0
+                                                                                                                                                            0.0
+                                                                                                                                                                 0.1
+                                                                                                                                                                      0.2
+                                                                                                                                                                           0.3
+                                                                                                                                                                                0.4
+                                                                                                                                                                                      0.5
+                                                                                                                                                                                           0.6
+                                                                                                                                                                                                0.7
+                                                                                                                                                                                                     0.8
+                                                                                                                                                                                                          0.9
+                                                                                                                                                                                                               1.0
+
+                                                                                                                                                                                                                      Cumulated frequency
+
+                                Estimated p -value
+
+   q -values                    Unfiltered target spectral library                                                                                          j                                    Noise-filtered target spectral library
+                                                                                                                                                                                           Score 0.7
+     i           Estimated q -value                                                                                                                                0.4
+                                                                                                                                          Estimated q -value     0.35                      Empirical Bayes approach
+              0.4
+                                                                                                                                                                   0.3          Target-decoy approach:
+            0.35                                                                                                                                                 0.25                       Naive method
+                                                                                                                                                                                            Spectrum-based method
+              0.3                                                                                                                                                  0.2                      Fragmentation tree-based
+                                                                                                                                                                                            method
+            0.25
+
+              0.2
+
+                 0.15                                                                                                                                         0.15
+
+                 0.1                                                                                                                                          0.1
+
+                 0.05                                                                                                                                         0.05
+
+                    0                                                                                                                                         0
+
+                       0  0.05  0.1  0.15               0.2        0.25  0.3  0.35                                                                                      0       0.05  0.1  0.15                    0.2                   0.25       0.3  0.35
+
+                                     True q -value                                                                                                                                         True q -value
+
+Fig. 2 Quality assessment for FDR estimations for Agilent query spectra to the GNPS library using MassBank scoring function. a­h p-values. Distribution of
+p-values. For searching in the unfiltered target spectral library a­d, p-values are estimated using the empirical Bayes approach. For searching the
+noise-filtered target spectral library, p-values are estimated using the fragmentation tree-based target-decoy approach e­h. Distributions contain p-values
+from ten decoy spectral libraries. p-value distribution for both, true and false hits a, e, p-value distribution for true hits only b, f, and for false hits only c, g.
+By definition, the distribution of p-values for false hits has to be uniform, corresponding to the main diagonal in the p-value quantile-quantile (qq) plots d, h.
+The qq plots for the other methods are provided as Supplementary Fig. 1. i, j q-value plots for Agilent data (q-value plots for MassBank are provided as
+Supplementary Fig. 2). Estimated (y-axis) vs. true q-values (x-axis) in the unfiltered i and noise-filtered j version of the GNPS library. The small red line
+indicates cosine of 0.7. For the fragmentation tree-based method, we searched against the noise-filtered GNPS only, since this approach applies
+noise-filtering by design. The naive target-decoy approach can be seen as baseline method for comparison. For target-decoy methods, results were
+averaged over ten decoy spectral libraries (Supplementary Fig. 4)
+
+fragment ion mass, or masses above the precursor fragment ion                       node. The new root node is not drawn uniformly: Instead, a node
+mass are discarded. If the precursor ion is absent from the MS/                     is chosen as new root with relative probability 1/(n+1), where n is
+MS spectrum, we use the selected ion mass to find matching                          the number of edges that we would have to re-graft. For all three
+compound masses. The third solution is a fragmentation tree-                        methods, intensities of the original fragment ions are used.
+based approach, where decoy spectra are generated using a re-
+rooted fragmentation tree (Fig. 1d). From the original fragmenta-                   Assessing quality against spectral libraries. Assessing the quality
+tion tree, its structure and all losses are kept, and some new                      of empirical Bayes, and the naive, spectrum-based and frag-
+internal node is selected as new root, with the molecular formula                   mentation tree-based target decoy databases was done by p-value
+of the precursor ion. Molecular formulas of all fragment ions are                   estimation, and by testing q-value estimates against exact values
+calculated along the edges of the tree, subtracting losses. In case                 using public MS/MS libraries. Evaluation can only be carried out
+the tree rearrangement yields chemically impossible molecular                       when the true identity of all query compounds is known. To
+formulas (that is, a negative number of atoms for some element),                    assess quality, we used high resolution reference spectra from the
+the corresponding loss and its subtree are placed to another                        Agilent30, MassBank11, and GNPS libraries9. From GNPS and
+branch of the tree (re-grafted), attaching it to a uniformly selected
+
+4                                                       NATURE COMMUNICATIONS | 8: 1494 | DOI: 10.1038/s41467-017-01318-5 | www.nature.com/naturecommunications
+NATURE COMMUNICATIONS | DOI: 10.1038/s41467-017-01318-5                                                                    ARTICLE
+
+                         1000                                                                                    5% FDR
+                                                                                                                 1% FDR
+                          800
+Identification gain (%)
+                          600
+                                                         Bruker MaXis - Q-TOF                            Bruker  Thermo Q-Exactive  Other
+                          400                                                                             MTQ
+                                                                                                         Q-TOF
+                          200
+
+                             0
+
+                                       Agilent
+                                       Q-TOF
+
+                         MSV000078923
+                           MSV000078658
+                              MSV000078995
+                                 MSV000079838
+                                    MSV000078584
+                                       MSV000078611
+                                          MSV000078612
+                                             MSV000078805
+                                                MSV000079339
+                                                   MSV000079398
+                                                      MSV000078903
+                                                         MSV000078938
+                                                            MSV000078894
+                                                               MSV000078567
+                                                                  MSV000079104
+                                                                     MSV000079243
+                                                                        MSV000079652
+                                                                           MSV000079559
+                                                                              MSV000079825
+                                                                                 MSV000078993
+                                                                                    MSV000079680
+                                                                                       MSV000079274
+                                                                                          MSV000079105
+                                                                                             MSV000078628
+                                                                                                MSV000078726
+                                                                                                   MSV000079788
+                                                                                                      MSV000079421
+                                                                                                         MSV000078586
+                                                                                                           MSV000078589
+                                                                                                              MSV000078649
+                                                                                                                 MSV000079581
+                                                                                                                    MSV000079558
+                                                                                                                       MSV000079677
+                                                                                                                          MSV000079416
+                                                                                                                             MSV000078711
+                                                                                                                                MSV000078797
+                                                                                                                                   MSV000078556
+                                                                                                                                      MSV000078708
+                                                                                                                                         MSV000079389
+                                                                                                                                            MSV000079344
+                                                                                                                                               MSV000079356
+                                                                                                                                                  MSV000079679
+                                                                                                                                                     MSV000079523
+                                                                                                                                                        MSV000078710
+                                                                                                                                                           MSV000079130
+                                                                                                                                                              MSV000079091
+                                                                                                                                                                 MSV000078719
+                                                                                                                                                                    MSV000079787
+                                                                                                                                                                       MSV000078832
+                                                                                                                                                                          MSV000079151
+                                                                                                                                                                             MSV000078603
+                                                                                                                                                                                MSV000079329
+                                                                                                                                                                                   MSV000078816
+                                                                                                                                                                                      MSV000079778
+                                                                                                                                                                                         MSV000078960
+                                                                                                                                                                                            MSV000079146
+                                                                                                                                                                                               MSV000078922
+                                                                                                                                                                                                 MSV000078801
+                                                                                                                                                                                                    MSV000078892
+                                                                                                                                                                                                       MSV000078683
+                                                                                                                                                                                                          MSV000078622
+                                                                                                                                                                                                             MSV000079098
+                                                                                                                                                                                                                MSV000078812
+                                                                                                                                                                                                                   MSV000078598
+                                                                                                                                                                                                                      MSV000078744
+                                                                                                                                                                                                                         MSV000079777
+                                                                                                                                                                                                                            MSV000079341
+                                                                                                                                                                                                                               MSV000079447
+                                                                                                                                                                                                                                  MSV000079040
+                                                                                                                                                                                                                                     MSV000078811
+                                                                                                                                                                                                                                        MSV000079050
+                                                                                                                                                                                                                                           MSV000078666
+                                                                                                                                                                                                                                              MSV000079029
+                                                                                                                                                                                                                                                 MSV000078936
+                                                                                                                                                                                                                                                    MSV000079450
+                                                                                                                                                                                                                                                       MSV000079907
+                                                                                                                                                                                                                                                          MSV000079905
+                                                                                                                                                                                                                                                             MSV000079573
+                                                                                                                                                                                                                                                                MSV000079758
+                                                                                                                                                                                                                                                                   MSV000079651
+                                                                                                                                                                                                                                                                      MSV000079760
+                                                                                                                                                                                                                                                                         MSV000079813
+                                                                                                                                                                                                                                                                            MSV000079772
+                                                                                                                                                                                                                                                                               MSV000079697
+                                                                                                                                                                                                                                                                                 MSV000079598
+                                                                                                                                                                                                                                                                                    MSV000078670
+                                                                                                                                                                                                                                                                                       MSV000079888
+                                                                                                                                                                                                                                                                                          MSV000079808
+                                                                                                                                                                                                                                                                                             MSV000079773
+                                                                                                                                                                                                                                                                                                MSV000079906
+                                                                                                                                                                                                                                                                                                   MSV000079034
+                                                                                                                                                                                                                                                                                                      MSV000079069
+
+                                                                                                                                                                                                                                                                                                           Agilent
+                                                                                                                                                                                                                                                                                                              Mass Bank
+
+                                                                                             MS dataset
+
+Fig. 3 FDR based annotations for 70 metabolomics projects. These are projects from human, microbes, plants, marine-organism, and other derived
+metabolomics data. The plot shows the percent gain in annotations for each of the data sets in GNPS-MassIVE at 1% and 5% FDR in relationship to the
+mass spectrometer used. A plot sorted by sample characteristic is provided as Supplementary Fig. 7. The impact on identification rates with the MassBank
+and Agilent data sets are shown on the right
+
+MassBank, only spectra that had the unfiltered spectrum in the           accurate q-value estimates: Even for true q-values around 0.15,
+public domain, that had SMILES or InChI structure annotations            estimates are already close to 0. All methods tend to overestimate
+(line notations for describing chemical structure using short            significance (estimated q-values are smaller than true q-values); in
+strings) and for which the precursor mass matched to the exact           particular, estimates are close to zero for true q-values below 0.05.
+structure-based mass to within 10 p.p.m., were used for the              For some query compounds, not contained in the target database,
+assessment of the FDR estimations. As an initial test, we checked        there is a structurally similar isomer with similar fragmentation
+if p-values of false hits (false positive identifications) estimated by  spectrum present in the target database (Supplementary Fig. 2).
+our methods are uniformly distributed31: The p-value of a spec-          These wrong hits will receive relatively high scores and, hence,
+trum match is the probability to randomly draw a result of this or       wrong hits in the target database are more frequent at top
+better quality, under the null hypothesis for which a spectrum has       positions of the output list than hits in the decoy database,
+been randomly generated. We observe a mostly uniform dis-                impeding accurate estimation for small q-values.
+tribution of p-values, both for the empirical Bayes approach and
+the fragmentation tree-based target-decoy approach (Fig. 2a­f),             Results in Fig. 2g, h are for Agilent queries; see Supplementary
+corresponding to a quantile-quantile plot close to the main              Figure 3 for MassBank queries. To further evaluate the robustness
+diagonal (Fig. 2d, h, Supplementary Fig. 1). This agrees with the        of our estimates, we generate 10 decoy spectral libraries for each
+distribution of p-values under the null hypothesis, and shows that       decoy method. Because generating decoy spectral libraries is a
+our decoy databases are indeed representative models of the null         random process, q-values vary slightly between the 10 decoy
+hypothesis. In the p-value distribution, we observe heightened           spectral libraries; we found these variations to be negligible
+peaks close to 0 and 1; the heightened peak close to 0 is discussed      (Supplementary Fig. 4). Results in Fig. 2 present searching
+below, whereas the heightened peak close to 1 is negligible for          Q-TOF spectra using the MassBank scoring function. Results for
+significance estimation.                                                 the cosine similarity score were comparable (Supplementary
+                                                                         Fig. 5). Furthermore, using Orbitrap MassBank spectra as queries
+   To evaluate the quality of estimated FDRs, we compared                yielded similar results (Supplementary Fig. 2).
+q-values of the four methods presented here with true q-values. In
+addition, we also assessed the impact of noise filtering on the          Evaluation of fragmentation tree decoy strategy against public
+quality of FDR estimation: Noise-filtering by fragmentation trees        data. We evaluated the fragmentation tree-based decoy FDR
+is accomplished by calculating a fragmentation tree that annotates       estimation method broadly across 70 data sets available on GNPS.
+some of the hypothetical fragment ions with molecular                    We selected a decoy-based FDR estimation, as this does not rely
+formulas32, 33; only these annotated fragment ions are kept,             on presupposed underlying (and potentially unrelated) prob-
+resulting in a cleaned spectrum that only keeps fragment ions that       abilistic models34. We also choose the filtered decoy approach as
+are well-supported by the fragmentation process. For the                 this is compatible with the filtered data in GNPS. Data sets
+unfiltered target spectral library, empirical Bayes approach             included high resolution Q-TOF or Orbitrap data from 6220 LC-
+resulted in good estimates, whereas spectrum-based target decoy          MS runs encompassing human, microbe, plant and marine-
+did not work as accurately (Fig. 2g, h): the empirical Bayes             organism derived samples. To calculate both the 1% FDR and 5%
+approach represented a good fit of the bisecting line, while the         FDR, the total running time for the FDR computation of the
+spectrum-based approach did not. For the noise-filtered target           spectral library matches associated with all the projects took ~48
+spectral library, the target-decoy methods except the naive              h on the GNPS cluster, demonstrating the compatibility of the
+method allow for accurate q-value estimates, and perform                 FDR approach with large-scale metabolomics experiments. At 1%
+roughly on par (Fig. 2c). The naive method never results in
+
+NATURE COMMUNICATIONS | 8: 1494 | DOI: 10.1038/s41467-017-01318-5 | www.nature.com/naturecommunications                                                                                                                                                                                                                  5
+ARTICLE                                                                    NATURE COMMUNICATIONS | DOI: 10.1038/s41467-017-01318-5
+
+         a            # Library matches                                                                                                                                   100,000
+                                       0.3                                                                                                                                90,000
+              35,000                        0.35                                                                                                                          80,000
+              30,000                              0.4                                                                                                                     70,000
+              25,000                                    0.45                                                                                                              60,000
+              20,000                                         0.5                                                                                                          50,000
+              15,000                                               0.55                                                                                                   40,000
+              10,000                                                    0.6                                                                                               30,000
+                                                                              0.65                                                                                        20,000
+                5000                                                               0.7                                                                                    10,000
+                     0                                                                   0.75                                                                             0
+                                                                                              0.8
+         b                                                                                          0.85
+                                                                                                          0.9
+                   35                                                                                          0.95
+                   30
+                   25                                                                                                1
+                   20                                                                                                                                    # Library matches
+                   15                                                             Total
+                   10
+                               Cosine cutoff at 1% FDR
+                     5
+                     0  2 MMP  4 MMP                                6 MMP  8 MMP
+                        3 MMP  5 MMP                                7 MMP
+
+                      # Datasets
+                                 0.3
+                                        0.35
+                                              0.4
+                                                    0.45
+                                                          0.5
+                                                                 0.55
+                                                                       0.6
+                                                                             0.65
+                                                                                   0.7
+                                                                                         0.75
+                                                                                                0.8
+                                                                                                      0.85
+                                                                                                            0.9
+                                                                                                                  0.95
+
+                                                                                                                         1
+
+                                                                                        Cosine cutoff at 1% FDR
+
+Fig. 4 The impact of number of matching fragment ions in a spectrum and cosine score at 1% FDR. a Frequency of data sets in relationship to number of
+MMP to match and cosine at 1% FDR estimation. b The number of MS/MS matches in relation to minimum matched fragment ions and cosine. An
+alternative 3D plot of these figures can be found in Supplementary Fig. 9
+
+FDR, the average gain in annotation for the 70 public data sets in  ions as close second and third in terms of the number of spectra
+comparison to default scoring cut-off value (cosine score of 0.7    that were annotated. As the number of fragment ions required to
+and minimum of 6 ions to match) was 139% with a range of -92        match the number of matches was increased to 7 and 8 or
+up to 5705% (Fig. 3, Supplementary Figs. 6 and 7). At a score of    lowered to 2, the number of total matches decreased significantly.
+0.7, the annotations from continuous identification, as judged by
+the community via a four-star rating of the identifications, the       This comparison furthermore revealed that for most of the
+GNPS community provided feedback that 91% of the annotations        projects, an FDR of 1% was achieved at cosine of 0.6­0.65 (for 5%
+are correct, 4% possible isomers or correct, 4% not enough          FDR, most of the projects dropped to a cosine of 0.5­0.55) and
+information to tell and 1% is incorrect9. When using 5% FDR, a      therefore the default cosine values for living data in GNPS are
+mean gain annotation of 235% was obtained and had a range of        slightly more stringent. Three representative FDR vs. default
+-75% up to 6705% gain (Fig. 3).                                     score threshold plots are provided as Supplementary Fig. 8, and
+                                                                    may guide the end user to make a decision on scoring criteria. At
+   Further, we explore the impact of cosine scoring and the         1% FDR, it was observed that parameters of the GNPS living
+minimum number of fragment ions to match on the number of           continuous annotation overestimates the number of annotations
+matches associated with 1% FDR using the fragmentation tree-        for 13% of the projects and that it underestimated the annotations
+based decoy strategy. Over the 70 public metabolomics projects,     in 82% of the projects and the remaining 5% of projects remained
+the minimum matched peaks were modulated resulting in a             unchanged by the introduction of the FDR estimation.
+cosine threshold ranging from 0.3 to 1 with the number of
+identifications represented in a histogram (Fig. 4a). The results   Discussion
+reveal that the more ions were required to match, the more          The four methods that were implemented and assessed for sig-
+forgiving the spectral scoring could be. When 8 ions were           nificance of annotations for untargeted mass spectrometry are
+required to match, the most common score to achieve 1% FDR          using empirical Bayes approach, which implies a probabilistic
+was found to be between a cosine of 0.50­0.60, while when two       model of score distributions, and three different target-decoy
+ions were required to match, the most common score required         approaches. Different from in silico annotation of MS/MS spectra
+was 0.85­0.95. For all the projects that require a cosine of 1 to   of peptidic small molecules35, three decoy methods for building
+achieve 1% FDR, not a single annotation was obtained (Fig. 4b).     decoy spectral libraries that were formulated and tested do not
+We observed that the most number of annotations was achieved        generate artificial metabolite structures: both, the construction of
+with a minimum of 4 fragment ions matching, with 3 ions and 5
+
+6                       NATURE COMMUNICATIONS | 8: 1494 | DOI: 10.1038/s41467-017-01318-5 | www.nature.com/naturecommunications
+NATURE COMMUNICATIONS | DOI: 10.1038/s41467-017-01318-5                                                  ARTICLE
+
+metabolite structures which are plausible but non-existing in           type of data that is most readily accessible in GNPS. In addition,
+nature, and the prediction of fragmentation spectra from meta-          empirical Bayes allows us to estimate Posterior Error Prob-
+bolites structures are extremely challenging problems and there-        abilities; but the method relies on presupposed probabilistic
+fore we did not pursue those routes for significance                    models, whereas target-decoy approaches make no further
+estimation35, 36. To avoid this challenge, the decoy libraries are      modeling assumptions34. To avoid making assumptions of a
+generated via the naive method, a spectrum-based and a frag-            model required by Empirical Bayes and because the fragmenta-
+mentation tree-based method. Using three test reference data-           tion tree decoy strategy was the most compatible with the data
+bases, Agilent30, MassBank11, and GNPS9, with thousands of MS/          type in GNPS, it was implemented as FDR controlled spectrum
+MS spectra that have the structures of molecules associated with        matching workflow into GNPS. Passatutto was tested against 70
+them, we show that all but the naive methods can estimate false         mass spectrometry projects in the public domain The results
+discovery rates37 (FDR, the proportion of false discoveries among       show that the same spectrum matching score can contribute to a
+the discoveries) and q-values (the minimal FDR thresholds at            highly variable FDR and that the FDR can be drastically different
+which given discoveries should be accepted) with high accuracy.         for each project. This means that the spectral scoring for anno-
+                                                                        tations needs to be adjusted on a per project basis and based on
+   The key considerations that went into the design of the decoy        the false discovery rates the end user is willing to accept. With the
+spectral libraries was to ensure that decoy spectra mimic real          70 projects analyzed there were no trends with respect to the
+spectra as closely as possible, but at the same time, do not cor-       instrument type observed, in agreement with our benchmark
+respond to MS/MS spectra of any true metabolites present in the         results (Fig. 2).
+sample. This ensures that hits in the decoy database are equally
+likely as false hits in the spectral library (the target database). In     However, notable trends were observed in relation to number
+addition, we assured that for any precursor mass range, the same        of fragment ions used to match MS/MS spectra. As the number of
+number of target and decoy spectra were found. All methods              fragment ions required to match the number of matches dropped
+circumvent generating decoy structures, as it is unsolved problem       to 3 and 2, the number of total matches decreased significantly. At
+to generate molecular structures which are sufficiently similar to      these scores, there is not enough spectral information to differ-
+the structures in the target spectral library, but not present in the   entiate a match to the library from the decoy library and therefore
+sample. Generating decoy MS/MS spectra completely at random,            drives up the FDR more quickly. However, there is a clear opti-
+i.e., randomly drawing both masses and intensities of the frag-         mum at 4, 5, 6 ions because as it requires 7 and 8 ions to match, a
+ment ions, will not result in an adequate decoy spectral library, as    decrease in the number of annotations can be observed. This was
+there are ion masses that can be generated but will never be found      explained by the fact that fewer spectra havinge a minimum of
+in a real MS/MS spectrum. Addition of adducts to the spectra that       seven or eight fragment ions were able to match.
+are not encountered would be a solution to create a decoy spectral
+library, as it was recently done for precursor mass FDR calcula-           We can further compare those results to the results from the
+tions in imaging mass spectrometry annotation32; but these              default GNPS scoring value of cosine of >0.7 and a minimum of 6
+adducts would not look like spectra that we would encounter in          fragment ions to match9 (If multiple reference spectra exist that
+an MS/MS spectrum from a biological sample and therefore this           satisfy these criteria, only the best-scoring reference is used as a
+solution is not appropriate for the annotation of MS/MS spectra.        "hit"). The GNPS community assessed matches are the only
+                                                                        direct comparisons that can be used to asses how the FDR esti-
+   We further showed that the approach could be applied to              mation impacts results of large scale spectrum library matching.
+different dot product like scoring methods (Supplementary Fig. 5)       However, a key observation is that for each data set the cosine
+and therefore we anticipate that these methods can be used for          scoring needs to be adjusted when compared to the default GNPS
+other commonly used scoring schemes for spectral matching,              parameters of cosine of 0.7 or greater and minimum 6 fragment
+such as cosine similarity itself28, 38, scorings based on the number    ions. In other words, GNPS living data enabled through con-
+of matching fragment ions and the sum of intensity differences39        tinuous annotation9 that uses just one specific scoring value not
+or scorings which incorporate mass differences40.                       only underestimates the annotations for most projects but per-
+                                                                        haps more importantly, as this affects the interpretation of the
+   It is evident that the methods are versatile but there are some      results, living data also overestimates the number of annotations
+limitations associated with significance estimations of spectral        for some projects.
+matches, some of these have been well documented for pro-
+teomics. All methods tend to overestimate significance (estimated          The reason why most GNPS projects analyzed with living data
+q-values are smaller than true q-values); in particular, estimates      parameters underestimate the number of matches is because there
+are close to zero for true q-values below 0.05. For some query          are many molecules that do not provide 6 ions when fragmented.
+compounds not contained in the target database, there is a              These are currently missed by living data in GNPS. Thus, FDR
+structurally similar isomer with similar fragmentation spectrum         calculations enable an informed decision in terms of the analysis
+present in the target database (Supplementary Fig. 2). These            parameters that a researcher can use in terms of deciding what
+wrong hits will receive relatively high scores and, hence, wrong        the level of acceptable incorrect annotations that can be expected
+hits in the target database are more frequent at top positions of       with such parameters. These results demonstrated why the
+the output list than hits in the decoy database, impeding accurate      introduction of significance estimation and FDR assessments are
+estimation for small q-values. This situation is different from         critical for the field of untargeted small molecule mass spectro-
+shotgun proteomics for a single organism but similar to meta-           metry and that significance estimations needs to become a routine
+proteomics, where estimation of accurate q-values close to zero is      part of this field.
+equally challenging41. One of the key reasons is that some small
+molecules, in particular isomeric structures (Supplementary                In summary, all tested methods but the naive allow for FDR
+Fig. 2), have nearly identical MS/MS spectra. Under such cir-           estimation. The decoy-based methods do not rely on presupposed
+cumstances the end user would have to consider all isomers and          underlying probabilistic models, but require that target mass
+perform follow up experiments to differentiate among the                spectra are noise-filtered to reach accurate estimates. We use
+possibilities.                                                          fragmentation trees26, 27, 33 to separate signal fragment ions from
+                                                                        noise fragment ions to "clean" target spectra for the generation of
+   Because of the probabilistic model requirements for Empirical        decoy libraries. We demonstrated that this approach can be used
+Bayes and the observation the fragmentation tree decoy strategy         for providing confidence measures in large scale metabolomics
+performed best of all the decoy strategies with filtered data, the      project, where it is becoming more and more impossible to
+
+NATURE COMMUNICATIONS | 8: 1494 | DOI: 10.1038/s41467-017-01318-5 | www.nature.com/naturecommunications  7
+ARTICLE                                                                                NATURE COMMUNICATIONS | DOI: 10.1038/s41467-017-01318-5
+
+inspect each annotation by hand, which is the current norm in                          for (a) generating a decoy database, (b) database searching in locally stored data
+metabolomics. It revealed that the spectrum scoring parameters                         sets, and (c) estimating q-values either by means of the target-decoy approach or by
+need to be adjusted on a per-project-basis, which requires a form                      empirical Bayes estimation. For generating a decoy database using the fragmen-
+of confidence measures associated with the results. As such eva-                       tation tree-based method, SIRIUS can be used for the computation of fragmen-
+luations have been critically important for advancing other fields                     tation trees, which is available from https://bio.informatik.uni-jena.de/sirius/. We
+such as proteomics, genomics and other fields, we anticipate that                      ran the software on an Intel XEON 6 Core E5-2630 at 2.30 GHz with 4 GB
+this will play a similarly critical role with mass spectrometric                       memory.
+analysis of small molecules in the future. In that perspective, we
+integrated passatutto into GNPS web platform to ensure that the                        FDR estimation. Given a decoy database, FDRs and q-values can be estimated
+community can readily search spectral libraries in high-                               using target-decoy competition25, separated target-decoy search23, or the more
+throughput manner while reporting a significance of the anno-                          sophisticated mix-max approach52. Here, we use a simple separated target-decoy
+tation. Our methods constitute the first step towards FDR esti-                        search23 where the proportion of incorrectly annotated spectra31 is estimated from
+mation of annotations in untargeted metabolomics, but we                               the empirical Bayes distribution. Only the best-scoring reference spectrum is
+anticipate that additional advances will be made in the years to                       referred to as the "hit" in the target database, as this represents the most likely
+come. We further envision that robust accuracy estimations,                            interpretation of the query data. We merge lists of hits from target and decoy
+including FDR, will also enhance the analysis of spectral matches                      database, and sort by score. For any score threshold, we only report hits above this
+for in silico generated reference libraries or in silico                               threshold in the target database, and estimate the number of false hits there using
+annotations4, 42­47, that48 are beginning to play important roles in                   the number of hits in the decoy database above the score threshold. We estimate
+brightening the dark matter of untargeted metabolomics 4, 49­51.                       the FDR as percentage of incorrect targets (PIT) times the number of decoy hits
+                                                                                       above score threshold, divided by the number of target hits above score threshold23.
+Methods                                                                                The PIT is the percentage of hits in the target database that are incorrect, when we
+                                                                                       do not apply a score threshold but consider the complete batch of queries. We
+Dataset. All metabolomics data used was from GNPS http://gnps.ucsd.edu                 estimate PIT as the area under curve for false identifications, using the empirical
+    The accession numbers for the data sets used are MSV000078567,                     Bayes approach described in Supplementary Information. The q-values of a hit is
+                                                                                       the minimal FDR at which this hit is present in the output list, varying over all
+MSV000078584, MSV000078586, MSV000078589, MSV000078598,                                possible score thresholds.
+MSV000078603, MSV000078611, MSV000078612, MSV000078628,
+MSV000078649, MSV000078658, MSV000078670, MSV000078683,                                    For the empirical Bayes approach26, 52, we model database search scores as a
+MSV000078708, MSV000078710, MSV000078711, MSV000078719,                                two-component mixture of distributions representing true hits and false hits (true
+MSV000078726, MSV000078744, MSV000078805, MSV000078811,                                positive and false positive identifications). Scores of true hits are modeled using a
+MSV000078812, MSV000078816, MSV000078832, MSV000078892,                                mirrored Gamma distribution, a mirrored Gumbel distribution, or a mirrored
+MSV000078903, MSV000078922, MSV000078936, MSV000078960,                                Weibull distribution, whereas scores of false hits are modeled using a Gamma
+MSV000078993, MSV000079029, MSV000079040, MSV000079050,                                distribution. Both the actual distribution for true hits and the distributions'
+MSV000079069, MSV000079091, MSV000079104, MSV000079105,                                parameters are chosen based on the observed data, where Expectation
+MSV000079146, MSV000079243, MSV000079329, MSV000079339,                                Maximization is used to simultaneously find the parameters of the mixture
+MSV000079341, MSV000079344, MSV000079356, MSV000079398,                                distribution. FDR and q-values are estimated using the average Posterior Error
+MSV000079416, MSV000079421, MSV000079447, MSV000079450,                                Probability of all hits with score above the threshold; the Posterior Error
+MSV000079558, MSV000079573, MSV000079581, MSV000079598,                                probability for a given score, in turn, is estimated as the proportion of incorrect hits
+MSV000079651, MSV000079652, MSV000079679, MSV000079758,                                among all hits with this score. See Supplementary Information.
+MSV000079760, MSV000079772, MSV000079773, MSV000079777,
+MSV000079778, MSV000079787, MSV000079808, MSV000079813,                                Quality assessment of FDR estimation. The two smaller data sets, MassBank and
+MSV000079825, MSV000079838, MSV000079888, MSV000079905,                                Agilent, are used as query spectra, whereas the larger GNPS dataset is searched in.
+MSV000079907.                                                                          The estimated p-value is the ratio of decoy hits with score above the threshold. As
+                                                                                       we know the true identity of all queries, we can calculate the true FDR (ratio of
+                                                                                       false hits among all hits) for any score threshold; by definition, the q-value of a hit
+                                                                                       is the smallest FDR for which it is reported.
+
+Spectral libraries and processing. We use three reference libraries for evaluating     FDR based annotations for metabolomics. Passatutto produced decoy spectra for
+our FDR estimations: Agilent, MassBank and GNPS. The requirements for a MS/            GNPS's spectral library search workflows. These workflows were altered to enable
+MS spectrum of a compound to be included in the analysis are that they had to (a)      FDR estimation utilizing these decoys to estimate provide q-values for all identi-
+have a SMILES or InChI associated with it; (b) to remove low resolution reference      fications in a search. The number of identifications were reported at 1% and 5%
+data, the exact precursor mass must be within 10 p.p.m. of the observed mass; (c)      FDR for each of the 70 data sets analyzed in GNPS and were compared against the
+the unfiltered MS/MS spectrum has to be available in the public domain. To ensure      default scoring thresholds recommended at GNPS (0.7 cosine, 6 minimum mat-
+maximal homogeneity, we keep only (d) spectra in positive ion mode, (e) com-           ched peaks).
+pounds below 1000 Da, and we discard (f) spectra with <5 peaks with relative
+intensity above 2%. Spectra recorded at different collision energies are merged. In    Impact of scoring parameters that achieve 1% FDR. To evaluate how scoring
+total, MS/MS spectra of 6716 compounds (4138 GNPS, 2120 Agilent, 458 Mass-             settings such as cosine score and number of minimum ions to match affected the
+Bank) fit these criteria. Most GNPS and all Agilent spectra were measured on Q-        number of annotations with an FDR of 1%, we ran passatutto on the same 70
+TOF instruments, all MassBank spectra were recorded on Orbitrap instruments.           public projects but varies the number of minimum matched ions from 2 to 8. We
+Not all peaks/signals in an MS/MS spectrum can be explained as fragment ions32,        then reported the number of data sets that achieved 1% FDR at each cosine value
+but we will stick with the term "fragment ion" instead of "hypothetical fragment       and minimum number of ions that matched. Finally, we reported the number of
+ion", "peak" or "signal" for the sake of readability. Similarly, we will speak of the  spectra matched for all of the different projects.
+"mass" of a fragment ion when we refer to the observed m/z value, and of its
+`intensity' when we refer to the peak intensity.                                       Empirical Bayes Approach. For details of the empirical Bayes approach, please see
+                                                                                       Supplementary Methods.
+Noise filtering. For each target MS/MS spectrum, we calculate a fragmentation
+tree that annotates a subset of hypothetical fragment ions with molecular              Data availability. Link to passatuto application and used spectral data:
+formulas27, 32, 33; only annotated fragment ions are kept, using the original peak         https://bio.informatik.uni-jena.de/passatutto/
+intensities. We set mass deviation parameters 10 p.p.m. (relative) and 2 mDa               Github link to passatuto source code:
+(absolute). This procedure is more sensitive than simply using a hard or soft              https://github.com/kaibioinfo/passatuto
+intensity cutoff, as it ensures that fragment ions can be explained in principle by        Web based passatuto: http://gnps.ucsd.edu/ProteoSAFe/static/gnps-
+some sensible fragmentation cascade. After noise filtering, 104 spectra were empty
+or consisted only of the precursor ion peak, and were discarded.                       experimental.jsp
+                                                                                       All metabolomics datasets are listed in `Dataset'.
+Software and creation of decoy databases. Passatutto has been implemented as
+a Java v1.6 program. It reads and writes spectra in MassBank file format and           Received: 20 July 2017 Accepted: 8 September 2017
+fragmentation trees in the SIRIUS DOT file format. Source code is available from
+https://github.com/kaibioinfo/passatuto, Java executables (JAR files) are available
+from https://bio.informatik.uni-jena.de/passatutto/. Passatutto contains modules
+
+8        NATURE COMMUNICATIONS | 8: 1494 | DOI: 10.1038/s41467-017-01318-5 | www.nature.com/naturecommunications
+NATURE COMMUNICATIONS | DOI: 10.1038/s41467-017-01318-5                                                  ARTICLE
+
+References                                                                               32. Rauf, I., Rasche, F., Nicolas, F. & Böcker, S. Finding maximum colorful subtrees
+                                                                                             in practice. J. Comput. Biol. 20, 311­321 (2013).
+1. Moran, M. A. et al. Deciphering ocean carbon in a changing world. Proceedings
+    of the National Academy of Sciences 201514645 (2016).                                33. Rasche, F., Svatos, A., Maddula, R. K., Böttcher, C. & Böcker, S. Computing
+                                                                                             fragmentation trees from tandem mass spectrometry data. Anal. Chem. 83,
+2. Beger, R. D. et al. Metabolomics enables precision medicine:`a white paper,               1243­1251 (2011).
+    community perspective'. Metabolomics 12, 149 (2016).
+                                                                                         34. Elias, J. E. & Gygi, S. P. Target-decoy search strategy for increased confidence in
+3. Benton, H. P. et al. Autonomous metabolomics for rapid metabolite                         large-scale protein identifications by mass spectrometry. Nat. Methods 4,
+    identification in global profiling. Anal. Chem. 141226090419007 (2014).                  207­214 (2007).
+
+4. Dias, D. A. et al. Current and future perspectives on the structural identification   35. Mohimani, H. et al. Dereplication of peptidic natural products through
+    of small molecules in biological systems. Metabolites 6, 46 (2016).                      database search of mass spectra. Nat. Chem. Biol., 13, 30­37 (2016).
+
+5. Quinn, R. A. et al. Metabolomics of reef benthic interactions reveals a bioactive     36. Grimme, S. Towards first principles calculation of electron impact mass spectra
+    lipid involved in coral defence. Proc. Biol. Sci. 283 1837 (2016).                       of molecules. Angew. Chem. Int. Ed. 52, 6306­6312 (2013).
+
+6. Petras, D. et al. Mass spectrometry-based visualization of molecules associated       37. Benjamini, Y. & Hochberg, Y. Controlling the false discovery rate: a practical
+    with human habitats. Anal. Chem. 88, 10775­10784 (2016).                                 and powerful approach to multiple testing. J. R. Stat. Soc. Ser. B Stat. Methodol.
+                                                                                             57, 289­300 (1995).
+7. Floros, D. J. et al. Mass spectrometry based molecular 3D-cartography of plant
+    metabolites. Front. Plant Sci. 8, 429 (2017).                                        38. Stein, S. E. & Scott, D. R. Optimization and testing of mass spectral library
+                                                                                             search algorithms for compound identification. J. Am. Soc. Mass Spectrom 5,
+8. Smith, C. A. et al. METLIN: a metabolite mass spectral database. Ther. Drug               859­866 (1994).
+    Monit. 27, 747­751 (2005).
+                                                                                         39. Pavlic, M., Libiseller, K. & Oberacher, H. Combined use of ESI­QqTOF-MS
+9. Wang, M. et al. Sharing and community curation of mass spectrometry data                  and ESI­QqTOF-MS/MS with mass-spectral library search for qualitative
+    with global natural products social molecular networking. Nat. Biotechnol. 34,           analysis of drugs. Anal. Bioanal. Chem. 386, 69­82 (2006).
+    828­837 (2016).
+                                                                                         40. Oberacher, H. et al. On the inter-instrument and the inter-laboratory
+10. Wohlgemuth, G. et al. SPLASH, a hashed identifier for mass spectra. Nat.                 transferability of a tandem mass spectral reference library: 2. Optimization and
+    Biotechnol. 34, 1099­1101 (2016).                                                        characterization of the search algorithm. J. Mass Spectrom 44, 494­502 (2009).
+
+11. Horai, H. et al. MassBank: a public repository for sharing mass spectral data for    41. Muth, T. et al. Navigating through metaproteomics data: a logbook of database
+    life sciences. J. Mass Spectrom. 45, 703­714 (2010).                                     searching. Proteomics 15, 3439­3453 (2015).
+
+12. The, M., Tasnim, A. & Käll, L. How to talk about protein-level false discovery       42. Ruttkies, C., Schymanski, E. L., Wolf, S., Hollender, J. & Neumann, S. MetFrag
+    rates in shotgun proteomics. Proteomics 16, 2461­2469 (2016).                            relaunched: incorporating strategies beyond in silico fragmentation. J.
+                                                                                             Cheminform 8, 1­16 (2016).
+13. Guthals, A., Watrous, J. D., Dorrestein, P. C. & Bandeira, N. The spectral
+    networks paradigm in high throughput mass spectrometry. Mol. Biosyst. 8,             43. Ridder, L. et al. Substructure-based annotation of high-resolution multistage
+    2535­2544 (2012).                                                                        MSn spectral trees. Rapid Commun. Mass Spectrom. 26, 2461­2471 (2012).
+
+14. Levitsky, L. I., Ivanov, M. V., Lobas, A. A. & Gorshkov, M. V. Unbiased false        44. Dührkop, K., Shen, H., Meusel, M., Rousu, J. & Böcker, S. Searching molecular
+    discovery rate estimation for shotgun proteomics based on the target-decoy               structure databases with tandem mass spectra using CSI: FingerID. Proc. Natl
+    approach. J. Proteome Res. 2, 393­397 (2017).                                            Acad. Sci. USA 112, 12580­12585 (2015).
+
+15. Kwon, T., Choi, H., Vogel, C., Nesvizhskii, A. I. & Marcotte, E. M. MSblender: a     45. Wang, Y., Kora, G., Bowen, B. P. & Pan, C. MIDAS: a database-searching
+    probabilistic approach for integrating peptide identifications from multiple             algorithm for metabolite identification in metabolomics. Anal. Chem. 86,
+    database search engines. J. Proteome Res. 10, 2949­2958 (2011).                          9496­9503 (2014).
+
+16. Silva, R. R. et al. ProbMetab: an R package for Bayesian probabilistic annotation    46. Wolf, S., Schmidt, S., Müller-Hannemann, M. & Neumann, S. In silico
+    of LC­MS-based metabolomics. Bioinformatics 30, 1336­1337 (2014).                        fragmentation for computer assisted identification of metabolite mass spectra.
+                                                                                             BMC Bioinf. 11, 148 (2010).
+17. Daly, R. et al. MetAssign: probabilistic annotation of metabolites from LC-MS
+    data using a Bayesian clustering approach. Bioinformatics 30, 2764­2771 (2014).      47. Allen, F., Greiner, R. & Wishart, D. Competitive fragmentation modeling of
+                                                                                             ESI-MS/MS spectra for putative metabolite identification. Metabolomics 11,
+18. Johnson, S. R. & Lange, B. M. Open-access metabolomics databases for natural             98­110 (2015).
+    product research: present capabilities and future potential. Front Bioeng.
+    Biotechnol. 3, 22 (2015).                                                            48. Allen, F., Pon, A., Wilson, M., Greiner, R. & Wishart, D. CFM-ID: a web server
+                                                                                             for annotation, spectrum prediction and metabolite identification from tandem
+19. Perez-Riverol, Y., Alpi, E., Wang, R., Hermjakob, H. & Vizcaíno, J. A. Making            mass spectra. Nucleic Acids Res. 42, W94­W99 (2014).
+    proteomics data accessible and reusable: current state of proteomics databases
+    and repositories. Proteomics 15, 930­950 (2015).                                     49. Silva, R. R., da, Dorrestein, P. C. & Quinn, R. A. Illuminating the dark matter in
+                                                                                             metabolomics: Fig. 1. Proc. Natl Acad. Sci. 112, 12549­12550 (2015).
+20. Sumner, L. W. et al. Proposed minimum reporting standards for chemical
+    analysis Chemical Analysis Working Group (CAWG) Metabolomics Standards               50. Quinn, R. A. et al. Molecular networking as a drug discovery, drug metabolism,
+    Initiative (MSI). Metabolomics 3, 211­221 (2007).                                        and precision medicine strategy. Trends Pharmacol. Sci. 38, 143­154 (2017).
+
+21. Kind, T. & Fiehn, O. Seven Golden Rules for heuristic filtering of molecular         51. Aksenov, A. A., da Silva, R., Knight, R., Lopes, N. P. & Dorrestein, P. C. Global
+    formulas obtained by accurate mass spectrometry. BMC Bioinf. 8, 105 (2007).              chemical analysis of biology by mass spectrometry. Nat. Rev. Chem. 1,
+                                                                                             s41570­017 (2017).
+22. Nesvizhskii, A. I., Vitek, O. & Aebersold, R. Analysis and validation of
+    proteomic data generated by tandem mass spectrometry. Nat. Methods 4, 787            52. Keller, A., Nesvizhskii, A. I., Kolker, E. & Aebersold, R. Empirical statistical
+    (2007).                                                                                  model to estimate the accuracy of peptide identifications made by MS/MS and
+                                                                                             database search. Anal. Chem. 74, 5383­5392 (2002).
+23. Käll, L., Storey, J. D., MacCoss, M. J. & Noble, W. S. Assigning significance to
+    peptides identified by tandem mass spectrometry using decoy databases.               Acknowledgements
+    J. Proteome Res. 7, 29­34 (2007).
+                                                                                         We thank the Deutsche Forschungsgemeinschaft for supporting this work under grant
+24. Efron, B., Tibshirani, R., Storey, J. D. & Tusher, V. Empirical Bayes analysis of a  BO 1910/16 and for a postdoctoral research fellowship to D.P. with grant number PE
+    microarray experiment. J. Am. Stat. Assoc 96, 1151­1160 (2001).                      2600/1-1. We thank the NIH for supporting this work under NIH number P41
+                                                                                         GM103484 and the NIH grant on reuse of metabolomics data R03 CA211211. Finally, we
+25. Keich, U., Kertesz-Farkas, A. & Noble, W. S. Improved false discovery rate           would like the thank Ricardo da Silva for valuable discussions.
+    estimation procedure for shotgun proteomics. J. Proteome Res. 14, 3148­3161
+    (2015).                                                                              Author contributions
+
+26. Böcker, S. & Rasche, F. Towards de novo identification of metabolites by             S.B. had the idea to create the FDR method for metabolomics. P.C.D. had the idea to test
+    analyzing tandem mass spectra. Bioinformatics 24, i49­i55 (2008).                    against GNPS projects. K.S., F.H., M.W., S.B. did the methods development, program-
+                                                                                         ming, and benchmarking. M.W., N.B. integrated passatutto in GNPS. M.W., L.-F.N., D.P.
+27. Böcker, S. & Dührkop, K. Fragmentation trees reloaded. J. Cheminform 8, 1­26         evaluated tools on GNPS-MaSSIVE data sets. K.S., F.H., D.P., L.-F.N., N.B., P.C.D., S.B.
+    (2016).                                                                              wrote the manuscript.
+
+28. Sokolow, S., Karnofsky, J. & Gustafson, P. The Finnigan Library Search               Additional information
+    Programs (1978).
+                                                                                         Supplementary Information accompanies this paper at doi:10.1038/s41467-017-01318-5.
+29. Wang, M. & Bandeira, N. Spectral library generating function for assessing
+    spectrum-spectrum match significance. J. Proteome Res. 12, 3944­3951 (2013).         Competing interests: The authors declare no competing financial interests.
+
+30. Agilent Technologies, MassHunter Personal Forensics and Toxicology Database          Reprints and permission information is available online at http://npg.nature.com/
+    Kit. Available at: https://www.agilent.com/cs/library/usermanuals/public/5990-       reprintsandpermissions/
+    4264EN_ForensicsToxPCD_Kit_QuickStart.pdf (Agilent Technologies Ltd.,
+    2009).
+
+31. Granholm, V., Noble, W. S. & Käll, L. On using samples of known protein
+    content to assess the statistical calibration of scores assigned to peptide-
+    spectrum matches in shotgun proteomics. J. Proteome Res. 10, 2671­2678
+    (2011).
+
+NATURE COMMUNICATIONS | 8: 1494 | DOI: 10.1038/s41467-017-01318-5 | www.nature.com/naturecommunications  9
+ARTICLE                                                                                      NATURE COMMUNICATIONS | DOI: 10.1038/s41467-017-01318-5
+
+Publisher's note: Springer Nature remains neutral with regard to jurisdictional claims in    material in this article are included in the article's Creative Commons license, unless
+published maps and institutional affiliations.                                               indicated otherwise in a credit line to the material. If material is not included in the
+                                                                                             article's Creative Commons license and your intended use is not permitted by statutory
+                    Open Access This article is licensed under a Creative Commons            regulation or exceeds the permitted use, you will need to obtain permission directly from
+                    Attribution 4.0 International License, which permits use, sharing,       the copyright holder. To view a copy of this license, visit http://creativecommons.org/
+adaptation, distribution and reproduction in any medium or format, as long as you give       licenses/by/4.0/.
+appropriate credit to the original author(s) and the source, provide a link to the Creative
+Commons license, and indicate if changes were made. The images or other third party          © The Author(s) 2017
+
+10       NATURE COMMUNICATIONS | 8: 1494 | DOI: 10.1038/s41467-017-01318-5 | www.nature.com/naturecommunications
+

@@ -1,0 +1,28 @@
+# Chem-aware DreaMS annotation pipeline — Python dependencies
+# 在服务器上: conda create -n dreams python=3.11 后 `pip install -r requirements.txt`
+# GPU 服务器把 torch 换成 +cu121 版(见下方注释)。
+
+# --- 核心(annotation/ 只 import 这几个 + 标准库) ---
+torch==2.2.1            # CPU 版; GPU 服务器装 torch==2.2.1+cu121
+numpy==1.26.4
+pandas==2.3.3
+h5py==3.11.0
+
+# --- dreams/utils/data.py 读 mzML/hdf5 所需 ---
+pyteomics==5.0
+psims==1.3.6
+lxml==4.9.4
+scipy==1.15.3
+networkx==3.6.1
+
+# --- 校准(M4 Platt/isotonic) + 差异分析(M5 Fisher) ---
+scikit-learn==1.9.0
+
+# --- 报告/绘图(可选) ---
+matplotlib==3.11.0
+
+# --- 进度条(可选) ---
+tqdm==4.68.3
+
+# --- encode 脚本间接 import(可选, 用 slim backbone 路径时不严格需要) ---
+pytorch-lightning==2.0.8

@@ -36,8 +36,8 @@ sys.path.insert(0, str(REPO_ROOT))
 DEFAULT_DATA = REPO_ROOT / "data" / "models" / "MassSpecGym_MurckoHist_split.hdf5"
 DEFAULT_BASE = REPO_ROOT / "dreams" / "models" / "pretrained" / "ssl_model_server.pt"
 DEFAULT_OFFICIAL = REPO_ROOT / "dreams" / "models" / "pretrained" / "embedding_model.ckpt"
-DEFAULT_TRAIN_POOL = REPO_ROOT / "data" / "e1" / "e1_train_triplet_pool.npz"
-DEFAULT_VAL_POOL = REPO_ROOT / "data" / "e1" / "e1_val_triplet_pool.npz"
+DEFAULT_TRAIN_POOL = REPO_ROOT / "data" / "e1" / "e1_train_triplet_pool_10ppm.npz"
+DEFAULT_VAL_POOL = REPO_ROOT / "data" / "e1" / "e1_val_triplet_pool_10ppm.npz"
 
 
 def parse_args() -> argparse.Namespace:
