@@ -72,7 +72,7 @@ def parse_args() -> argparse.Namespace:
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--epochs", type=int, default=8)
     ap.add_argument("--batch-size", type=int, default=32)
-    ap.add_argument("--lr", type=float, default=1e-4)
+    ap.add_argument("--lr", type=float, default=3e-5, help="PartB/C 定案 3e-5；1e-4/3e-4 会坍缩+检索退化")
     ap.add_argument("--weight-decay", type=float, default=1e-4)
     ap.add_argument("--tau", type=float, default=0.1)
     ap.add_argument("--n-highest-peaks", type=int, default=100)

@@ -42,6 +42,7 @@ MAX_ANCHORS=30000
 EPOCHS=8
 BATCH=32
 UNFREEZE=2
+LR=3e-5
 TRAINED="data/validation/noise_isomer_infonce/seed_${SEED}/best_infonce.pt"
 
 echo "===== G3 门：InfoNCE 训练 + Step5 评估（seed=${SEED}, anchors=${MAX_ANCHORS}, epochs=${EPOCHS}）====="
@@ -67,6 +68,8 @@ echo ""
 echo "===== [1/2] 训练 InfoNCE（seed=${SEED}）====="
 # --no-amp：G3 首跑发现 AMP fp16 在 epoch0 末(step~880)溢出 NaN——模型变自信后
 #   last-2 层 scale 漂移使 fp16 激活溢出。纯 fp32 无溢出天花板（G2 CPU fp32 已验证）。
+# --lr 3e-5：PartB/C 定案——1e-4/3e-4 会 rank 坍缩 + 检索退化（auc 0.739→0.718/0.675），
+#   3e-5 是唯一四门全过（pos↑/neg↓/rank 42.5 更健康/检索 0.744 不退化）。
 python -u tasks/step4_infonce_train.py \
     --device cuda \
     --no-amp \
@@ -74,6 +77,7 @@ python -u tasks/step4_infonce_train.py \
     --epochs "${EPOCHS}" \
     --batch-size "${BATCH}" \
     --unfreeze-layers "${UNFREEZE}" \
+    --lr "${LR}" \
     --max-anchors "${MAX_ANCHORS}"
 
 if [[ ! -f "${TRAINED}" ]]; then
