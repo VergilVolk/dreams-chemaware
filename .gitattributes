@@ -1,0 +1,6 @@
+# 强制 LF 换行：sbatch / shell / python 脚本在 Linux 集群上执行。
+# 覆盖 core.autocrlf=true 在 checkout 时把 LF 转成 CRLF 的行为，
+# 否则会触发 `sbatch: error: Batch script contains DOS line breaks (\r\n)`。
+*.sbatch text eol=lf
+*.sh     text eol=lf
+*.py     text eol=lf
