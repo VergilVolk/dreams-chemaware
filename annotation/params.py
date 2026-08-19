@@ -10,7 +10,9 @@ a reader can audit any number back to a DOI.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+import json
+from dataclasses import dataclass, field, replace
+from pathlib import Path
 from typing import Literal
 
 # --------------------------------------------------------------------------- #
@@ -133,3 +135,34 @@ DEFAULT = Params()
 def source(key: str) -> str:
     """Return the citation string for a parameter origin key."""
     return SOURCES.get(key, key)
+
+
+def load_params(path: str | Path | None) -> Params:
+    """Build a Params set from an optional JSON override file (interface 7.9).
+
+    Missing keys keep ``DEFAULT``; present keys replace them via
+    ``dataclasses.replace``. Unknown keys raise (fail-fast) so a typo can never
+    silently fall back to a default. Values are passed through unchanged, so they
+    must be JSON-compatible with the field type (numbers / booleans / strings, or
+    lists / dicts for nested fields such as ``schymanski_levels``).
+
+    Example file (any subset of fields)::
+
+        {"cosine_confident": 0.75, "ppm_tolerance": 15.0, "qvalue_threshold": 0.05}
+    """
+    if path is None:
+        return DEFAULT
+    overrides = json.loads(Path(path).read_text(encoding="utf-8"))
+    if not isinstance(overrides, dict):
+        raise ValueError(
+            f"--params-json must be a JSON object, got {type(overrides).__name__}"
+        )
+    try:
+        return replace(DEFAULT, **overrides)
+    except TypeError as exc:
+        # replace() raises "unexpected keyword argument" for an unknown key;
+        # re-raise with the field list so the failure is self-explanatory.
+        valid = sorted(f.name for f in __import__("dataclasses").fields(Params))
+        raise ValueError(
+            f"--params-json {path}: {exc}; valid keys: {valid}"
+        ) from exc

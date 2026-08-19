@@ -1,0 +1,61 @@
+Source Name	Characteristics[Organism]	Term Source REF	Term Accession Number	Characteristics[Organism part]	Term Source REF	Term Accession Number	Characteristics[Variant]	Term Source REF	Term Accession Number	Characteristics[Sample type]	Term Source REF	Term Accession Number	Protocol REF	Sample Name	Factor Value[Primary tumor location]	Term Source REF	Term Accession Number
+P01-Ltu	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Left colon			Colon Adenocarcinoma						Sample collection	P01-Ltu	Colon Adenocarcinoma		
+P01-LN	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Left colon			Normal						Sample collection	P01-LN	Normal		
+P02-Ltu	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Left colon			Colon Adenocarcinoma						Sample collection	P02-Ltu	Colon Adenocarcinoma		
+P02-LN	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Left colon			Normal						Sample collection	P02-LN	Normal		
+P03-Ltu	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Left colon			Colon Adenocarcinoma						Sample collection	P03-Ltu	Colon Adenocarcinoma		
+P03-LN	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Left colon			Normal						Sample collection	P03-LN	Normal		
+P04-Ltu	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Left colon			Colon Adenocarcinoma						Sample collection	P04-Ltu	Colon Adenocarcinoma		
+P04-LN	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Left colon			Normal						Sample collection	P04-LN	Normal		
+P05-Ltu	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Left colon			Colon Adenocarcinoma						Sample collection	P05-Ltu	Colon Adenocarcinoma		
+P05-LN	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Left colon			Normal						Sample collection	P05-LN	Normal		
+P06-Ltu	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Left colon			Colon Adenocarcinoma						Sample collection	P06-Ltu	Colon Adenocarcinoma		
+P06-LN	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Left colon			Normal						Sample collection	P06-LN	Normal		
+P07-Ltu	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Left colon			Colon Adenocarcinoma						Sample collection	P07-Ltu	Colon Adenocarcinoma		
+P07-LN	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Left colon			Normal						Sample collection	P07-LN	Normal		
+P08-Ltu	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Left colon			Colon Adenocarcinoma						Sample collection	P08-Ltu	Colon Adenocarcinoma		
+P08-LN	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Left colon			Normal						Sample collection	P08-LN	Normal		
+P09-Ltu	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Left colon			Colon Adenocarcinoma						Sample collection	P09-Ltu	Colon Adenocarcinoma		
+P09-LN	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Left colon			Normal						Sample collection	P09-LN	Normal		
+P10-Ltu	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Left colon			Colon Adenocarcinoma						Sample collection	P10-Ltu	Colon Adenocarcinoma		
+P10-LN	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Left colon			Normal						Sample collection	P10-LN	Normal		
+P11-Rtu	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Right colon			Colon Adenocarcinoma						Sample collection	P11-Rtu	Colon Adenocarcinoma		
+P11-RN	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Right colon			Normal						Sample collection	P11-RN	Normal		
+P12-Rtu	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Right colon			Colon Adenocarcinoma						Sample collection	P12-Rtu	Colon Adenocarcinoma		
+P12-RN	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Right colon			Normal						Sample collection	P12-RN	Normal		
+P13-Rtu	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Right colon			Colon Adenocarcinoma						Sample collection	P13-Rtu	Colon Adenocarcinoma		
+P13-RN	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Right colon			Normal						Sample collection	P13-RN	Normal		
+P14-Rtu	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Right colon			Colon Adenocarcinoma						Sample collection	P14-Rtu	Colon Adenocarcinoma		
+P14-RN	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Right colon			Normal						Sample collection	P14-RN	Normal		
+P15-Rtu	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Right colon			Colon Adenocarcinoma						Sample collection	P15-Rtu	Colon Adenocarcinoma		
+P15-RN	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Right colon			Normal						Sample collection	P15-RN	Normal		
+P16-Rtu	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Right colon			Colon Adenocarcinoma						Sample collection	P16-Rtu	Colon Adenocarcinoma		
+P16-RN	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Right colon			Normal						Sample collection	P16-RN	Normal		
+P17-Rtu	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Right colon			Colon Adenocarcinoma						Sample collection	P17-Rtu	Colon Adenocarcinoma		
+P17-RN	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Right colon			Normal						Sample collection	P17-RN	Normal		
+P18-Rtu	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Right colon			Colon Adenocarcinoma						Sample collection	P18-Rtu	Colon Adenocarcinoma		
+P18-RN	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Right colon			Normal						Sample collection	P18-RN	Normal		
+P19-Rtu	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Right colon			Colon Adenocarcinoma						Sample collection	P19-Rtu	Colon Adenocarcinoma		
+P19-RN	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Right colon			Normal						Sample collection	P19-RN	Normal		
+P20-Rtu	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Right colon			Colon Adenocarcinoma						Sample collection	P20-Rtu	Colon Adenocarcinoma		
+P20-RN	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Right colon			Normal						Sample collection	P20-RN	Normal		
+P21-Rmu	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Right colon			Colon Adenocarcinoma						Sample collection	P21-Rmu	Colon Adenocarcinoma		
+P21-RN	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Right colon			Normal						Sample collection	P21-RN	Normal		
+P22-Rmu	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Right colon			Colon Adenocarcinoma						Sample collection	P22-Rmu	Colon Adenocarcinoma		
+P22-RN	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Right colon			Normal						Sample collection	P22-RN	Normal		
+P23-Rmu	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Right colon			Colon Adenocarcinoma						Sample collection	P23-Rmu	Colon Adenocarcinoma		
+P23-RN	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Right colon			Normal						Sample collection	P23-RN	Normal		
+P24-Rmu	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Right colon			Colon Adenocarcinoma						Sample collection	P24-Rmu	Colon Adenocarcinoma		
+P24-RN	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Right colon			Normal						Sample collection	P24-RN	Normal		
+P25-Rmu	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Right colon			Colon Adenocarcinoma						Sample collection	P25-Rmu	Colon Adenocarcinoma		
+P25-RN	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Right colon			Normal						Sample collection	P25-RN	Normal		
+P26-Rmu	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Right colon			Colon Adenocarcinoma						Sample collection	P26-Rmu	Colon Adenocarcinoma		
+P26-RN	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Right colon			Normal						Sample collection	P26-RN	Normal		
+P27-Rmu	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Right colon			Colon Adenocarcinoma						Sample collection	P27-Rmu	Colon Adenocarcinoma		
+P27-RN	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Right colon			Normal						Sample collection	P27-RN	Normal		
+P28-Rmu	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Right colon			Colon Adenocarcinoma						Sample collection	P28-Rmu	Colon Adenocarcinoma		
+P28-RN	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Right colon			Normal						Sample collection	P28-RN	Normal		
+P29-Rmu	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Right colon			Colon Adenocarcinoma						Sample collection	P29-Rmu	Colon Adenocarcinoma		
+P29-RN	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Right colon			Normal						Sample collection	P29-RN	Normal		
+P30-Rmu	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Right colon			Colon Adenocarcinoma						Sample collection	P30-Rmu	Colon Adenocarcinoma		
+P30-RN	Homo sapiens	NCBITaxon	http://purl.obolibrary.org/obo/NCBITaxon_9606	Right colon			Normal						Sample collection	P30-RN	Normal		

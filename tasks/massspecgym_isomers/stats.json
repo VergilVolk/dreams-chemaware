@@ -1,0 +1,15 @@
+{
+  "fold": "train",
+  "n_unique_ik14": 23223,
+  "n_isomer_pairs": 21944,
+  "n_mces_computed": 21208,
+  "skipped_large_mol": 736,
+  "n_near": 3296,
+  "n_mid": 3639,
+  "n_far": 14273,
+  "n_uncomputed": 0,
+  "mces_raw_min": 0.0,
+  "mces_raw_max": 30.5,
+  "mces_raw_mean": 7.600033006412675,
+  "mces_raw_median": 8.0
+}

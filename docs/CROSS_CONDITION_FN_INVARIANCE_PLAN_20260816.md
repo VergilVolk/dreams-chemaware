@@ -172,7 +172,32 @@ FN 的根源是"条件特异峰"，但**条件改变的是峰的相对丰度比�
    preserve_cosine 0.998（未触发 0.995 地板）；`cond=0.31` 有**真梯度**。证实"真实跨条件对的一致性损失有
    headroom"，对照 Step 3 强度抖动无 headroom（`docs/WEIGHTED_RULE_NOISE_TRAINING_PLAN` §3.8）。
    L2 遮蔽（§4.2）对 FN 是补充、主攻 FP，等 L1 在 locked benchmark 上看到 gap 动之后再上。
-4. **M4 层级**：按需解冻 last-1/last-2 层，重复测。
+
+   **结果（2026-08-18，3 种子 locked benchmark，GPU V100）**：head-only 两版都**失败**于 FP 守卫——
+   - v1（纯 `1−cos` + ceiling 守卫）：seed 2 neg **0.327→0.408**、margin **0.496→0.448**（FP 回归大于 FN 改善）。
+   - v2（加相对 margin 0.40 + preserve 权重 2.0）：3 种子一致，cross **0.823→0.851**（+0.028，FN 改善真实、
+     可复现），但 neg **0.327→0.386**（+0.060，仍是 cross 的 2 倍多）、margin **0.496→0.464**（−0.033，检索分离缩小）；
+     gap_vs_floor 0.086→0.076（次要）。margin 项把 FP 损伤从 v1 的 +0.081 压到 +0.060，**但没反转**。
+     `both` 分层（仪器+CE 都不同）margin≈0.06、CI 含 0，近坍缩。preserve 掉到 0.967（权重 2.0 压不住）。
+   **结论**：head-only 线性头不足（§6 预言命中）——线性头无法区分"跨条件同分子"与"不同分子"，条件特异信息
+   纠缠在 backbone 峰级表征里；再加大 preserve 就回到 §5 的"钉死输出 0.0"。→ 转 M4：解冻最后 1–2 层。
+4. **M4 层级**：✅ 脚本已建（2026-08-18，`tasks/step3_m4_cross_condition_train.py`，`--unfreeze-layers` 默认 1、
+   `--backbone-lr` 5e-5）+ smoke 跑通（150 对/1 epoch CPU：cross 0.682→0.733、margin 0.329→0.356、preserve 0.995 没破，
+   梯度确实过了 backbone 12.6M 参数）。**同时修了 benchmark 静默 bug**：原 benchmark 只加载 head、不加载 backbone，
+   M4 改的 backbone 会被官方权重顶掉（等于白跑）；现已在 `eval_condition_invariance_benchmark.py` 加
+   `model.backbone.load_state_dict(official_backbone_state(...))`。**结果（2026-08-18，3 种子 locked benchmark，GPU V100）**：解冻 last-1 层**失败于 FP 守卫，且比 M3 v2 更差**——
+   cross 0.823→0.873（+0.050，FN 涨得比 M3 v2 的 +0.028 多），但 neg 0.327→0.424（+0.097，比 M3 v2 的 +0.060 更糟）、
+   margin 0.496→0.449（−0.048，比 M3 v2 的 −0.033 更塌）。3 种子高度一致（cross 0.872/0.873/0.873、neg 0.421/0.427/0.425、
+   margin 0.451/0.446/0.448）。`both` 分层（仪器+CE 都不同）cross 0.409→0.570 大涨但 neg 0.382→0.486 同步涨、margin 仍 ~0.08 近坍缩。
+   **结论**：解冻没让 backbone 学会抑制条件特异峰，而是给了它更多自由度做**全局收缩**（cross 和 neg 一起往上拉）——条件信息
+   纠缠在 peak 级、最后一层够不着。趋势（M3 v1 neg 0.408 → v2 neg 0.386 → M4 neg 0.424）表明「容量越大、收缩越狠」，
+   **last-2 只会更糟，跳过**。转 M5（条件判别器 + GRL 梯度反转）或先改 loss（把无界 `1−cos` 收缩项封顶在同条件地板 ~0.91）。
+   **loss v3（2026-08-18，解冻 last-1 + 绝对锚，GPU V100）也失败于 FP 守卫，但比 v2 好**：把相对 margin 换成绝对锚
+   `cond=relu(0.88−cos(pos))` + `neg_guard=relu(cos(neg)−0.35)` + preserve。3 种子 val（1523 对）：cross 0.823→**0.860**（+0.037）、
+   neg 0.327→**0.391**（+0.064）、margin 0.496→**0.469**（−0.027）。neg 从 M4 v2 的 0.424 压回 0.391（绝对天花板比相对 margin 有效），
+   **但没反转 FP**。train/val 断层是实锤：train neg 0.370→0.270（往下）但 val neg 0.327→0.391（往上）——neg_guard 只记住了 2000 个
+   训练负例、不泛化到 val。结论：4/4 个「拉近 cross 对」方案（M3 v1/v2、M4 v2/v3）全部失败于 FP，机理一致（拉近→全局收缩→val neg 上升），
+   cross 天花板已到。→ 转 M5（GRL 条件判别器），换机制：不拉对、改删条件信息。
 5. **M5 L3**：条件判别器 + GRL（CaNE 稳定化），仅在 L1+L2 不够时上。
 6. **M6 锁定判定**：§8 验证链全绿 → 才宣称改正；否则回 M3 改机制。
 

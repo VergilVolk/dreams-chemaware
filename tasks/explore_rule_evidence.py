@@ -1,15 +1,25 @@
-"""Explore rule-hit structure on Met/neg query spectra to decide the rule-injection
+"""Explore rule-hit structure on query spectra to decide the rule-injection
 mechanism (do NOT invent a threshold; measure first).
 
-Caches the 13,770 x 335 rule-hit matrix to
-data/msv100574/embeddings/met_neg/rule_hits.npy + rule_meta.json, then reports:
+Caches the N x 335 rule-hit matrix to <manifest dir>/rule_hits.npy + rule_meta.json
+(rule_hits.npy must sit next to the query manifest — annotation.cli reads it from
+query_dir/rule_hits.npy), then reports:
   1. per-category hit density (NL is ~18.6/spectrum -> no discrimination; CF is
      ~1.3/spectrum -> sparse, structurally specific),
   2. CF-hit count vs confident-annotation rate (does CF evidence track confident
      library matches?).
+
+Usage (默认 Met/neg):
+    python tasks/explore_rule_evidence.py
+Usage (pos/lipid):
+    python tasks/explore_rule_evidence.py \
+        --manifest data/msv100574/embeddings/met_pos/manifest.csv \
+        --hdf5-dir data/msv100574/Metabolomics/pos \
+        --annotations data/msv100574/annotation/met_pos/annotations.csv
 """
 from __future__ import annotations
 
+import argparse
 import json
 from pathlib import Path
 
@@ -68,12 +78,24 @@ def spectrum_rule_vector(mz_padded: np.ndarray, precursor: float, rules: list[di
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--manifest", type=Path,
+                        default=ROOT / "data/msv100574/embeddings/met_neg/manifest.csv",
+                        help="query manifest.csv（rule_hits.npy 写到它的同目录）")
+    parser.add_argument("--hdf5-dir", type=Path,
+                        default=ROOT / "data/msv100574/Metabolomics/neg",
+                        help="含 <file_name>.hdf5 原始谱文件的目录")
+    parser.add_argument("--annotations", type=Path,
+                        default=ROOT / "data/msv100574/annotation/met_neg/annotations.csv",
+                        help="可选，用于 CF-vs-confident 分析（不存在则跳过）")
+    args = parser.parse_args()
+
     rules = json.loads((ROOT / "dreams/models/chem_aware/chem_rules_data.json").read_text(encoding="utf-8"))["rules"]
-    manifest = pd.read_csv(ROOT / "data/msv100574/embeddings/met_neg/manifest.csv")
+    manifest = pd.read_csv(args.manifest)
 
     vecs = []
     for fname, grp in manifest.groupby("file_name"):
-        hdf = ROOT / f"data/msv100574/Metabolomics/neg/{fname}.hdf5"
+        hdf = args.hdf5_dir / f"{fname}.hdf5"
         with h5py.File(hdf, "r") as h:
             spec = np.asarray(h["spectrum"][:], dtype=np.float32)
             prec = np.asarray(h["precursor_mz"][:], dtype=np.float32)
@@ -82,7 +104,7 @@ def main() -> None:
     V = np.stack(vecs).astype(np.uint8)
     print("rule-hit matrix:", V.shape, flush=True)
 
-    out_dir = ROOT / "data/msv100574/embeddings/met_neg"
+    out_dir = args.manifest.parent  # 必须和 manifest 同目录：annotation.cli 从 query_dir/rule_hits.npy 读
     np.save(out_dir / "rule_hits.npy", V)
     (out_dir / "rule_meta.json").write_text(json.dumps({
         "rule_name": [r["name"] for r in rules],
@@ -109,7 +131,12 @@ def main() -> None:
     print(f"  fraction spectra with >=1 CF hit: {(cf >= 1).mean():.4f}", flush=True)
 
     # CF hit count vs confident-annotation rate (top1 cosine>=0.7 & mz_pass)
-    ann = pd.read_csv(ROOT / "data/msv100574/annotation/met_neg/annotations.csv")
+    ann_path = args.annotations
+    if not ann_path.exists():
+        print("\n[skip] annotations.csv 不存在；rule_hits.npy 已写盘。先跑 annotate，"
+              "再重跑本脚本即可得到 CF-vs-confident 分析。", flush=True)
+        return
+    ann = pd.read_csv(ann_path)
     top1 = ann[ann["rank"] == 1].sort_values("query_idx")
     conf = ((top1["cosine"] >= 0.7) & top1["mz_pass"]).to_numpy()
     assert len(conf) == len(cf), (len(conf), len(cf))

@@ -1,0 +1,105 @@
+ONTOLOGY SOURCE REFERENCE
+Term Source Name	CHMO	EFO	MI	MONDO	MTBLS	NCBITaxon	NCIT	OBI	PRIDE	PSI:MS
+Term Source File	http://purl.obolibrary.org/obo/chmo.owl	http://www.ebi.ac.uk/efo/efo.owl	http://purl.obolibrary.org/obo/mi.owl	https://purl.obolibrary.org/obo/mondo/mondo-international.owl	https://github.com/EBI-Metabolights/MtblsWS-Py/blob/main/resources/Metabolights.owl	http://purl.obolibrary.org/obo/ncbitaxon.owl	http://purl.obolibrary.org/obo/ncit.owl	http://purl.obolibrary.org/obo/obi.owl	https://raw.githubusercontent.com/PRIDE-Utilities/pride-ontology/master/pride_cv.owl	
+Term Source Version	2025-10-21	3.88.0		2026-03-03		2025-12-03	25.06e	2025-12-18		
+Term Source Description	Chemical Methods Ontology	Experimental Factor Ontology	Molecular Interactions Controlled Vocabulary	Mondo Disease Ontology	MetaboLights Controlled Vocabulary	NCBI organismal classification	NCI Thesaurus OBO Edition	Ontology for Biomedical Investigations	Proteomics Identification Database Ontology	
+INVESTIGATION
+Investigation Identifier	MTBLS13729
+Investigation Title	Spatial and Untargeted Metabolomics Define Location- and Histology-Specific Metabolic Reprogramming in Colorectal Cancer
+Investigation Description	Created using the MetaboLights Online Editor (MOE)
+Investigation Submission Date	2026-01-20
+Investigation Public Release Date	2026-03-24
+Comment[Created With Configuration]	MetaboLightsConfig20150707
+Comment[Last Opened With Configuration]	MetaboLightsConfig20150707
+INVESTIGATION PUBLICATIONS
+Investigation PubMed ID
+Investigation Publication DOI
+Investigation Publication Author List
+Investigation Publication Title
+Investigation Publication Status
+Investigation Publication Status Term Accession Number
+Investigation Publication Status Term Source REF
+INVESTIGATION CONTACTS
+Investigation Person Last Name
+Investigation Person First Name
+Investigation Person Mid Initials
+Investigation Person Email
+Investigation Person Phone
+Investigation Person Fax
+Investigation Person Address
+Investigation Person Affiliation
+Investigation Person Roles
+Investigation Person Roles Term Accession Number
+Investigation Person Roles Term Source REF
+STUDY
+Study Identifier	MTBLS13729
+Study Title	Spatial and Untargeted Metabolomics Define Location- and Histology-Specific Metabolic Reprogramming in Colorectal Cancer
+Study Description	<p>Colorectal cancer (CRC) exhibits profound molecular heterogeneity based on primary tumor location. A comprehensive understanding of the spatially resolved metabolic differences between right-sided (RCC) and left-sided (LCC) carcinomas remains elusive. Here, to eliminate the influence of inter-individual heterogeneity on metabolic differences, we performed spatial metabolomics using matrix-assisted laser desorption/ionization mass spectrometry imaging (MALDI-MSI) on synchronous bilateral tumors from the same patient. This was complemented by untargeted metabolomic profiling via ultrahigh-performance liquid chromatography-tandem mass spectrometry (UHPLC-MS/MS) on tumor and matched normal tissues from 30 CRC patients with different locations and histologies. Our analysis identified 345 metabolites and revealed distinct, location-specific metabolic reprogramming. Among these, 72 altered metabolites between left- (Ltu) and right-sided colon tubular adenocarcinomas (Rtu) indicated disruptions in ether lipid and phosphatidylcholine metabolism of Ltu and nucleotide, amino sugar, and fatty acid metabolism of Rtu. Furthermore, right-sided mucinous adenocarcinomas (Rmu) were characterized by unique sphingolipid metabolism reprogramming, shifting from an 'apoptosis-promoting signaling' to a 'structural construction' function, compared to Rtu. N-Acetylneuraminic acid, oleoyl-l-carnitine and 12-Hydroxystearic acid are representative DEMs in the aforementioned pathway. Spatial analysis delineated metabolic profiles varied spatially from the tumor center to the periphery. Collectively, our findings underscore the influence of primary tumor location on metabolism and suggest subtype-specific metabolic adaptation mechanisms associated with histology and spatial architecture.</p>
+Study Submission Date	2026-01-20
+Study Public Release Date	2026-03-24
+Study File Name	s_MTBLS13729.txt
+Comment[Created At]	2026-01-20T04:56:43.174860
+Comment[License]	CC0 1.0 Universal
+Comment[Revision]	1
+Comment[Revision Date]	
+Comment[Revision Log]	Initial revision
+Comment[Sample Template]	minimum
+Comment[Study Category]	other
+Comment[Study Template]	
+Comment[Template Version]	1.0
+STUDY DESIGN DESCRIPTORS
+Study Design Type	untargeted metabolites	cancer	Multi-omics study	ultra-performance liquid chromatography-mass spectrometry
+Study Design Type Term Accession Number	http://www.ebi.ac.uk/metabolights/ontology/MTBLS_000279	http://purl.obolibrary.org/obo/MONDO_0004992	http://purl.obolibrary.org/obo/PRIDE_0000461	http://purl.obolibrary.org/obo/CHMO_0000715
+Study Design Type Term Source REF	MTBLS	MONDO	PRIDE	CHMO
+STUDY PUBLICATIONS
+Study PubMed ID	
+Study Publication DOI	
+Study Publication Author List	Junfeng Wang, Jinjin Gao, Jia Liu, Dongzhi Hu and Yang Zhan
+Study Publication Title	Spatial and Untargeted Metabolomics Define Location- and Histology-Specific Metabolic Reprogramming in Colorectal Cancer
+Study Publication Status	in preparation
+Study Publication Status Term Accession Number	http://www.ebi.ac.uk/efo/EFO_0001795
+Study Publication Status Term Source REF	EFO
+STUDY FACTORS
+Study Factor Name	Primary tumor location
+Study Factor Type	Anatomical Location of Primary Lesion
+Study Factor Type Term Accession Number	http://purl.obolibrary.org/obo/NCIT_C181315
+Study Factor Type Term Source REF	NCIT
+STUDY ASSAYS
+Study Assay File Name	a_MTBLS13729_LC-MS_positive_hilic_metabolite_profiling.txt	a_MTBLS13729_LC-MS_negative_hilic_metabolite_profiling.txt	a_MTBLS13729_LC-MS_positive_reverse-phase_metabolite_profiling.txt	a_MTBLS13729_LC-MS_negative_reverse-phase_metabolite_profiling.txt
+Study Assay Measurement Type	metabolite profiling assay	metabolite profiling assay	metabolite profiling assay	metabolite profiling assay
+Study Assay Measurement Type Term Accession Number	http://purl.obolibrary.org/obo/OBI_0000366	http://purl.obolibrary.org/obo/OBI_0000366	http://purl.obolibrary.org/obo/OBI_0000366	http://purl.obolibrary.org/obo/OBI_0000366
+Study Assay Measurement Type Term Source REF	OBI	OBI	OBI	OBI
+Study Assay Technology Type	mass spectrometry assay	mass spectrometry assay	mass spectrometry assay	mass spectrometry assay
+Study Assay Technology Type Term Accession Number	http://purl.obolibrary.org/obo/OBI_0000470	http://purl.obolibrary.org/obo/OBI_0000470	http://purl.obolibrary.org/obo/OBI_0000470	http://purl.obolibrary.org/obo/OBI_0000470
+Study Assay Technology Type Term Source REF	OBI	OBI	OBI	OBI
+Study Assay Technology Platform	Liquid Chromatography MS - positive - hilic	Liquid Chromatography MS - negative - hilic	Liquid Chromatography MS - positive - reverse-phase	Liquid Chromatography MS - negative - reverse-phase
+Comment[Assay Identifier]				
+Comment[Assay Type Label]	LC-MS	LC-MS	LC-MS	LC-MS
+STUDY PROTOCOLS
+Study Protocol Name	Sample collection	Extraction	Chromatography	Mass spectrometry	Data transformation	Metabolite identification
+Study Protocol Type	Sample collection	Extraction	chromatography	mass spectrometry	data transformation	metabolite identification
+Study Protocol Type Term Accession Number	http://www.ebi.ac.uk/metabolights/ontology/MTBLS_001100	http://www.ebi.ac.uk/metabolights/ontology/MTBLS_001105	http://purl.obolibrary.org/obo/CHMO_0001000	http://purl.obolibrary.org/obo/CHMO_0000470	http://purl.obolibrary.org/obo/OBI_0200000	http://purl.obolibrary.org/obo/MI_2131
+Study Protocol Type Term Source REF	MTBLS	MTBLS	CHMO	CHMO	OBI	MI
+Study Protocol Description	<p>Thirty pairs of matched colorectal cancer samples were sourced from left-sided tubular adenocarcinomas, right-sided tubular adenocarcinomas, and right-sided mucinous adenocarcinomas, along with their corresponding normal colon tissues.&nbsp;</p>	<p>Colon tissue was weighted and freeze-homogenized in 20 times the volume (μl/mg) of 80% aqueous methanol by using a Tissuelyser (JX-24, Jingxin, Shanghai, China) with zirconia beads at 50 Hz for 4 min. After centrifugation at 16000 g and 4 ℃ for 15 min, the supernatant (300 μL) was evaporated to dryness under mild nitrogen and reconstituted in 100 μL of 50% acetonitrile including internal standard before performing UHPLC-HRMS/MS analysis. Quality control (QC) sample was obtained by isometrically pooling all the prepared samples.</p>	<p>RPLC: Chromatographic separation was performed on a Ultimate 3000 UHPLC system (Thermo Fisher Scientific) with an Acquity UPLC BEH C18 column (2.1 mm × 100 mm, 1.7 μm, Waters Corporation). The mobile phases contained of (A) 95% methanol and (B) water, both with 0.1% formic acid (positive mode) or 6.5 mM ammonium bicarbonate (negative mode). A linear gradient elution was performed with the following program: 0-1 min, 98%B; 10 min, 0%B; 13 min, 0%B; 13.1 min, 98%B; 15 min, 98%B (positive mode), or 0-1 min, 98%B; 10 min, 0%B; 12 min, 0%B; 12.1 min, 98%B; 14 min, 98%B (negative mode). The flow rate was 0.35 mL/min. The injection volume is 2 μL (positive mode) and 3 μL (negative mode).</p><p><br></p><p>HILIC: Chromatographic separation was performed on a Ultimate 3000 UHPLC system (Thermo Fisher Scientific) with an Acquity UPLC BEH Amide column (2.1 mm × 100 mm, 1.7 μm, Waters Corporation). The mobile phases contained of (A) 90% acetonitrile and (B) water, both with 10 mM ammonium formate and 0.1% formic acid (positive mode) or 15 mM ammonium acetate and 0.1% ammonium hydroxide (negative mode). A linear gradient elution was performed with the following program: 0-1 min, 5%B; 7 min, 25%B; 9 min, 60%B; 10 min, 60%B; 10.1 min, 5%B; 12 min, 5%B (positive mode), or 0-0.5 min, 0%B; 8 min, 22%B; 9.5 min, 45%B; 10.5 min, 45%B; 10.6 min, 0%B; 13 min, 0%B (negative mode). The flow rate was 0.3 mL/min. The injection volume is 1 μL (positive mode) and 2 μL (negative mode)</p>	<p>The metabolites were determined by a ThermoFisher Q Exactive Hybrid Quadrupole-Orbitrap Mass Spectrometry in Heated Electrospray Ionization Negative mode, respectively. Spray voltage was set to 3.5 kV. Both Capillary and Aux Gas Temperature were350 °C. Sheath gas flow rate was 40 (Arb). Aux gas flow rate was 10 (Arb). S-Lens RF Level was 50 (Arb). The full scan was operated at a high-resolution of 35000 FWHM (m/z=200) at a range of 70-1050 m/z with AGC Target setting at 3e6. Simultaneously, the fragment ions information of top 8 precursors each scan was acquired by Data-dependant acquisition (DDA) with HCD energy at 15, 30 and 45 eV, mass resolution of 17500 FWHM, and AGC Target of 2e5.</p>	<p>The raw data of UHPLC-HRMS/MS were preprocessed by Compound Discoverer (verison 3.3, Thermo Fisher Scientific) with metabolomics workflow template, where retention times alignment, compound detection, compound group, and structural identification were performed. The following parameters were applied in compound identification: (1) accurate mass to charge ratio (m/z) of parent ion, denoted as MS1; (2) mass spectra of fragment ions, denoted as MS2; and (3) chromatographic retention times (RT). The above three parameters were matched against the in-house database (containing MS1, MS2 and chromatographic retention times), as well as public or commercial databases such as mzCloud database. The tolerances of MS1 and MS2 to theoretical mass to charge ratio were limited to 5 ppm and 10 ppm, respectively, and the threshold of MS2 matching similarity was set to 70%. RT tolerance is set to 1 min for in-house database, and infinity for public or commercial library. All compounds identified by software were reviewed by experienced expert</p>	<p>Paired test was conducted in both univariate statistical analysis and multivariate statistical analysis. For multivariate statistical analysis, the normalized data were preprocessed by par scaling and mean centering before performing PCA, PLS-DA, and OPLS-DA. The model quality is described by the R2X or R2Y and Q2 values. R2X (PCA)or R2Y(PLS-DA and OPLS-DA) is defined as the proportion of variance in the data explained by the models and indicates the goodness of fit. Q2 is defined as the proportion of variance in the data predictable by current model and indicates the predictability of current model, calculated by cross-validation procedure. In order to avoid model over-fitting, a default 10-round cross-validation was performed throughout to determine the optimal number of principal components. For univariate statistical analysis, the normalized data were analyzed in R platform, where parametric test was performed on the data of normal distribution by Welch’s t test, while nonparametric test was performed on the data of abnormal distribution by Wilcoxon Mann-Whitney test. The p values of univariate statistical analysis lower than 0.05 and fold change (FC) larger than 1.2 were identified as potential differential metabolites. Fold change (Log2FC) was calculated as binary logarithm of average normalized peak intensity ratio between A and B, where the positive value means that the average mass response of A is higher than B.</p>
+Study Protocol URI						
+Study Protocol Version						
+Study Protocol Parameters Name		Post Extraction;Derivatization	Chromatography Instrument;Autosampler model;Column model;Column type;Guard column	Scan polarity;Scan m/z range;Instrument;Ion source;Mass analyzer		
+Study Protocol Parameters Name Term Accession Number		;	;;;;	;;;;		
+Study Protocol Parameters Name Term Source REF		;	;;;;	;;;;		
+Study Protocol Components Name						
+Study Protocol Components Type						
+Study Protocol Components Type Term Accession Number						
+Study Protocol Components Type Term Source REF						
+STUDY CONTACTS
+Study Person Last Name	Zhan
+Study Person First Name	Yang
+Study Person Mid Initials	
+Study Person Email	zhanyang@tmu.edu.cn
+Study Person Phone	
+Study Person Fax	
+Study Person Address	Huan huxi Street,District, Tianjin, 300060,China
+Study Person Affiliation	Tianjin Medical University Cancer Institute and Hospital
+Study Person Roles	Principal Investigator
+Study Person Roles Term Accession Number	http://purl.obolibrary.org/obo/NCIT_C19924
+Study Person Roles Term Source REF	NCIT
+Comment[Study Person Alternative Email]	zhanyang@tjmuch.com

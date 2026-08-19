@@ -1,0 +1,22 @@
+{
+  "fold": "train",
+  "n_spectra_fold": 185919,
+  "n_unique_ik14": 23223,
+  "n_unique_smiles": 25455,
+  "n_formula": 14891,
+  "n_formula_multi_ik": 3865,
+  "total_isomer_pairs": 21944,
+  "group_size_min": 2,
+  "group_size_max": 26,
+  "group_size_mean": 3.1557567917205693,
+  "group_size_median": 2.0,
+  "tanimoto_pairs_computed": 21908,
+  "tanimoto_histogram": {
+    "<0.2": 8455,
+    "0.2-0.4": 6431,
+    "0.4-0.6": 3623,
+    "0.6-0.8": 2490,
+    "0.8-0.9": 390,
+    "0.9-1.0": 519
+  }
+}

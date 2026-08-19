@@ -34,32 +34,65 @@ def group_counts(conf: pd.DataFrame, group_col: str, inchikey_col: str = "lib_in
     return g
 
 
+def sample_counts(
+    conf: pd.DataFrame,
+    group_col: str,
+    sample_col: str = "query_file",
+    inchikey_col: str = "lib_inchikey",
+) -> pd.DataFrame:
+    """Presence/absence per sample: # unique samples per (compound, group) with >=1
+    confident top-1 hit. This is the sample-level unit of analysis (one point per
+    biological sample, not per spectrum)."""
+    present = conf[[inchikey_col, group_col, sample_col]].drop_duplicates()
+    return present.groupby([inchikey_col, group_col]).size().rename("n_samples").reset_index()
+
+
 def differential(
     conf: pd.DataFrame,
     group_col: str,
     group_a: str,
     group_b: str,
     params: Params,
+    total_a: int | None = None,
+    total_b: int | None = None,
+    sample_col: str = "query_file",
 ) -> pd.DataFrame:
-    """Fisher-exact differential test of confident top-1 spectral counts between
-    group_a and group_b. Returns one row per compound with counts, p-value and
-    BH-corrected q-value."""
+    """Fisher-exact differential test at the **sample** level (presence/absence per
+    sample). Replaces the old spectral-count 2x2 table, which pseudoreplicated (one
+    sample -> many spectra -> inflated significance).
+
+    For each compound: a = # samples in group_a with >=1 confident top-1 hit,
+    b = # samples in group_b likewise. Table = [[a, total_a - a], [b, total_b - b]].
+    total_a/total_b are the number of samples per group (pass from the full
+    annotations so samples with zero confident hits still count); falls back to the
+    unique samples seen in `conf` if not given.
+    """
     from scipy.stats import fisher_exact
 
-    counts = group_counts(conf, group_col)
-    total_a = int(conf[conf[group_col] == group_a].shape[0])
-    total_b = int(conf[conf[group_col] == group_b].shape[0])
+    s_counts = sample_counts(conf, group_col, sample_col)
+    spec_counts = group_counts(conf, group_col)  # spectral counts, kept for reference
+    if total_a is None:
+        total_a = int(conf.loc[conf[group_col] == group_a, sample_col].nunique())
+    if total_b is None:
+        total_b = int(conf.loc[conf[group_col] == group_b, sample_col].nunique())
 
     rows = []
-    for inchikey, sub in counts.groupby("lib_inchikey"):
-        a = int(sub.loc[sub[group_col] == group_a, "n"].sum())
-        b = int(sub.loc[sub[group_col] == group_b, "n"].sum())
+    for inchikey, sub in s_counts.groupby("lib_inchikey"):
+        a = int(sub.loc[sub[group_col] == group_a, "n_samples"].sum())
+        b = int(sub.loc[sub[group_col] == group_b, "n_samples"].sum())
         table = [[a, total_a - a], [b, total_b - b]]
         odds, p = fisher_exact(table)
+        spec = spec_counts[spec_counts["lib_inchikey"] == inchikey]
+        sa = int(spec.loc[spec[group_col] == group_a, "n"].sum())
+        sb = int(spec.loc[spec[group_col] == group_b, "n"].sum())
         rows.append({
             "lib_inchikey": inchikey,
-            f"n_{group_a}": a,
-            f"n_{group_b}": b,
+            f"n_samples_{group_a}": a,
+            f"n_samples_{group_b}": b,
+            f"n_spectra_{group_a}": sa,
+            f"n_spectra_{group_b}": sb,
+            f"total_samples_{group_a}": total_a,
+            f"total_samples_{group_b}": total_b,
             "odds_ratio": float(odds),
             "p_value": float(p),
         })

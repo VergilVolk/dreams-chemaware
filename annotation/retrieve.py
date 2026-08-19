@@ -47,6 +47,36 @@ def chunked_topk(
     return topk_vals, topk_idx
 
 
+def chunked_topk_torch(
+    query: np.ndarray,
+    library: np.ndarray,
+    k: int,
+    chunk: int = 1024,
+    device: str = "cuda",
+) -> tuple[np.ndarray, np.ndarray]:
+    """GPU top-k via torch matmul + torch.topk (interface 7.7, retrieval backend).
+
+    Numerically equivalent to :func:`chunked_topk` (largest-k, descending): the
+    inputs are already L2-normalized, so ``query @ library.T`` is cosine. Query
+    rows are chunked to bound device memory; the (smaller) library is held on
+    device once. ``device`` may be ``"cuda"`` or ``"cpu"`` -- the CPU branch of
+    torch still uses a fused, threaded matmul and can beat numpy for large sets.
+    """
+    import torch
+
+    q = torch.as_tensor(query, dtype=torch.float32, device=device)
+    lib = torch.as_tensor(library, dtype=torch.float32, device=device)
+    n_query = q.shape[0]
+    topk_vals = np.empty((n_query, k), dtype=np.float32)
+    topk_idx = np.empty((n_query, k), dtype=np.int64)
+    for start in range(0, n_query, chunk):
+        stop = min(start + chunk, n_query)
+        vals, idx = torch.topk(q[start:stop] @ lib.T, k, dim=1)
+        topk_vals[start:stop] = vals.detach().cpu().numpy()
+        topk_idx[start:stop] = idx.detach().cpu().numpy()
+    return topk_vals, topk_idx
+
+
 def _normalize(arr: np.ndarray) -> np.ndarray:
     norms = np.linalg.norm(arr, axis=1)
     if not np.allclose(norms, 1.0, atol=1e-3):
@@ -64,6 +94,8 @@ def retrieve(
     library_dir: Path,
     params: Params,
     group_by: str | None = None,
+    backend: str = "cpu",
+    device: str = "cuda",
 ) -> tuple[pd.DataFrame, dict]:
     """Run top-k retrieval and return (annotations, report).
 
@@ -80,7 +112,12 @@ def retrieve(
     query = _normalize(query)
     library = _normalize(library)
 
-    topk_vals, topk_idx = chunked_topk(query, library, params.topk)
+    if backend == "gpu":
+        topk_vals, topk_idx = chunked_topk_torch(query, library, params.topk, device=device)
+    elif backend == "cpu":
+        topk_vals, topk_idx = chunked_topk(query, library, params.topk)
+    else:
+        raise ValueError(f"unknown retrieval backend {backend!r} (expected 'cpu' | 'gpu')")
 
     q_pmz = q_manifest["precursor_mz"].to_numpy(dtype=np.float64)
     l_pmz = l_manifest["precursor_mz"].to_numpy(dtype=np.float64)
@@ -133,6 +170,8 @@ def retrieve(
         "cosine_confident": params.cosine_confident,
         "annotation_rate_cosine_only": rates_cos,
         "annotation_rate_cosine_and_mz": rates_mz,
+        "backend": backend,
+        "device": device,
         "sources": {"ppm": source("dreams"), "cosine": source("dreams")},
     }
     return hits, report

@@ -181,3 +181,12 @@ render.js
 dreams_fullspectrum.json
 dreams_zeroshot_baseline.json
 tasks/ms2ds_scores_T*.json
+
+# Slurm / job log outputs (transient)
+*.out
+
+# Step 3 generated isomer-pair datasets (large derived data — regenerate via tasks/)
+tasks/massspecgym_isomers/dataset_manifest.json
+tasks/massspecgym_isomers/pairs.json
+tasks/massspecgym_isomers/ik_to_smiles.json
+tasks/massspecgym_isomers/ik_to_rows.json

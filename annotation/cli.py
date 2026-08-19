@@ -27,7 +27,7 @@ import numpy as np
 import pandas as pd
 
 from . import __version__
-from .params import Params, DEFAULT
+from .params import load_params
 
 
 def parse_mgf(path: Path) -> list[dict]:
@@ -102,14 +102,15 @@ def cmd_embed(args) -> int:
 
 def cmd_annotate(args) -> int:
     from . import retrieve, confidence, fdr, calibrate, ablation
-    from .params import DEFAULT, Params
-    import dataclasses
 
-    params = DEFAULT
+    params = load_params(args.params_json)
     query_dir, library_dir, out = Path(args.query_dir), Path(args.library_dir), Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
 
-    hits, report = retrieve.retrieve(query_dir, library_dir, params, group_by=args.group_col)
+    hits, report = retrieve.retrieve(
+        query_dir, library_dir, params, group_by=args.group_col,
+        backend=args.backend, device=args.device,
+    )
     print(json.dumps(report, indent=2))
 
     if args.fdr:
@@ -181,6 +182,14 @@ def build_parser() -> argparse.ArgumentParser:
     a.add_argument("--calibrate", action="store_true")
     a.add_argument("--rules", action="store_true",
                    help="inject diagnostic-rule evidence (reads rule_hits.npy cache)")
+    a.add_argument("--params-json", default=None,
+                   help="optional JSON file overriding any Params field "
+                        "(cosine_confident, ppm_tolerance, qvalue_threshold, ...); "
+                        "see annotation.params.load_params")
+    a.add_argument("--backend", choices=["cpu", "gpu"], default="cpu",
+                   help="retrieval backend (7.7): cpu=numpy matmul, gpu=torch matmul+topk")
+    a.add_argument("--device", default="cuda",
+                   help="torch device for --backend gpu (e.g. cuda | cpu)")
     a.set_defaults(func=cmd_annotate)
     return p
 

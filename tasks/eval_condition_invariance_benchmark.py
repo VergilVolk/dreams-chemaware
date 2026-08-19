@@ -46,6 +46,7 @@ sys.path.insert(0, str(ROOT / "tasks"))
 
 from e1_checkpoint_io import (  # noqa: E402
     checkpoint_kind,
+    official_backbone_state,
     official_head_state,
     torch_load_compat,
 )
@@ -338,6 +339,7 @@ def main() -> None:
         package = torch_load_compat(args.head_checkpoint, map_location="cpu")
         kind = checkpoint_kind(package)
         model.head.load_state_dict(official_head_state(package), strict=True)
+        model.backbone.load_state_dict(official_backbone_state(package), strict=True)
         tag = f"{kind}_epoch{int(package.get('epoch', -1))}"
     model.eval()
 
