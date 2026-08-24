@@ -123,10 +123,21 @@ def cmd_annotate(args) -> int:
             records = parse_mgf(Path(args.library_mgf))
             decoys = fdr.make_shuffle_decoys(records, seed=0)
             decoy_emb = E.embed_records(decoys, model, weight, bias, device, batch_size=64)
-            query, _ = retrieve.load_embedding_set(query_dir)
+            query, q_manifest = retrieve.load_embedding_set(query_dir)
             library, _ = retrieve.load_embedding_set(library_dir)
-            target_scores = fdr.top1_scores(query, library)
-            decoy_scores = fdr.top1_scores(query, decoy_emb)
+            _, l_manifest = retrieve.load_embedding_set(library_dir)
+            if params.mz_constraint:
+                target_scores = fdr.mz_masked_top1_scores(
+                    query, q_manifest["precursor_mz"].to_numpy(float),
+                    library, l_manifest["precursor_mz"].to_numpy(float), params.ppm_tolerance,
+                )
+                decoy_scores = fdr.mz_masked_top1_scores(
+                    query, q_manifest["precursor_mz"].to_numpy(float),
+                    decoy_emb, l_manifest["precursor_mz"].to_numpy(float), params.ppm_tolerance,
+                )
+            else:
+                target_scores = fdr.top1_scores(query, library)
+                decoy_scores = fdr.top1_scores(query, decoy_emb)
             hits = fdr.annotate_fdr(hits, target_scores, decoy_scores, params)
             n_fdr_pass = int(hits[hits["rank"] == 1]["fdr_pass"].sum())
             print(f"[fdr] {n_fdr_pass} top-1 hits pass q-value <= {params.qvalue_threshold}")

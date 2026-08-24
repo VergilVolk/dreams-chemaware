@@ -1,0 +1,22 @@
+{
+  "status": "g8r_p2b_rank_fusion_frozen",
+  "configuration": {
+    "normalization": "absolute",
+    "weights": [0.1, 0.0, 0.1, 0.8],
+    "min_support": 1,
+    "min_advantage": 0.0
+  },
+  "selected_features": [
+    "dreams_similarity",
+    "sqrt_cosine",
+    "entropy_similarity",
+    "neutral_loss_sqrt_cosine"
+  ],
+  "cache_sha256": "b103b2574593a629a63a3b24d6d801260271a1f856c6fb712d3f574ef7245731",
+  "cache_audit_sha256": "b562c7e5748ef6c04c593d0463969cc61b1c3de76e592f984dc36a65fe7987ae",
+  "selection_report_sha256": "af669c313403f5320d33cc4b26cc61e853e5a89b6a5a4837eb72bf8204bbc4e1",
+  "artifact_sha256": "3ed4af01661556be198058db4dacdfb4f7e1893928586231cc02476ff28046fc",
+  "hdf5_sha256": "ccda2c4114d9b21413977df03376ca0fc097956a7fa304b861a3154a2b81e64f",
+  "p3_lock_summary_sha256": "97c8e336e9a39caa01a75d537dfa85e0c93e8dcccf09903fb92a534b2251f7cb",
+  "p3_used_for_training_or_selection": false
+}

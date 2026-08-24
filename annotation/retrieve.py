@@ -47,6 +47,46 @@ def chunked_topk(
     return topk_vals, topk_idx
 
 
+def chunked_mz_constrained_topk(
+    query: np.ndarray,
+    query_mz: np.ndarray,
+    library: np.ndarray,
+    library_mz: np.ndarray,
+    k: int,
+    ppm_tolerance: float,
+    chunk: int = 512,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Top-k cosine *inside* each query's precursor-mass window.
+
+    Returning a validity mask is essential when fewer than ``k`` library spectra
+    fall in the mass window. Post-filtering an unconstrained global top-k is not
+    equivalent and can silently discard every chemically admissible candidate.
+    """
+    n_query = query.shape[0]
+    actual_k = min(k, library.shape[0])
+    values = np.full((n_query, actual_k), -np.inf, dtype=np.float32)
+    indices = np.full((n_query, actual_k), -1, dtype=np.int64)
+    valid = np.zeros((n_query, actual_k), dtype=bool)
+    for start in range(0, n_query, chunk):
+        stop = min(start + chunk, n_query)
+        sim = query[start:stop] @ library.T
+        delta_ppm = np.abs(query_mz[start:stop, None] - library_mz[None, :]) / np.maximum(
+            np.abs(library_mz[None, :]), 1e-9
+        ) * 1e6
+        admissible = delta_ppm <= ppm_tolerance
+        masked = np.where(admissible, sim, -np.inf)
+        idx = np.argpartition(masked, -actual_k, axis=1)[:, -actual_k:]
+        vals = np.take_along_axis(masked, idx, axis=1)
+        order = np.argsort(-vals, axis=1)
+        idx = np.take_along_axis(idx, order, axis=1)
+        vals = np.take_along_axis(vals, order, axis=1)
+        ok = np.isfinite(vals)
+        indices[start:stop] = np.where(ok, idx, -1)
+        values[start:stop] = vals
+        valid[start:stop] = ok
+    return values, indices, valid
+
+
 def chunked_topk_torch(
     query: np.ndarray,
     library: np.ndarray,
@@ -75,6 +115,45 @@ def chunked_topk_torch(
         topk_vals[start:stop] = vals.detach().cpu().numpy()
         topk_idx[start:stop] = idx.detach().cpu().numpy()
     return topk_vals, topk_idx
+
+
+def chunked_mz_constrained_topk_torch(
+    query: np.ndarray,
+    query_mz: np.ndarray,
+    library: np.ndarray,
+    library_mz: np.ndarray,
+    k: int,
+    ppm_tolerance: float,
+    chunk: int = 1024,
+    device: str = "cuda",
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Torch equivalent of :func:`chunked_mz_constrained_topk`."""
+    import torch
+
+    q = torch.as_tensor(query, dtype=torch.float32, device=device)
+    lib = torch.as_tensor(library, dtype=torch.float32, device=device)
+    q_mz = torch.as_tensor(query_mz, dtype=torch.float64, device=device)
+    l_mz = torch.as_tensor(library_mz, dtype=torch.float64, device=device)
+    n_query = q.shape[0]
+    actual_k = min(k, lib.shape[0])
+    values = np.full((n_query, actual_k), -np.inf, dtype=np.float32)
+    indices = np.full((n_query, actual_k), -1, dtype=np.int64)
+    valid = np.zeros((n_query, actual_k), dtype=bool)
+    for start in range(0, n_query, chunk):
+        stop = min(start + chunk, n_query)
+        sim = q[start:stop] @ lib.T
+        delta_ppm = torch.abs(q_mz[start:stop, None] - l_mz[None, :]) / torch.clamp(
+            torch.abs(l_mz[None, :]), min=1e-9
+        ) * 1e6
+        sim = sim.masked_fill(delta_ppm > ppm_tolerance, float("-inf"))
+        vals, idx = torch.topk(sim, actual_k, dim=1)
+        ok = torch.isfinite(vals)
+        values[start:stop] = vals.detach().cpu().numpy()
+        idx_np = idx.detach().cpu().numpy()
+        ok_np = ok.detach().cpu().numpy()
+        indices[start:stop] = np.where(ok_np, idx_np, -1)
+        valid[start:stop] = ok_np
+    return values, indices, valid
 
 
 def _normalize(arr: np.ndarray) -> np.ndarray:
@@ -112,25 +191,41 @@ def retrieve(
     query = _normalize(query)
     library = _normalize(library)
 
-    if backend == "gpu":
-        topk_vals, topk_idx = chunked_topk_torch(query, library, params.topk, device=device)
-    elif backend == "cpu":
-        topk_vals, topk_idx = chunked_topk(query, library, params.topk)
-    else:
-        raise ValueError(f"unknown retrieval backend {backend!r} (expected 'cpu' | 'gpu')")
-
     q_pmz = q_manifest["precursor_mz"].to_numpy(dtype=np.float64)
     l_pmz = l_manifest["precursor_mz"].to_numpy(dtype=np.float64)
+
+    if backend == "gpu":
+        if params.mz_constraint:
+            topk_vals, topk_idx, valid = chunked_mz_constrained_topk_torch(
+                query, q_pmz, library, l_pmz, params.topk, params.ppm_tolerance, device=device
+            )
+        else:
+            topk_vals, topk_idx = chunked_topk_torch(query, library, params.topk, device=device)
+            valid = np.ones_like(topk_vals, dtype=bool)
+    elif backend == "cpu":
+        if params.mz_constraint:
+            topk_vals, topk_idx, valid = chunked_mz_constrained_topk(
+                query, q_pmz, library, l_pmz, params.topk, params.ppm_tolerance
+            )
+        else:
+            topk_vals, topk_idx = chunked_topk(query, library, params.topk)
+            valid = np.ones_like(topk_vals, dtype=bool)
+    else:
+        raise ValueError(f"unknown retrieval backend {backend!r} (expected 'cpu' | 'gpu')")
 
     # long table
     rows = []
     l_smiles = l_manifest["smiles"].tolist()
     l_inchikey = l_manifest["inchikey"].tolist()
     l_name = l_manifest["name"].tolist()
+    l_source = l_manifest["source"].tolist() if "source" in l_manifest else [""] * len(library)
+    l_adduct = l_manifest["adduct"].tolist() if "adduct" in l_manifest else [""] * len(library)
     l_pmz_list = l_manifest["precursor_mz"].tolist()
     q_group = q_manifest[group_by].tolist() if group_by else [""] * len(query)
     for i in range(len(query)):
-        for r in range(params.topk):
+        for r in range(topk_vals.shape[1]):
+            if not valid[i, r]:
+                continue
             j = int(topk_idx[i, r])
             rows.append({
                 "query_idx": i,
@@ -143,10 +238,11 @@ def retrieve(
                 "lib_smiles": l_smiles[j],
                 "lib_inchikey": l_inchikey[j],
                 "lib_name": l_name[j],
+                "lib_source": l_source[j],
+                "lib_adduct": l_adduct[j],
                 "lib_precursor_mz": l_pmz_list[j],
             })
     hits = pd.DataFrame(rows)
-    top1_lib = topk_idx[:, 0]
     # dppm / mz_pass must be per-row (this rank's library hit), not the top-1 hit.
     hits["dppm"] = dppm(
         hits["query_precursor_mz"].to_numpy(dtype=np.float64),
@@ -155,11 +251,14 @@ def retrieve(
     hits["mz_pass"] = hits["dppm"] <= params.ppm_tolerance
 
     top1 = topk_vals[:, 0]
-    rates_cos = {str(t): float((top1 >= t).mean()) for t in [0.5, 0.6, 0.7, 0.8, 0.9]}
-    top1_dppm = dppm(q_pmz, l_pmz[top1_lib])
-    rates_mz = {
-        str(t): float(((top1 >= t) & (top1_dppm <= params.ppm_tolerance)).mean())
-        for t in [0.5, 0.6, 0.7, 0.8, 0.9]
+    has_candidate = valid[:, 0]
+    rates_cos = {str(t): float((has_candidate & (top1 >= t)).mean()) for t in [0.5, 0.6, 0.7, 0.8, 0.9]}
+    # When retrieval is constrained, the top score already is the best m/z-pass
+    # candidate; retain both keys for backwards-compatible reports.
+    rates_mz = dict(rates_cos) if params.mz_constraint else {
+        str(t): float((has_candidate & (top1 >= t) & (
+            dppm(q_pmz, l_pmz[np.maximum(topk_idx[:, 0], 0)]) <= params.ppm_tolerance
+        )).mean()) for t in [0.5, 0.6, 0.7, 0.8, 0.9]
     }
 
     report = {
@@ -168,6 +267,8 @@ def retrieve(
         "topk": params.topk,
         "ppm_tolerance": params.ppm_tolerance,
         "cosine_confident": params.cosine_confident,
+        "candidate_generation": "precursor-mz constrained before cosine top-k" if params.mz_constraint else "global cosine top-k",
+        "queries_with_mass_candidate": int(has_candidate.sum()),
         "annotation_rate_cosine_only": rates_cos,
         "annotation_rate_cosine_and_mz": rates_mz,
         "backend": backend,
