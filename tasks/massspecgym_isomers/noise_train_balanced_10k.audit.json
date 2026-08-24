@@ -1,0 +1,58 @@
+{
+  "purpose": "preflight audit; sorted-prefix training is prohibited",
+  "source_manifest": "D:\\DreaMS\\tasks\\massspecgym_isomers\\dataset_manifest.json",
+  "source_split": "train",
+  "selection": {
+    "method": "uniform_identity_adduct_then_shuffle",
+    "seed": 20260821,
+    "max_per_identity_adduct": 4
+  },
+  "legacy_sorted_prefix": {
+    "n_anchors": 10000,
+    "n_unique_ik14": 516,
+    "n_unique_identity_adduct": 608,
+    "n_unique_smiles": 704,
+    "n_unique_formula": 144,
+    "anchors_with_same_identity_adduct_peer": 9898,
+    "fraction_with_same_identity_adduct_peer": 0.9898,
+    "anchors_with_cross_condition_peer": 8696,
+    "fraction_with_cross_condition_peer": 0.8696,
+    "anchors_with_hard_negative": 9724,
+    "fraction_with_hard_negative": 0.9724,
+    "negative_grade_counts": {
+      "near": 18115,
+      "far": 13046,
+      "mid": 9264
+    },
+    "identity_adduct_group_size": {
+      "median": 5.0,
+      "p90": 45.600000000000136,
+      "max": 276
+    }
+  },
+  "balanced_selected": {
+    "n_anchors": 10000,
+    "n_unique_ik14": 3133,
+    "n_unique_identity_adduct": 3293,
+    "n_unique_smiles": 3436,
+    "n_unique_formula": 2002,
+    "anchors_with_same_identity_adduct_peer": 9999,
+    "fraction_with_same_identity_adduct_peer": 0.9999,
+    "anchors_with_cross_condition_peer": 6522,
+    "fraction_with_cross_condition_peer": 0.6522,
+    "anchors_with_hard_negative": 9453,
+    "fraction_with_hard_negative": 0.9453,
+    "negative_grade_counts": {
+      "far": 17884,
+      "near": 5364,
+      "mid": 4681
+    },
+    "identity_adduct_group_size": {
+      "median": 3.0,
+      "p90": 4.0,
+      "max": 4
+    }
+  },
+  "locked_subset": "D:\\DreaMS\\tasks\\massspecgym_isomers\\noise_train_balanced_10k.json",
+  "locked_subset_sha256": "bd2ac4995d65eb4a79b8ffd8b56684a0f8d6b209ccd36f52a76dfe67ac4267bb"
+}

@@ -5,7 +5,7 @@ Step 2: 四轴合成噪声增强器（作用于原始谱 m/z + intensity，走 s
   1. 删峰     随机删 p% 峰（含强峰，非只弱峰）   p ~ U[0, 0.3]
   2. 抖动     强度 ×U[1-α, 1+α]                 α = 0.4
   3. 加峰     加 0-10 个弱峰                    强度 U[0, 0.05]，m/z 在谱自身范围内随机
-  4. m/z 位移 δ ~ N(0, 0.01 Da)                质量校准 / 仪器漂移（关键，旧 pilot 缺失）
+  4. m/z 位移 δ ~ N(0, 0.01 Da)                （消融轴，默认关：逐峰独立位移无物理依据，审计 2026-08-20 定为 off）
 
 与旧 pilot 的 apply_ms2deepscore_noise 区别：
   - 旧：只删弱峰(intensity<0.4) 0-20%；新：随机删含强峰 0-30%。
@@ -37,7 +37,12 @@ class NoiseConfig:
     do_delete: bool = True
     do_jitter: bool = True
     do_add: bool = True
-    do_shift: bool = True
+    do_shift: bool = False                           # 消融轴，默认关（逐峰独立位移无物理依据）
+    # If set, identity-positive augmentation never deletes peaks at or above
+    # this relative intensity.  The empirical cross-condition audit shows that
+    # high-intensity peaks are much more stable than weak/condition-specific
+    # peaks, so uniform deletion is scientifically inappropriate for that arm.
+    protect_above_relative_intensity: float | None = None
 
 
 def apply_noise(raw_2_n: np.ndarray, rng: np.random.Generator,
@@ -61,12 +66,16 @@ def apply_noise(raw_2_n: np.ndarray, rng: np.random.Generator,
 
     n_valid = int(valid.sum())
 
-    # 1) 删峰：随机删 p% 峰（含强峰），至少保留 1 个有效峰
+    # 1) 删峰。Default keeps historical uniform deletion for reproducibility.
+    # A calibrated identity-positive run can protect stable main peaks.
     if cfg.do_delete and n_valid > 1:
         frac = float(rng.uniform(*cfg.delete_frac))
-        n_rm = min(int(round(frac * n_valid)), n_valid - 1)
+        eligible = np.where(valid)[0]
+        if cfg.protect_above_relative_intensity is not None:
+            eligible = eligible[intens[eligible] < cfg.protect_above_relative_intensity]
+        n_rm = min(int(round(frac * n_valid)), len(eligible), n_valid - 1)
         if n_rm > 0:
-            rm = rng.choice(np.where(valid)[0], size=n_rm, replace=False)
+            rm = rng.choice(eligible, size=n_rm, replace=False)
             keep = np.ones(len(mz), dtype=bool)
             keep[rm] = False
             mz, intens, valid = mz[keep], intens[keep], valid[keep]

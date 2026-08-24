@@ -1,0 +1,34 @@
+{
+  "train": {
+    "n_anchors": 10000,
+    "n_ik14": 4726,
+    "n_identity_adduct": 5000,
+    "cross_condition_anchor_fraction": 1.0,
+    "hard_negative_anchor_fraction": 0.3434,
+    "max_entries_per_identity_adduct": 2,
+    "n_hard_negative_pairs": 7300,
+    "hard_negative_grade_counts": {
+      "near": 3704,
+      "mid": 3596
+    },
+    "sha256": "c3b734337879c038ed3fe44679a0780f21497563360e93cf252e54c3410840e1"
+  },
+  "validation": {
+    "n_anchors": 2000,
+    "n_ik14": 957,
+    "n_identity_adduct": 1000,
+    "cross_condition_anchor_fraction": 1.0,
+    "hard_negative_anchor_fraction": 0.157,
+    "max_entries_per_identity_adduct": 2,
+    "n_hard_negative_pairs": 446,
+    "hard_negative_grade_counts": {
+      "mid": 226,
+      "near": 220
+    },
+    "sha256": "271dfcb8e8211588f17c31fa2ebdaca27c5ee9bfcb8dd4bf93facfbf78694759"
+  },
+  "n_source_train_ik14": 10448,
+  "n_partition_train_ik14": 8603,
+  "n_partition_val_ik14": 1845,
+  "ik14_overlap": 0
+}

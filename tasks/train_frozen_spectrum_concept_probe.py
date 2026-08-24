@@ -79,7 +79,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--embeddings", type=Path,
-        default=ROOT / "data/validation/e0_baseline/e0_embeddings.npy",
+        default=ROOT / "data/validation/cosmic_retrieval/retrieval_embeddings.npy",
     )
     parser.add_argument(
         "--labels", type=Path,
@@ -87,7 +87,7 @@ def main() -> None:
     )
     parser.add_argument(
         "--output-dir", type=Path,
-        default=ROOT / "data/validation/double_mapping/frozen_concept_probe",
+        default=ROOT / "data/validation/cosmic_retrieval/frozen_concept_probe",
     )
     parser.add_argument("--categories", nargs="+", default=["CF", "NL", "ISO"])
     parser.add_argument("--min-prevalence", type=float, default=0.01)
@@ -103,13 +103,17 @@ def main() -> None:
     args.output_dir.mkdir(parents=True, exist_ok=True)
 
     cache = np.load(args.labels, allow_pickle=False)
-    embedding_idx = cache["embedding_idx"].astype(np.int64)
     ik14 = cache["ik14"].astype(str)
     labels_all = cache["labels"].astype(np.float32)
     names_all = cache["rule_name"].astype(str)
     categories_all = cache["rule_category"].astype(str)
     embeddings = np.load(args.embeddings, mmap_mode="r")
-    x_all = np.asarray(embeddings[embedding_idx], dtype=np.float32)
+    # Cache-order retrieval embeddings (aligned row-for-row with labels/ik14). The
+    # embeddings file may be a subset (local smoke), so slice labels to match.
+    n = int(embeddings.shape[0])
+    ik14 = ik14[:n]
+    labels_all = labels_all[:n]
+    x_all = np.asarray(embeddings, dtype=np.float32)
 
     train_mol, val_mol, test_mol = split_molecules(ik14, args.seed)
     train_idx = capped_indices(ik14, train_mol, args.max_spectra_per_molecule, args.seed)
@@ -206,7 +210,8 @@ def main() -> None:
     split_hash = hashlib.sha256("|".join(sorted(test_mol.tolist())).encode()).hexdigest()[:16]
     report = {
         "status": "frozen_spectrum_concept_probe_complete",
-        "checkpoint": "official DreaMS embedding; backbone and embedding frozen",
+        "space": "retrieval (official_embedding_slim.pt, headed, 100 peaks)",
+        "checkpoint": "official DreaMS retrieval embedding; backbone and embedding frozen",
         "label_semantics": "observed spectrum-level rule motif",
         "molecule_disjoint_split": True,
         "spectra_per_molecule_cap": args.max_spectra_per_molecule,

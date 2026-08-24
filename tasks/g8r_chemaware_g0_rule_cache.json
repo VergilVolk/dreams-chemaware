@@ -1,0 +1,47 @@
+{
+  "status": "chemaware_g0_rule_cache_complete",
+  "formal": true,
+  "candidate_graph_queries": 23876,
+  "reachable_spectra_in_full_graph": 25275,
+  "cached_spectra": 25275,
+  "cached_identities": 3472,
+  "rules": 3486,
+  "core_rules": 335,
+  "massbank_rules": 3151,
+  "categories": {
+    "NL": 293,
+    "CF": 3174,
+    "ISO": 8,
+    "NR": 1,
+    "EE": 1,
+    "HR": 9
+  },
+  "semantics_counts": {
+    "fragment_neutral_loss": 214,
+    "fragment_mz": 3174,
+    "peak_pair_pattern": 19,
+    "precursor_exact_mass_offset": 79
+  },
+  "coverage": {
+    "median_spectrum_prevalence": 0.004213649851632048,
+    "median_identity_prevalence": 0.017857142857142856,
+    "rules_zero_spectrum_support": 35,
+    "rules_lt_10_identity_support": 113,
+    "rules_gt_50pct_identity_coverage": 53
+  },
+  "semantics": "observed spectrum-level mass motifs; core NL uses precursor-fragment loss; MassBank NL is kept separately as precursor-exact-mass offset; never identity labels",
+  "empty_union_policy": "pairwise Jaccard is missing when both spectra have no hit",
+  "provenance": {
+    "candidate_graph": "/data02/run01/scv7tsl/DreaMS/data/validation/g8r_error_atlas_listwise_cache.npz",
+    "candidate_graph_sha256": "5f2340751c7521c5a93114e2b134d5796f157148736ad9162d545b84c11d9f71",
+    "hdf5": "/data02/run01/scv7tsl/DreaMS/data/models/MassSpecGym_MurckoHist_split.hdf5",
+    "hdf5_sha256": "ccda2c4114d9b21413977df03376ca0fc097956a7fa304b861a3154a2b81e64f",
+    "core_rules_sha256": "d66c085e8718c14eeebc6e99959ba54741e44726421d5d7d36ac7d684e63a498",
+    "massbank_rules_sha256": "c88e1de1a27601cc9e7915c02454663a18ae6241b64f8e13700adbf9e0c293a3",
+    "cache_sha256": "70fe3c4828daf132220e63584e8b0bdc8b198652fe06d1675d724d16a8ea6c98"
+  },
+  "parameters": {
+    "tolerance": 0.02,
+    "max_spectra": 0
+  }
+}

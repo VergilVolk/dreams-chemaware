@@ -54,11 +54,14 @@ AMBIGUITY_MARKERS = ("»", " or ", " / ", "或", "；")
 
 
 def min_dppm(x: np.ndarray, refs: np.ndarray) -> np.ndarray:
-    """对每个 x，返回它与任意 ref 的最小 |x-ref|/ref*1e6（ppm）；refs 空则 +inf。"""
+    """对每个 x，返回它与任意 ref 的最小 |x-ref|/ref*1e6（ppm）；refs 空则 +inf。
+
+    零/负 m/z 的 ref 视为不可匹配（置 inf），避免除零告警。"""
     x = np.asarray(x, dtype=float)
     refs = np.asarray(refs, dtype=float)
     if refs.size == 0:
         return np.full(x.shape, np.inf)
+    refs = np.where(refs > 0, refs, np.inf)
     return (np.abs(x[:, None] - refs[None, :]) / refs[None, :] * 1e6).min(axis=1)
 
 

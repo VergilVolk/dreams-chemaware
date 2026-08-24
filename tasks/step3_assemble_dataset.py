@@ -16,7 +16,7 @@ Step 3: 组装对比学习数据集 manifest（anchor / pos / neg_list）。
   - 负例 = 同分异构体谱，强制同 adduct（同 formula+同 adduct -> 同 precursor m/z，逼模型看碎裂）。
   - 负例优先序 near > mid > far，cap 每个 anchor 最多 --max-neg 个；far 也进池（"一律负例"），
     每条都打 grade 标签，供后续 near-only vs 全量消融。
-  - 划分分子不相交 train/eval（--eval-frac）。
+  - 按异构体图连通分量划分 train/eval，保证 anchor/正例/负例分子零跨 split 重叠（--eval-frac 控制 eval 分子占比）。
 
 用法（本机 conda，CPU，快）：
   python tasks/step3_assemble_dataset.py
@@ -112,14 +112,49 @@ def main():
     for ik in anchor_iks:
         all_entries.extend(build_entries(ik))
 
-    # ---- 5. 分子不相交 train/eval 划分 ----
+    # ---- 5. 按异构体图连通分量划分 train/eval（零跨 split 泄漏） ----
+    # 旧 bug：只按 anchor ik14 随机分，负例（异构体）会跨 split——eval 锚的负例谱行出现在
+    # 训练侧（师兄审计实测：train/eval 分子重叠 3,731、谱行重叠 4,195、eval 98.5% 分子
+    # 在训练侧出现过）。修法：A、B 是异构体（有边）就必须同侧 → 对 anchor 分子做 union-find
+    # 连通分量，整个分量一起进 train 或 eval，保证任何异构体对都不跨 split。
+    parent = {ik: ik for ik in anchor_iks}
+
+    def find(x):
+        while parent[x] != x:
+            parent[x] = parent[parent[x]]
+            x = parent[x]
+        return x
+
+    def union(a, b):
+        ra, rb = find(a), find(b)
+        if ra != rb:
+            parent[rb] = ra
+
+    for ik in anchor_iks:
+        for (nb, _grade, _mces) in adj[ik]:
+            if nb in parent:      # nb 也是 anchor 分子（有谱）
+                union(ik, nb)
+
+    comp = defaultdict(list)
+    for ik in anchor_iks:
+        comp[find(ik)].append(ik)
+    comps = sorted(comp.values(), key=lambda c: (-len(c), min(c)))
     rng = np.random.default_rng(args.split_seed)
-    iks = sorted(anchor_iks)
-    rng.shuffle(iks)
-    n_eval_mol = max(1, int(round(len(iks) * args.eval_frac)))
-    eval_iks = set(iks[:n_eval_mol])
+    rng.shuffle(comps)
+
+    target_eval = max(1, int(round(len(anchor_iks) * args.eval_frac)))
+    eval_iks = set()
+    n_eval = 0
+    for c in comps:
+        if n_eval >= target_eval:
+            break
+        eval_iks.update(c)
+        n_eval += len(c)
     train_entries = [e for e in all_entries if e["ik14"] not in eval_iks]
     eval_entries = [e for e in all_entries if e["ik14"] in eval_iks]
+    comp_sizes = sorted((len(c) for c in comps), reverse=True)
+    print(f"[5] 连通分量数={len(comps)}，最大分量={comp_sizes[0]}，size>=2 数={sum(1 for s in comp_sizes if s >= 2)}，"
+          f"eval 分子={n_eval}（目标≈{target_eval}）")
 
     # ---- 6. 统计 + 保存 ----
     def neg_grade_dist(entries):
@@ -134,14 +169,36 @@ def main():
 
     tr_dist, tr_empty = neg_grade_dist(train_entries)
     ev_dist, ev_empty = neg_grade_dist(eval_entries)
+
+    # 零泄漏核验：分子（anchor+neg 并集）与谱行都不得跨 train/eval
+    def all_molecules(entries):
+        mols, rows = set(), set()
+        for e in entries:
+            mols.add(e["ik14"]); rows.add(e["anchor_row"])
+            for n in e["neg"]:
+                mols.add(n["ik14"]); rows.add(n["row"])
+        return mols, rows
+
+    tr_mols, tr_rows = all_molecules(train_entries)
+    ev_mols, ev_rows = all_molecules(eval_entries)
+    leak_mols = len(tr_mols & ev_mols)
+    leak_rows = len(tr_rows & ev_rows)
+    anchor_ov = len({e["ik14"] for e in train_entries} & {e["ik14"] for e in eval_entries})
+
     meta = {
         "fold": args.fold,
         "max_neg": args.max_neg,
         "eval_frac": args.eval_frac,
         "split_seed": args.split_seed,
+        "split": "isomer_connected_component",
         "n_anchor_molecules": len(anchor_iks),
+        "n_components": len(comps),
+        "n_eval_molecules": n_eval,
         "n_train_anchors": len(train_entries),
         "n_eval_anchors": len(eval_entries),
+        "anchor_molecule_overlap": anchor_ov,
+        "leak_molecule_overlap": leak_mols,
+        "leak_spectrum_row_overlap": leak_rows,
         "train_neg_grade_dist": tr_dist,
         "train_empty_neg": tr_empty,
         "eval_neg_grade_dist": ev_dist,
@@ -153,6 +210,9 @@ def main():
     print(f"[3] train anchors: {len(train_entries)}  eval anchors: {len(eval_entries)}")
     print(f"    train 负例分级: {tr_dist}（empty-neg {tr_empty}）")
     print(f"    eval  负例分级: {ev_dist}（empty-neg {ev_empty}）")
+    ok = (anchor_ov == 0 and leak_mols == 0 and leak_rows == 0)
+    print(f"[零泄漏核验] anchor 分子重叠={anchor_ov}  分子重叠={leak_mols}  谱行重叠={leak_rows}  "
+          f"{'[OK] 全为 0' if ok else '[FAIL] 仍有泄漏!'}")
     print(f"[4] 已保存 -> {args.out}")
     print("\n=== Step 3 DONE ===")
 

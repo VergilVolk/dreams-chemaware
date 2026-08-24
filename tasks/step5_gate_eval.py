@@ -9,7 +9,7 @@ Step 5: G3 门评估 —— 噪声一致性 + 异构体区分(FP 守卫) + 10ppm
                         （同 formula 异构体被推远 = 撞脸不再混淆）
   G3-3 检索不降       : 10ppm 同 adduct 检索 macro-AUC / Recall@1 不降 > baseline-0.01
 
-eval 集 = manifest 的 eval 锚（分子与训练集不相交），噪声现场施加（同 Step 4 四轴）。
+eval 集 = manifest 的 eval 锚（连通分量划分，与训练集零泄漏）；噪声一次性预生成、两模型共用同一份（配对评估），10ppm 检索候选池 = 全量验证集。
 
 用法（GPU）：
   python tasks/step5_gate_eval.py --device cuda \
@@ -117,41 +117,56 @@ def retrieval_metrics(emb, iks, pmzs, adducts, ppm_tol):
     }
 
 
-def evaluate_model(model, entries, h5, pmz_all, n_highest, noise_cfg, rng, device, batch_size, noise_draws, ppm_tol):
-    """返回 pos_cos / neg_cos / separation / retrieval 指标。"""
-    clean_embs, noisy_embs, neg_embs = [], [], []
-    neg_counts = []
+def prepare_clean(entries, h5, pmz_all, n_highest):
+    """预生成 clean 谱 + 元数据（供检索候选池 & pos/neg 的 anchor 侧）。"""
+    clean_specs = []
     iks, pmzs, adducts = [], [], []
-
     for e in entries:
         r = e["anchor_row"]
         raw = np.asarray(h5["spectrum"][r])
         pmz = float(pmz_all[r])
-        clean = preprocess_spectrum(raw, pmz, n_highest)
-        # 噪声多抽样取均值（正例一致性）
-        noisy = [preprocess_spectrum(apply_noise(raw, rng, noise_cfg), pmz, n_highest)
-                 for _ in range(noise_draws)]
-        clean_embs.append(clean)
-        noisy_embs.extend(noisy)
-        neg_embs.append([preprocess_spectrum(np.asarray(h5["spectrum"][n["row"]]),
-                                             float(pmz_all[n["row"]]), n_highest)
-                         for n in e["neg"]])
-        neg_counts.append(len(e["neg"]))
+        clean_specs.append(preprocess_spectrum(raw, pmz, n_highest))
         iks.append(e["ik14"]); pmzs.append(e["precursor_mz"]); adducts.append(e["adduct"])
+    return clean_specs, iks, pmzs, adducts
 
-    clean_emb = embed(model, clean_embs, device, batch_size)
-    noisy_emb = embed(model, noisy_embs, device, batch_size)  # len = n_entries * noise_draws
+
+def prepare_noisy_neg(entries, h5, pmz_all, n_highest, noise_cfg, rng, noise_draws):
+    """预生成 noisy（正例）+ neg（异构体）谱，一次生成、两模型共用 → 配对评估。
+
+    （旧 bug：rng 被 base→trained 顺序消费，两模型看到不同噪声，比较不公平。）"""
+    noisy_specs = []
+    neg_specs = []
+    neg_counts = []
+    for e in entries:
+        r = e["anchor_row"]
+        raw = np.asarray(h5["spectrum"][r])
+        pmz = float(pmz_all[r])
+        for _ in range(noise_draws):
+            noisy_specs.append(preprocess_spectrum(apply_noise(raw, rng, noise_cfg), pmz, n_highest))
+        neg_specs.append([preprocess_spectrum(np.asarray(h5["spectrum"][n["row"]]),
+                                              float(pmz_all[n["row"]]), n_highest)
+                          for n in e["neg"]])
+        neg_counts.append(len(e["neg"]))
+    return noisy_specs, neg_specs, neg_counts
+
+
+def evaluate_model(model, clean_specs, noisy_specs, neg_specs, neg_counts,
+                   iks, pmzs, adducts, device, batch_size, noise_draws, ppm_tol):
+    """用预生成谱算指标：clean 全量算一次（检索候选池），noisy/neg 只算锚子集。"""
+    clean_emb = embed(model, clean_specs, device, batch_size)
+    n_sub = len(neg_specs)  # 锚子集数（= len(entries)）
+    noisy_emb = embed(model, noisy_specs, device, batch_size)
 
     # pos cos（每锚 noise_draws 次取平均）
     pos_cos = []
-    for i in range(len(entries)):
+    for i in range(n_sub):
         seg = noisy_emb[i * noise_draws:(i + 1) * noise_draws]
         pos_cos.append(float((clean_emb[i:i + 1] * seg).sum(1).mean()))
     pos_cos = np.array(pos_cos)
 
     # neg cos（每锚对全部异构体取平均，无异构体则跳过）
     neg_cos = []
-    for i, negs in enumerate(neg_embs):
+    for i, negs in enumerate(neg_specs):
         if not negs:
             continue
         ne = embed(model, negs, device, batch_size)
@@ -163,8 +178,8 @@ def evaluate_model(model, entries, h5, pmz_all, n_highest, noise_cfg, rng, devic
         "noise_consistency_pos_cos": float(pos_cos.mean()) if len(pos_cos) else float("nan"),
         "isomer_neg_cos": float(neg_cos.mean()) if len(neg_cos) else float("nan"),
         "separation": float(pos_cos.mean() - neg_cos.mean()) if len(pos_cos) and len(neg_cos) else float("nan"),
-        "n_anchors": len(entries),
-        "n_with_isomer": int((neg_counts and np.array(neg_counts) > 0).sum()) if neg_counts else 0,
+        "n_anchors": n_sub,
+        "n_with_isomer": int(np.count_nonzero(np.array(neg_counts) > 0)) if neg_counts else 0,
         "retrieval": ret,
     }
 
@@ -176,15 +191,19 @@ def main() -> None:
 
     with open(args.manifest) as fh:
         manifest = json.load(fh)
-    entries = manifest["eval"]
-    if args.max_eval > 0 and len(entries) > args.max_eval:
-        entries = entries[: args.max_eval]
-    print(f"[eval] 锚: {len(entries)}", flush=True)
-
-    with h5py.File(args.data, "r") as f:
-        pmz_all = np.array(f["precursor_mz"][:], dtype=float)
+    full_entries = manifest["eval"]
+    # 检索候选池 = 全量验证集；pos/neg 锚子集 = 前 max_eval（提速），噪声/异构体只算子集。
+    entries = full_entries[: args.max_eval] if (args.max_eval > 0 and len(full_entries) > args.max_eval) else full_entries
+    print(f"[eval] 检索候选池(全量)={len(full_entries)}   pos/neg 锚子集={len(entries)}", flush=True)
 
     noise_cfg = NoiseConfig()
+
+    # 预生成谱（一次，两模型共用 → 配对）；clean 全量供检索，noisy/neg 仅锚子集。
+    with h5py.File(args.data, "r") as f:
+        pmz_all = np.array(f["precursor_mz"][:], dtype=float)
+        clean_specs, iks, pmzs, adducts = prepare_clean(full_entries, f, pmz_all, args.n_highest_peaks)
+        noisy_specs, neg_specs, neg_counts = prepare_noisy_neg(
+            entries, f, pmz_all, args.n_highest_peaks, noise_cfg, rng, args.noise_draws)
 
     print("[1] 加载基线（official）...", flush=True)
     base_model, _ = load_base_model(args.base_ckpt, args.architecture_ckpt, device, args.n_highest_peaks)
@@ -194,13 +213,12 @@ def main() -> None:
     trn_model, kind = load_trained(args.base_ckpt, args.architecture_ckpt, device, args.n_highest_peaks, args.trained)
 
     t0 = time.time()
-    with h5py.File(args.data, "r") as f:
-        print("[3] 评估基线...", flush=True)
-        base_res = evaluate_model(base_model, entries, f, pmz_all, args.n_highest_peaks,
-                                  noise_cfg, rng, device, args.batch_size, args.noise_draws, args.ppm_tol)
-        print("[4] 评估训练模型...", flush=True)
-        trn_res = evaluate_model(trn_model, entries, f, pmz_all, args.n_highest_peaks,
-                                 noise_cfg, rng, device, args.batch_size, args.noise_draws, args.ppm_tol)
+    print("[3] 评估基线...", flush=True)
+    base_res = evaluate_model(base_model, clean_specs, noisy_specs, neg_specs, neg_counts,
+                              iks, pmzs, adducts, device, args.batch_size, args.noise_draws, args.ppm_tol)
+    print("[4] 评估训练模型...", flush=True)
+    trn_res = evaluate_model(trn_model, clean_specs, noisy_specs, neg_specs, neg_counts,
+                             iks, pmzs, adducts, device, args.batch_size, args.noise_draws, args.ppm_tol)
 
     g3_1 = trn_res["noise_consistency_pos_cos"] > base_res["noise_consistency_pos_cos"]
     g3_2 = trn_res["isomer_neg_cos"] < base_res["isomer_neg_cos"]
@@ -211,6 +229,7 @@ def main() -> None:
         "kind": kind,
         "trained_checkpoint": str(args.trained),
         "n_eval_anchors": len(entries),
+        "n_retrieval_candidates": len(full_entries),
         "noise_draws": args.noise_draws,
         "baseline": base_res,
         "trained": trn_res,

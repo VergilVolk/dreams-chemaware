@@ -72,6 +72,10 @@ def parse_mgf(path: Path) -> list[dict]:
                     cur["inchikey"] = v
                 elif k == "NAME":
                     cur["name"] = v
+                elif k == "SOURCE":
+                    cur["source"] = v
+                elif k == "ADDUCT":
+                    cur["adduct"] = v
             elif cur is not None:
                 parts = line.split()
                 if len(parts) >= 2:
@@ -150,6 +154,8 @@ def main() -> None:
         "smiles": [r.get("smiles", "") for r in records],
         "inchikey": [r.get("inchikey", "") for r in records],
         "name": [r.get("name", "") for r in records],
+        "source": [r.get("source", "") for r in records],
+        "adduct": [r.get("adduct", "") for r in records],
         "precursor_mz": [r.get("precursor_mz", float("nan")) for r in records],
     })
     manifest.to_csv(args.out / "manifest.csv", index=False)

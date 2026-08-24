@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chem-aware DreaMS — LC-MS/MS Annotation Platform</title>
+  <meta name="description" content="Reference-free LC-MS/MS spectral annotation platform. Cosine matching, target-decoy FDR confidence, self-consistency (COSMIC), chemical rule matching, and chemical explainability for untargeted metabolomics dark matter." />
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">Cᵈ</div>
+      <div class="brand-text">
+        <h1>Chem-aware DreaMS</h1>
+        <p>Reference-free LC-MS/MS annotation platform</p>
+      </div>
+    </div>
+    <div class="backend">
+      <label for="backend-toggle" class="backend-label">
+        <span class="backend-gear" title="Compute backend">⚙</span>
+        <select id="backend-toggle" aria-label="Compute backend">
+          <option value="official" selected>Backend · Official DreaMS API</option>
+          <option value="selfhost">Backend · Self-hosted (disulf-posit-predict)</option>
+        </select>
+      </label>
+    </div>
+  </header>
+
+  <nav class="sidenav" aria-label="Sections">
+    <a href="#overview" class="active">Overview</a>
+    <a href="#run">Run annotation</a>
+    <a href="#matches">Confident matches</a>
+    <a href="#fdr">FDR confidence</a>
+    <a href="#selfconsistency">Self-consistency</a>
+    <a href="#rules">Chemical rules</a>
+    <a href="#explain">Explainability</a>
+    <a href="#hmdb">HMDB / biochemical</a>
+    <a href="#diff">Differential</a>
+    <a href="#novel">Novel findings</a>
+    <a href="#author">Author comparison</a>
+    <a href="#citations">Citations</a>
+  </nav>
+
+  <main class="content">
+
+    <!-- ============================ OVERVIEW ============================ -->
+    <section id="overview" class="panel">
+      <h2>Overview</h2>
+      <p class="lede">
+        Results of the Chem-aware DreaMS pipeline on the <strong>MTBLS13729</strong> colorectal-cancer
+        metabolomics cohort (smoke run: 14,948 query spectra against a 1,000-spectrum MONA library).
+        This is a static showcase — data is precomputed; see
+        <a href="#run">Run annotation</a> for live compute.
+      </p>
+      <div class="stat-grid" id="overview-stats"><!-- JS --></div>
+      <div class="ladder" id="ladder"><!-- JS --></div>
+    </section>
+
+    <!-- ============================ RUN ============================ -->
+    <section id="run" class="panel">
+      <h2>Run annotation</h2>
+      <p class="lede">
+        This Space is <strong>static</strong> (free, no Python compute). Live annotation runs on a
+        compute backend selected top-right. The form below matches the DreaMS <code>/predict</code>
+        interface exactly.
+      </p>
+      <form id="run-form" class="run-form">
+        <label>Reference library (.mgf)
+          <input type="file" name="lib" accept=".mgf" />
+        </label>
+        <label>Input spectra (.mgf / .mzML)
+          <input type="file" name="in" accept=".mgf,.mzML" />
+        </label>
+        <label>Cosine threshold
+          <input type="number" name="threshold" value="0.7" min="0" max="1" step="0.05" />
+        </label>
+        <label class="checkbox">
+          <input type="checkbox" name="modified_cosine" /> Modified cosine
+        </label>
+        <label class="checkbox">
+          <input type="checkbox" name="high_quality" checked /> Only high-quality input
+        </label>
+        <button type="submit" class="btn" id="run-submit">Run</button>
+      </form>
+      <div id="run-status" class="run-status" hidden></div>
+      <div id="backend-note" class="backend-note"><!-- JS --></div>
+    </section>
+
+    <!-- ============================ MATCHES ============================ -->
+    <section id="matches" class="panel">
+      <h2>Confident matches <span class="pill">cos ≥ 0.7 ∧ |Δm/z| ≤ 20 ppm</span></h2>
+      <p class="lede">
+        The 9 spectra whose top-1 hit passes both the cosine cutoff and the precursor
+        <strong>m/z hard constraint</strong> (4 distinct structures). The m/z constraint removes
+        ~4× raw-cosine over-annotation.
+      </p>
+      <div class="table-wrap">
+        <table id="matches-table" class="data-table"><!-- JS --></table>
+      </div>
+    </section>
+
+    <!-- ============================ FDR ============================ -->
+    <section id="fdr" class="panel">
+      <h2>FDR confidence</h2>
+      <p class="lede">
+        Confidence is a <strong>target-decoy FDR</strong>
+        (Elias &amp; Gygi 2007; Scheubert et al. 2017), not a raw similarity.
+      </p>
+      <div id="fdr-body" class="two-col"><!-- JS --></div>
+    </section>
+
+    <!-- ============================ SELF-CONSISTENCY ============================ -->
+    <section id="selfconsistency" class="panel">
+      <h2>Self-consistency <span class="pill">COSMIC · Hoffmann 2022</span></h2>
+      <p class="lede">
+        The COSMIC structure-space coherence score is a <strong>self-consistency</strong> signal —
+        <em>not</em> P(correct). Decoded via a frozen concept probe over the retrieval embedding.
+      </p>
+      <div id="cosmic-body"><!-- JS --></div>
+    </section>
+
+    <!-- ============================ CHEMICAL RULES ============================ -->
+    <section id="rules" class="panel">
+      <h2>Chemical rule matching</h2>
+      <p class="lede">
+        Frozen Schymanski chemical rules decoded from the embedding by a concept probe
+        (266/335 rules). This panel is the per-match rule-evidence surface.
+      </p>
+      <div id="rules-body"><!-- JS --></div>
+    </section>
+
+    <!-- ============================ EXPLAINABILITY ============================ -->
+    <section id="explain" class="panel">
+      <h2>Chemical explainability</h2>
+      <p class="lede">
+        Every confident match carries a transparent, auditable reason for its assignment.
+        Select a row to read the full evidence chain.
+      </p>
+      <div id="explain-body"><!-- JS --></div>
+    </section>
+
+    <!-- ============================ HMDB ============================ -->
+    <section id="hmdb" class="panel">
+      <h2>HMDB / biochemical confidence <span class="pill warn">reserved · all NaN</span></h2>
+      <p class="lede">
+        Biochemical pathway / functional confidence (HMDB pathway &amp; disease associations).
+        Interface reserved; not yet populated.
+      </p>
+      <div id="hmdb-body" class="na-card"><!-- JS --></div>
+    </section>
+
+    <!-- ============================ DIFFERENTIAL ============================ -->
+    <section id="diff" class="panel">
+      <h2>Differential analysis <span class="pill">tumor vs normal</span></h2>
+      <p class="lede">
+        Fisher exact test on confident structures across tumor / normal samples
+        (q-value = Benjamini–Hochberg corrected).
+      </p>
+      <div class="table-wrap">
+        <table id="diff-table" class="data-table"><!-- JS --></table>
+      </div>
+    </section>
+
+    <!-- ============================ NOVEL ============================ -->
+    <section id="novel" class="panel">
+      <h2>Novel findings <span class="pill">dark matter</span></h2>
+      <p class="lede">
+        Structures our pipeline recovered that the original author annotation did not report
+        (<code>min_dppm_to_author</code> = distance to the closest author hit — hundreds to thousands
+        of ppm, i.e. genuinely distinct).
+      </p>
+      <div class="table-wrap">
+        <table id="novel-table" class="data-table"><!-- JS --></table>
+      </div>
+    </section>
+
+    <!-- ============================ AUTHOR COMPARE ============================ -->
+    <section id="author" class="panel">
+      <h2>Author comparison</h2>
+      <p class="lede">Per-panel coverage of our pipeline vs the study authors' reported annotations.</p>
+      <div class="table-wrap">
+        <table id="author-table" class="data-table"><!-- JS --></table>
+      </div>
+    </section>
+
+    <!-- ============================ CITATIONS ============================ -->
+    <section id="citations" class="panel">
+      <h2>Citations &amp; honest limits</h2>
+      <div id="citations-body"><!-- JS --></div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <p>Chem-aware DreaMS · static showcase build · data from <code>tasks/make_hf_showcase.py</code></p>
+  </footer>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>

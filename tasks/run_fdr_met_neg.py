@@ -111,14 +111,19 @@ def main() -> None:
         np.save(args.decoy_cache, decoy_emb.astype(np.float32))
         print(f"[FDR] cached -> {args.decoy_cache} ({time.time()-t0:.0f}s)", flush=True)
 
-    query, _ = retrieve.load_embedding_set(args.query_dir)
-    library, _ = retrieve.load_embedding_set(args.library_dir)
+    query, q_manifest = retrieve.load_embedding_set(args.query_dir)
+    library, l_manifest = retrieve.load_embedding_set(args.library_dir)
     query = retrieve._normalize(query)
     library = retrieve._normalize(library)
+    q_mz = q_manifest["precursor_mz"].to_numpy(dtype=np.float64)
+    l_mz = l_manifest["precursor_mz"].to_numpy(dtype=np.float64)
+    # decoy precursor m/z = library precursor m/z (shuffle keeps it, same order).
     t0 = time.time()
-    target_scores = fdr.top1_scores(query, library)
-    decoy_scores = fdr.top1_scores(query, decoy_emb)
-    print(f"[FDR] top1 scores in {time.time()-t0:.0f}s", flush=True)
+    target_scores = fdr.mz_masked_top1_scores(
+        query, q_mz, library, l_mz, DEFAULT.ppm_tolerance)
+    decoy_scores = fdr.mz_masked_top1_scores(
+        query, q_mz, decoy_emb, l_mz, DEFAULT.ppm_tolerance)
+    print(f"[FDR] m/z-constrained top1 scores in {time.time()-t0:.0f}s", flush=True)
 
     hits = pd.read_csv(args.annotations)
     hits = fdr.annotate_fdr(hits, target_scores, decoy_scores, DEFAULT)
