@@ -558,7 +558,7 @@ def build_app():
                 spectrum_choice = gr.Dropdown(label="文件中的谱图", choices=[])
             uploaded_status = gr.Markdown("支持单谱或多谱图文件。")
             spectra_state = gr.State([])
-            upload.change(interface.parse_uploaded, inputs=[upload], outputs=[spectrum_choice, spectra_state, uploaded_status])
+            upload.change(interface.parse_uploaded, inputs=[upload], outputs=[spectrum_choice, spectra_state, uploaded_status], queue=False)
 
             with gr.Row():
                 spectrum_input = gr.Textbox(label="MS/MS 峰表（JSON 或逐行 m/z intensity）", lines=7, value=DEFAULT_SPECTRUM)
@@ -589,6 +589,7 @@ def build_app():
                 interface.select_uploaded,
                 inputs=[spectrum_choice, spectra_state],
                 outputs=[spectrum_input, precursor_mz, charge, spectrum_plot, peak_table],
+                queue=False,
             )
             candidate_state = gr.State([])
             with gr.Row():

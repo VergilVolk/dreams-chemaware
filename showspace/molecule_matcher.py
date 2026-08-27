@@ -175,7 +175,3 @@ class MoleculeDatabase:
             result['Rank'] = idx
 
         return pd.DataFrame(results[:max_results])
-
-
-# 创建全局数据库实例
-database = MoleculeDatabase()
