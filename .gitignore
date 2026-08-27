@@ -97,6 +97,9 @@ celerybeat.pid
 
 # Environments
 .env
+!.env.example
+showspace/.env
+!showspace/.env.example
 .venv
 venv/
 env/
@@ -156,6 +159,8 @@ tasks/_cache/
 # Raw spectral data & archives
 *.mgf
 *.msp
+# Keep the small public showspace fixture; large datasets remain ignored.
+!showspace/example_5_drugs_zhao2025 (1).mgf
 *.rar
 *.zip
 *.7z
