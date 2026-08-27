@@ -651,4 +651,10 @@ if __name__ == "__main__":
     port = int(os.getenv("GRADIO_SERVER_PORT", os.getenv("PORT", "7860")))
     server_name = os.getenv("GRADIO_SERVER_NAME", "127.0.0.1")
     share = os.getenv("GRADIO_SHARE", "false").strip().lower() in {"1", "true", "yes", "on"}
-    demo.launch(server_name=server_name, server_port=port, share=share)
+    frontend_check = os.getenv("GRADIO_FRONTEND_CHECK", "false").strip().lower() in {"1", "true", "yes", "on"}
+    demo.launch(
+        server_name=server_name,
+        server_port=port,
+        share=share,
+        _frontend=frontend_check,
+    )
