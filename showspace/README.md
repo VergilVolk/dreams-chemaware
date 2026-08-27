@@ -64,7 +64,12 @@ DREAMS_SSL_CKPT=D:/DreaMSData/models/ssl_model.ckpt
 DREAMS_MOLECULE_DB=D:/DreaMSData/MassSpecGym_DreaMS.hdf5
 GRADIO_SERVER_NAME=127.0.0.1
 GRADIO_SERVER_PORT=7860
+GRADIO_SHARE=false
 ```
+
+- `127.0.0.1`：仅台式机本机访问。
+- `0.0.0.0`：允许局域网访问，需配置 Windows 防火墙。
+- `GRADIO_SHARE=true`：请求 Gradio 临时公网 `gradio.live` 链接；需要台式机能连接 Gradio 服务。
 
 检查并启动：
 

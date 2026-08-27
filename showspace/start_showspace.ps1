@@ -45,4 +45,7 @@ $process = Start-Process -FilePath $VenvPython -WorkingDirectory $RepoDir `
 $process.Id | Set-Content $PidFile
 Write-Host "showspace started with PID $($process.Id)"
 Write-Host "URL: http://$([Environment]::GetEnvironmentVariable('GRADIO_SERVER_NAME','Process')):$([Environment]::GetEnvironmentVariable('GRADIO_SERVER_PORT','Process'))"
+if ([Environment]::GetEnvironmentVariable('GRADIO_SHARE','Process') -eq 'true') {
+    Write-Host 'Gradio share link is enabled; check the output log for the public URL.'
+}
 Write-Host "Logs: $LogDir"
