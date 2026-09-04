@@ -30,6 +30,7 @@ python -u tasks/audit_bioaware_b0_reaction_embedding_signal.py \
   --folds 5 \
   --community-resolution 2.0 \
   --controls-per-edge 3 \
+  --maximum-standardised-imbalance 0.10 \
   --permutations 200 \
   --bootstrap-resamples 5000 \
   --seed 20260901 \

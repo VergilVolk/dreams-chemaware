@@ -643,9 +643,18 @@ def main() -> None:
     parser.add_argument("--controls-per-edge", type=int, default=3)
     parser.add_argument("--permutations", type=int, default=20)
     parser.add_argument("--bootstrap-resamples", type=int, default=2000)
+    parser.add_argument(
+        "--maximum-standardised-imbalance", type=float, default=0.10,
+        help=(
+            "Hard balance limit for each reaction-versus-decoy covariate. "
+            "Without balanced decoys, a reaction signal is not interpretable."
+        ),
+    )
     parser.add_argument("--seed", type=int, default=20260901)
     parser.add_argument("--formal", action="store_true")
     args = parser.parse_args()
+    if not (0.0 < args.maximum_standardised_imbalance <= 0.25):
+        raise ValueError("maximum-standardised-imbalance must be in (0, 0.25]")
     if args.output_dir.exists() and any(args.output_dir.iterdir()):
         raise RuntimeError(f"fail-closed: non-empty output: {args.output_dir}")
     for path in (args.hdf5, args.embedding_cache, args.participants):
@@ -762,6 +771,10 @@ def main() -> None:
             value["identity_overlap"] == 0 and value["formula_overlap"] == 0
             for value in fold_audit.values()
         )),
+        "matched_decoy_imbalance_within_threshold": bool(all(
+            value <= args.maximum_standardised_imbalance
+            for value in imbalance.values()
+        )),
         "metadata_auc_reported_not_used_as_success": True,
         "incremental_auc_ge_0_02": bool(observed_incremental_auc >= 0.02),
         "conditional_embedding_permutation_p_le_0_05": bool(conditional_p <= 0.05),
@@ -804,6 +817,13 @@ def main() -> None:
             "bootstrap_resamples": int(args.bootstrap_resamples),
         },
         "matching_standardised_imbalance": imbalance,
+        "matching_balance_contract": {
+            "maximum_standardised_imbalance": float(args.maximum_standardised_imbalance),
+            "interpretation": (
+                "All reaction-versus-decoy covariates must pass before an "
+                "embedding increment can be interpreted as reaction-specific."
+            ),
+        },
         "identity_vs_reaction_geometry": {
             "same_identity_pairs": int(len(same_identity_cosine)),
             "same_identity_mean_cosine": float(np.mean(same_identity_cosine)),
