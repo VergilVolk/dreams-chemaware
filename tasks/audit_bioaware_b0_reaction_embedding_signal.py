@@ -39,7 +39,47 @@ from sklearn.preprocessing import StandardScaler
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from annotation.bioaware_relations import _direction_label, noncurrency_signature  # noqa: E402
+
+
+# Kept local deliberately: B0 is a standalone, fail-closed audit job that is
+# also run on the GPU cluster's minimal deployment checkout.  The two helpers
+# below are copied from the audited relation utility rather than imported, so a
+# missing optional `annotation/` package cannot prevent the preflight from
+# running.  They do not score spectra or access labels.
+def _normalise_bool(value: object) -> bool:
+    if isinstance(value, bool):
+        return value
+    return str(value).strip().lower() in {"1", "true", "yes", "y"}
+
+
+def noncurrency_signature(group: pd.DataFrame, side: str) -> tuple[tuple[str, float], ...]:
+    selected = group[
+        (group["side"].astype(str) == side)
+        & ~group["is_currency"].map(_normalise_bool)
+    ]
+    totals: dict[str, float] = defaultdict(float)
+    for row in selected.itertuples(index=False):
+        totals[str(row.compound_id)[:14]] += float(row.stoichiometry)
+    return tuple(sorted((key, round(value, 8)) for key, value in totals.items()))
+
+
+def _direction_label(semantics: str, source_side: str, target_side: str) -> str:
+    value = semantics.strip().lower()
+    if any(token in value for token in ("bidirectional", "reversible", "equilibrium")):
+        return "reaction_bidirectional"
+    physiological_lr = (
+        ("physiological_lr" in value or "reactome_consensus_lr" in value)
+        and "not_physiological" not in value
+    )
+    physiological_rl = (
+        ("physiological_rl" in value or "reactome_consensus_rl" in value)
+        and "not_physiological" not in value
+    )
+    if physiological_lr:
+        return "reaction_forward" if source_side == "left" else "reaction_reverse"
+    if physiological_rl:
+        return "reaction_forward" if source_side == "right" else "reaction_reverse"
+    return "reaction_direction_unknown"
 
 
 def sha256(path: Path) -> str:
