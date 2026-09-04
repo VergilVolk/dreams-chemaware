@@ -21,7 +21,10 @@ for path in "$CACHE" "$PARTICIPANTS" data/models/MassSpecGym_MurckoHist_split.hd
 done
 test ! -e "$OUTPUT" || { echo "Refusing to overwrite: $OUTPUT" >&2; exit 3; }
 
-python -m pytest tests/test_audit_bioaware_b0_reaction_embedding_signal.py -q
+# The cluster's `dreams` environment intentionally has no pytest dependency.
+# Execute the dependency-free unit functions directly, so an infrastructure
+# package cannot block the scientific preflight.
+python -c "import runpy; ns = runpy.run_path('tests/test_audit_bioaware_b0_reaction_embedding_signal.py'); [ns[n]() for n in sorted(ns) if n.startswith('test_')]; print('[BioAware B0 unit checks] PASS')"
 python -u tasks/audit_bioaware_b0_reaction_embedding_signal.py \
   --hdf5 data/models/MassSpecGym_MurckoHist_split.hdf5 \
   --embedding-cache "$CACHE" \
