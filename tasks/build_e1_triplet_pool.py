@@ -6,6 +6,11 @@ E1 reproduces the identity-only DreaMS contrastive objective:
 * negative: a different molecule within ``mass_window_da`` of the anchor
 * all spectra come from one explicit HDF5 fold and one adduct
 
+``SIMULATION_CHALLENGE`` is intentionally not a filter here: MassSpecGym uses
+it as spectrum-simulation benchmark subset membership, not as spectrum
+provenance.  E1 includes both values unless another scientifically justified,
+explicit cohort contract is added.
+
 The output stores candidate lists, not preselected triplets.  The trainer samples
 fresh positives and negatives every epoch while preserving a fully auditable,
 deterministic candidate universe.
@@ -29,6 +34,10 @@ DEFAULT_DATA = REPO_ROOT / "data" / "models" / "MassSpecGym_MurckoHist_split.hdf
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Build E1 hard-triplet candidate pool")
     parser.add_argument("--data", type=Path, default=DEFAULT_DATA)
+    parser.add_argument(
+        "--allow-list", type=Path, default=None,
+        help="Optional corrected P3-disjoint JSON containing train_primary_all.rows.",
+    )
     parser.add_argument("--fold", choices=("train", "val"), required=True)
     parser.add_argument("--adduct", default="[M+H]+")
     parser.add_argument("--mass-window-da", type=float, default=0.05)
@@ -53,6 +62,49 @@ def decode_array(values) -> np.ndarray:
         value.decode("utf-8", errors="ignore") if isinstance(value, bytes) else str(value)
         for value in values
     ])
+
+
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(8 << 20), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def load_corrected_allow_list(
+    path: Path, total_rows: int | None = None,
+) -> tuple[np.ndarray, dict]:
+    """Load the only allow-list schema valid for new ChemAware work.
+
+    The semantic declaration is deliberately required in addition to the
+    ``train_primary_all`` key.  This makes a renamed copy of the historical
+    provenance-misinterpreted allow-list fail closed.
+    """
+    body = json.loads(path.read_text(encoding="utf-8"))
+    primary = body.get("train_primary_all")
+    if not isinstance(primary, dict) or "rows" not in primary:
+        raise RuntimeError(
+            "allow-list must use corrected train_primary_all.rows schema; "
+            "legacy real_train_primary is prohibited"
+        )
+    if "not spectrum provenance" not in body.get("simulation_challenge_semantics", ""):
+        raise RuntimeError("allow-list does not declare corrected SIMULATION_CHALLENGE semantics")
+    if int(body.get("p3_query_overlap", -1)) != 0:
+        raise RuntimeError("allow-list does not prove zero P3 identity overlap")
+    rows = np.asarray(primary["rows"], dtype=np.int64)
+    if rows.ndim != 1:
+        raise RuntimeError("allow-list rows must be one-dimensional")
+    if len(rows) != len(np.unique(rows)):
+        raise RuntimeError("allow-list contains duplicate rows")
+    if total_rows is not None and np.any((rows < 0) | (rows >= total_rows)):
+        raise RuntimeError("allow-list contains an out-of-range HDF5 row")
+    return rows, {
+        "path": str(path.resolve()),
+        "sha256": sha256_file(path),
+        "schema": "train_primary_all.rows",
+        "p3_query_overlap": 0,
+    }
 
 
 def spectrum_hash(spectrum: np.ndarray, mz_tol: float, intensity_tol: float) -> str:
@@ -95,8 +147,16 @@ def main() -> None:
 
     output = args.output
     if output is None:
-        output = REPO_ROOT / "data" / "e1" / f"e1_{args.fold}_triplet_pool.npz"
+        suffix = "_p3disjoint_corrected" if args.allow_list is not None else ""
+        output = REPO_ROOT / "data" / "e1" / f"e1_{args.fold}_triplet_pool{suffix}.npz"
+    if output.exists() or output.with_suffix(".json").exists():
+        raise FileExistsError(f"refusing to overwrite E1 pool or audit: {output}")
     output.parent.mkdir(parents=True, exist_ok=True)
+
+    allowed_rows: np.ndarray | None = None
+    allow_audit: dict | None = None
+    if args.allow_list is not None:
+        allowed_rows, allow_audit = load_corrected_allow_list(args.allow_list)
 
     print(f"Data:   {args.data}")
     print(f"Fold:   {args.fold}")
@@ -109,7 +169,16 @@ def main() -> None:
     with h5py.File(args.data, "r") as handle:
         folds = decode_array(handle["fold"][:])
         adducts = decode_array(handle["adduct"][:])
-        selected = np.flatnonzero((folds == args.fold) & (adducts == args.adduct))
+        selected_mask = (folds == args.fold) & (adducts == args.adduct)
+        if allowed_rows is not None:
+            # Recheck now that the authoritative HDF5 row count is known.
+            allowed_rows, allow_audit = load_corrected_allow_list(
+                args.allow_list, total_rows=len(folds)
+            )
+            allowed_mask = np.zeros(len(folds), dtype=bool)
+            allowed_mask[allowed_rows] = True
+            selected_mask &= allowed_mask
+        selected = np.flatnonzero(selected_mask)
         if args.max_spectra and len(selected) > args.max_spectra:
             subset_rng = np.random.RandomState(args.seed)
             selected = np.sort(subset_rng.choice(selected, args.max_spectra, replace=False))
@@ -119,6 +188,9 @@ def main() -> None:
         all_inchikeys = decode_array(handle["INCHIKEY"][:])
         inchikeys = np.asarray([value[:14] for value in all_inchikeys[selected]])
         precursor_mz = np.asarray(handle["precursor_mz"][:], dtype=np.float64)[selected]
+        membership = decode_array(handle["SIMULATION_CHALLENGE"][:])[selected]
+        instrument = decode_array(handle["INSTRUMENT_TYPE"][:])[selected]
+        collision_energy = np.asarray(handle["COLLISION_ENERGY"][:], dtype=np.float64)[selected]
 
         print(f"Selected spectra: {len(selected):,}")
         print("Computing peak hashes...")
@@ -160,6 +232,8 @@ def main() -> None:
     negative_flat: list[int] = []
     positive_counts: list[int] = []
     negative_counts: list[int] = []
+    cross_instrument_positive_edges = 0
+    distinct_observed_ce_positive_edges = 0
     skipped_no_positive = 0
     skipped_no_negative = 0
 
@@ -212,6 +286,12 @@ def main() -> None:
         negative_ptr.append(len(negative_flat))
         positive_counts.append(len(positive_global))
         negative_counts.append(len(negative_global))
+        cross_instrument_positive_edges += int(np.sum(instrument[positive] != instrument[local_anchor]))
+        distinct_observed_ce_positive_edges += int(np.sum(
+            np.isfinite(collision_energy[positive])
+            & np.isfinite(collision_energy[local_anchor])
+            & (collision_energy[positive] != collision_energy[local_anchor])
+        ))
 
     if not anchors:
         raise RuntimeError("No eligible E1 anchors were found")
@@ -227,7 +307,12 @@ def main() -> None:
 
     audit = {
         "e1_pool_version": "1.0",
+        "scientific_role": (
+            "identity-only DreaMS domain-continuation control; not the ChemAware contribution"
+        ),
         "data": str(args.data.resolve()),
+        "data_sha256": sha256_file(args.data),
+        "allow_list": allow_audit,
         "hdf5_rows": int(len(folds)),
         "fold": args.fold,
         "adduct": args.adduct,
@@ -240,11 +325,21 @@ def main() -> None:
         "seed": args.seed,
         "selected_spectra": int(len(selected)),
         "unique_molecules": int(len(set(inchikeys))),
+        "simulation_challenge_membership_counts": {
+            str(value): int(np.sum(membership == value)) for value in np.unique(membership)
+        },
+        "simulation_challenge_semantics": (
+            "spectrum-simulation benchmark subset membership; never used as provenance or a filter"
+        ),
         "eligible_anchors": len(anchors),
         "skipped_no_positive": skipped_no_positive,
         "skipped_no_negative_after_positive": skipped_no_negative,
         "positive_candidates_per_anchor": describe_counts(positive_counts),
         "negative_candidates_per_anchor": describe_counts(negative_counts),
+        "positive_edge_condition_diversity": {
+            "cross_instrument_edges": cross_instrument_positive_edges,
+            "distinct_observed_collision_energy_edges": distinct_observed_ce_positive_edges,
+        },
         "peak_hash": {
             "mz_tolerance_da": args.peak_hash_mz_tol,
             "intensity_tolerance": args.peak_hash_intensity_tol,

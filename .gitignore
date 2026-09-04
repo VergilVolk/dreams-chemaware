@@ -184,6 +184,17 @@ tasks/ms2ds_scores_T*.json
 
 # Slurm / job log outputs (transient)
 *.out
+*.err
+
+# Local tooling, interrupted downloads and generated model artefacts
+node_modules/
+.artifact_tmp_oep/
+.codex_spreadsheet_audit/
+.codex_tmp*/
+/models/
+chem_aware_checkpoints/
+contrastive_checkpoints_v5_triplet/
+*.filepart
 
 # Step 3 generated isomer-pair datasets (large derived data — regenerate via tasks/)
 tasks/massspecgym_isomers/dataset_manifest.json

@@ -120,7 +120,13 @@ def pair_scores_collapsed(
 
 def summarize(scores: pd.DataFrame) -> dict[str, float | int]:
     values = scores.class_median_log2fc.to_numpy(float)
-    order_rho, order_p = spearmanr(scores.pair_center_order, values)
+    finite_order = np.isfinite(scores.pair_center_order.to_numpy(float)) & np.isfinite(values)
+    if finite_order.sum() >= 3:
+        order_rho, order_p = spearmanr(
+            scores.loc[finite_order, "pair_center_order"].to_numpy(float), values[finite_order]
+        )
+    else:
+        order_rho, order_p = np.nan, np.nan
     return {
         "n_pairs": int(len(values)),
         "mean_class_log2fc": float(np.mean(values)),
@@ -218,25 +224,36 @@ def main() -> None:
     log_raw = np.log2(full + pseudo)
     factors = pqn_factors(log_raw)
     pqn_matrix = log_raw.loc[feature_ids].sub(factors, axis=1)
-    acquisition = pd.read_csv(args.acquisition_audit)
-    acquisition = acquisition[acquisition.panel == "pos_rp"]
-    order_map = dict(zip(acquisition.sample_name, acquisition.injection_order))
+    if args.acquisition_audit.exists():
+        acquisition = pd.read_csv(args.acquisition_audit)
+        acquisition = acquisition[acquisition.panel == "pos_rp"]
+        order_map = dict(zip(acquisition.sample_name, acquisition.injection_order))
+    else:
+        print(f"[acylcarnitine] optional acquisition audit absent: {args.acquisition_audit}", flush=True)
+        order_map = {}
     order_values = np.asarray([order_map.get(column, np.nan) for column in pqn_matrix.columns], dtype=float)
     order_center = float(np.nanmedian(order_values))
-    drift = pd.read_csv(args.drift_diagnostics).set_index("feature_id")
-    drifted = pqn_matrix.copy()
-    for feature_id in feature_ids:
-        slope = float(drift.loc[feature_id, "applied_slope"]) if feature_id in drift.index else 0.0
-        valid = np.isfinite(order_values)
-        drifted.loc[feature_id, np.asarray(drifted.columns)[valid]] = (
-            pqn_matrix.loc[feature_id, np.asarray(drifted.columns)[valid]].to_numpy(float)
-            - slope * (order_values[valid] - order_center)
-        )
     variants = {
         "log_raw": log_raw.loc[feature_ids],
         "pqn": pqn_matrix,
-        "pqn_pair_drift": drifted,
     }
+    drift_available = args.drift_diagnostics.exists() and bool(order_map)
+    if drift_available:
+        drift = pd.read_csv(args.drift_diagnostics).set_index("feature_id")
+        drifted = pqn_matrix.copy()
+        for feature_id in feature_ids:
+            slope = float(drift.loc[feature_id, "applied_slope"]) if feature_id in drift.index else 0.0
+            valid = np.isfinite(order_values)
+            drifted.loc[feature_id, np.asarray(drifted.columns)[valid]] = (
+                pqn_matrix.loc[feature_id, np.asarray(drifted.columns)[valid]].to_numpy(float)
+                - slope * (order_values[valid] - order_center)
+            )
+        variants["pqn_pair_drift"] = drifted
+    else:
+        print(
+            f"[acylcarnitine] pair-drift sensitivity unavailable; diagnostics={args.drift_diagnostics}",
+            flush=True,
+        )
 
     pair_frames = []
     collapsed_pair_frames = []
@@ -250,6 +267,7 @@ def main() -> None:
             "min_ms2_samples": args.min_ms2_samples,
             "min_features_per_pair": args.min_features_per_pair,
             "pseudocount": pseudo,
+            "pair_drift_sensitivity_available": drift_available,
         },
         "variants": {},
         "chain_collapsed_sensitivity": {
@@ -310,12 +328,22 @@ def main() -> None:
     pd.concat(collapsed_pair_frames, ignore_index=True).to_csv(
         out / "acylcarnitine_chain_collapsed_pair_scores.csv", index=False
     )
-    clinical = pd.read_csv(args.clinical, sep="\t")
-    clinical_scores, clinical_report = clinical_sensitivity(
-        pd.concat(collapsed_pair_frames, ignore_index=True), clinical
-    )
-    clinical_scores.to_csv(out / "acylcarnitine_chain_collapsed_pair_scores_clinical.tsv", sep="\t", index=False)
-    report["clinical_sensitivity_table_s2"] = clinical_report
+    if args.clinical.exists():
+        clinical = pd.read_csv(args.clinical, sep="\t")
+        clinical_scores, clinical_report = clinical_sensitivity(
+            pd.concat(collapsed_pair_frames, ignore_index=True), clinical
+        )
+        clinical_scores.to_csv(
+            out / "acylcarnitine_chain_collapsed_pair_scores_clinical.tsv",
+            sep="\t",
+            index=False,
+        )
+        report["clinical_sensitivity_table_s2"] = clinical_report
+    else:
+        report["clinical_sensitivity_table_s2"] = {
+            "status": "not_run",
+            "reason": f"missing optional clinical table {args.clinical}",
+        }
     (out / "class_score_report.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
     print(json.dumps(report, indent=2))
 

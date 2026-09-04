@@ -16,6 +16,8 @@ Modules (each independently usable and ablatable):
     darkmatter  -- dark-matter candidate mining (M7)
     ablation    -- module on/off comparison harness (M8)
     cli         -- end-to-end command line entrypoint (M9)
+    bioaware    -- conservative reaction-network evidence after embedding
+    bioaware_negative_expert -- frozen risk-controlled [M-H]- network reranker
 """
 
 __version__ = "0.1.0"

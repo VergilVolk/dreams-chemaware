@@ -1,9 +1,15 @@
-"""Build the real-only, P3-disjoint P2 molecule-listwise training cache.
+"""Reproduce the legacy restricted-cohort P2 molecule-listwise cache.
 
 The cache preserves complete strict-10ppm candidate groups inside the sealed
 P2 allow-list.  Scores are stored per query-spectrum/candidate-spectrum pair;
 training and evaluation aggregate them by candidate molecule with max(), the
 same operation used by deployment retrieval.
+
+Historical ``real_train_primary`` was defined by treating MassSpecGym
+``SIMULATION_CHALLENGE=False`` as experimental provenance. That interpretation
+is wrong: the field is benchmark-subset membership. This builder is therefore
+disabled by default and may only be used for explicit legacy reproduction. A
+new formal graph must use corrected ``train_primary_all`` in a new builder.
 """
 from __future__ import annotations
 
@@ -66,6 +72,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--workers", type=int, default=1,
                    help="Parallel CPU workers for RAW peak-pair features.")
     p.add_argument("--overwrite", action="store_true")
+    p.add_argument("--legacy-cohort-reproduction-only", action="store_true")
     return p.parse_args()
 
 
@@ -211,6 +218,12 @@ def load_or_build_embeddings(a: argparse.Namespace, rows: np.ndarray, spectra: n
 
 def main() -> None:
     a = parse_args()
+    if not a.legacy_cohort_reproduction_only:
+        raise RuntimeError(
+            "fail-closed: this builder consumes obsolete real_train_primary semantics. "
+            "Use a corrected train_primary_all graph builder for new ChemAware work; "
+            "pass --legacy-cohort-reproduction-only only to reproduce historical artifacts."
+        )
     if (a.ppm_tol <= 0 or a.peak_tolerance <= 0 or a.max_queries <= 0
             or a.queries_per_identity <= 0 or a.workers <= 0):
         raise ValueError("invalid cache-builder parameter")

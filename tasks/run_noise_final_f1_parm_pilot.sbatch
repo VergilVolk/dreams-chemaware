@@ -1,0 +1,29 @@
+#!/bin/bash
+#SBATCH --job-name=noise_f1_parm
+#SBATCH --gpus=1
+#SBATCH --cpus-per-task=8
+#SBATCH --time=08:00:00
+#SBATCH --output=data/validation/noise_final_f1_parm_%j.out
+#SBATCH --error=data/validation/noise_final_f1_parm_%j.err
+
+set -euo pipefail
+export PYTHONUNBUFFERED=1
+export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK:-8}"
+cd /data02/run01/scv7tsl/DreaMS
+export PYTHONPATH="$PWD:$PWD/tasks:${PYTHONPATH:-}"
+
+TOKEN_DIR=data/validation/g8r_noise_final_f1_full_tokens
+if [[ ! -f "$TOKEN_DIR/report.json" ]]; then
+  echo "Missing F1 full-token cache. Submit tasks/run_noise_final_f1_token_cache.sbatch first." >&2
+  exit 3
+fi
+OUTPUT=data/validation/g8r_noise_final_f1_parm/seed_20260825/fold_0
+[[ ! -e "$OUTPUT" ]] || { echo "Refusing to overwrite F1 pilot: $OUTPUT" >&2; exit 4; }
+
+echo "=== F1 P-arm shared-encoder pilot started: $(date) ==="
+python -u tasks/test_noise_final_f1_parm.py
+python -u tasks/train_noise_final_f1_parm.py \
+  --outer-fold 0 \
+  --seed 20260825 \
+  --device cuda
+echo "=== F1 P-arm shared-encoder pilot completed: $(date) ==="

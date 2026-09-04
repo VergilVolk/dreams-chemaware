@@ -181,6 +181,9 @@ def main() -> None:
 
     for variant in ("log_raw", "pqn", "pqn_pair_drift"):
         stats_path = args.paired_dir / f"pos_rp__{variant}__paired_stats.csv.gz"
+        if not stats_path.exists():
+            print(f"[acylcarnitine] optional paired statistics absent: {stats_path}", flush=True)
+            continue
         stats = pd.read_csv(stats_path)
         keep = [
             "feature_id", "rmu_vs_rn_n", "rmu_vs_rn_mean_log2fc", "rmu_vs_rn_ttest_p",

@@ -51,8 +51,14 @@ def main() -> None:
                     file_rows.append({
                         "panel": panel,
                         "sample_name": path.stem,
-                        "status": "failed",
-                        "error": f"Missing peak-resolved EIC: {peak_path}",
+                        # A raw mzML can legitimately be absent from the
+                        # upstream EIC sample manifest (P06-Ltu in pos_rp is
+                        # the known MTBLS13729 example).  In that case there
+                        # is no chromatographic peak boundary against which an
+                        # MS2 spectrum can be linked.  This is an explicit
+                        # exclusion, not a parser/execution failure.
+                        "status": "excluded_no_peak_resolved_eic",
+                        "reason": f"Missing peak-resolved EIC: {peak_path}",
                     })
                     continue
                 peaks = pd.read_csv(peak_path).set_index("feature_id")
@@ -145,6 +151,7 @@ def main() -> None:
     pd.DataFrame(file_rows).to_csv(files_path, index=False)
     report = {
         "status": "complete_with_failures" if any(row["status"] == "failed" for row in file_rows) else "complete",
+        "file_status_counts": pd.Series([row["status"] for row in file_rows]).value_counts().to_dict(),
         "n_candidates": int(len(candidates)),
         "n_candidates_with_ms2": int((coverage.n_ms2_spectra > 0).sum()),
         "n_ms2_links": int(len(link_frame)),

@@ -1,0 +1,94 @@
+{
+  "schema_version": "chemaware.chemical-prior.v2",
+  "library_id": "chemaware-prior-example",
+  "release": "0.0.1-evaluation-only",
+  "description": "A non-production example demonstrating the v2 executable-prior contract.",
+  "license": "MIT",
+  "sources": [
+    {
+      "source_id": "magma-ms-pred",
+      "title": "MAGMa heuristic fragment enumeration as implemented by ms-pred",
+      "role": "fragmentation_teacher",
+      "doi": null,
+      "url": "https://github.com/coleygroup/ms-pred",
+      "version": "cd616f629a82040b950fbf8f0a983cc70ce1cf3b",
+      "license": "MIT",
+      "content_sha256": "5fc6ac347a09ea8486154ce827eea0ea810a0c7f6a277279ffd4c5abd1e93744"
+    }
+  ],
+  "rules": [
+    {
+      "rule_id": "eval.generic-c-o-cleavage.v1",
+      "rule_kind": "fragmentation_transition",
+      "status": "evaluation_only",
+      "name": "Generic single C-O bond cleavage candidate",
+      "description": "Enumeration template only; it is not an empirically promoted fragmentation rule.",
+      "acquisition_scope": {
+        "polarities": ["positive"],
+        "adducts": ["[M+H]+"],
+        "ionization_methods": ["ESI"],
+        "dissociation_methods": ["CID", "HCD"],
+        "instrument_types": [],
+        "collision_energy": {
+          "unit": "unknown",
+          "minimum": null,
+          "maximum": null
+        }
+      },
+      "structure_scope": {
+        "required_smarts": ["[C:1]-[O:2]"],
+        "forbidden_smarts": [],
+        "required_element_minimum": {"C": 1, "O": 1},
+        "allowed_charge_states": [0, 1]
+      },
+      "transformation": {
+        "bond_edits": [
+          {
+            "operation": "break",
+            "atom_map_left": 1,
+            "atom_map_right": 2,
+            "from_order": 1.0,
+            "to_order": null
+          }
+        ],
+        "neutral_element_delta": {},
+        "hydrogen_shift_min": -1,
+        "hydrogen_shift_max": 1,
+        "charge_delta": 0,
+        "radical_electron_delta": 0,
+        "minimum_path_depth": 1,
+        "maximum_path_depth": 1,
+        "maximum_broken_bonds": 1,
+        "requires_parent_fragment": false,
+        "product_smarts": null,
+        "product_formula": null
+      },
+      "observation_model": {
+        "target": "fragment_and_neutral_loss",
+        "mass_tolerance_ppm": 20.0,
+        "mass_tolerance_floor_da": 0.01,
+        "minimum_relative_intensity": null
+      },
+      "evidence": {
+        "evidence_type": "theoretical",
+        "source_ids": ["magma-ms-pred"],
+        "unique_molecules": 0,
+        "unique_scaffolds": 0,
+        "unique_spectra": 0,
+        "unique_sources_or_labs": null,
+        "positive_observations": 0,
+        "eligible_observations": 0,
+        "posterior_mean": null,
+        "posterior_ci_low": null,
+        "posterior_ci_high": null,
+        "calibration_split": null,
+        "last_validated": null
+      },
+      "deployment": {
+        "role": "training_teacher",
+        "enabled_by_default": false,
+        "minimum_teacher_probability": null
+      }
+    }
+  ]
+}

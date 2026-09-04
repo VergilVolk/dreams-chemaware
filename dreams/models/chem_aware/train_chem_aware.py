@@ -2,7 +2,7 @@
 化学感知 DreaMS 轻量微调脚本 [v3 简化版]
 
 功能：
-  冻结预训练 DreaMS backbone → 仅训练化学规则引擎的 5 维权重向量
+  冻结预训练 DreaMS backbone → 训练化学规则权重与零初始化注意力尺度
   通过 mask prediction 任务驱动各规则权重的学习。
 
 核心改动（v2 → v3）：
@@ -51,6 +51,9 @@ def parse_args():
     p.add_argument('--lr', type=float, default=1e-4)
     p.add_argument('--chem_attn_layer', type=int, default=-1,
                    help='Layer index to inject chem bias (-1 = last layer)')
+    p.add_argument('--chem_attn_mode', choices=('attention', 'residual'),
+                   default='attention',
+                   help='true pre-softmax attention bias or explicit legacy residual control')
     p.add_argument('--dry_run', action='store_true',
                    help='Use synthetic data for local testing')
     p.add_argument('--save_dir', type=str, default='./chem_aware_checkpoints_v3')
@@ -65,7 +68,11 @@ def parse_args():
 # 从预训练 DreaMS 构建 ChemAwareDreaMS（参数克隆）
 # ==============================================================================
 
-def build_chem_aware_from_pretrained(pretrained_model: DreaMS, chem_attn_layer: int = -1) -> ChemAwareDreaMS:
+def build_chem_aware_from_pretrained(
+    pretrained_model: DreaMS,
+    chem_attn_layer: int = -1,
+    chem_attn_mode: str = 'attention',
+) -> ChemAwareDreaMS:
     """从预训练 DreaMS 克隆 backbone 参数到 ChemAwareDreaMS [v3]"""
     from argparse import Namespace
 
@@ -108,6 +115,7 @@ def build_chem_aware_from_pretrained(pretrained_model: DreaMS, chem_attn_layer: 
     old_args.chem_attn = True
     old_args.chem_attn_tolerance = 0.02
     old_args.chem_attn_layer = chem_attn_layer
+    old_args.chem_attn_mode = chem_attn_mode
 
     # 构建
     chem_model = ChemAwareDreaMS(old_args, pretrained_model.spec_preproc)
@@ -167,8 +175,8 @@ def train_chem_aware(
     chem_params = model.get_chem_aware_params()
     optimizer = torch.optim.Adam(chem_params, lr=lr)
     n_params = sum(p.numel() for p in chem_params)
-    n_rules = n_params  # 每个规则一个权重
-    print(f'   Optimizer params: {n_params} ({n_rules} rule weights)')
+    n_rules = int(model.chem_rule_engine.rule_weights_raw.numel())
+    print(f'   Optimizer params: {n_params} ({n_rules} rule weights + route scale)')
 
     # ---- 日志 ----
     rule_names = model.chem_rule_engine.get_rule_names()  # 逐规则名称列表
@@ -227,7 +235,13 @@ def train_chem_aware(
                 print('[FINITE DIFF] Testing if rule_weights affect loss...')
                 with torch.no_grad():
                     orig_raw = model.chem_rule_engine.rule_weights_raw.clone()
-                    orig_w = model.chem_rule_engine.get_rule_weights().clone()
+                    route_scale = (
+                        model.chem_attention_scale
+                        if model.chem_attention_scale is not None
+                        else model.chem_residual_scale
+                    )
+                    orig_scale = route_scale.clone()
+                    route_scale.fill_(1.0)
 
                     # 权重→0（softplus(-100)≈0，即无化学偏置）
                     model.chem_rule_engine.rule_weights_raw.fill_(-100.0)
@@ -239,6 +253,7 @@ def train_chem_aware(
 
                     # 恢复
                     model.chem_rule_engine.rule_weights_raw.copy_(orig_raw)
+                    route_scale.copy_(orig_scale)
 
                 diff = loss10 - loss0
                 print(f'[FINITE DIFF] loss(weights→0)={loss0:.6f}  loss(weights→10)={loss10:.6f}  diff={diff:.6f}')
@@ -261,7 +276,11 @@ def train_chem_aware(
             # [DEBUG] 诊断梯度是否到达 rule_weights_raw
             if global_step < 5:
                 rw_param = model.chem_rule_engine.rule_weights_raw
-                scale_param = model.chem_residual_scale
+                scale_param = (
+                    model.chem_attention_scale
+                    if model.chem_attention_scale is not None
+                    else model.chem_residual_scale
+                )
                 print(f'[DEBUG step {global_step}] rule_weights_raw.grad is None: {rw_param.grad is None}')
                 print(f'[DEBUG step {global_step}] chem_residual_scale={scale_param.item():.4f}')
                 # 诊断：逐级检查中间张量梯度
@@ -335,7 +354,12 @@ def train_chem_aware(
                                     for i in top3_idx)
                 bot_str = ' | '.join(f'{rule_names[i].split(":")[-1]}={rw_np[i]:.3f}'
                                     for i in bot3_idx)
-                scale_val = model.chem_residual_scale.item()
+                scale_param = (
+                    model.chem_attention_scale
+                    if model.chem_attention_scale is not None
+                    else model.chem_residual_scale
+                )
+                scale_val = scale_param.item()
                 print(f'   Epoch {epoch+1}/{epochs} | Step {batch_idx} | '
                       f'mask_loss={loss_mask.item():.4f} | scale={scale_val:.3f} | '
                       f'avg_w={rw_np.mean():.4f} | '
@@ -399,6 +423,7 @@ def main():
     print(f'ChemAwareDreaMS v3 — Reward-based, last-layer-only')
     print(f'  chem_attn_layer: {args.chem_attn_layer} '
           f'({"last" if args.chem_attn_layer == -1 else args.chem_attn_layer})')
+    print(f'  chem_attn_mode: {args.chem_attn_mode}')
 
     # ---- 加载预训练 DreaMS ----
     ckpt_path = args.ckpt_path or (PRETRAINED / 'ssl_model.ckpt')
@@ -439,7 +464,11 @@ def main():
 
     # ---- 构建 ChemAwareDreaMS [v3] ----
     print('Building ChemAwareDreaMS v3...')
-    model = build_chem_aware_from_pretrained(pretrained, chem_attn_layer=args.chem_attn_layer)
+    model = build_chem_aware_from_pretrained(
+        pretrained,
+        chem_attn_layer=args.chem_attn_layer,
+        chem_attn_mode=args.chem_attn_mode,
+    )
     print(f'   chem_attn_enabled: {model.chem_attn_enabled}')
     rw = model.chem_rule_engine.get_rule_weights()
     print(f'   Initial rule weights: {rw.tolist()}')

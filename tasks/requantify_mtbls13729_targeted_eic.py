@@ -9,6 +9,7 @@ scale and prevents non-detection from being silently encoded as biological zero.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
 import re
@@ -23,6 +24,23 @@ from scipy.signal import find_peaks, peak_widths
 
 
 SAMPLE_RE = re.compile(r"^P\d{2}-(?:Ltu|Rtu|Rmu|LN|RN)$")
+
+
+def parameter_signature(args: argparse.Namespace) -> dict[str, object]:
+    return {
+        "ppm": float(args.ppm),
+        "rt_half_window_sec": float(args.rt_half_window_sec),
+        "resolve_local_peaks": bool(args.resolve_local_peaks),
+        "max_apex_delta_sec": float(args.max_apex_delta_sec),
+    }
+
+
+def file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 def extract_eics(
@@ -197,7 +215,17 @@ def main() -> None:
                 continue
             source = root / panel / f"{sample}.mzML"
             target_path = per_sample / f"{panel}__{sample}__eic.csv.gz"
-            if target_path.exists() and not args.force:
+            metadata_path = per_sample / f"{panel}__{sample}__eic.meta.json"
+            reusable = False
+            if target_path.exists() and metadata_path.exists() and not args.force:
+                metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+                reusable = (
+                    metadata.get("parameters") == parameter_signature(args)
+                    and metadata.get("targets_sha256")
+                    == file_sha256(consensus_dir / f"{panel}__requantification_targets.csv.gz")
+                    and metadata.get("source_bytes") == source.stat().st_size
+                )
+            if reusable:
                 manifest.append({"panel": panel, "sample_name": sample, "status": "reused", "output": str(target_path)})
                 print(f"[{panel} {i}/{len(samples)}] reused {sample}", flush=True)
                 continue
@@ -215,6 +243,22 @@ def main() -> None:
                 values.insert(0, "sample_name", sample)
                 values.insert(0, "panel", panel)
                 values.to_csv(target_path, index=False)
+                metadata_path.write_text(
+                    json.dumps(
+                        {
+                            "panel": panel,
+                            "sample_name": sample,
+                            "parameters": parameter_signature(args),
+                            "targets_sha256": file_sha256(
+                                consensus_dir / f"{panel}__requantification_targets.csv.gz"
+                            ),
+                            "source_bytes": source.stat().st_size,
+                        },
+                        indent=2,
+                        sort_keys=True,
+                    ),
+                    encoding="utf-8",
+                )
                 manifest.append(
                     {
                         "panel": panel,
@@ -250,6 +294,14 @@ def main() -> None:
             "median_detected_fraction": float(manifest_frame.get("detected_fraction", pd.Series(dtype=float)).median()),
             "resolve_local_peaks": bool(args.resolve_local_peaks),
             "max_apex_delta_sec": float(args.max_apex_delta_sec),
+            "parameters": parameter_signature(args),
+            "all_samples_parameter_locked": bool(
+                len(usable) == len(samples)
+                and all(
+                    (per_sample / f"{panel}__{sample}__eic.meta.json").exists()
+                    for sample in usable["sample_name"].astype(str)
+                )
+            ),
         }
     (out / "report.json").write_text(json.dumps(full_report, indent=2), encoding="utf-8")
     print(json.dumps(full_report, indent=2), flush=True)

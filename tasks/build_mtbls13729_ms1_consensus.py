@@ -18,10 +18,29 @@ import numpy as np
 import pandas as pd
 import pyopenms as oms
 
-from align_mtbls13729_openms_features import dataframe_to_feature_map
-
 
 SAMPLE_RE = re.compile(r"^(P\d{2})-(Ltu|Rtu|Rmu|LN|RN)$")
+
+
+def dataframe_to_feature_map(frame: pd.DataFrame, source: str) -> oms.FeatureMap:
+    """Convert a frozen feature table into an OpenMS FeatureMap."""
+
+    uid = oms.UniqueIdGenerator()
+    feature_map = oms.FeatureMap()
+    feature_map.setUniqueId(uid.getUniqueId())
+    feature_map.setPrimaryMSRunPath([source.encode()])
+    for row in frame.itertuples(index=False):
+        feature = oms.Feature()
+        feature.setMZ(float(row.mz))
+        feature.setRT(float(row.rt_sec))
+        feature.setIntensity(float(row.intensity))
+        feature.setCharge(int(row.charge))
+        feature.setOverallQuality(float(row.quality))
+        feature.setWidth(float(row.width_sec))
+        feature.setUniqueId(uid.getUniqueId())
+        feature_map.push_back(feature)
+    feature_map.updateRanges()
+    return feature_map
 
 
 def sample_class(name: str) -> tuple[str, str, str]:

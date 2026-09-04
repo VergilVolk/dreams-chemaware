@@ -9,7 +9,7 @@
   MultiheadAttention.forward() 新增两个可选参数：
     - chem_bias: (batch, n_heads, n, n) 或 (batch, 1, n, n) — 化学规则偏置矩阵
       由 ChemicalRuleEngine 根据峰对质量差计算，在 softmax 前注入，
-      使化学合理的碎裂路径获得正常注意力，不合理路径被衰减。
+      用正/负 logits 显式奖励或抑制相应峰对。
     - gate_weights: (batch, n_heads) — 注意力头门控权重
       由 HeadGatingNetwork 根据当前层输入动态生成，用于调节各注意力头的贡献。
 
@@ -101,8 +101,8 @@ class MultiheadAttention(nn.Module):
             do_proj_qkv: bool — 是否执行 QKV 线性投影
             chem_bias: (batch, n_heads|1, n_peaks, n_peaks) — [模块一新增] 化学规则注意力偏置
                 - 形状 (batch, 1, n, n) 时自动广播到所有头
-                - 化学合理的峰对 → bias ≈ 0（不衰减）
-                - 化学不合理的峰对 → bias < 0（衰减）
+                - 正值提高相应峰对的 softmax 概率
+                - 负值降低相应峰对的 softmax 概率
                 - 为 None 时行为与原版完全一致
             gate_weights: (batch, n_heads) — [模块一新增] 注意力头门控权重
                 - 值域 [0, 1]，由 HeadGatingNetwork 产生
@@ -148,6 +148,43 @@ class MultiheadAttention(nn.Module):
                 # (bs, n, n, dists_d) -> (bs, 1, n, n)，广播到所有头
                 att_bias = graphormer_dists.sum(dim=-1).unsqueeze(1)
             att_weights = att_weights + att_bias
+
+        # --- [模块一] 化学规则注意力偏置 ---
+        # This must be an additive logit bias before masking and softmax.  The
+        # previous implementation exposed and documented ``chem_bias`` but
+        # silently ignored it, so all callers received the unmodified DreaMS
+        # attention.  Validate aggressively here: a broadcast over the wrong
+        # dimension can otherwise look numerically plausible while changing
+        # the scientific meaning of the rule graph.
+        if chem_bias is not None:
+            if not torch.is_floating_point(chem_bias):
+                raise ValueError("chem_bias must be a floating-point tensor")
+            if chem_bias.ndim != 4:
+                raise ValueError(
+                    "chem_bias must have shape (batch, 1|n_heads, n, n); "
+                    f"observed {tuple(chem_bias.shape)}"
+                )
+            if chem_bias.shape[0] != bs:
+                raise ValueError(
+                    f"chem_bias batch mismatch: {chem_bias.shape[0]} != {bs}"
+                )
+            if chem_bias.shape[1] not in (1, self.n_heads):
+                raise ValueError(
+                    "chem_bias head dimension must be 1 or n_heads; "
+                    f"observed {chem_bias.shape[1]}"
+                )
+            if tuple(chem_bias.shape[-2:]) != (n, n):
+                raise ValueError(
+                    "chem_bias peak dimensions must match attention; "
+                    f"observed {tuple(chem_bias.shape[-2:])}, expected {(n, n)}"
+                )
+            if chem_bias.device != att_weights.device:
+                raise ValueError(
+                    "chem_bias and attention logits must be on the same device"
+                )
+            if not bool(torch.isfinite(chem_bias).all()):
+                raise ValueError("chem_bias contains NaN or infinite values")
+            att_weights = att_weights + chem_bias.to(dtype=att_weights.dtype)
 
         # --- [模块一 遗留] 注意力头门控权重（v3 不再使用） ---
         if gate_weights is not None:

@@ -10,16 +10,126 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import re
 import time
 from pathlib import Path
+from typing import Any
 
-import pandas as pd
-
-from pilot_mtbls13729_openms_features import detect_features, load_ms1
+import numpy as np
+import pandas as pd  
+import pyopenms as oms
 
 
 SAMPLE_RE = re.compile(r"^P\d{2}-(?:Ltu|Rtu|Rmu|LN|RN)$")
+
+
+def load_ms1(path: Path) -> tuple[oms.MSExperiment, dict[str, Any]]:
+    """Load only MS1 scans from one mzML file."""
+
+    experiment = oms.MSExperiment()
+    loader = oms.MzMLFile()
+    options = loader.getOptions()
+    options.setMSLevels([1])
+    loader.setOptions(options)
+    started = time.time()
+    loader.load(str(path), experiment)
+    experiment.sortSpectra(True)
+    intensities: list[np.ndarray] = []
+    spectrum_types: dict[str, int] = {}
+    for spectrum in experiment:
+        spectrum_type = str(spectrum.getType())
+        spectrum_types[spectrum_type] = spectrum_types.get(spectrum_type, 0) + 1
+        _, intensity = spectrum.get_peaks()
+        if len(intensity):
+            intensities.append(np.asarray(intensity, dtype=np.float64))
+    pooled = np.concatenate(intensities) if intensities else np.asarray([], dtype=float)
+    positive = pooled[pooled > 0]
+    summary = {
+        "n_ms1": int(experiment.size()),
+        "spectrum_types": spectrum_types,
+        "n_ms1_points": int(pooled.size),
+        "intensity_p10": float(np.percentile(positive, 10)) if positive.size else math.nan,
+        "intensity_p25": float(np.percentile(positive, 25)) if positive.size else math.nan,
+        "intensity_p50": float(np.percentile(positive, 50)) if positive.size else math.nan,
+        "intensity_p75": float(np.percentile(positive, 75)) if positive.size else math.nan,
+        "intensity_p90": float(np.percentile(positive, 90)) if positive.size else math.nan,
+        "load_seconds": time.time() - started,
+    }
+    return experiment, summary
+
+
+def detect_features(
+    experiment: oms.MSExperiment,
+    noise_threshold: float,
+    mass_error_ppm: float,
+    min_trace_length: float,
+    max_trace_length: float,
+) -> tuple[pd.DataFrame, dict[str, Any]]:
+    """Run the frozen OpenMS metabolomics feature-detection recipe."""
+
+    started = time.time()
+    mass_traces: list[Any] = []
+    detector = oms.MassTraceDetection()
+    detector.setLogType(oms.LogType.NONE)
+    params = detector.getDefaults()
+    params.setValue("mass_error_ppm", float(mass_error_ppm))
+    params.setValue("noise_threshold_int", float(noise_threshold))
+    params.setValue("min_trace_length", float(min_trace_length))
+    params.setValue("max_trace_length", float(max_trace_length))
+    params.setValue("trace_termination_criterion", "outlier")
+    params.setValue("trace_termination_outliers", 5)
+    detector.setParameters(params)
+    detector.run(experiment, mass_traces, 0)
+
+    split_traces: list[Any] = []
+    peak_detector = oms.ElutionPeakDetection()
+    peak_detector.setLogType(oms.LogType.NONE)
+    epd_params = peak_detector.getDefaults()
+    epd_params.setValue("width_filtering", "auto")
+    peak_detector.setParameters(epd_params)
+    peak_detector.detectPeaks(mass_traces, split_traces)
+    final_traces: list[Any] = []
+    peak_detector.filterByPeakWidth(split_traces, final_traces)
+
+    feature_map = oms.FeatureMap()
+    feature_chromatograms: list[Any] = []
+    finder = oms.FeatureFindingMetabo()
+    finder.setLogType(oms.LogType.NONE)
+    ffm_params = finder.getDefaults()
+    ffm_params.setValue("isotope_filtering_model", "none")
+    ffm_params.setValue("mz_scoring_13C", "true")
+    ffm_params.setValue("remove_single_traces", "false")
+    ffm_params.setValue("report_convex_hulls", "false")
+    ffm_params.setValue("report_summed_ints", "false")
+    finder.setParameters(ffm_params)
+    finder.run(final_traces, feature_map, feature_chromatograms)
+    feature_map.setUniqueIds()
+
+    rows = [
+        {
+            "feature_index": i,
+            "mz": float(feature.getMZ()),
+            "rt_sec": float(feature.getRT()),
+            "intensity": float(feature.getIntensity()),
+            "charge": int(feature.getCharge()),
+            "quality": float(feature.getOverallQuality()),
+            "width_sec": float(feature.getWidth()),
+        }
+        for i, feature in enumerate(feature_map)
+    ]
+    feature_df = pd.DataFrame(rows)
+    summary = {
+        "noise_threshold": float(noise_threshold),
+        "n_mass_traces": len(mass_traces),
+        "n_split_traces": len(split_traces),
+        "n_final_traces": len(final_traces),
+        "n_features": int(feature_map.size()),
+        "feature_intensity_median": float(feature_df["intensity"].median()) if len(feature_df) else math.nan,
+        "feature_quality_median": float(feature_df["quality"].median()) if len(feature_df) else math.nan,
+        "detect_seconds": time.time() - started,
+    }
+    return feature_df, summary
 
 
 def load_exclusions(path: Path | None) -> set[tuple[str, str]]:

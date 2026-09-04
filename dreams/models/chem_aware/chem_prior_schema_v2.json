@@ -1,0 +1,291 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://chemaware.local/schema/chemical-prior-v2.json",
+  "title": "ChemAware candidate-executable chemical prior library",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "library_id",
+    "release",
+    "sources",
+    "rules"
+  ],
+  "properties": {
+    "schema_version": {"const": "chemaware.chemical-prior.v2"},
+    "library_id": {"type": "string", "minLength": 1},
+    "release": {"type": "string", "minLength": 1},
+    "description": {"type": "string"},
+    "license": {"type": ["string", "null"]},
+    "sources": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/source"}
+    },
+    "rules": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/rule"}
+    }
+  },
+  "$defs": {
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_id", "title", "role"],
+      "properties": {
+        "source_id": {"type": "string", "minLength": 1},
+        "title": {"type": "string", "minLength": 1},
+        "role": {
+          "enum": [
+            "physical_constraint",
+            "curated_mechanism",
+            "empirical_observation",
+            "fragmentation_teacher",
+            "calibration_dataset"
+          ]
+        },
+        "doi": {"type": ["string", "null"]},
+        "url": {"type": ["string", "null"], "format": "uri"},
+        "version": {"type": ["string", "null"]},
+        "license": {"type": ["string", "null"]},
+        "content_sha256": {
+          "type": ["string", "null"],
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "formula_counts": {
+      "type": "object",
+      "propertyNames": {"pattern": "^[A-Z][a-z]?$"},
+      "additionalProperties": {"type": "integer", "minimum": 0}
+    },
+    "acquisition_scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["polarities", "adducts", "dissociation_methods"],
+      "properties": {
+        "polarities": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"enum": ["positive", "negative"]}
+        },
+        "adducts": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "ionization_methods": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "dissociation_methods": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "instrument_types": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "collision_energy": {
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "required": ["unit", "minimum", "maximum"],
+          "properties": {
+            "unit": {"enum": ["eV", "NCE", "unknown"]},
+            "minimum": {"type": ["number", "null"]},
+            "maximum": {"type": ["number", "null"]}
+          }
+        }
+      }
+    },
+    "structure_scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required_smarts", "forbidden_smarts"],
+      "properties": {
+        "required_smarts": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1}
+        },
+        "forbidden_smarts": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1}
+        },
+        "required_element_minimum": {"$ref": "#/$defs/formula_counts"},
+        "allowed_charge_states": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "integer"}
+        }
+      }
+    },
+    "bond_edit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operation", "atom_map_left", "atom_map_right"],
+      "properties": {
+        "operation": {"enum": ["break", "form", "change_order"]},
+        "atom_map_left": {"type": "integer", "minimum": 1},
+        "atom_map_right": {"type": "integer", "minimum": 1},
+        "from_order": {"type": ["number", "null"]},
+        "to_order": {"type": ["number", "null"]}
+      }
+    },
+    "transformation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "bond_edits",
+        "neutral_element_delta",
+        "hydrogen_shift_min",
+        "hydrogen_shift_max",
+        "charge_delta",
+        "radical_electron_delta",
+        "minimum_path_depth",
+        "maximum_path_depth",
+        "maximum_broken_bonds"
+      ],
+      "properties": {
+        "bond_edits": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/bond_edit"}
+        },
+        "neutral_element_delta": {"$ref": "#/$defs/formula_counts"},
+        "hydrogen_shift_min": {"type": "integer"},
+        "hydrogen_shift_max": {"type": "integer"},
+        "charge_delta": {"type": "integer"},
+        "radical_electron_delta": {"type": "integer"},
+        "minimum_path_depth": {"type": "integer", "minimum": 0},
+        "maximum_path_depth": {"type": "integer", "minimum": 0},
+        "maximum_broken_bonds": {"type": "integer", "minimum": 0},
+        "requires_parent_fragment": {"type": "boolean", "default": false},
+        "product_smarts": {"type": ["string", "null"]},
+        "product_formula": {"type": ["string", "null"]}
+      }
+    },
+    "observation_model": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target", "mass_tolerance_ppm", "mass_tolerance_floor_da"],
+      "properties": {
+        "target": {
+          "enum": [
+            "fragment_ion",
+            "neutral_loss",
+            "fragment_and_neutral_loss",
+            "isotope_pattern"
+          ]
+        },
+        "mass_tolerance_ppm": {"type": "number", "exclusiveMinimum": 0},
+        "mass_tolerance_floor_da": {"type": "number", "exclusiveMinimum": 0},
+        "minimum_relative_intensity": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evidence_type",
+        "source_ids",
+        "unique_molecules",
+        "unique_scaffolds",
+        "unique_spectra",
+        "positive_observations",
+        "eligible_observations",
+        "posterior_mean",
+        "posterior_ci_low",
+        "posterior_ci_high",
+        "calibration_split"
+      ],
+      "properties": {
+        "evidence_type": {"enum": ["theoretical", "empirical", "hybrid"]},
+        "source_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "unique_molecules": {"type": "integer", "minimum": 0},
+        "unique_scaffolds": {"type": "integer", "minimum": 0},
+        "unique_spectra": {"type": "integer", "minimum": 0},
+        "unique_sources_or_labs": {"type": ["integer", "null"], "minimum": 0},
+        "positive_observations": {"type": "integer", "minimum": 0},
+        "eligible_observations": {"type": "integer", "minimum": 0},
+        "posterior_mean": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
+        "posterior_ci_low": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
+        "posterior_ci_high": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
+        "calibration_split": {"type": ["string", "null"]},
+        "last_validated": {"type": ["string", "null"], "format": "date"}
+      }
+    },
+    "deployment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role", "enabled_by_default"],
+      "properties": {
+        "role": {
+          "enum": [
+            "hard_constraint",
+            "training_teacher",
+            "soft_prior",
+            "qc_only",
+            "legacy_observation"
+          ]
+        },
+        "enabled_by_default": {"type": "boolean"},
+        "minimum_teacher_probability": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+    "rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rule_id",
+        "rule_kind",
+        "status",
+        "name",
+        "acquisition_scope",
+        "structure_scope",
+        "transformation",
+        "observation_model",
+        "evidence",
+        "deployment"
+      ],
+      "properties": {
+        "rule_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]+$"},
+        "rule_kind": {
+          "enum": [
+            "fragmentation_transition",
+            "neutral_loss",
+            "diagnostic_ion",
+            "isotope_pattern",
+            "charge_retention",
+            "hydrogen_rearrangement"
+          ]
+        },
+        "status": {"enum": ["active", "evaluation_only", "deprecated"]},
+        "name": {"type": "string", "minLength": 1},
+        "description": {"type": "string"},
+        "acquisition_scope": {"$ref": "#/$defs/acquisition_scope"},
+        "structure_scope": {"$ref": "#/$defs/structure_scope"},
+        "transformation": {"$ref": "#/$defs/transformation"},
+        "observation_model": {"$ref": "#/$defs/observation_model"},
+        "evidence": {"$ref": "#/$defs/evidence"},
+        "deployment": {"$ref": "#/$defs/deployment"}
+      }
+    }
+  }
+}

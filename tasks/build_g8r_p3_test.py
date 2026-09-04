@@ -1,10 +1,10 @@
-"""Build and seal the leakage-resistant G8R P3 v3 evaluation set.
+"""Reproduce the historical G8R P3 membership-stratified evaluation set.
 
-Primary queries and the reference library use experimental spectra only
-(`SIMULATION_CHALLENGE=False`). Query identities exclude all identities consumed
-by prior G8R/reranker development and audits. Missing MCES labels are recomputed
-for reachable same-formula candidate pairs. Main, isomer, genuine MCES-near,
-exposed, and sim-to-real views are sealed separately before P2 development.
+This legacy protocol treated ``SIMULATION_CHALLENGE=False`` as experimental
+provenance and ``True`` as simulated spectra. MassSpecGym actually defines the
+field as spectrum-simulation benchmark subset membership. Existing P3 results
+remain a frozen membership=False subset result, but this builder is disabled by
+default and must not create a new formal P3 or real/sim provenance claim.
 """
 from __future__ import annotations
 
@@ -66,6 +66,7 @@ def parse_args() -> argparse.Namespace:
         help="local code audit only; forbidden for a formal lock",
     )
     p.add_argument("--dry-run", action="store_true", help="compute and validate, but write nothing")
+    p.add_argument("--legacy-membership-cohort-reproduction-only", action="store_true")
     return p.parse_args()
 
 
@@ -178,6 +179,12 @@ def load_exclusions(a: argparse.Namespace):
 
 def main() -> None:
     a = parse_args()
+    if not a.legacy_membership_cohort_reproduction_only:
+        raise RuntimeError(
+            "fail-closed: this historical P3 builder misinterprets SIMULATION_CHALLENGE "
+            "as provenance. Existing consumed P3 may be audited as a membership=False "
+            "subset, but any new formal evaluation requires a new protocol."
+        )
     if a.allow_missing_exclusions_for_dry_run and not a.dry_run:
         raise ValueError("missing exclusion sources may be tolerated only in --dry-run")
     if a.smoke_query_rows and not a.dry_run:

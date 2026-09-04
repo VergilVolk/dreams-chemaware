@@ -1,21 +1,22 @@
 """
-化学感知 DreaMS (Chemical-Aware DreaMS) — 模块一主模型 [v3 简化版]
+化学感知 DreaMS (Chemical-Aware DreaMS) — 真注意力修复版
 
 核心改动（v2 → v3）：
   1. 移除 LambdaController / StateExtractor / LambdaGenerator（过度工程化）
   2. 移除 HeadGatingNetwork（门控权重未证明有效）
-  3. 化学偏置仅注入最后一层 Transformer（避免跨层复合放大）
-  4. ChemicalRuleEngine v3：奖励式 + 每维度独立权重
+  3. 化学偏置真正加到指定 Transformer 层的 pre-softmax logits
+  4. 零初始化全局尺度保证启用时仍精确复现官方基线
+  5. 旧 post-Transformer 残差保留为显式 legacy control
 
 设计理念：
-  - DreaMS 前 6 层自由学习（原版 Graphormer 注意力不受干扰）
-  - 最后一层接收化学规则"建议"：匹配碎裂规则的峰对获得正向注意力偏置
+  - 非目标层保持原版 Graphormer 注意力不受干预
+  - 指定层接收化学规则"建议"：匹配碎裂规则的峰对获得正向注意力偏置
   - 每条规则维度的权重独立学习，好规则不会被坏规则拖累
   - 不匹配规则的峰对不受惩罚，保持 DreaMS 原有注意力自由
 
 对比开关：
   chem_attn_enabled = False → 行为与原版 DreaMS 完全一致
-  chem_attn_enabled = True  → 最后一层注入化学奖励偏置
+      chem_attn_enabled = True  → 指定层注入化学奖励偏置
 
 作者：module1-chem-attn 开发分支
 """
@@ -27,6 +28,32 @@ import pytorch_lightning as pl
 from typing import Optional, Dict, List
 from dreams.models.dreams.dreams import DreaMS
 from dreams.models.chem_aware.chem_rules import ChemicalRuleEngine
+
+
+def route_chemical_bias_to_layer(
+    chem_bias: torch.Tensor,
+    n_layers: int,
+    target_layer: int,
+) -> tuple[list[Optional[torch.Tensor]], int]:
+    """Route one candidate-independent rule bias to exactly one encoder layer.
+
+    Negative indices follow normal Python indexing.  Returning the resolved
+    index makes the scientific intervention auditable and prevents the old
+    failure mode where ``chem_attn_layer`` was accepted but never used.
+    """
+
+    if n_layers < 1:
+        raise ValueError("n_layers must be positive")
+    resolved = int(target_layer)
+    if resolved < 0:
+        resolved += int(n_layers)
+    if resolved < 0 or resolved >= int(n_layers):
+        raise ValueError(
+            f"chem_attn_layer {target_layer} is outside an encoder with {n_layers} layers"
+        )
+    routed: list[Optional[torch.Tensor]] = [None] * int(n_layers)
+    routed[resolved] = chem_bias
+    return routed, resolved
 
 
 class ChemAwareDreaMS(DreaMS):
@@ -65,6 +92,12 @@ class ChemAwareDreaMS(DreaMS):
         self.chem_attn_enabled = getattr(args, 'chem_attn', False)
         self.chem_attn_tolerance = getattr(args, 'chem_attn_tolerance', 0.02)
         self.chem_attn_layer = getattr(args, 'chem_attn_layer', -1)
+        self.chem_attn_mode = getattr(args, 'chem_attn_mode', 'attention')
+        if self.chem_attn_mode not in {'attention', 'residual'}:
+            raise ValueError("chem_attn_mode must be 'attention' or 'residual'")
+        self.chem_attn_categories = tuple(
+            getattr(args, 'chem_attn_categories', ('NL', 'CF', 'ISO'))
+        )
         self.chem_attn_use_massbank = getattr(args, 'chem_attn_use_massbank', False)  # 默认屏蔽 MassBank 噪声
 
         # ---- 调用父类初始化 ----
@@ -77,10 +110,22 @@ class ChemAwareDreaMS(DreaMS):
                 enable_categories=None,  # 全部 6 类启用（NL/CF/ISO/NR/EE/HR）
                 use_massbank=self.chem_attn_use_massbank
             )
-            # 化学残差的全局缩放因子（可学习，初始 1.0）
-            self.chem_residual_scale = nn.Parameter(torch.tensor(1.0))
+            # The true attention route is exactly the official model at init.
+            # A zero gate first learns whether the aggregate rule graph helps;
+            # individual softplus rule weights receive gradients once it opens.
+            self.chem_attention_scale = (
+                nn.Parameter(torch.tensor(0.0))
+                if self.chem_attn_mode == 'attention' else None
+            )
+            # Retain the old post-Transformer residual only as an explicit
+            # legacy control; it is no longer mislabeled as attention.
+            self.chem_residual_scale = (
+                nn.Parameter(torch.tensor(1.0))
+                if self.chem_attn_mode == 'residual' else None
+            )
         else:
             self.chem_rule_engine = None
+            self.chem_attention_scale = None
             self.chem_residual_scale = None
 
         # 缓存最近一次的化学分析数据
@@ -163,27 +208,56 @@ class ChemAwareDreaMS(DreaMS):
                 mz_values=raw_mz,
                 precursor_mz=raw_mz[:, 0],
                 padding_mask=padding_mask,
-                categories=['NL', 'CF', 'ISO']
+                categories=list(self.chem_attn_categories)
             )
 
             # 缓存分析数据
             self._last_chem_analysis = {
                 'chem_bias': chem_bias.detach(),
+                'chem_bias_specific': chem_bias_specific.detach(),
                 'rule_weights': self.chem_rule_engine.get_rule_weights().detach().clone(),
                 'rule_stats': self.chem_rule_engine.get_rule_stats(),
+                'mode': self.chem_attn_mode,
+                'categories': list(self.chem_attn_categories),
             }
 
-        # ---- Step 7: Transformer 编码器（原版 DreaMS，不传 chem_bias） ----
+        # ---- Step 7: Transformer 编码器 ----
         if self.vanilla_transformer:
+            if self.chem_attn_enabled and self.chem_attn_mode == 'attention':
+                raise RuntimeError(
+                    "true chemical attention requires the custom DreaMS encoder"
+                )
             spec = self.transformer_encoder(spec_emb, src_key_padding_mask=padding_mask)
         else:
+            layer_biases = None
+            resolved_layer = None
+            if (
+                self.chem_attn_enabled
+                and self.chem_attn_mode == 'attention'
+                and chem_bias_specific is not None
+            ):
+                effective_bias = chem_bias_specific * self.chem_attention_scale
+                layer_biases, resolved_layer = route_chemical_bias_to_layer(
+                    effective_bias,
+                    int(self.transformer_encoder.n_layers),
+                    int(self.chem_attn_layer),
+                )
+                self._last_chem_analysis.update({
+                    'target_layer': int(resolved_layer),
+                    'effective_scale': self.chem_attention_scale.detach().clone(),
+                    'effective_bias': effective_bias.detach(),
+                })
             spec = self.transformer_encoder(
                 spec_emb, padding_mask, graphormer_dists,
-                chem_bias=None, gate_weights_per_layer=None
+                chem_bias=layer_biases, gate_weights_per_layer=None
             )
 
-        # ---- Step 8: [v3] 化学残差连接 ----
-        if self.chem_attn_enabled and chem_bias_specific is not None:
+        # ---- Step 8: legacy chemical residual control (not attention) ----
+        if (
+            self.chem_attn_enabled
+            and self.chem_attn_mode == 'residual'
+            and chem_bias_specific is not None
+        ):
             cw0 = chem_bias_specific.squeeze(1)                    # (batch, n, n)
             cw1 = cw0 - cw0.mean(dim=-1, keepdim=True)             # mean-subtract
             cw2 = cw1 * self.chem_residual_scale                    # × learnable scale
@@ -205,7 +279,11 @@ class ChemAwareDreaMS(DreaMS):
         """冻结 DreaMS backbone 的所有参数（chem_aware 模块除外）"""
         count = 0
         for name, param in self.named_parameters():
-            if 'chem_rule_engine' not in name and 'chem_residual_scale' not in name:
+            if (
+                'chem_rule_engine' not in name
+                and 'chem_attention_scale' not in name
+                and 'chem_residual_scale' not in name
+            ):
                 param.requires_grad = False
                 count += 1
         return count
@@ -214,7 +292,11 @@ class ChemAwareDreaMS(DreaMS):
         """仅解冻 chem_aware 模块参数（规则权重 + 残差缩放）"""
         count = 0
         for name, param in self.named_parameters():
-            if 'chem_rule_engine' in name or 'chem_residual_scale' in name:
+            if (
+                'chem_rule_engine' in name
+                or 'chem_attention_scale' in name
+                or 'chem_residual_scale' in name
+            ):
                 param.requires_grad = True
                 count += 1
         return count
@@ -224,6 +306,8 @@ class ChemAwareDreaMS(DreaMS):
         if self.chem_rule_engine is None:
             return []
         params = list(self.chem_rule_engine.parameters())
+        if self.chem_attention_scale is not None:
+            params.append(self.chem_attention_scale)
         if self.chem_residual_scale is not None:
             params.append(self.chem_residual_scale)
         return params

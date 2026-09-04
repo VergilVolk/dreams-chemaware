@@ -5,9 +5,9 @@ Nature Methods 2025 七库对比）。输入两个已下载的库：
 
   * MassSpecGym (NeurIPS 2024 Spotlight, arXiv:2410.23326)
       data/reference/massspecgym/data/auxiliary/MassSpecGym.mgf   (231,104 谱)
-      SIMULATION_CHALLENGE 字段：True=in-silico 模拟谱，False=真实实验谱。
-      实测同分子成对出现（ID0000001=True 与 ID0000002=False 同 SMILES/同 InChIKey），
-      故只留 SIMULATION_CHALLENGE=False 的真实实验谱（~112k），丢弃模拟谱。
+      SIMULATION_CHALLENGE 是该谱是否进入 spectrum-simulation benchmark 子任务的资格标记，
+      不是实验谱/模拟谱来源标签；不得据此筛谱。本构建器纳入 True/False 两类，并在输出中
+      原样保留该标记，便于后续按 benchmark 合同审计。
   * GNPS 公共库 (ALL_GNPS.mgf, 2,091,446 谱)
       用 INCHI= 而非 INCHIKEY=；LIBRARYQUALITY：1=Gold / 2=Silver / 3=Bronze / 4=无
       InChI 的低置信条目（实测全库分布：Gold 1.51M / Silver 6.4k / Bronze 424k / 4 149k；
@@ -20,9 +20,14 @@ Nature Methods 2025 七库对比）。输入两个已下载的库：
 InChIKey 一律用 rdkit 从 (INCHI 优先，其次 SMILES) 现算 27 位全键（含立体层）；
 MassSpecGym 自带的 14 位 InChIKey 只有骨架层、不够区分立体异构体，故重算。
 
-去重：键 = (完整 InChIKey, 电离模式)。同分子在 pos/neg 各保留一张代表谱（pos 谱与
-neg 谱是不同碎裂模式，不能互相替代）。代表谱选法：质量(金>银>铜)优先，再按峰数。
+去重：键 = (完整 InChIKey, 电离模式, 推断加合物)。每个键默认只保留一张代表谱；
+不同极性和不同加合物不能互相替代。代表谱选法：质量(金>银>铜)优先，再按峰数。
 输出 unified_pos.mgf / unified_neg.mgf + build_report.json。
+
+用途边界：这个输出是压缩后的代表谱检索库，不是 ChemAware 的重复谱训练库。v3 会为
+MassSpecGym 代表谱保留原始 identifier、仪器类型、碰撞能、fold 和 simulation-challenge
+资格标记，但同键跨条件重复谱仍会被去重。需要完整重复条件的训练任务必须从原始库另建
+metadata-preserving replicate bank，不能复用本输出冒充多正样本。
 
 已知限制（v1 不做，留待后续）：
   * 不加合离子归一化：GNPS 同一化合物可能以 [M+H]+ / [M+Na]+ / [M+NH4]+ 等多张谱出现，
@@ -35,12 +40,12 @@ neg 谱是不同碎裂模式，不能互相替代）。代表谱选法：质量(
     python tasks/build_reference_library.py --limit 3000 \
         --massspecgym data/reference/massspecgym/data/auxiliary/MassSpecGym.mgf \
         --gnps data/reference/gnps/ALL_GNPS.mgf \
-        --out-dir data/reference/unified
-    # 全量（GNPS 2.09M 谱 + MassSpecGym 112k 谱，rdkit 算 InChIKey 约 20-30 分钟）
+        --out-dir data/reference/unified_v3_smoke
+    # 全量（GNPS 2.09M 谱 + MassSpecGym 231,104 谱，rdkit 算 InChIKey 约 20-30 分钟）
     python tasks/build_reference_library.py \
         --massspecgym data/reference/massspecgym/data/auxiliary/MassSpecGym.mgf \
         --gnps data/reference/gnps/ALL_GNPS.mgf \
-        --out-dir data/reference/unified
+        --out-dir data/reference/unified_v3
 """
 from __future__ import annotations
 
@@ -161,9 +166,11 @@ def iter_mgf_blocks(path: Path):
 
 
 def normalize_massspecgym(fields: dict, peaks: list[tuple[float, float]]) -> dict | None:
-    """MassSpecGym 记录 -> 统一 record；模拟谱(SIMULATION_CHALLENGE=True) 或无法定身份返回 None。"""
-    if fields.get("SIMULATION_CHALLENGE", "False").strip() == "True":
-        return None
+    """MassSpecGym 记录 -> 统一 record；无法确定身份或前体质量时返回 None。
+
+    ``SIMULATION_CHALLENGE`` 仅表示该记录是否满足官方 spectrum-simulation
+    benchmark 的子集条件，不表示谱图是模拟生成的，因此这里只保留字段而不筛选。
+    """
     try:
         pmz = float(fields["PRECURSOR_MZ"].split()[0])
     except (KeyError, ValueError, IndexError):
@@ -177,6 +184,10 @@ def normalize_massspecgym(fields: dict, peaks: list[tuple[float, float]]) -> dic
         "inchikey": ik, "smiles": smi, "name": fields.get("IDENTIFIER", "").strip(),
         "precursor_mz": pmz, "peaks": peaks, "ion": ion,
         "quality_score": _MASSSPECGYM_QUALITY, "n_peaks": len(peaks), "source": "massspecgym",
+        "instrument_type": fields.get("INSTRUMENT_TYPE", "").strip(),
+        "collision_energy": fields.get("COLLISION_ENERGY", "").strip(),
+        "fold": fields.get("FOLD", "").strip(),
+        "simulation_challenge": fields.get("SIMULATION_CHALLENGE", "").strip(),
     }
 
 
@@ -218,7 +229,7 @@ def _score_key(r: dict) -> tuple[int, int]:
 
 
 def feed(best: dict, rec: dict, max_n: int, min_peaks: int) -> None:
-    """把 rec 并入去重表 best[(inchikey, ion)]，每键最多保留 max_n 条「质量高、峰多」的谱。"""
+    """并入代表谱表；每个 (inchikey, ion, adduct) 只留最高质量的 max_n 条。"""
     if rec["n_peaks"] < min_peaks:
         return
     # Keep independently queryable adducts.  Collapsing all adducts to one
@@ -245,6 +256,15 @@ def write_mgf(records: list[dict], out_path: Path) -> int:
             f.write(f"PEPMASS={rec['precursor_mz']:.6f}\n")
             f.write(f"ADDUCT={rec.get('adduct', '')}\n")
             f.write(f"SOURCE={rec['source']}\n")
+            for key, field_name in (
+                ("instrument_type", "INSTRUMENT_TYPE"),
+                ("collision_energy", "COLLISION_ENERGY"),
+                ("fold", "FOLD"),
+                ("simulation_challenge", "SIMULATION_CHALLENGE"),
+            ):
+                value = rec.get(key, "")
+                if value != "":
+                    f.write(f"{field_name}={value}\n")
             for mz, it in sorted(rec["peaks"]):
                 f.write(f"{mz:.6f} {it:.6f}\n")
             f.write("END IONS\n")
@@ -258,7 +278,7 @@ def main() -> int:
                    default=ROOT / "data/reference/massspecgym/data/auxiliary/MassSpecGym.mgf")
     p.add_argument("--gnps", type=Path,
                    default=ROOT / "data/reference/gnps/ALL_GNPS.mgf")
-    p.add_argument("--out-dir", type=Path, default=ROOT / "data/reference/unified")
+    p.add_argument("--out-dir", type=Path, default=ROOT / "data/reference/unified_v3")
     p.add_argument("--min-gnps-quality", choices=["gold", "silver", "bronze"], default="silver")
     p.add_argument("--max-spectra-per-compound", type=int, default=1)
     p.add_argument("--min-peaks", type=int, default=3)
@@ -278,7 +298,14 @@ def main() -> int:
     max_q = _MIN_QUALITY_RANK[args.min_gnps_quality]
     best: dict = {}
     stats = {
-        "massspecgym": {"n_in": 0, "n_sim_dropped": 0, "n_invalid": 0, "n_precursor_invalid": 0, "n_kept": 0},
+        "massspecgym": {
+            "n_in": 0,
+            "n_simulation_challenge_member": 0,
+            "n_simulation_challenge_nonmember": 0,
+            "n_invalid": 0,
+            "n_precursor_invalid": 0,
+            "n_kept": 0,
+        },
         "gnps": {"n_in": 0, "n_quality_dropped": 0, "n_invalid": 0,
                  "n_no_polarity": 0, "n_precursor_invalid": 0, "n_kept": 0},
     }
@@ -290,8 +317,9 @@ def main() -> int:
             break
         stats["massspecgym"]["n_in"] += 1
         if fields.get("SIMULATION_CHALLENGE", "False").strip() == "True":
-            stats["massspecgym"]["n_sim_dropped"] += 1
-            continue
+            stats["massspecgym"]["n_simulation_challenge_member"] += 1
+        else:
+            stats["massspecgym"]["n_simulation_challenge_nonmember"] += 1
         rec = normalize_massspecgym(fields, peaks)
         if rec is None:
             stats["massspecgym"]["n_invalid"] += 1
@@ -360,6 +388,13 @@ def main() -> int:
     neg_ik = {r["inchikey"] for r in neg_recs}
     union = pos_ik | neg_ik
     report = {
+        "schema_semantics": {
+            "SIMULATION_CHALLENGE": (
+                "MassSpecGym spectrum-simulation benchmark subset membership; "
+                "not experimental-versus-synthetic provenance and never used as a source filter"
+            ),
+            "library_role": "deduplicated representative-spectrum retrieval library, not a replicate training bank",
+        },
         "filters": {
             "min_gnps_quality": args.min_gnps_quality,
             "max_spectra_per_compound": args.max_spectra_per_compound,
