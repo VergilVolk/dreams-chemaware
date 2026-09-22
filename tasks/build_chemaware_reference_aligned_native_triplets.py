@@ -82,7 +82,15 @@ def arguments() -> argparse.Namespace:
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--margin", type=float, default=0.1)
     parser.add_argument("--candidates-per-query", type=int, default=3)
+    parser.add_argument("--chemical-candidates-per-query", type=int, default=1)
     parser.add_argument("--negative-references-per-candidate", type=int, default=2)
+    parser.add_argument(
+        "--explicit-positive-references-per-negative", type=int, default=0,
+        help=(
+            "Zero preserves native random positive sampling; two emits one boundary "
+            "positive and one hard positive for every active negative reference."
+        ),
+    )
     parser.add_argument("--max-active-spectrum-events-per-query", type=int, default=4)
     parser.add_argument("--chemical-hardness-window", type=float, default=0.50)
     parser.add_argument(
@@ -169,7 +177,7 @@ def select_candidate_slots(
     metrics: Mapping[str, np.ndarray], row: int, center: int,
     correction: np.ndarray, protection: np.ndarray, geometry: QueryGeometry,
     candidates_per_query: int, chemical_hardness_window: float,
-    min_chemical_activation_probability: float,
+    min_chemical_activation_probability: float, chemical_candidates_per_query: int,
 ) -> list[tuple[int, int]]:
     """Choose fixed base slots and at most one arm-specific chemical slot."""
     query = int(np.asarray(evidence["query"])[row])
@@ -216,7 +224,6 @@ def select_candidate_slots(
         ):
             eligible.append(baseline)
         eligible = sorted(set(eligible))
-        chemical = None
         if eligible:
             def key(candidate: int) -> tuple[float, ...]:
                 if candidate in candidate_slot:
@@ -231,12 +238,14 @@ def select_candidate_slots(
                     float(geometry.mean_hinge[candidate]),
                     float(geometry.activation_probability[candidate]),
                 )
-            chemical = max(eligible, key=key)
-        if chemical is not None:
-            tag = CHEMICAL_HARD
-            if chemical in strict:
-                tag |= STRICT_SPECIFIC
-            selected[int(chemical)] = tag
+            chemical_budget = min(
+                int(chemical_candidates_per_query), budget - len(selected),
+            )
+            for chemical in sorted(eligible, key=key, reverse=True)[:chemical_budget]:
+                tag = CHEMICAL_HARD
+                if chemical in strict:
+                    tag |= STRICT_SPECIFIC
+                selected[int(chemical)] = tag
 
     for candidate in ordered:
         if len(selected) >= budget:
@@ -287,13 +296,38 @@ def retain_query_events(
     return retained[:max_active_events], False
 
 
+def explicit_positive_indices(
+    positive_scores: np.ndarray, hinge: np.ndarray, cap: int,
+) -> list[int]:
+    """Select a boundary positive and a hard positive without duplication."""
+    active = np.flatnonzero(np.asarray(hinge) > 0.0)
+    if not len(active):
+        return [int(np.argmax(positive_scores))]
+    boundary = int(active[np.argmax(np.asarray(positive_scores)[active])])
+    hard = int(active[np.argmin(np.asarray(positive_scores)[active])])
+    chosen = [boundary]
+    if hard != boundary:
+        chosen.append(hard)
+    remaining = sorted(
+        set(map(int, active)) - set(chosen),
+        key=lambda index: float(hinge[index]), reverse=True,
+    )
+    chosen.extend(remaining)
+    return chosen[:cap]
+
+
 def build_pool(
     evidence: Mapping[str, np.ndarray], manifest: Mapping[str, np.ndarray],
     geometry_by_query: Mapping[int, QueryGeometry], center: int, recipe,
     candidates_per_query: int, chemical_hardness_window: float,
-    min_chemical_activation_probability: float, margin: float,
+    min_chemical_activation_probability: float, chemical_candidates_per_query: int,
+    margin: float,
     max_active_spectrum_events_per_query: int,
-) -> tuple[dict[str, np.ndarray], dict[str, object], set[tuple[int, int]], set[tuple[int, int, int]]]:
+    explicit_positive_references_per_negative: int,
+) -> tuple[
+    dict[str, np.ndarray], dict[str, object], set[tuple[int, int]],
+    set[tuple[int, int, int, int]],
+]:
     validate_evidence(evidence)
     correction, protection, _ = directional_masks(evidence, recipe, center)
     metrics = metric_cache(evidence)
@@ -304,12 +338,13 @@ def build_pool(
     negative_ptr = [0]
     source_query: list[int] = []
     negative_candidate: list[int] = []
+    positive_reference_row: list[int] = []
     negative_reference_row: list[int] = []
     source_tag: list[int] = []
     activation_probability: list[float] = []
     mean_hinge: list[float] = []
     candidate_pairs: set[tuple[int, int]] = set()
-    spectrum_triplets: set[tuple[int, int, int]] = set()
+    spectrum_triplets: set[tuple[int, int, int, int]] = set()
     selected_reference_edges = 0
     available_reference_edges = 0
     safe_sentinel_events = 0
@@ -319,7 +354,7 @@ def build_pool(
         chosen = select_candidate_slots(
             evidence, manifest, metrics, row, center, correction, protection,
             geometry, candidates_per_query, chemical_hardness_window,
-            min_chemical_activation_probability,
+            min_chemical_activation_probability, chemical_candidates_per_query,
         )
         query_events = []
         for candidate, tag in chosen:
@@ -333,14 +368,35 @@ def build_pool(
                 hinge = np.maximum(
                     float(margin) + float(negative_score) - geometry.positive_scores, 0.0,
                 )
-                query_events.append({
-                    "candidate": int(candidate),
-                    "negative_row": int(negative_row),
-                    "negative_score": float(negative_score),
-                    "tag": int(event_tag),
-                    "activation": float(np.mean(hinge > 0.0)),
-                    "hinge": float(np.mean(hinge)),
-                })
+                if explicit_positive_references_per_negative > 0:
+                    # One boundary positive gives the smallest still-active
+                    # perturbation; one hard positive transfers replicate
+                    # invariance. A safe negative supplies only a sentinel
+                    # possibility, later pruned unless the whole query is safe.
+                    chosen_positive = explicit_positive_indices(
+                        geometry.positive_scores, hinge,
+                        explicit_positive_references_per_negative,
+                    )
+                    for positive_index in chosen_positive:
+                        query_events.append({
+                            "candidate": int(candidate),
+                            "positive_row": int(geometry.positive_rows[positive_index]),
+                            "negative_row": int(negative_row),
+                            "negative_score": float(negative_score),
+                            "tag": int(event_tag),
+                            "activation": float(hinge[positive_index] > 0.0),
+                            "hinge": float(hinge[positive_index]),
+                        })
+                else:
+                    query_events.append({
+                        "candidate": int(candidate),
+                        "positive_row": -1,
+                        "negative_row": int(negative_row),
+                        "negative_score": float(negative_score),
+                        "tag": int(event_tag),
+                        "activation": float(np.mean(hinge > 0.0)),
+                        "hinge": float(np.mean(hinge)),
+                    })
         retained, used_sentinel = retain_query_events(
             query_events, max_active_spectrum_events_per_query,
         )
@@ -348,19 +404,25 @@ def build_pool(
             safe_sentinel_events += 1
         for event in retained:
             candidate = int(event["candidate"])
+            positive_row = int(event["positive_row"])
             negative_row = int(event["negative_row"])
-            triplet = (query, candidate, negative_row)
+            triplet = (query, positive_row, candidate, negative_row)
             if triplet in spectrum_triplets:
-                raise RuntimeError("query-negative-reference triplet was duplicated")
+                raise RuntimeError("query-positive-negative-reference triplet was duplicated")
             spectrum_triplets.add(triplet)
             candidate_pairs.add((query, candidate))
             anchors.append(geometry.query_row)
-            positives.extend(map(int, geometry.positive_rows))
+            event_positive_rows = (
+                geometry.positive_rows if positive_row < 0
+                else np.asarray([positive_row], dtype=np.int64)
+            )
+            positives.extend(map(int, event_positive_rows))
             negatives.append(negative_row)
             positive_ptr.append(len(positives))
             negative_ptr.append(len(negatives))
             source_query.append(query)
             negative_candidate.append(candidate)
+            positive_reference_row.append(positive_row)
             negative_reference_row.append(negative_row)
             source_tag.append(int(event["tag"]))
             activation_probability.append(float(event["activation"]))
@@ -379,6 +441,7 @@ def build_pool(
         "negative_idx": np.asarray(negatives, dtype=np.int64),
         "source_query": np.asarray(source_query, dtype=np.int64),
         "negative_candidate": np.asarray(negative_candidate, dtype=np.int16),
+        "positive_reference_row": np.asarray(positive_reference_row, dtype=np.int64),
         "negative_reference_row": np.asarray(negative_reference_row, dtype=np.int64),
         "source_tag": np.asarray(source_tag, dtype=np.int8),
         "activation_probability": np.asarray(activation_probability, dtype=np.float32),
@@ -392,7 +455,7 @@ def build_pool(
     audit = {
         "spectrum_triplet_events": int(len(anchors)),
         "candidate_events": int(len(candidate_pairs)),
-        "unique_query_negative_reference_triplets": int(len(spectrum_triplets)),
+        "unique_query_positive_negative_reference_triplets": int(len(spectrum_triplets)),
         "anchor_queries": int(len(np.unique(query_array))),
         "unique_formulas": int(len(np.unique(formulas))),
         "primary_hard_spectrum_events": int(np.sum((tags & PRIMARY_HARD) > 0)),
@@ -432,8 +495,12 @@ def main() -> None:
         raise FileExistsError(f"refusing to overwrite {args.output}")
     if args.candidates_per_query < 1:
         raise ValueError("--candidates-per-query must be positive")
+    if args.chemical_candidates_per_query < 0:
+        raise ValueError("--chemical-candidates-per-query must be nonnegative")
     if args.negative_references_per_candidate < 1:
         raise ValueError("--negative-references-per-candidate must be positive")
+    if args.explicit_positive_references_per_negative < 0:
+        raise ValueError("--explicit-positive-references-per-negative must be nonnegative")
     if args.max_active_spectrum_events_per_query < 1:
         raise ValueError("--max-active-spectrum-events-per-query must be positive")
     if not 0.0 <= args.min_chemical_activation_probability <= 1.0:
@@ -468,14 +535,16 @@ def main() -> None:
     pools: dict[tuple[str, str], dict[str, np.ndarray]] = {}
     audits: dict[str, dict[str, object]] = {}
     candidate_sets: dict[tuple[str, str], set[tuple[int, int]]] = {}
-    spectrum_sets: dict[tuple[str, str], set[tuple[int, int, int]]] = {}
+    spectrum_sets: dict[tuple[str, str], set[tuple[int, int, int, int]]] = {}
     for role, body in evidence.items():
         for center, arm in enumerate(arm_names):
             pool, audit, candidates, spectra = build_pool(
                 body, manifest, geometry[role], center, recipe,
                 args.candidates_per_query, args.chemical_hardness_window,
-                args.min_chemical_activation_probability, args.margin,
+                args.min_chemical_activation_probability,
+                args.chemical_candidates_per_query, args.margin,
                 args.max_active_spectrum_events_per_query,
+                args.explicit_positive_references_per_negative,
             )
             pools[(role, arm)] = pool
             audits[f"{role}:{arm}"] = audit
@@ -492,7 +561,7 @@ def main() -> None:
         "train_chemical_candidates": len(correct_chemical_candidates) >= args.min_chemical_candidates,
         "unique_spectrum_triplets": (
             train["spectrum_triplet_events"]
-            == train["unique_query_negative_reference_triplets"]
+            == train["unique_query_positive_negative_reference_triplets"]
         ),
         "role2_recipe_specific": int(selection["specific_candidate_surplus"]) > 0,
         "formula_roles_disjoint": True,
@@ -526,13 +595,17 @@ def main() -> None:
         }
     report = {
         "status": "CHEMAWARE_REFERENCE_ALIGNED_NATIVE_TRIPLETS_COMPLETE",
-        "method": "checkpoint-hard three-slot candidates with explicit top-reference expansion",
+        "method": "checkpoint-hard candidate slots with explicit positive-negative reference expansion",
         "training_runtime": "unmodified DreaMS ContrastiveSpectraDataset plus ContrastiveHead",
         "initialization_cache": str(args.embedding_cache.resolve()),
         "embedding_cache_file": str(embedding_path.resolve()),
         "margin": float(args.margin),
         "candidates_per_query": int(args.candidates_per_query),
+        "chemical_candidates_per_query": int(args.chemical_candidates_per_query),
         "negative_references_per_candidate": int(args.negative_references_per_candidate),
+        "explicit_positive_references_per_negative": int(
+            args.explicit_positive_references_per_negative
+        ),
         "max_active_spectrum_events_per_query": int(args.max_active_spectrum_events_per_query),
         "chemical_hardness_window": float(args.chemical_hardness_window),
         "min_chemical_activation_probability": float(args.min_chemical_activation_probability),

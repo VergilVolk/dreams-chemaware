@@ -63,6 +63,7 @@ def main() -> None:
         evidence, manifest, metrics, 0, 0, correction, protection, geometry,
         candidates_per_query=3, chemical_hardness_window=0.5,
         min_chemical_activation_probability=0.05,
+        chemical_candidates_per_query=1,
     ))
     assert set(chosen) == {1, 2, 3}
     assert chosen[1] & PRIMARY_HARD
@@ -82,6 +83,7 @@ def main() -> None:
         evidence, manifest, metrics, 0, 0, correction, protection, inactive,
         candidates_per_query=3, chemical_hardness_window=0.5,
         min_chemical_activation_probability=0.05,
+        chemical_candidates_per_query=1,
     ))
     assert not chosen[3] & CHEMICAL_HARD
 
