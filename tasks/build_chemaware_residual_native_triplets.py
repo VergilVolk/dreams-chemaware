@@ -344,6 +344,16 @@ def build_pool(
     return pool, audit, pairs
 
 
+def tagged_pairs(pool: Mapping[str, np.ndarray], tag: int) -> set[tuple[int, int]]:
+    query = np.asarray(pool["source_query"], dtype=np.int64)
+    candidate = np.asarray(pool["negative_candidate"], dtype=np.int64)
+    tags = np.asarray(pool["source_tag"], dtype=np.int64)
+    return {
+        (int(q), int(c))
+        for q, c in zip(query[(tags & tag) > 0], candidate[(tags & tag) > 0], strict=True)
+    }
+
+
 def main() -> None:
     args = arguments()
     if args.output.exists():
@@ -407,7 +417,10 @@ def main() -> None:
         for role in ("train", "selection", "confirmation")
     }
     overlaps = {}
+    secondary_overlaps = {}
     correct_pairs = pair_sets[("selection", "correct")]
+    correct_adaptive = tagged_pairs(pools[("selection", "correct")], ADAPTIVE_HARD)
+    correct_secondary = correct_pairs - correct_adaptive
     for arm in arm_names[1:]:
         null_pairs = pair_sets[("selection", arm)]
         overlaps[arm] = {
@@ -416,6 +429,22 @@ def main() -> None:
             "jaccard": float(len(correct_pairs & null_pairs) / max(1, len(correct_pairs | null_pairs))),
             "correct_only": int(len(correct_pairs - null_pairs)),
             "null_only": int(len(null_pairs - correct_pairs)),
+        }
+        null_adaptive = tagged_pairs(pools[("selection", arm)], ADAPTIVE_HARD)
+        if null_adaptive != correct_adaptive:
+            raise RuntimeError("arm-independent adaptive-hard slot drifted across chemistry controls")
+        null_secondary = null_pairs - null_adaptive
+        secondary_overlaps[arm] = {
+            "correct_secondary_pairs": int(len(correct_secondary)),
+            "null_secondary_pairs": int(len(null_secondary)),
+            "intersection": int(len(correct_secondary & null_secondary)),
+            "union": int(len(correct_secondary | null_secondary)),
+            "jaccard": float(
+                len(correct_secondary & null_secondary)
+                / max(1, len(correct_secondary | null_secondary))
+            ),
+            "correct_only": int(len(correct_secondary - null_secondary)),
+            "null_only": int(len(null_secondary - correct_secondary)),
         }
     report = {
         "status": "CHEMAWARE_RESIDUAL_NATIVE_TRIPLETS_COMPLETE",
@@ -438,6 +467,7 @@ def main() -> None:
         },
         "audits": audits,
         "role2_correct_vs_null_pair_overlap": overlaps,
+        "role2_correct_vs_null_secondary_slot_overlap": secondary_overlaps,
         "identity_audit": identity_audit,
         "gates": gates,
     }

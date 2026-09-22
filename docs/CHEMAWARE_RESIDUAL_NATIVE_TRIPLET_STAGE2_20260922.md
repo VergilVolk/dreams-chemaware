@@ -78,12 +78,12 @@ role-2 冻结的 correct-vs-null recipe 在 roles 0--1 上只产生：
 
 本地用 official embedding cache 检查工程与统计合同，不把这些数字当作第二阶段性能：
 
-| hardness window | events | queries | formulas | chemical events | strict events | margin-violating | role-2 max null Jaccard |
-|---:|---:|---:|---:|---:|---:|---:|---:|
-| 0.30 | 6,792 | 4,032 | 2,518 | 2,505 | 291 | 15.95% | 0.8497 |
-| 0.50 | 6,792 | 4,032 | 2,518 | 2,702 | 292 | 15.40% | 0.8239 |
+| hardness window | events | queries | formulas | chemical events | strict events | margin-violating | role-2 overall max Jaccard | second-slot max Jaccard |
+|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 0.30 | 6,792 | 4,032 | 2,518 | 2,505 | 291 | 15.95% | 0.8497 | `0.6669` |
+| 0.50 | 6,792 | 4,032 | 2,518 | 2,702 | 292 | 15.40% | 0.8239 | `0.6162` |
 
-在预先规定“至少保留最佳 active-boundary 比例的 95%”后，0.50 保留 `97.88%`，同时有更低 correct/null pair overlap，因此本地选择 0.50。正式服务器运行必须基于第一阶段 `best.ckpt` 的新 cache 重做 0.30/0.50 选择，不能沿用本地答案。
+在预先规定“至少保留最佳 active-boundary 比例的 95%”后，0.50 保留 `97.88%`，同时有更低 correct/null pair overlap，因此本地选择 0.50。整体 overlap 包含每个 query 按设计共享的 adaptive-hard 第一槽；扣除该共同槽后，0.50 的三个 second-slot Jaccard 为约 `0.6009/0.6009/0.6162`，每个 null 对应 `322--338` 个 correct-only pair。正式服务器运行必须基于第一阶段 `best.ckpt` 的新 cache 重做 0.30/0.50 选择，不能沿用本地答案。
 
 所有本地池通过：
 

@@ -34,6 +34,9 @@ def main() -> None:
             raise RuntimeError(f"residual triplet bank is incomplete: {directory}")
         role2 = report["audits"]["selection:correct"]
         overlap = report["role2_correct_vs_null_pair_overlap"]
+        secondary_overlap = report.get(
+            "role2_correct_vs_null_secondary_slot_overlap", overlap,
+        )
         rows.append({
             "name": name,
             "directory": str(directory.resolve()),
@@ -44,6 +47,9 @@ def main() -> None:
             "strict_specific_events": int(role2["strict_specific_events"]),
             "maximum_correct_null_pair_jaccard": max(
                 float(value["jaccard"]) for value in overlap.values()
+            ),
+            "maximum_correct_null_secondary_slot_jaccard": max(
+                float(value["jaccard"]) for value in secondary_overlap.values()
             ),
         })
     maximum_violation = max(row["margin_violating_fraction"] for row in rows)
@@ -57,7 +63,7 @@ def main() -> None:
     if not admissible:
         raise RuntimeError("no residual triplet bank retained the required active-boundary fraction")
     selected = min(admissible, key=lambda row: (
-        float(row["maximum_correct_null_pair_jaccard"]),
+        float(row["maximum_correct_null_secondary_slot_jaccard"]),
         -int(row["strict_specific_events"]),
         -int(row["chemical_hard_events"]),
         float(row["mean_positive_minus_negative"]),
@@ -67,7 +73,7 @@ def main() -> None:
         "selection_scope": "formula role 2 only; no model weights fitted",
         "selection_rule": (
             "retain at least the configured fraction of the most active bank, "
-            "then minimize correct-vs-null pair overlap"
+            "then minimize correct-vs-null secondary-slot pair overlap"
         ),
         "min_relative_violation": float(args.min_relative_violation),
         "selected": selected,
