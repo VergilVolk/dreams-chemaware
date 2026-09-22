@@ -88,6 +88,15 @@ def arguments() -> argparse.Namespace:
         help="Keep zero for the one-GPU native run; CUDA-before-fork can deadlock workers.",
     )
     parser.add_argument("--max-epochs", type=int, default=301)
+    parser.add_argument(
+        "--max-steps", type=int, default=-1,
+        help="Optional optimizer-step cap; use for short residual curricula.",
+    )
+    parser.add_argument(
+        "--checkpoint-mode", choices=("train_loss", "fixed_steps"),
+        default="train_loss",
+    )
+    parser.add_argument("--save-every-n-steps", type=int, default=1000)
     parser.add_argument("--n-highest-peaks", type=int, default=100)
     parser.add_argument("--device", default="cuda")
     return parser.parse_args()
@@ -230,24 +239,49 @@ def main() -> None:
     )
 
     args.output.mkdir(parents=True)
-    callback = pl.callbacks.ModelCheckpoint(
-        dirpath=args.output, filename="best", monitor="Train loss",
-        mode="min", save_top_k=1, save_last=True, every_n_train_steps=1000,
-    )
+    if args.save_every_n_steps < 1:
+        raise ValueError("--save-every-n-steps must be positive")
+    if args.checkpoint_mode == "train_loss":
+        callback = pl.callbacks.ModelCheckpoint(
+            dirpath=args.output, filename="best", monitor="Train loss",
+            mode="min", save_top_k=1, save_last=True,
+            every_n_train_steps=args.save_every_n_steps,
+        )
+    else:
+        if args.max_steps < 1:
+            raise ValueError("fixed-step checkpointing requires --max-steps >= 1")
+        callback = pl.callbacks.ModelCheckpoint(
+            dirpath=args.output, filename="step-{step:06d}",
+            auto_insert_metric_name=False, save_top_k=-1, save_last=True,
+            every_n_train_steps=args.save_every_n_steps,
+            save_on_train_epoch_end=False,
+        )
     progress = SlurmLineProgress(every_n_batches=50)
     trainer = pl.Trainer(
         accelerator="gpu", devices=1, max_epochs=args.max_epochs,
+        max_steps=args.max_steps,
         precision="32-true", logger=False, callbacks=[callback, progress],
         num_sanity_val_steps=0, log_every_n_steps=5,
         enable_progress_bar=False,
     )
     trainer.fit(model, train_dataloaders=train_loader, val_dataloaders=val_loader)
-    best_path = Path(callback.best_model_path)
-    if not best_path.is_file():
-        raise RuntimeError("DreaMS native training produced no best checkpoint")
+    checkpoint_paths: list[Path]
     canonical = args.output / "best.ckpt"
-    if best_path.resolve() != canonical.resolve():
-        shutil.copy2(best_path, canonical)
+    if args.checkpoint_mode == "train_loss":
+        best_path = Path(callback.best_model_path)
+        if not best_path.is_file():
+            raise RuntimeError("DreaMS native training produced no best checkpoint")
+        if best_path.resolve() != canonical.resolve():
+            shutil.copy2(best_path, canonical)
+        checkpoint_paths = [canonical]
+        checkpoint_monitor = f"Train loss every {args.save_every_n_steps} train steps"
+        best_train_loss = float(callback.best_model_score.cpu())
+    else:
+        checkpoint_paths = sorted(args.output.glob("step-*.ckpt"))
+        if not checkpoint_paths:
+            raise RuntimeError("fixed-step native training produced no step checkpoint")
+        checkpoint_monitor = "fixed optimizer steps; no training-loss model selection"
+        best_train_loss = None
     report = {
         "status": "CHEMAWARE_DREAMS_NATIVE_TRAINING_COMPLETE",
         "custom_loss": False,
@@ -269,12 +303,17 @@ def main() -> None:
             "n_highest_peaks": args.n_highest_peaks,
             "precision": 32, "unfreeze_backbone_at_epoch": 0,
             "max_epochs": args.max_epochs,
+            "max_steps": args.max_steps,
         },
         "train_triplets": int(len(train_indices)),
         "validation_triplets": int(len(val_indices)),
-        "best_model_path": str(canonical.resolve()),
-        "checkpoint_monitor": "Train loss every 1000 train steps",
-        "best_train_loss": float(callback.best_model_score.cpu()),
+        "checkpoint_mode": args.checkpoint_mode,
+        "checkpoint_paths": [str(path.resolve()) for path in checkpoint_paths],
+        "best_model_path": (
+            str(canonical.resolve()) if args.checkpoint_mode == "train_loss" else None
+        ),
+        "checkpoint_monitor": checkpoint_monitor,
+        "best_train_loss": best_train_loss,
     }
     (args.output / "report.json").write_text(
         json.dumps(report, indent=2), encoding="utf-8",

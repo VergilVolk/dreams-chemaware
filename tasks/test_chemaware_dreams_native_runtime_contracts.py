@@ -16,7 +16,8 @@ assert "configure_optimizers" in trainer
 assert "torch.optim.Adam(" not in trainer
 assert "F.relu" not in trainer and "clamp_min" not in trainer
 assert 'monitor="Train loss"' in trainer
-assert "every_n_train_steps=1000" in trainer
+assert "every_n_train_steps=args.save_every_n_steps" in trainer
+assert '"--save-every-n-steps", type=int, default=1000' in trainer
 assert "trainer.validate(" not in trainer
 assert 'default=0' in trainer[trainer.index('"--num-workers"'):trainer.index('"--num-workers"') + 220]
 assert "BLOCKED:" in blocked_sbatch and "exit 2" in blocked_sbatch

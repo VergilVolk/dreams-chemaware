@@ -55,6 +55,11 @@ def arguments() -> argparse.Namespace:
     parser.add_argument("--n-highest-peaks", type=int, default=100)
     parser.add_argument("--bootstrap-draws", type=int, default=5000)
     parser.add_argument("--seed", type=int, default=20260920)
+    parser.add_argument("--formula-role", type=int, default=3)
+    parser.add_argument(
+        "--paired-reference", default=None,
+        help="Optional checkpoint name for an additional paired comparison.",
+    )
     parser.add_argument("--device", default="cuda")
     return parser.parse_args()
 
@@ -141,6 +146,7 @@ def main() -> None:
     rows = required_rows(manifest, queries)
 
     reports = []
+    ranks_by_name: dict[str, np.ndarray] = {}
     baseline_ranks = None
     baseline_embeddings = None
     for index, raw_checkpoint in enumerate(args.checkpoint):
@@ -180,14 +186,30 @@ def main() -> None:
                 encoded * baseline_embeddings, axis=1,
             )))
         reports.append(row)
+        ranks_by_name[name] = ranks.copy()
         print(json.dumps(row, indent=2), flush=True)
+
+    if args.paired_reference is not None:
+        if args.paired_reference not in ranks_by_name:
+            raise ValueError(
+                f"paired reference checkpoint is absent: {args.paired_reference}"
+            )
+        reference_rank = ranks_by_name[args.paired_reference]
+        field = f"paired_vs_{args.paired_reference}"
+        for index, row in enumerate(reports):
+            if row["name"] == args.paired_reference:
+                continue
+            row[field] = paired_summary(
+                reference_rank, ranks_by_name[row["name"]], formulas,
+                args.bootstrap_draws, args.seed + 10_000 + index,
+            )
 
     report = {
         "status": "CHEMAWARE_V2_DIRECT_TRIPLET_SHARED_EMBEDDING_EVALUATION_COMPLETE",
         "shared_embedding_result": True,
         "candidate_features_used_at_inference": False,
         "chemical_rules_used_at_inference": False,
-        "formula_role": 3,
+        "formula_role": int(args.formula_role),
         "outer_role_4_accessed": False,
         "queries": int(len(queries)),
         "unique_spectrum_rows_encoded": int(len(rows)),
