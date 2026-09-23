@@ -12,6 +12,10 @@ def arguments() -> argparse.Namespace:
     parser.add_argument("--evaluation", type=Path, required=True)
     parser.add_argument("--base-name", default="stage1_base")
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument(
+        "--require-positive-formula-ci", action="store_true",
+        help="Require the formula-cluster Recall@1 CI lower bound to exceed zero.",
+    )
     return parser.parse_args()
 
 
@@ -50,6 +54,10 @@ def main() -> None:
             "micro_auc_nonnegative": float(metrics["micro_auc"]) >= float(base_metrics["micro_auc"]),
             "macro_auc_nonnegative": float(metrics["macro_auc"]) >= float(base_metrics["macro_auc"]),
         }
+        if args.require_positive_formula_ci:
+            gates["formula_cluster_ci_strictly_positive"] = float(
+                paired["formula_cluster_bootstrap_delta_recall1_ci95"][0]
+            ) > 0.0
         candidates.append({
             "name": name,
             "checkpoint": row["checkpoint"],
@@ -92,6 +100,10 @@ def main() -> None:
         "selection_rule": (
             "maximize corrected-2*introduced versus stage1; require positive "
             "Recall@1 and MRR plus nonnegative Recall@3, micro-AUC and macro-AUC"
+            + (
+                "; require strictly positive formula-cluster Recall@1 CI"
+                if args.require_positive_formula_ci else ""
+            )
         ),
         "selected": selected,
         "candidates": candidates,
