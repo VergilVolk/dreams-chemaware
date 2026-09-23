@@ -7,13 +7,13 @@ DreaMS ChemAware 应用配置
 # ============================================================================
 
 APP_CONFIG = {
-    "title": "DreaMS ChemAware - MS/MS Mass Spectra Encoder",
-    "description": "Interactive platform for chemical-aware mass spectra embeddings",
-    "version": "1.0.0",
+    "title": "DreaMS ChemAware Workbench",
+    "description": "Auditable shared-embedding retrieval with optional P2b and BioAware evidence",
+    "version": "2.0.0-dev",
     "author": "DreaMS Contributors",
     "theme": "soft",
-    "share": True,
-    "server_name": "0.0.0.0",
+    "share": False,
+    "server_name": "127.0.0.1",
     "server_port": 7860,
 }
 
@@ -84,7 +84,7 @@ UI_CONFIG = {
     ],
     "theme": "soft",
     "layout": "vertical",
-    "show_api": True,
+    "show_api": False,
 }
 
 # ============================================================================

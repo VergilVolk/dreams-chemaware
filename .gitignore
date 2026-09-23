@@ -100,7 +100,11 @@ celerybeat.pid
 !.env.example
 showspace/.env
 !showspace/.env.example
+showspace/run/
+showspace/logs/
+showspace/secrets/
 .venv
+.venv_showspace*/
 venv/
 env/
 ENV/

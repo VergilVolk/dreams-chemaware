@@ -23,6 +23,7 @@ import torch
 DREAMS_ROOT = Path(__file__).resolve().parent.parent
 if DREAMS_ROOT.exists():
     sys.path.insert(0, str(DREAMS_ROOT))
+    sys.path.insert(0, str(DREAMS_ROOT / "tasks"))
 
 try:
     from dreams.models.chem_aware.chem_rules import ChemicalRuleEngine  # type: ignore
@@ -67,6 +68,113 @@ class OfficialDreaMSAdapter:
         return embedding
 
 
+class SharedDreaMSEncoderAdapter:
+    """A clean-spectrum shared E4/E8 (or official-slim) embedding encoder.
+
+    E4/E8 checkpoints contain a complete shared query/reference model.  The
+    adapter therefore uses the exact lightweight HDF5 preprocessor from the
+    training code and never consults a candidate table at inference.
+    """
+
+    def __init__(
+        self,
+        model,
+        preprocess,
+        checkpoint_path: Path,
+        architecture_path: Path,
+        device: str,
+        model_type: str,
+        fingerprint: str,
+    ):
+        self.model = model.eval()
+        self.preprocess = preprocess
+        self.checkpoint_path = checkpoint_path
+        self.architecture_path = architecture_path
+        self.device = device
+        self.model_type = model_type
+        self.fingerprint = fingerprint
+        self.backend = model_type
+
+    @property
+    def dtype(self):
+        return next(self.model.parameters()).dtype
+
+    def _tensor(self, peaks: np.ndarray, precursor_mz: float) -> torch.Tensor:
+        raw = np.asarray(peaks, dtype=np.float32)
+        if raw.ndim != 2 or raw.shape[1] != 2:
+            raise ValueError("shared encoder expects an (n, 2) peak array")
+        return self.preprocess(raw.T, float(precursor_mz), 100)
+
+    def embed_batch(self, spectra: List[np.ndarray], precursor_mz: List[float]) -> np.ndarray:
+        batch = torch.stack([
+            self._tensor(peaks, mz) for peaks, mz in zip(spectra, precursor_mz)
+        ]).to(device=self.device, dtype=self.dtype)
+        with torch.inference_mode():
+            embedding = self.model(batch)
+        values = embedding.detach().float().cpu().numpy().astype(np.float32)
+        if values.ndim != 2 or values.shape[1] != 1024 or not np.isfinite(values).all():
+            raise RuntimeError("shared DreaMS encoder returned an invalid embedding batch")
+        return values
+
+    def embed(self, peaks: np.ndarray, precursor_mz: float) -> np.ndarray:
+        return self.embed_batch([peaks], [precursor_mz])[0]
+
+
+def _sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for block in iter(lambda: stream.read(8 * 1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def _first_existing(*paths: Path) -> Path:
+    for path in paths:
+        if path.is_file():
+            return path
+    return paths[0]
+
+
+def available_model_types() -> Dict[str, Dict[str, object]]:
+    """Return configured model modes without loading 116M parameters."""
+    parent_repo = DREAMS_ROOT.parent
+    official_slim = Path(os.getenv(
+        "DREAMS_OFFICIAL_SLIM_CKPT",
+        _first_existing(
+            DREAMS_ROOT / "data" / "e1" / "official_embedding_slim.pt",
+            parent_repo / "data" / "e1" / "official_embedding_slim.pt",
+        ),
+    ))
+    architecture = Path(os.getenv(
+        "DREAMS_ARCHITECTURE_CKPT",
+        _first_existing(
+            DREAMS_ROOT / "dreams" / "models" / "pretrained" / "ssl_model_server.pt",
+            parent_repo / "dreams" / "models" / "pretrained" / "ssl_model_server.pt",
+        ),
+    ))
+    entries = {
+        "official_dreams": {
+            "label": "Official DreaMS",
+            "checkpoint": official_slim,
+            "ready": official_slim.is_file() and architecture.is_file(),
+            "evidence": "frozen official baseline",
+        },
+        "e4a_shared": {
+            "label": "E4-A shared embedding",
+            "checkpoint": Path(os.getenv("DREAMS_E4_CKPT", "")),
+            "ready": bool(os.getenv("DREAMS_E4_CKPT")) and Path(os.getenv("DREAMS_E4_CKPT", "")).is_file(),
+            "evidence": "5 formula folds x 3 seeds OOF; deployment checkpoint must be explicitly selected",
+        },
+        "e8_shared": {
+            "label": "E8 shared embedding",
+            "checkpoint": Path(os.getenv("DREAMS_E8_CKPT", "")),
+            "ready": bool(os.getenv("DREAMS_E8_CKPT")) and Path(os.getenv("DREAMS_E8_CKPT", "")).is_file(),
+            "evidence": "mechanism-transfer development model; not an external blind claim",
+        },
+    }
+    return entries
+
+
 def _checkpoint_paths() -> Tuple[Path, Path]:
     pretrained = DREAMS_ROOT / "dreams" / "models" / "pretrained"
     embedding_path = Path(os.getenv("DREAMS_EMBEDDING_CKPT", pretrained / "embedding_model.ckpt"))
@@ -79,38 +187,63 @@ def load_model(
     device: str = "cpu",
     checkpoint_path: Optional[str] = None,
 ) -> Tuple:
-    """Load the official DreaMS embedding model and rule engine."""
+    """Load one registered shared embedding model and the rule engine."""
     if model_type == "demo":
         return None, ChemicalRuleEngine(tolerance=0.02, enable_categories=None, use_massbank=False)
-    if model_type != "official_dreams":
-        raise ValueError("模型模式必须是 official_dreams 或 demo")
+    if model_type not in {"official_dreams", "e4a_shared", "e8_shared"}:
+        raise ValueError("未知 embedding 模型模式")
 
-    embedding_path, ssl_path = _checkpoint_paths()
-    if not embedding_path.is_file():
-        raise FileNotFoundError(f"缺少 embedding_model.ckpt: {embedding_path.name}")
-    if not ssl_path.is_file():
-        raise FileNotFoundError(f"缺少 ssl_model.ckpt: {ssl_path.name}")
+    # All public production modes use the state-only loader.  It provides one
+    # identical encoder for query and reference spectra and can consume E4/E8
+    # complete shared-model checkpoints without Lightning object pickles.
+    parent_repo = DREAMS_ROOT.parent
+    official_slim = Path(os.getenv(
+        "DREAMS_OFFICIAL_SLIM_CKPT",
+        _first_existing(
+            DREAMS_ROOT / "data" / "e1" / "official_embedding_slim.pt",
+            parent_repo / "data" / "e1" / "official_embedding_slim.pt",
+        ),
+    ))
+    architecture = Path(os.getenv(
+        "DREAMS_ARCHITECTURE_CKPT",
+        _first_existing(
+            DREAMS_ROOT / "dreams" / "models" / "pretrained" / "ssl_model_server.pt",
+            parent_repo / "dreams" / "models" / "pretrained" / "ssl_model_server.pt",
+        ),
+    ))
+    if not official_slim.is_file():
+        raise FileNotFoundError(f"缺少 official_embedding_slim.pt: {official_slim}")
+    if not architecture.is_file():
+        raise FileNotFoundError(f"缺少 ssl_model_server.pt: {architecture}")
+    selected = {
+        "official_dreams": official_slim,
+        "e4a_shared": Path(os.getenv("DREAMS_E4_CKPT", "")),
+        "e8_shared": Path(os.getenv("DREAMS_E8_CKPT", "")),
+    }[model_type]
+    if not selected.is_file():
+        variable = "DREAMS_E4_CKPT" if model_type == "e4a_shared" else "DREAMS_E8_CKPT"
+        raise FileNotFoundError(f"{model_type} 未配置；请设置 {variable} 指向冻结 shared checkpoint")
 
     try:
-        sys.path.insert(0, str(DREAMS_ROOT))
-        from dreams.models.heads.heads import ContrastiveHead
-        from dreams.utils.data import SpectrumPreprocessor
-        from dreams.utils.dformats import DataFormatA
+        from train_e1_identity import load_base_model, preprocess_spectrum, torch_load_compat
 
-        print(f"加载官方 DreaMS embedding 到 {device}")
-        pretrained = ContrastiveHead.load_from_checkpoint(
-            embedding_path,
-            backbone_pth=ssl_path,
-            map_location=torch.device(device),
-        )
-        pretrained.eval().to(device)
-        preprocessor = SpectrumPreprocessor(
-            dformat=DataFormatA(), n_highest_peaks=100
-        )
+        torch_device = torch.device(device)
+        model, _ = load_base_model(official_slim, architecture, torch_device, 100)
+        if model_type != "official_dreams":
+            package = torch_load_compat(selected, map_location="cpu")
+            if package.get("status") != "noise_final_e4a_direct_shared_dreams_encoder":
+                raise ValueError("checkpoint is not an E4/E8 clean shared encoder")
+            if not package.get("inference_clean_only") or package.get("P2b_used"):
+                raise ValueError("checkpoint violates clean shared-embedding deployment contract")
+            model.load_state_dict(package["model_state"], strict=True)
+        model.eval().to(torch_device)
+        fingerprint = _sha256(selected)
         rules = ChemicalRuleEngine(tolerance=0.02, enable_categories=None, use_massbank=False)
-        return OfficialDreaMSAdapter(pretrained, preprocessor, embedding_path, ssl_path, device), rules
+        return SharedDreaMSEncoderAdapter(
+            model, preprocess_spectrum, selected, architecture, device, model_type, fingerprint,
+        ), rules
     except Exception as exc:
-        raise RuntimeError(f"官方 DreaMS 加载失败: {type(exc).__name__}: {exc}") from exc
+        raise RuntimeError(f"{model_type} 加载失败: {type(exc).__name__}: {exc}") from exc
 
 
 def validate_spectrum(
@@ -267,7 +400,7 @@ def generate_embedding(
             "charge": int(charge),
         }
 
-        if isinstance(model, OfficialDreaMSAdapter):
+        if isinstance(model, (OfficialDreaMSAdapter, SharedDreaMSEncoderAdapter)):
             embedding = model.embed(peaks, precursor_mz)
         elif model is None:
             embedding = _demo_embedding(preprocessed_peaks, precursor_mz, charge, chem_aware)
@@ -281,6 +414,11 @@ def generate_embedding(
             metadata["embedding_checkpoint"] = model.embedding_path.name
             metadata["ssl_checkpoint"] = model.ssl_path.name
             metadata["preprocessing"] = "official SpectrumPreprocessor/DataFormatA"
+        elif isinstance(model, SharedDreaMSEncoderAdapter):
+            metadata["backend"] = model.backend
+            metadata["checkpoint"] = model.checkpoint_path.name
+            metadata["checkpoint_sha256"] = model.fingerprint
+            metadata["preprocessing"] = "training-identical top-100 SpectrumPreprocessor equivalent"
         else:
             metadata["backend"] = "reproducible_demo"
         metadata["device"] = device

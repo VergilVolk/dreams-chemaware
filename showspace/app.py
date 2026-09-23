@@ -16,6 +16,7 @@ import numpy as np
 from config import APP_CONFIG, RULE_CATEGORIES_INFO
 from inference_utils import (
     analyze_chemical_rules,
+    available_model_types,
     batch_generate_embeddings,
     calculate_cosine_similarity,
     export_embedding_to_csv,
@@ -24,6 +25,7 @@ from inference_utils import (
     load_model,
     validate_spectrum,
 )
+from bioaware_service import BioAwareService
 try:
     from molecule_matcher import MoleculeDatabase
 except ImportError:
@@ -153,8 +155,9 @@ def choice_index(choice: Any) -> int:
 
 def candidate_columns() -> List[str]:
     return [
-        "Rank", "Precursor m/z", "Delta m/z", "Ref. name", "Ref. ID",
-        "Formula", "SMILES", "DreaMS similarity",
+        "Embedding rank", "P2b preview rank", "Precursor m/z", "Delta ppm",
+        "Ref. name", "Ref. ID", "Formula", "SMILES", "Embedding similarity",
+        "P2b preview score", "BioAware support", "BioAware paths",
     ]
 
 
@@ -171,14 +174,14 @@ def deduplicate_candidates(candidates: List[Dict[str, Any]], max_results: int) -
         else:
             key = f"smiles:{smiles}"
 
-        similarity = float(candidate.get("DreaMS similarity", 0.0))
+        similarity = float(candidate.get("Embedding similarity", candidate.get("DreaMS similarity", 0.0)))
         previous = best_by_structure.get(key)
-        if previous is None or similarity > float(previous.get("DreaMS similarity", 0.0)):
+        if previous is None or similarity > float(previous.get("Embedding similarity", previous.get("DreaMS similarity", 0.0))):
             best_by_structure[key] = candidate
 
     unique = sorted(
         best_by_structure.values(),
-        key=lambda candidate: float(candidate.get("DreaMS similarity", 0.0)),
+        key=lambda candidate: float(candidate.get("Embedding similarity", candidate.get("DreaMS similarity", 0.0))),
         reverse=True,
     )[:max_results]
     for rank, candidate in enumerate(unique, 1):
@@ -218,8 +221,9 @@ class DreaMSInterface:
         self.chem_rule_engine = None
         self.loaded_model_type: Optional[str] = None
         self.device = get_runtime_device()
-        self.database: Optional[MoleculeDatabase] = None
-        self.database_error: Optional[str] = None
+        self.databases: Dict[str, MoleculeDatabase] = {}
+        self.database_errors: Dict[str, str] = {}
+        self.bioaware = BioAwareService()
 
     def ensure_model(self, model_type: str = "official_dreams") -> None:
         if self.loaded_model_type != model_type:
@@ -229,13 +233,14 @@ class DreaMSInterface:
     def load_model_wrapper(self, model_type: str = "official_dreams") -> str:
         try:
             self.ensure_model(model_type)
-            if model_type == "official_dreams":
+            if model_type in {"official_dreams", "e4a_shared", "e8_shared"}:
+                fingerprint = getattr(self.model, "fingerprint", "legacy")
                 return (
-                    "✅ 官方 DreaMS embedding 后端已就绪\n\n"
+                    f"✅ {model_type} shared embedding 后端已就绪\n\n"
                     f"- 设备: `{self.device}`\n"
-                    "- 模式: `official_dreams`\n"
-                    "- 权重: `embedding_model.ckpt` + `ssl_model.ckpt`\n"
-                    "- 预处理: 官方 SpectrumPreprocessor / DataFormatA"
+                    f"- checkpoint SHA256: `{fingerprint}`\n"
+                    "- 查询与参考谱必须使用同一 fingerprint\n"
+                    "- P2b / BioAware 均为 embedding 后的独立证据层"
                 )
             return (
                 "✅ 演示后端已就绪\n\n"
@@ -244,7 +249,7 @@ class DreaMSInterface:
                 "- 注意: 演示向量不代表真实 DreaMS embedding"
             )
         except Exception as exc:
-            return f"❌ 后端初始化失败: {type(exc).__name__}"
+            return f"❌ 后端初始化失败: {type(exc).__name__}: {str(exc)}"
 
     def parse_uploaded(self, file_path: Optional[str]):
         """Parse an uploaded multi-spectrum file."""
@@ -286,36 +291,46 @@ class DreaMSInterface:
             peaks.tolist(),
         )
 
-    def _get_database(self) -> Tuple[Optional[MoleculeDatabase], Optional[str]]:
-        if self.database is not None or self.database_error is not None:
-            return self.database, self.database_error
+    def _get_database(self, model_type: str) -> Tuple[Optional[MoleculeDatabase], Optional[str]]:
+        fingerprint = getattr(self.model, "fingerprint", None)
+        key = f"{model_type}:{fingerprint}"
+        if key in self.databases or key in self.database_errors:
+            return self.databases.get(key), self.database_errors.get(key)
         try:
             if MoleculeDatabase is None:
-                self.database_error = "候选功能需要安装 h5py 和 pandas"
-                return self.database, self.database_error
-            database = MoleculeDatabase()
-            if database.embeddings is None:
-                self.database_error = (
-                    "未找到 MassSpecGym_DreaMS.hdf5；请设置 DREAMS_MOLECULE_DB 指向数据库文件"
-                )
+                self.database_errors[key] = "候选功能需要安装 h5py 和 pandas"
+                return None, self.database_errors[key]
+            database = MoleculeDatabase(model_type=model_type, model_fingerprint=fingerprint)
+            if not database.ready:
+                self.database_errors[key] = database.error or "候选数据库不可用"
             else:
-                self.database = database
+                self.databases[key] = database
         except Exception as exc:
-            self.database_error = f"候选数据库不可用（{type(exc).__name__}）"
-        return self.database, self.database_error
+            self.database_errors[key] = f"候选数据库不可用（{type(exc).__name__}: {exc}）"
+        return self.databases.get(key), self.database_errors.get(key)
 
-    def _match_candidates(self, embedding: np.ndarray, precursor_mz: float, tolerance_da: float, max_results: int):
-        database, error = self._get_database()
+    def _match_candidates(
+        self, model_type: str, embedding: np.ndarray, peaks: np.ndarray,
+        precursor_mz: float, adduct: str, ppm: float, max_results: int,
+        p2b_preview: bool,
+    ):
+        database, error = self._get_database(model_type)
         if error or database is None:
-            return None, error or "候选数据库不可用"
+            return None, {}, error or "候选数据库不可用"
         try:
-            return database.get_candidate_molecules(embedding, precursor_mz, tolerance_da, max_results), None
-        except Exception:
-            return None, "候选检索失败，请检查数据库结构"
+            frame, report = database.retrieve(
+                embedding, peaks, precursor_mz, adduct=adduct, ppm=ppm,
+                max_results=max_results, p2b_preview=p2b_preview,
+            )
+            return frame, report, None
+        except Exception as exc:
+            return None, {}, f"候选检索失败: {type(exc).__name__}: {exc}"
 
     def process_spectrum(
-        self, spectrum_text: str, precursor_mz: float, charge: int, analyze_rules: bool,
-        model_type: str, tolerance_da: float = 0.05, max_results: int = 10,
+        self, spectrum_text: str, precursor_mz: float, charge: int, adduct: str,
+        analyze_rules: bool, model_type: str, ppm: float = 10.0,
+        max_results: int = 10, p2b_preview: bool = True,
+        bioaware_seed_file: Optional[str] = None,
     ):
         """Run one spectrum through embedding, rules, matching and exports."""
         empty = ("", "", "", None, [], [], "", None, None, [])
@@ -326,16 +341,22 @@ class DreaMSInterface:
                 "peaks": peaks,
                 "precursor_mz": precursor_mz,
                 "charge": charge,
-            }, official=model_type == "official_dreams")["peaks"]
+            }, official=model_type in {"official_dreams", "e4a_shared", "e8_shared"})["peaks"]
             self.ensure_model(model_type)
             embedding, metadata = generate_embedding(
                 self.model, record, float(precursor_mz), int(charge), self.device,
                 chem_aware=False,
             )
             rules = analyze_chemical_rules(self.chem_rule_engine, record, float(precursor_mz)) if analyze_rules else {}
-            candidates, match_error = self._match_candidates(embedding, float(precursor_mz), float(tolerance_da), int(max_results) * 2)
+            candidates, retrieval_report, match_error = self._match_candidates(
+                model_type, embedding, record, float(precursor_mz), str(adduct or ""),
+                float(ppm), int(max_results) * 2, bool(p2b_preview),
+            )
             candidates_data = candidates.to_dict("records") if candidates is not None and not candidates.empty else []
             candidates_data = deduplicate_candidates(candidates_data, int(max_results))
+            bioaware_report = {"state": "abstained_no_context", "applied": False}
+            if candidates_data:
+                candidates_data, bioaware_report = self.bioaware.preview(candidates_data, bioaware_seed_file)
             stats = f"""### ✅ 单谱分析完成
 
 **输入质量**
@@ -353,18 +374,32 @@ class DreaMSInterface:
             embedding_md = "### Embedding 前 10 个分量\n\n```text\n" + "\n".join(
                 f"{i}: {value:.6f}" for i, value in enumerate(embedding[:10])
             ) + f"\n... 共 {len(embedding)} 维\n```"
-            candidate_status = (
-                f"⚠️ {match_error}。候选功能需要缓存数据库后才能使用。"
-                if match_error else "✅ 候选已按前体 m/z 和 embedding 相似度排序；不是鉴定置信度。"
-            )
+            if match_error:
+                candidate_status = f"⚠️ {match_error}"
+            else:
+                reference_scope = str(retrieval_report.get("reference_scope", "unknown_reference"))
+                if reference_scope.startswith("engineering_smoke"):
+                    scope_note = (
+                        "⚠️ **LOCAL SMOKE 参考库**：当前仅用于本机端到端工程联调，"
+                        "不得用于宣称正式注释率、检索性能或 SOTA。\n\n"
+                    )
+                else:
+                    scope_note = f"参考库范围：`{reference_scope}`。\n\n"
+                candidate_status = (
+                    scope_note
+                    + "✅ Primary rank = model-aligned shared embedding. "
+                    f"P2b = `{retrieval_report.get('p2b_state')}`（仅预览，near-core 封存结果为负）；"
+                    f"BioAware = `{bioaware_report.get('state')}`（上下文证据层）。"
+                )
             rules_md = format_rules_analysis(rules) + "\n\n" + candidate_status
             result = {
                 "spectrum_id": "manual_input",
                 "peaks": record.tolist(),
                 "precursor_mz": float(precursor_mz), "charge": int(charge),
-                "model_type": model_type, "metadata": metadata,
+                "model_type": model_type, "metadata": metadata, "adduct": adduct,
                 "embedding": embedding.tolist(), "chemical_rules": rules,
-                "candidates": candidates_data,
+                "candidates": candidates_data, "retrieval": retrieval_report,
+                "bioaware": bioaware_report,
             }
             json_path = self._write_json(result)
             csv_path = self._write_csv([(embedding, {"spectrum_id": "manual_input", **metadata})])
@@ -455,10 +490,10 @@ class DreaMSInterface:
                 <div class='candidate-structure'>{image_html}</div>
                 <div class='candidate-details'>
                   <div class='candidate-metrics'>
-                    <div><b>相似度</b><br>{html.escape(str(candidate.get('DreaMS similarity', 'N/A')))}</div>
-                    <div><b>Δm/z</b><br>{html.escape(str(candidate.get('Delta m/z', 'N/A')))}</div>
-                    <div><b>Formula</b><br>{formula}</div>
-                    <div><b>Ref. ID</b><br>{html.escape(str(candidate.get('Ref. ID', 'N/A')))}</div>
+                    <div><b>Embedding</b><br>{html.escape(str(candidate.get('Embedding similarity', 'N/A')))}</div>
+                    <div><b>P2b preview rank</b><br>{html.escape(str(candidate.get('P2b preview rank', 'N/A')))}</div>
+                    <div><b>BioAware</b><br>{html.escape(str(candidate.get('BioAware support', 'N/A')))}</div>
+                    <div><b>Δppm</b><br>{html.escape(str(candidate.get('Delta ppm', 'N/A')))}</div>
                   </div>
                   <p><b>SMILES</b><br><code>{escaped_smiles}</code></p>
                   <div class='candidate-properties'>{info_html}</div>
@@ -473,7 +508,7 @@ class DreaMSInterface:
         if not file_path:
             return [], None, None, "请先上传文件。"
         try:
-            official = model_type == "official_dreams"
+            official = model_type in {"official_dreams", "e4a_shared", "e8_shared"}
             records = [validate_record(record, official=official) for record in SpectrumParser.parse_file(file_path)]
             self.ensure_model(model_type)
             embeddings = batch_generate_embeddings(
@@ -487,13 +522,17 @@ class DreaMSInterface:
                 if embedding is None:
                     errors.append(record["spectrum_id"] + ": embedding 失败")
                     continue
-                candidates, error = self._match_candidates(embedding, record["precursor_mz"], tolerance_da, int(max_results) * 2)
+                candidates, retrieval_report, error = self._match_candidates(
+                    model_type, embedding, record["peaks"], record["precursor_mz"],
+                    "", tolerance_da / max(record["precursor_mz"], 1e-12) * 1e6,
+                    int(max_results) * 2, False,
+                )
                 candidate_records = candidates.to_dict("records") if candidates is not None and not candidates.empty else []
                 candidate_records = deduplicate_candidates(candidate_records, int(max_results))
                 rows.append({
                     "spectrum_id": record["spectrum_id"], "precursor_mz": record["precursor_mz"],
                     "charge": record["charge"], "embedding_dim": len(embedding),
-                    "top_similarity": candidate_records[0].get("DreaMS similarity") if candidate_records else None,
+                    "top_similarity": candidate_records[0].get("Embedding similarity") if candidate_records else None,
                     "candidate_count": len(candidate_records),
                 })
                 complete.append({
@@ -506,10 +545,10 @@ class DreaMSInterface:
                     "metadata": metadata,
                     "embedding": embedding.tolist(),
                     "candidates": candidate_records,
-                    "candidate_error": error,
+                    "candidate_error": error, "retrieval": retrieval_report,
                 })
             csv_path = self._write_csv(embeddings)
-            backend = "official_dreams_embedding" if model_type == "official_dreams" else "reproducible_demo"
+            backend = model_type if model_type != "demo" else "reproducible_demo"
             json_path = self._write_json({"schema_version": 1, "model_type": model_type, "backend": backend, "records": complete})
             status = f"✅ 批量完成: {len(rows)} 成功，{len(errors)} 失败。"
             if errors:
@@ -524,6 +563,14 @@ class DreaMSInterface:
 def build_app():
     """Build the public Gradio application."""
     interface = DreaMSInterface()
+    registry = available_model_types()
+    model_choices = [
+        (f"{body['label']} {'● ready' if body['ready'] else '○ not configured'}", key)
+        for key, body in registry.items()
+    ]
+    if os.getenv("ALLOW_DEMO", "false").lower() in {"1", "true", "yes"}:
+        model_choices.append(("Demo vector (not a model)", "demo"))
+    default_model = next((key for key in ("e8_shared", "e4a_shared", "official_dreams") if registry[key]["ready"]), "official_dreams")
     css = """
     .hero{padding:24px;border-radius:16px;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:white}
     .note{padding:12px 16px;border-radius:12px;background:#f6f7ff}
@@ -548,9 +595,11 @@ def build_app():
     @media(max-width:700px){.candidate-card-body{flex-direction:column}.candidate-structure{width:100%}.candidate-metrics,.candidate-properties{grid-template-columns:repeat(2,minmax(90px,1fr))}}
     """
 
+    reference_label = html.escape(os.getenv("SHOWSPACE_REFERENCE_LABEL", "UNSPECIFIED_REFERENCE"))
     with gr.Blocks(title=APP_CONFIG.get("title", "DreaMS ChemAware"), theme=gr.themes.Soft(), css=css) as app:
-        gr.Markdown("<div class='hero'><h1>🧪 DreaMS-based ChemAware 展示面板</h1><p>在 DreaMS 基础上扩展的质谱表示与化学分析体验。</p></div>")
-        gr.Markdown("<div class='note'><b>模型状态：</b>默认使用官方 DreaMS embedding checkpoint（embedding_model.ckpt + ssl_model.ckpt）。仅在用户主动选择时使用 demo 模式。候选分子需要 MassSpecGym 数据库，结果是相似度排序而非鉴定结论。</div>")
+        gr.Markdown("<div class='hero'><h1>DreaMS ChemAware Workbench</h1><p>共享谱图表示、局部谱学证据与生化网络证据的可审计组合平台。</p></div>")
+        gr.Markdown(f"<div class='note'><b>当前参考库：</b><code>{reference_label}</code></div>")
+        gr.Markdown("<div class='note'><b>严格模块边界：</b>E4/E8 改变 shared embedding；P2b 是候选组内的谱学重排预览；BioAware 是需要独立上下文种子的后验网络证据。三者不会被合并成一个虚假的“总模型分数”。</div>")
 
         with gr.Tab("单谱体验"):
             with gr.Row():
@@ -565,14 +614,25 @@ def build_app():
                 with gr.Column():
                     precursor_mz = gr.Number(label="前体 m/z", value=500.0)
                     charge = gr.Number(label="电荷", value=1, precision=0)
-                    model_type = gr.Dropdown(label="表示模式", choices=[("官方 DreaMS（真实权重）", "official_dreams"), ("演示模式（非模型）", "demo")], value="official_dreams")
+                    model_type = gr.Dropdown(label="共享 embedding 模型", choices=model_choices, value=default_model)
+                    adduct = gr.Dropdown(
+                        label="前体 adduct（P2b exact protocol 必填）",
+                        choices=["", "[M+H]+", "[M-H]-", "[M+Na]+", "[M+NH4]+", "[M+K]+"],
+                        value="",
+                        allow_custom_value=True,
+                    )
                     analyze_rules = gr.Checkbox(label="启用化学规则提示", value=True)
-                    tolerance_da = gr.Number(label="候选 m/z 容差（Da）", value=0.05, minimum=0.0001)
+                    tolerance_ppm = gr.Number(label="候选容差（ppm）", value=10.0, minimum=1.0, maximum=50.0)
+                    p2b_preview = gr.Checkbox(label="计算 P2b 重排预览（不覆盖 primary rank）", value=True)
+                    bioaware_seed_file = gr.File(
+                        label="BioAware context seeds CSV（可选）",
+                        type="filepath", file_types=[".csv", ".gz"],
+                    )
                     max_results = gr.Slider(label="候选数量", minimum=1, maximum=50, step=1, value=10)
             select_btn = gr.Button("载入所选谱图")
             with gr.Row():
                 run_btn = gr.Button("运行单谱分析", variant="primary")
-                load_btn = gr.Button("准备演示后端")
+                load_btn = gr.Button("加载所选共享编码器")
                 model_status = gr.Markdown("尚未准备后端")
             load_btn.click(interface.load_model_wrapper, inputs=[model_type], outputs=[model_status])
             spectrum_plot = gr.Plot(label="谱图预览")
@@ -609,7 +669,14 @@ def build_app():
             with gr.Row():
                 json_download = gr.File(label="下载完整 JSON", interactive=False)
                 csv_download = gr.File(label="下载 embedding CSV", interactive=False)
-            run_btn.click(interface.process_spectrum, inputs=[spectrum_input, precursor_mz, charge, analyze_rules, model_type, tolerance_da, max_results], outputs=[stats_out, embedding_out, rules_out, spectrum_plot, peak_table, candidates_out, candidate_status, json_download, csv_download, candidate_state])
+            run_btn.click(
+                interface.process_spectrum,
+                inputs=[spectrum_input, precursor_mz, charge, adduct, analyze_rules, model_type,
+                        tolerance_ppm, max_results, p2b_preview, bioaware_seed_file],
+                outputs=[stats_out, embedding_out, rules_out, spectrum_plot, peak_table,
+                         candidates_out, candidate_status, json_download, csv_download, candidate_state],
+                api_name="analyze_spectrum",
+            )
             show_structures_btn.click(
                 interface.render_molecules,
                 inputs=[structure_top_n, candidate_state],
@@ -620,7 +687,7 @@ def build_app():
             gr.Markdown("上传包含多个谱图的文件，逐谱生成 embedding 并导出汇总结果。")
             batch_file = gr.File(label="批量质谱文件", type="filepath", file_types=SUPPORTED_FORMATS)
             with gr.Row():
-                batch_model = gr.Dropdown(label="表示模式", choices=[("官方 DreaMS（真实权重）", "official_dreams"), ("演示模式（非模型）", "demo")], value="official_dreams")
+                batch_model = gr.Dropdown(label="共享 embedding 模型", choices=model_choices, value=default_model)
                 batch_tolerance = gr.Number(label="候选 m/z 容差（Da）", value=0.05, minimum=0.0001)
                 batch_k = gr.Slider(label="候选数量", minimum=1, maximum=50, step=1, value=10)
             batch_btn = gr.Button("运行批量分析", variant="primary")
@@ -630,18 +697,25 @@ def build_app():
             batch_status = gr.Markdown()
             batch_btn.click(interface.batch_analyze, inputs=[batch_file, batch_model, batch_tolerance, batch_k], outputs=[batch_table, batch_csv, batch_json, batch_status])
 
-        with gr.Tab("能力与限制"):
-            gr.Markdown("""## 当前面板能力
+        with gr.Tab("证据与边界"):
+            gr.Markdown("""## 当前组合系统
 
 - 文件上传：`.mgf`、`.mzML`、`.mzXML`、`.hdf5`、`.h5`、`.hd5`、`.json`
-- 多谱图选择与批量 embedding 导出
-- 谱图 stick plot、峰表和完整 JSON/CSV 下载
-- 候选分子检索、SMILES 结构图和 RDKit 分子性质（需要本地数据库/RDKit）
-- 化学规则提示和演示表示对比
+- Official / E4-A / E8 clean shared embedding（只有已配置 checkpoint 才能启用）
+- 与 checkpoint SHA256 完全一致的 reference embedding index
+- strict mass-window candidate generation 与 molecule-level aggregation
+- 冻结 P2b 谱学融合的 side-by-side preview
+- phenotype-blind BioAware one-hop Rhea evidence；无独立 seeds 时自动弃权
 
-## 明确限制
+## 已验证结果不能混写
 
-默认入口使用官方 DreaMS embedding checkpoint；只有用户主动选择 demo 时才使用可复现替代向量。官方模式的候选结果才是基于官方 embedding 的相似度排序，仍不是结构鉴定或置信度。正式 annotation 的 FDR、校准、Schymanski、dark matter、Atlas、氟预测、attention 和 pathway 功能需要对应权重、数据库或外部映射，当前不会以伪结果呈现。
+- **E4-A**：5 formula folds × 3 seeds 的开发 OOF 结果支持 shared embedding 有小幅稳定改善；它不是 3–4 pp 的 P2b 结果。
+- **P2b**：开发 nested OOF 约 +3.91 pp；sealed P3 main +1.07 pp，但 near-core −4.23 pp。因此网页默认不让 P2b 覆盖 primary rank。
+- **BioAware**：目前是可审计的上下文证据/弃权模块，尚无可靠外部准确率提升，不可宣传为结构鉴定器。
+
+## 明确限制与上线合同
+
+候选排名不是 MSI Level 1/2 身份结论。E4/E8 查询端不能与官方 reference index 混用；索引 fingerprint 不匹配时服务会 fail-closed。BioAware 不接收 phenotype、q-value、fold-change 等字段，避免用疾病标签反证身份。P2b 只作预览，直到推理时可用的 near-safety gate 在新封存集通过。
 """)
 
     return app
@@ -653,9 +727,32 @@ if __name__ == "__main__":
     server_name = os.getenv("GRADIO_SERVER_NAME", "127.0.0.1")
     share = os.getenv("GRADIO_SHARE", "false").strip().lower() in {"1", "true", "yes", "on"}
     frontend_check = os.getenv("GRADIO_FRONTEND_CHECK", "false").strip().lower() in {"1", "true", "yes", "on"}
-    demo.launch(
+    username = os.getenv("SHOWSPACE_USERNAME", "").strip()
+    password = os.getenv("SHOWSPACE_PASSWORD", "")
+    auth = (username, password) if username and password else None
+    if bool(username) != bool(password):
+        raise RuntimeError("SHOWSPACE_USERNAME and SHOWSPACE_PASSWORD must be configured together")
+    if os.getenv("SHOWSPACE_PUBLIC_MODE", "false").strip().lower() in {"1", "true", "yes", "on"}:
+        allow_anonymous = os.getenv("SHOWSPACE_ALLOW_ANONYMOUS", "false").strip().lower() in {"1", "true", "yes", "on"}
+        if auth is None and not allow_anonymous:
+            raise RuntimeError("public mode requires Showspace credentials or an explicit SHOWSPACE_ALLOW_ANONYMOUS=true")
+    blocked_paths = []
+    for variable in (
+        "DREAMS_OFFICIAL_SLIM_CKPT", "DREAMS_ARCHITECTURE_CKPT", "DREAMS_E4_CKPT", "DREAMS_E8_CKPT",
+        "DREAMS_MOLECULE_DB", "DREAMS_OFFICIAL_EMBEDDING_INDEX", "DREAMS_E4_EMBEDDING_INDEX", "DREAMS_E8_EMBEDDING_INDEX",
+    ):
+        value = os.getenv(variable, "").strip()
+        if value and Path(value).exists():
+            blocked_paths.append(str(Path(value).resolve()))
+    demo.queue(default_concurrency_limit=1, max_size=8).launch(
         server_name=server_name,
         server_port=port,
         share=share,
+        auth=auth,
+        show_api=False,
+        max_threads=2,
+        state_session_capacity=100,
+        max_file_size=os.getenv("SHOWSPACE_MAX_FILE_SIZE", "200mb"),
+        blocked_paths=blocked_paths,
         _frontend=frontend_check,
     )
