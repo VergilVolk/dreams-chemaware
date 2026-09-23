@@ -111,6 +111,19 @@ def main() -> None:
     assert "--max-steps 3000 --checkpoint-mode fixed_steps" in sbatch
     assert "--formula-role 2" in sbatch and "--formula-role 3" in sbatch
     assert "role_4" not in sbatch.lower()
+
+    resume = (
+        Path(__file__).resolve().parent
+        / "run_chemaware_pair_expanded_native_resume_2342187.sbatch"
+    ).read_text(encoding="utf-8")
+    assert '#SBATCH --gpus=1' in resume
+    assert '#SBATCH --mem' not in resume
+    assert 'OUT="data/validation/chemaware_pair_expanded_native/run_2342187"' in resume
+    assert "train_pool.npz" not in resume
+    assert "mapfile -t trained_checkpoints" in resume
+    assert "[[ ${#trained_checkpoints[@]} -eq 6 ]]" in resume
+    assert "--formula-role 2" in resume and "--formula-role 3" in resume
+    assert "srun --export=ALL --preserve-env" in resume
     print("PASS: ChemAware pair-expanded native-triplet contracts")
 
 

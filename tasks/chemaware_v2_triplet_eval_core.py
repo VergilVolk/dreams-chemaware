@@ -4,6 +4,83 @@ from __future__ import annotations
 import numpy as np
 
 
+def numerical_rank_replay_audit(
+    encoded: np.ndarray,
+    rows: np.ndarray,
+    manifest: dict[str, np.ndarray],
+    queries: np.ndarray,
+    expected_rank: np.ndarray,
+    observed_rank: np.ndarray,
+    *,
+    tie_tolerance: float = 5e-7,
+    maximum_fraction: float = 0.005,
+) -> tuple[np.ndarray, list[dict[str, object]]]:
+    """Identify only rank changes explainable by float32 boundary ties.
+
+    A frozen rank is replay-compatible when it falls inside the rank interval
+    obtained by moving every negative within ``tie_tolerance`` of the positive
+    to either side of the boundary.  This is stricter than merely allowing a
+    small mismatch count: any mismatch away from a numerical tie fails closed.
+    """
+    queries = np.asarray(queries, dtype=np.int64)
+    expected_rank = np.asarray(expected_rank, dtype=np.int64)
+    observed_rank = np.asarray(observed_rank, dtype=np.int64)
+    if len(queries) != len(expected_rank) or len(queries) != len(observed_rank):
+        raise ValueError("rank replay arrays do not align")
+    if tie_tolerance < 0 or not 0 < maximum_fraction <= 0.01:
+        raise ValueError("invalid numerical replay audit tolerance")
+
+    position = {int(row): index for index, row in enumerate(rows)}
+    mismatch = np.flatnonzero(observed_rank != expected_rank)
+    stable = np.ones(len(queries), dtype=bool)
+    stable[mismatch] = False
+    audit: list[dict[str, object]] = []
+    unexplained = []
+    for output_row in mismatch:
+        query = int(queries[output_row])
+        molecule_left, molecule_right = map(
+            int, manifest["query_ptr"][query:query + 2],
+        )
+        pair_left = int(manifest["molecule_ptr"][molecule_left])
+        pair_right = int(manifest["molecule_ptr"][molecule_right])
+        candidate_rows = manifest["pair_candidate_row"][pair_left:pair_right]
+        candidate_position = np.asarray([position[int(row)] for row in candidate_rows])
+        query_position = position[int(manifest["query_row"][query])]
+        pair_scores = encoded[candidate_position] @ encoded[query_position]
+        local_ptr = manifest["molecule_ptr"][molecule_left:molecule_right + 1] - pair_left
+        molecule_scores = np.maximum.reduceat(pair_scores, local_ptr[:-1])
+        positive = float(molecule_scores[0])
+        negative = np.asarray(molecule_scores[1:], dtype=np.float64)
+        gaps = negative - positive
+        minimum_rank = 1 + int(np.sum(gaps > tie_tolerance))
+        maximum_rank = 1 + int(np.sum(gaps >= -tie_tolerance))
+        expected = int(expected_rank[output_row])
+        explained = minimum_rank <= expected <= maximum_rank
+        nearest_gap = float(np.min(np.abs(gaps)))
+        row = {
+            "policy_position": int(output_row),
+            "manifest_query": query,
+            "expected_rank": expected,
+            "observed_rank": int(observed_rank[output_row]),
+            "tie_compatible_rank_interval": [minimum_rank, maximum_rank],
+            "nearest_negative_positive_score_gap": nearest_gap,
+            "tie_tolerance": float(tie_tolerance),
+            "tie_explained": bool(explained),
+        }
+        audit.append(row)
+        if not explained:
+            unexplained.append(row)
+
+    maximum = max(1, int(np.ceil(maximum_fraction * len(queries))))
+    if unexplained or len(mismatch) > maximum:
+        raise RuntimeError(
+            "official retrieval replay differs beyond the audited numerical-boundary "
+            f"contract: mismatches={len(mismatch)} maximum={maximum} "
+            f"unexplained={len(unexplained)} first={audit[:10]}"
+        )
+    return stable, audit
+
+
 def binary_auc(labels: np.ndarray, scores: np.ndarray) -> float:
     """Exact ROC AUC via average ranks, including score ties."""
     labels = np.asarray(labels, dtype=bool)

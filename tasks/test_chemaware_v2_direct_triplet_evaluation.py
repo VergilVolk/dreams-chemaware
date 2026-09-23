@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tasks"))
 
 from chemaware_v2_triplet_eval_core import (  # noqa: E402
-    evaluate_graph, paired_summary, summarize,
+    evaluate_graph, numerical_rank_replay_audit, paired_summary, summarize,
 )
 
 
@@ -42,6 +42,29 @@ def main() -> None:
     assert paired["corrected_at_1"] == 1
     assert paired["introduced_at_1"] == 1
     assert paired["delta_recall1"] == 0.0
+
+    # A frozen rank on an exact positive/negative boundary is isolated rather
+    # than turning a cross-BLAS tie into either a gain or a regression.
+    tied = encoded.copy()
+    tied[2] = tied[1]
+    tied_rank, *_ = evaluate_graph(tied, rows, manifest, np.asarray([0, 1]))
+    stable, audit = numerical_rank_replay_audit(
+        tied, rows, manifest, np.asarray([0, 1]),
+        np.asarray([1, tied_rank[1]]), tied_rank,
+    )
+    assert np.array_equal(stable, [False, True])
+    assert len(audit) == 1 and audit[0]["tie_explained"]
+
+    # A real rank drift with a finite score gap must still fail closed.
+    try:
+        numerical_rank_replay_audit(
+            encoded, rows, manifest, np.asarray([0, 1]),
+            np.asarray([2, 2]), ranks,
+        )
+    except RuntimeError as error:
+        assert "unexplained=1" in str(error)
+    else:
+        raise AssertionError("non-tie replay drift was accepted")
     print("PASS: ChemAware V2 direct-triplet evaluation contracts")
 
 
