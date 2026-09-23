@@ -54,8 +54,11 @@ def arguments() -> argparse.Namespace:
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--chemical-events-per-query", type=int, default=3)
     parser.add_argument(
-        "--maximum-null-candidate-agreement", type=int, default=1,
-        help="Keep correct candidates selected chemically by at most this many of three nulls.",
+        "--maximum-null-candidate-agreement", type=int, default=2,
+        help=(
+            "Upper bound for an automatic strictest-admissible scan from zero to this "
+            "many agreeing nulls; three would admit fully nonspecific candidates."
+        ),
     )
     parser.add_argument("--min-train-queries", type=int, default=3500)
     parser.add_argument("--min-specific-chemical-events", type=int, default=300)
@@ -411,13 +414,78 @@ def main() -> None:
         raise FileExistsError(f"refusing to overwrite {args.output}")
     if args.chemical_events_per_query < 1:
         raise ValueError("chemical event cap must be positive")
-    if not 0 <= args.maximum_null_candidate_agreement <= len(NULL_NAMES):
+    if not 0 <= args.maximum_null_candidate_agreement < len(NULL_NAMES):
         raise ValueError("invalid maximum null-candidate agreement")
     report_path = args.pair_bank / "report.json"
     report = json.loads(report_path.read_text(encoding="utf-8"))
     if report.get("status") != "CHEMAWARE_REFERENCE_ALIGNED_NATIVE_TRIPLETS_COMPLETE":
         raise RuntimeError("pair-expanded source bank is incomplete")
     manifest = load_npz(args.manifest)
+    # Select the strictest candidate-disagreement level that can support a
+    # full-model native continuation.  This structural scan uses roles 0--1
+    # only and never consults role-2 performance or role-3 outcomes.
+    train_correct = load_npz(args.pair_bank / "train_pool.npz")
+    train_nulls = {
+        name: load_npz(args.pair_bank / f"train_pool_{name}.npz")
+        for name in NULL_NAMES
+    }
+    validate_source_pool(train_correct, "train:correct")
+    for name, null_pool in train_nulls.items():
+        validate_source_pool(null_pool, f"train:{name}")
+    train_safety = select_safety(train_correct)
+    specificity_profiles: dict[str, dict[str, object]] = {}
+    selected_null_agreement: int | None = None
+    for agreement in range(args.maximum_null_candidate_agreement + 1):
+        profile_schedule = select_specific_schedule(
+            train_correct, train_nulls, train_safety,
+            args.chemical_events_per_query, agreement,
+        )
+        profile_schedule, removed = prune_to_matched_null_capacity(
+            train_correct, train_nulls, train_safety, profile_schedule,
+        )
+        profile_pool = compose_pool(
+            train_correct, train_safety, train_correct, profile_schedule,
+            SPECIFIC_CHEMISTRY,
+        )
+        profile = audit_pool(profile_pool, manifest)
+        profile_gates = {
+            "specific_chemical_events": (
+                int(profile["chemical_or_matched_events"])
+                >= args.min_specific_chemical_events
+            ),
+            "specific_chemical_queries": (
+                int(profile["queries_with_chemical_or_matched_event"])
+                >= args.min_specific_chemical_queries
+            ),
+            "chemical_fraction": (
+                float(profile["chemical_or_matched_fraction"])
+                >= args.min_chemical_fraction
+            ),
+            "active_chemical_fraction": (
+                float(profile["active_chemical_or_matched_fraction"])
+                >= args.min_active_chemical_fraction
+            ),
+        }
+        specificity_profiles[str(agreement)] = {
+            "audit": profile,
+            "matched_capacity_pruned_events": int(removed),
+            "gates": profile_gates,
+            "admissible": bool(all(profile_gates.values())),
+        }
+        if all(profile_gates.values()):
+            selected_null_agreement = agreement
+            break
+    if selected_null_agreement is None:
+        raise RuntimeError(
+            "no counterfactual-specific replay profile reaches the frozen coverage "
+            f"gates without admitting three-null consensus: {specificity_profiles}"
+        )
+    print(json.dumps({
+        "status": "CHEMAWARE_SPECIFIC_REPLAY_PROFILE_SELECTED",
+        "selected_maximum_null_candidate_agreement": selected_null_agreement,
+        "profiles": specificity_profiles,
+    }, indent=2), flush=True)
+
     pools: dict[tuple[str, str], dict[str, np.ndarray]] = {}
     audits: dict[str, dict[str, object]] = {}
     capacity_pruned: dict[str, int] = {}
@@ -442,7 +510,7 @@ def main() -> None:
         safety = select_safety(correct)
         schedule = select_specific_schedule(
             correct, nulls, safety, args.chemical_events_per_query,
-            args.maximum_null_candidate_agreement,
+            selected_null_agreement,
         )
         schedule, removed = prune_to_matched_null_capacity(
             correct, nulls, safety, schedule,
@@ -532,7 +600,11 @@ def main() -> None:
         "training_runtime": "unmodified DreaMS ContrastiveSpectraDataset plus ContrastiveHead",
         "source_pair_bank": str(args.pair_bank.resolve()),
         "chemical_events_per_query": int(args.chemical_events_per_query),
-        "maximum_null_candidate_agreement": int(args.maximum_null_candidate_agreement),
+        "maximum_null_candidate_agreement_requested": int(
+            args.maximum_null_candidate_agreement
+        ),
+        "maximum_null_candidate_agreement_selected": int(selected_null_agreement),
+        "specificity_profiles": specificity_profiles,
         "arms": ["correct", *NULL_NAMES],
         "roles": {
             "optimization": "formula roles 0-1",

@@ -108,6 +108,7 @@ def main() -> None:
         assert "--official-checkpoint \"$BASE_CHECKPOINT\"" in text
         assert "--formula-role 2" in text and "--formula-role 3" in text
         assert "--require-positive-formula-ci" in text
+        assert "--maximum-null-candidate-agreement 2" in text
     print("PASS: ChemAware specific-replay native-triplet contracts")
 
 

@@ -26,8 +26,11 @@ Only the empirical event distribution changes:
    query.  This is the safety replay background.
 2. Consider active correct-arm events tagged `CHEMICAL_HARD`.
 3. For candidate `c`, compute its null agreement as the number of three frozen
-   content-permuted arms that also select `c` chemically.  Retain `c` only when
-   null agreement is at most one.
+   content-permuted arms that also select `c` chemically.  Before training,
+   scan agreement limits 0, 1, and 2 and freeze the strictest level that reaches
+   all coverage and active-gradient gates.  Agreement 3 is forbidden because it
+   would admit candidates shared by every null and provide no counterfactual
+   chemical specificity.
 4. Cap retained chemical events at three per query and order them by lower null
    agreement, native hinge, and activation.
 5. For every null arm, keep the exact correct-arm query/event schedule and the
