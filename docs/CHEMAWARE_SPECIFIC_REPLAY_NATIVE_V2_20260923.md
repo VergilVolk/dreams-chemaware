@@ -24,14 +24,18 @@ Only the empirical event distribution changes:
 
 1. Retain exactly one stage-1 primary-boundary event `s_q` for every training
    query.  This is the safety replay background.
-2. Consider active correct-arm events tagged `CHEMICAL_HARD`.
+2. Re-open the frozen 22-slot candidate evidence and retain up to five
+   chemically ranked hard candidates per query before reference expansion.
+   This repairs the original two-candidate discretization bottleneck without
+   changing labels, roles, or the stage-1 embedding geometry.  Consider active
+   correct-arm events tagged `CHEMICAL_HARD` from this wider bank.
 3. For candidate `c`, compute its null agreement as the number of three frozen
    content-permuted arms that also select `c` chemically.  Before training,
    scan agreement limits 0, 1, and 2 and freeze the strictest level that reaches
    all coverage and active-gradient gates.  Agreement 3 is forbidden because it
    would admit candidates shared by every null and provide no counterfactual
    chemical specificity.
-4. Cap retained chemical events at three per query and order them by lower null
+4. Cap retained chemical events at four per query and order them by lower null
    agreement, native hinge, and activation.
 5. For every null arm, keep the exact correct-arm query/event schedule and the
    exact same safety event.  Replace each correct chemical event by an active

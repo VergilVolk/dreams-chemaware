@@ -18,8 +18,10 @@ export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK:-8}"
 
 BASE_CHECKPOINT="data/validation/chemaware_high_coverage_native/run_2340721_resume_2340524/training/best.ckpt"
 EVIDENCE="data/validation/chemaware_high_coverage_native/run_2340524/evidence"
-PAIR_BANK="data/validation/chemaware_pair_expanded_native/run_2342187/pair_expanded_triplets"
+SOURCE_RUN="data/validation/chemaware_pair_expanded_native/run_2342187"
+CACHE="$SOURCE_RUN/stage1_embedding_cache"
 OUT="data/validation/chemaware_specific_replay_native/run_${SLURM_JOB_ID}"
+PAIR_BANK="$OUT/wide_pair_expanded_triplets"
 BANK="$OUT/specific_replay_triplets"
 CORRECT="$OUT/training_correct"
 
@@ -30,10 +32,10 @@ required_files=(
   "$BASE_CHECKPOINT"
   "$EVIDENCE/selection_triplet_evidence.npz"
   "$EVIDENCE/confirmation_triplet_evidence.npz"
-  "$PAIR_BANK/report.json"
-  "$PAIR_BANK/train_pool.npz"
-  "$PAIR_BANK/selection_pool.npz"
-  "$PAIR_BANK/confirmation_pool.npz"
+  "$EVIDENCE/train_triplet_evidence.npz"
+  "$CACHE/rows.npy"
+  "$CACHE/embeddings_f32.npy"
+  tasks/build_chemaware_reference_aligned_native_triplets.py
   tasks/build_chemaware_specific_replay_native_triplets.py
   tasks/test_chemaware_specific_replay_native_triplets.py
   tasks/train_chemaware_dreams_native.py
@@ -44,11 +46,6 @@ required_files=(
   data/e1/official_embedding_slim.pt
   dreams/models/pretrained/ssl_model_server.pt
 )
-for null_name in content_permuted content_permuted_b content_permuted_c; do
-  for role in train selection confirmation; do
-    required_files+=("$PAIR_BANK/${role}_pool_${null_name}.npz")
-  done
-done
 for required_file in "${required_files[@]}"; do
   [[ -f "$required_file" ]] || {
     echo "Missing required specific-replay file: $required_file" >&2
@@ -58,13 +55,32 @@ done
 
 python -u tasks/test_chemaware_specific_replay_native_triplets.py
 
-# Freeze one safety boundary per query, then retain only correct-arm chemical
-# candidates selected by at most one of the three content-permuted nulls.
+# Re-open the complete frozen candidate tensor.  The previous bank allowed two
+# chemical candidates per query; that discretization left only 103 queries
+# after counterfactual matching.  Five chemically ranked candidates are now
+# retained before the same strict correct-vs-null replay filter is applied.
+python -u tasks/build_chemaware_reference_aligned_native_triplets.py \
+  --evidence-dir "$EVIDENCE" --embedding-cache "$CACHE" \
+  --manifest data/validation/chemaware_corrected_candidate_manifest_v1/manifest.npz \
+  --data data/models/MassSpecGym_MurckoHist_split.hdf5 \
+  --output "$PAIR_BANK" --margin 0.1 --candidates-per-query 8 \
+  --chemical-candidates-per-query 5 \
+  --negative-references-per-candidate 2 \
+  --explicit-positive-references-per-negative 2 \
+  --max-active-spectrum-events-per-query 18 \
+  --chemical-hardness-window 0.75 \
+  --min-chemical-activation-probability 0.05 \
+  --min-train-queries 3500 --min-candidate-events 5000 \
+  --min-spectrum-events 9000 --min-train-formulas 2000 \
+  --min-chemical-candidates 500 --min-chemical-spectrum-events 1400
+
+# Freeze one safety boundary per query, then retain the strictest sufficiently
+# covered counterfactual chemical profile (null agreement 0, 1, or 2).
 python -u tasks/build_chemaware_specific_replay_native_triplets.py \
   --pair-bank "$PAIR_BANK" \
   --manifest data/validation/chemaware_corrected_candidate_manifest_v1/manifest.npz \
   --data data/models/MassSpecGym_MurckoHist_split.hdf5 \
-  --output "$BANK" --chemical-events-per-query 3 \
+  --output "$BANK" --chemical-events-per-query 4 \
   --maximum-null-candidate-agreement 2 \
   --min-train-queries 3500 --min-specific-chemical-events 300 \
   --min-specific-chemical-queries 150 --min-chemical-fraction 0.06 \

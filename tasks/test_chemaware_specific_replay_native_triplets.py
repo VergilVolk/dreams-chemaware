@@ -109,6 +109,9 @@ def main() -> None:
         assert "--formula-role 2" in text and "--formula-role 3" in text
         assert "--require-positive-formula-ci" in text
         assert "--maximum-null-candidate-agreement 2" in text
+        assert "--candidates-per-query 8" in text
+        assert "--chemical-candidates-per-query 5" in text
+        assert "--chemical-events-per-query 4" in text
     print("PASS: ChemAware specific-replay native-triplet contracts")
 
 
