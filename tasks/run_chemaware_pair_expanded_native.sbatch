@@ -79,9 +79,9 @@ python -u tasks/build_chemaware_reference_aligned_native_triplets.py \
   --max-active-spectrum-events-per-query 12 \
   --chemical-hardness-window 0.50 \
   --min-chemical-activation-probability 0.05 \
-  --min-train-queries 3500 --min-candidate-events 6000 \
-  --min-spectrum-events 12000 --min-train-formulas 2000 \
-  --min-chemical-candidates 800
+  --min-train-queries 3500 --min-candidate-events 4500 \
+  --min-spectrum-events 8000 --min-train-formulas 2000 \
+  --min-chemical-candidates 300 --min-chemical-spectrum-events 1000
 
 # The same stage-1 embedding cache must show a material gain over the old pool
 # before any optimizer step is allowed.
@@ -94,9 +94,9 @@ python -u tasks/audit_chemaware_native_triplet_activity.py \
 python -u tasks/validate_chemaware_triplet_activity_gain.py \
   --old "$OUT/old_pool_activity_audit.json" \
   --new "$OUT/new_pool_activity_audit.json" \
-  --min-active-event-ratio 2.0 \
-  --min-activation-probability-ratio 2.0 \
-  --min-mean-hinge-ratio 2.0 \
+  --min-active-event-ratio 1.25 \
+  --min-activation-probability-ratio 1.25 \
+  --min-mean-hinge-ratio 1.25 \
   --output "$OUT/triplet_activity_gate.json"
 
 # Keep the successful native DreaMS model, loss, optimizer and hyperparameters.

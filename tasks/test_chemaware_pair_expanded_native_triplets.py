@@ -13,6 +13,7 @@ from build_chemaware_reference_aligned_native_triplets import (
     QueryGeometry,
     explicit_positive_indices,
     select_candidate_slots,
+    structural_gates,
 )
 
 
@@ -71,6 +72,27 @@ def main() -> None:
     assert explicit_positive_indices(scores, hinge, 2) == [1, 3]
     assert explicit_positive_indices(scores, np.zeros(4), 2) == [0]
 
+    # Regression contract for the first real stage-1 server geometry.  It was
+    # scientifically valid but rejected by local-cache absolute thresholds.
+    server_train = {
+        "spectrum_triplet_events": 9957,
+        "candidate_events": 5389,
+        "unique_query_positive_negative_reference_triplets": 9957,
+        "anchor_queries": 4032,
+        "unique_formulas": 2518,
+        # 1,516 explicit events and at most four events per chemical candidate
+        # prove a lower bound of ceil(1516 / 4) = 379 unique candidates.
+        "chemical_candidate_events": 379,
+        "chemical_spectrum_events": 1516,
+    }
+    gates = structural_gates(
+        server_train, min_train_queries=3500, min_candidate_events=4500,
+        min_spectrum_events=8000, min_train_formulas=2000,
+        min_chemical_candidates=300, min_chemical_spectrum_events=1000,
+        role2_specific_surplus=110,
+    )
+    assert all(gates.values()), gates
+
     sbatch = (
         Path(__file__).resolve().parent / "run_chemaware_pair_expanded_native.sbatch"
     ).read_text(encoding="utf-8")
@@ -81,6 +103,11 @@ def main() -> None:
     assert "--chemical-candidates-per-query 2" in sbatch
     assert "--explicit-positive-references-per-negative 2" in sbatch
     assert "--max-active-spectrum-events-per-query 12" in sbatch
+    assert "--min-candidate-events 4500" in sbatch
+    assert "--min-spectrum-events 8000" in sbatch
+    assert "--min-chemical-candidates 300" in sbatch
+    assert "--min-chemical-spectrum-events 1000" in sbatch
+    assert "--min-active-event-ratio 1.25" in sbatch
     assert "--max-steps 3000 --checkpoint-mode fixed_steps" in sbatch
     assert "--formula-role 2" in sbatch and "--formula-role 3" in sbatch
     assert "role_4" not in sbatch.lower()

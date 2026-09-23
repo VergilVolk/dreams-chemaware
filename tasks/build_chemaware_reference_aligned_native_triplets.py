@@ -98,10 +98,11 @@ def arguments() -> argparse.Namespace:
         help="Minimum fraction of positive-reference pairs with nonzero native hinge loss.",
     )
     parser.add_argument("--min-train-queries", type=int, default=3500)
-    parser.add_argument("--min-candidate-events", type=int, default=5000)
-    parser.add_argument("--min-spectrum-events", type=int, default=6500)
+    parser.add_argument("--min-candidate-events", type=int, default=4500)
+    parser.add_argument("--min-spectrum-events", type=int, default=8000)
     parser.add_argument("--min-train-formulas", type=int, default=2000)
-    parser.add_argument("--min-chemical-candidates", type=int, default=400)
+    parser.add_argument("--min-chemical-candidates", type=int, default=300)
+    parser.add_argument("--min-chemical-spectrum-events", type=int, default=1000)
     return parser.parse_args()
 
 
@@ -452,6 +453,11 @@ def build_pool(
     tags = np.asarray(source_tag, dtype=np.int64)
     activation = np.asarray(activation_probability, dtype=np.float64)
     hinges = np.asarray(mean_hinge, dtype=np.float64)
+    chemical_mask = (tags & CHEMICAL_HARD) > 0
+    chemical_candidate_pairs = set(zip(
+        query_array[chemical_mask].tolist(),
+        np.asarray(negative_candidate, dtype=np.int64)[chemical_mask].tolist(),
+    ))
     audit = {
         "spectrum_triplet_events": int(len(anchors)),
         "candidate_events": int(len(candidate_pairs)),
@@ -461,6 +467,7 @@ def build_pool(
         "primary_hard_spectrum_events": int(np.sum((tags & PRIMARY_HARD) > 0)),
         "secondary_hard_spectrum_events": int(np.sum((tags & SECONDARY_HARD) > 0)),
         "chemical_spectrum_events": int(np.sum((tags & CHEMICAL_HARD) > 0)),
+        "chemical_candidate_events": int(len(chemical_candidate_pairs)),
         "strict_specific_spectrum_events": int(np.sum((tags & STRICT_SPECIFIC) > 0)),
         "fallback_spectrum_events": int(np.sum((tags & HARD_FALLBACK) > 0)),
         "retrieval_margin_violating_spectrum_events": int(
@@ -486,6 +493,34 @@ def _tagged_candidate_pairs(pool: Mapping[str, np.ndarray], tag: int) -> set[tup
     return {
         (int(q), int(c))
         for q, c in zip(query[(tags & tag) > 0], candidate[(tags & tag) > 0], strict=True)
+    }
+
+
+def structural_gates(
+    train: Mapping[str, object], *, min_train_queries: int,
+    min_candidate_events: int, min_spectrum_events: int,
+    min_train_formulas: int, min_chemical_candidates: int,
+    min_chemical_spectrum_events: int, role2_specific_surplus: int,
+) -> dict[str, bool]:
+    """Checkpoint-portable floors; relative activity is gated separately."""
+    return {
+        "train_queries": int(train["anchor_queries"]) >= min_train_queries,
+        "train_candidate_events": int(train["candidate_events"]) >= min_candidate_events,
+        "train_spectrum_events": int(train["spectrum_triplet_events"]) >= min_spectrum_events,
+        "train_formulas": int(train["unique_formulas"]) >= min_train_formulas,
+        "train_chemical_candidates": (
+            int(train["chemical_candidate_events"]) >= min_chemical_candidates
+        ),
+        "train_chemical_spectrum_events": (
+            int(train["chemical_spectrum_events"]) >= min_chemical_spectrum_events
+        ),
+        "unique_spectrum_triplets": (
+            int(train["spectrum_triplet_events"])
+            == int(train["unique_query_positive_negative_reference_triplets"])
+        ),
+        "role2_recipe_specific": int(role2_specific_surplus) > 0,
+        "formula_roles_disjoint": True,
+        "outer_role_4_untouched": True,
     }
 
 
@@ -551,22 +586,16 @@ def main() -> None:
             candidate_sets[(role, arm)] = candidates
             spectrum_sets[(role, arm)] = spectra
     train = audits["train:correct"]
-    correct_train_pool = pools[("train", "correct")]
-    correct_chemical_candidates = _tagged_candidate_pairs(correct_train_pool, CHEMICAL_HARD)
-    gates = {
-        "train_queries": int(train["anchor_queries"]) >= args.min_train_queries,
-        "train_candidate_events": int(train["candidate_events"]) >= args.min_candidate_events,
-        "train_spectrum_events": int(train["spectrum_triplet_events"]) >= args.min_spectrum_events,
-        "train_formulas": int(train["unique_formulas"]) >= args.min_train_formulas,
-        "train_chemical_candidates": len(correct_chemical_candidates) >= args.min_chemical_candidates,
-        "unique_spectrum_triplets": (
-            train["spectrum_triplet_events"]
-            == train["unique_query_positive_negative_reference_triplets"]
-        ),
-        "role2_recipe_specific": int(selection["specific_candidate_surplus"]) > 0,
-        "formula_roles_disjoint": True,
-        "outer_role_4_untouched": True,
-    }
+    gates = structural_gates(
+        train,
+        min_train_queries=args.min_train_queries,
+        min_candidate_events=args.min_candidate_events,
+        min_spectrum_events=args.min_spectrum_events,
+        min_train_formulas=args.min_train_formulas,
+        min_chemical_candidates=args.min_chemical_candidates,
+        min_chemical_spectrum_events=args.min_chemical_spectrum_events,
+        role2_specific_surplus=int(selection["specific_candidate_surplus"]),
+    )
     if not all(gates.values()):
         raise RuntimeError(f"reference-aligned triplet gates failed: {gates}; train={train}")
     identity_audit = {

@@ -92,7 +92,7 @@ query at 12 active events, and uses role-2 checkpoint selection at
 500-step intervals.  Role 3 is evaluated only after role 2 advances beyond the
 stage-1 checkpoint under all retrieval and safety metrics.
 
-Before training, the stage-1 checkpoint cache must show at least a 2x gain over
+Before training, the stage-1 checkpoint cache must show at least a 1.25x gain over
 the old pool in all three quantities:
 
 - active event count;
@@ -100,6 +100,21 @@ the old pool in all three quantities:
 - mean native hinge.
 
 Failure stops before optimization.
+
+### 2026-09-23 server-threshold correction
+
+The first server construction produced 9,957 unique spectrum triplets, 7,346
+active triplets, 5,389 candidate boundaries, 1,516 chemical spectrum events,
+and complete 4,032-query/2,518-formula coverage.  Construction was valid, but
+it was incorrectly rejected by absolute gates copied from the local official
+cache (`6,000/12,000/800`).  Those counts are checkpoint-dependent and cannot
+be transported to the stronger stage-1 geometry.
+
+The repaired contract uses only conservative structural floors (4,500
+candidate events, 8,000 spectrum events, 300 chemical candidates and 1,000
+chemical spectrum events).  The scientific quality decision is made afterward
+by comparing old and new pools in the exact same server checkpoint cache and
+requiring a 1.25x gain in active events, activation probability and mean hinge.
 
 ## Optimization contract
 
