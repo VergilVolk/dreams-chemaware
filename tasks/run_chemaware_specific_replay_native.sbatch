@@ -81,7 +81,7 @@ python -u tasks/build_chemaware_specific_replay_native_triplets.py \
   --pair-bank "$PAIR_BANK" \
   --manifest data/validation/chemaware_corrected_candidate_manifest_v1/manifest.npz \
   --data data/models/MassSpecGym_MurckoHist_split.hdf5 \
-  --output "$BANK" --chemical-events-per-query 4 \
+  --output "$BANK" --chemical-events-per-query 2 \
   --maximum-null-candidate-agreement 2 \
   --min-train-queries 3500 --min-specific-chemical-events 300 \
   --min-specific-chemical-queries 150 --min-chemical-fraction 0.06 \

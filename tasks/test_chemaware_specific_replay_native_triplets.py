@@ -134,7 +134,7 @@ def main() -> None:
         assert "--maximum-null-candidate-agreement 2" in text
         assert "--candidates-per-query 8" in text
         assert "--chemical-candidates-per-query 2" in text
-        assert "--chemical-events-per-query 4" in text
+        assert "--chemical-events-per-query 2" in text
         assert "--max-null-event-hinge-gap 0.25" in text
         assert "--max-steps 1000 --checkpoint-mode fixed_steps" in text
         assert "--save-every-n-steps 250" in text

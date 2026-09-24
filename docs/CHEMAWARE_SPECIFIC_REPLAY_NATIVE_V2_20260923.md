@@ -36,7 +36,7 @@ Only the empirical event distribution changes:
    all coverage and active-gradient gates.  Agreement 3 is forbidden because it
    would admit candidates shared by every null and provide no counterfactual
    chemical specificity.
-4. Cap retained chemical events at four per query and order them by lower null
+4. Cap retained chemical events at two per query and order them by lower null
    agreement, native hinge, and activation. The final curriculum keeps exactly
    one checkpoint-hard safety boundary for all 4,032 queries; it is not the
    earlier 9,957-event pair-expanded training pool.
@@ -75,3 +75,21 @@ identical.
 
 The experiment may establish a larger incremental gain, but no gain is claimed
 before the role-2 and role-3 reports exist.
+
+## 2026-09-24 local dose audit
+
+The official-embedding cache was used only as a conservative, local structural
+proxy; these are not retrieval results and the server must rebuild the pool in
+the stage-1 checkpoint geometry.  With the same directional candidate bank and
+the same correct-vs-three-null geometry constraints:
+
+| chemical-event cap per query | selected null agreement | chemical events | chemical queries | active chemical fraction |
+|---:|---:|---:|---:|---:|
+| 1 | 1 | 295 | 295 | 13.52% |
+| 2 | 1 | 522 | 296 | 21.67% |
+| 4 | 1 | 759 | 297 | 28.68% |
+
+Cap 1 misses the predeclared 15% active-gradient floor. Cap 4 adds 237 events
+over cap 2 while covering only one additional query. Cap 2 is therefore the
+minimum sufficient residual dose. This explicitly rejects the failed strategy
+of treating more active triplets as intrinsically better.
