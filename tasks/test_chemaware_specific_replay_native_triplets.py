@@ -14,6 +14,7 @@ from build_chemaware_specific_replay_native_triplets import (
     matched_null_schedule,
     matched_geometry_audit,
     prune_to_matched_null_capacity,
+    prune_to_matched_null_geometry,
     select_safety,
     select_specific_schedule,
     validate_source_pool,
@@ -80,6 +81,28 @@ def main() -> None:
         correct, nulls, safety, schedule,
     )
     assert removed == 0
+    geometry_schedule, geometry_removed = prune_to_matched_null_geometry(
+        correct, nulls, safety, schedule,
+        max_mean_hinge_gap=0.05, max_mean_activation_gap=0.10,
+        max_event_hinge_gap=0.25, max_event_activation_gap=0.25,
+    )
+    assert geometry_removed >= 0
+    for arm_pool in nulls.values():
+        matched_geometry = matched_null_schedule(
+            arm_pool, geometry_schedule, correct, safety,
+        )
+        correct_geometry_pool = compose_pool(
+            correct, safety, correct, geometry_schedule, SPECIFIC_CHEMISTRY,
+        )
+        null_geometry_pool = compose_pool(
+            correct, safety, arm_pool, matched_geometry, MATCHED_NULL,
+        )
+        assert matched_geometry_audit(
+            correct_geometry_pool, null_geometry_pool,
+        )["mean_absolute_hinge_gap"] <= 0.05
+        assert matched_geometry_audit(
+            correct_geometry_pool, null_geometry_pool,
+        )["maximum_absolute_hinge_gap"] <= 0.25
     correct_output = compose_pool(
         correct, safety, correct, schedule, SPECIFIC_CHEMISTRY,
     )
@@ -110,8 +133,13 @@ def main() -> None:
         assert "--require-positive-formula-ci" in text
         assert "--maximum-null-candidate-agreement 2" in text
         assert "--candidates-per-query 8" in text
-        assert "--chemical-candidates-per-query 5" in text
+        assert "--chemical-candidates-per-query 2" in text
         assert "--chemical-events-per-query 4" in text
+        assert "--max-null-event-hinge-gap 0.25" in text
+        assert "--max-steps 1000 --checkpoint-mode fixed_steps" in text
+        assert "--save-every-n-steps 250" in text
+        assert "Expected four residual checkpoints" in text
+        assert "--max-steps 3000" not in text
     print("PASS: ChemAware specific-replay native-triplet contracts")
 
 

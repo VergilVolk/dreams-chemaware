@@ -67,6 +67,8 @@ def arguments() -> argparse.Namespace:
     parser.add_argument("--min-active-chemical-fraction", type=float, default=0.15)
     parser.add_argument("--max-null-mean-hinge-gap", type=float, default=0.05)
     parser.add_argument("--max-null-mean-activation-gap", type=float, default=0.10)
+    parser.add_argument("--max-null-event-hinge-gap", type=float, default=0.25)
+    parser.add_argument("--max-null-event-activation-gap", type=float, default=0.25)
     return parser.parse_args()
 
 
@@ -300,6 +302,116 @@ def prune_to_matched_null_capacity(
     return pruned, removed
 
 
+def prune_to_matched_null_geometry(
+    correct: Mapping[str, np.ndarray],
+    nulls: Mapping[str, Mapping[str, np.ndarray]],
+    safety: Mapping[int, int],
+    schedule: Mapping[int, list[int]],
+    max_mean_hinge_gap: float,
+    max_mean_activation_gap: float,
+    max_event_hinge_gap: float,
+    max_event_activation_gap: float,
+) -> tuple[dict[int, list[int]], int]:
+    """Prune worst-matched events until every null has comparable geometry.
+
+    Candidate specificity and optimizer geometry are separate constraints. A
+    chemically specific event can still have a much larger native hinge than
+    every available null event, which confounds a correct-vs-null comparison.
+    The check therefore happens before a profile is admitted. Events from
+    queries with multiple chemical constraints are removed first, preserving
+    query diversity whenever possible.
+    """
+    current = {int(query): list(indices) for query, indices in schedule.items()}
+    removed = 0
+    while True:
+        matches = {
+            name: matched_null_schedule(pool, current, correct, safety)
+            for name, pool in nulls.items()
+        }
+        if not any(current.values()):
+            return current, removed
+
+        hinge_by_arm: dict[str, list[float]] = {name: [] for name in nulls}
+        activation_by_arm: dict[str, list[float]] = {name: [] for name in nulls}
+        penalties: dict[tuple[int, int], float] = {}
+        ordered_keys: list[tuple[int, int]] = []
+        maximum_hinge: dict[tuple[int, int], float] = {}
+        maximum_activation: dict[tuple[int, int], float] = {}
+        for query, correct_indices in current.items():
+            for position, correct_index in enumerate(correct_indices):
+                event_key = (query, position)
+                ordered_keys.append(event_key)
+                hinge = float(correct["mean_hinge_at_mining"][correct_index])
+                activation = float(correct["activation_probability"][correct_index])
+                event_penalty = 0.0
+                event_hinge = 0.0
+                event_activation = 0.0
+                for name, pool in nulls.items():
+                    null_index = int(matches[name][query][position])
+                    hinge_gap = abs(
+                        float(pool["mean_hinge_at_mining"][null_index]) - hinge
+                    )
+                    activation_gap = abs(
+                        float(pool["activation_probability"][null_index]) - activation
+                    )
+                    hinge_by_arm[name].append(hinge_gap)
+                    activation_by_arm[name].append(activation_gap)
+                    event_hinge = max(event_hinge, hinge_gap)
+                    event_activation = max(event_activation, activation_gap)
+                    event_penalty = max(
+                        event_penalty,
+                        hinge_gap / max(float(max_event_hinge_gap), 1e-12),
+                        activation_gap / max(float(max_event_activation_gap), 1e-12),
+                    )
+                penalties[event_key] = event_penalty
+                maximum_hinge[event_key] = event_hinge
+                maximum_activation[event_key] = event_activation
+
+        geometry_ok = all(
+            float(np.mean(hinge_by_arm[name])) <= float(max_mean_hinge_gap)
+            and float(np.mean(activation_by_arm[name])) <= float(max_mean_activation_gap)
+            and float(np.max(hinge_by_arm[name])) <= float(max_event_hinge_gap)
+            and float(np.max(activation_by_arm[name])) <= float(max_event_activation_gap)
+            for name in nulls
+        )
+        if geometry_ok:
+            return current, removed
+
+        # Remove all event-level violations together. For a mean-only failure,
+        # remove the smallest frozen set of worst gaps needed by each failing
+        # arm under the current matching, then rematch. This avoids hundreds
+        # of full 4,032-query scans while retaining the same deterministic gate.
+        remove_keys = {
+            key for key in ordered_keys
+            if maximum_hinge[key] > float(max_event_hinge_gap)
+            or maximum_activation[key] > float(max_event_activation_gap)
+        }
+        if not remove_keys:
+            for values, threshold in (
+                (hinge_by_arm, float(max_mean_hinge_gap)),
+                (activation_by_arm, float(max_mean_activation_gap)),
+            ):
+                for name, gaps in values.items():
+                    if float(np.mean(gaps)) <= threshold:
+                        continue
+                    total = float(np.sum(gaps)); remaining = len(gaps)
+                    for index in sorted(
+                        range(len(gaps)), key=lambda value: gaps[value], reverse=True,
+                    ):
+                        remove_keys.add(ordered_keys[index])
+                        total -= float(gaps[index]); remaining -= 1
+                        if remaining == 0 or total / remaining <= threshold:
+                            break
+        for query in sorted({key[0] for key in remove_keys}):
+            positions = sorted(
+                (position for q, position in remove_keys if q == query),
+                reverse=True,
+            )
+            for position in positions:
+                current[query].pop(position)
+                removed += 1
+
+
 def compose_pool(
     safety_pool: Mapping[str, np.ndarray], safety: Mapping[int, int],
     event_pool: Mapping[str, np.ndarray], schedule: Mapping[int, list[int]],
@@ -443,6 +555,11 @@ def main() -> None:
         profile_schedule, removed = prune_to_matched_null_capacity(
             train_correct, train_nulls, train_safety, profile_schedule,
         )
+        profile_schedule, geometry_removed = prune_to_matched_null_geometry(
+            train_correct, train_nulls, train_safety, profile_schedule,
+            args.max_null_mean_hinge_gap, args.max_null_mean_activation_gap,
+            args.max_null_event_hinge_gap, args.max_null_event_activation_gap,
+        )
         profile_pool = compose_pool(
             train_correct, train_safety, train_correct, profile_schedule,
             SPECIFIC_CHEMISTRY,
@@ -469,6 +586,7 @@ def main() -> None:
         specificity_profiles[str(agreement)] = {
             "audit": profile,
             "matched_capacity_pruned_events": int(removed),
+            "matched_geometry_pruned_events": int(geometry_removed),
             "gates": profile_gates,
             "admissible": bool(all(profile_gates.values())),
         }
@@ -488,7 +606,7 @@ def main() -> None:
 
     pools: dict[tuple[str, str], dict[str, np.ndarray]] = {}
     audits: dict[str, dict[str, object]] = {}
-    capacity_pruned: dict[str, int] = {}
+    capacity_pruned: dict[str, dict[str, int]] = {}
     matching_audits: dict[str, dict[str, float | int]] = {}
     role_formulas: dict[str, set[str]] = {}
     for role in ("train", "selection", "confirmation"):
@@ -515,7 +633,15 @@ def main() -> None:
         schedule, removed = prune_to_matched_null_capacity(
             correct, nulls, safety, schedule,
         )
-        capacity_pruned[role] = int(removed)
+        schedule, geometry_removed = prune_to_matched_null_geometry(
+            correct, nulls, safety, schedule,
+            args.max_null_mean_hinge_gap, args.max_null_mean_activation_gap,
+            args.max_null_event_hinge_gap, args.max_null_event_activation_gap,
+        )
+        capacity_pruned[role] = {
+            "capacity": int(removed),
+            "geometry": int(geometry_removed),
+        }
         correct_output = compose_pool(
             correct, safety, correct, schedule, SPECIFIC_CHEMISTRY,
         )
@@ -586,6 +712,16 @@ def main() -> None:
             <= args.max_null_mean_activation_gap
             for value in matching_audits.values()
         ),
+        "null_event_hinge_geometry_matched": all(
+            float(value["maximum_absolute_hinge_gap"])
+            <= args.max_null_event_hinge_gap
+            for value in matching_audits.values()
+        ),
+        "null_event_activation_geometry_matched": all(
+            float(value["maximum_absolute_activation_gap"])
+            <= args.max_null_event_activation_gap
+            for value in matching_audits.values()
+        ),
         "outer_role_4_untouched": True,
     }
     if not all(gates.values()):
@@ -604,6 +740,12 @@ def main() -> None:
             args.maximum_null_candidate_agreement
         ),
         "maximum_null_candidate_agreement_selected": int(selected_null_agreement),
+        "matched_null_geometry_limits": {
+            "mean_hinge_gap": float(args.max_null_mean_hinge_gap),
+            "mean_activation_gap": float(args.max_null_mean_activation_gap),
+            "event_hinge_gap": float(args.max_null_event_hinge_gap),
+            "event_activation_gap": float(args.max_null_event_activation_gap),
+        },
         "specificity_profiles": specificity_profiles,
         "arms": ["correct", *NULL_NAMES],
         "roles": {

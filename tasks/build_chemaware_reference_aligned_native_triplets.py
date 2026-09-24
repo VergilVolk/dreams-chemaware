@@ -31,7 +31,6 @@ from build_chemaware_action_hard_native_triplets import load_npz, true_locals
 from build_chemaware_dreams_native_triplets import audit_identity_edges, molecule_rows
 from build_chemaware_residual_native_triplets import (
     cache_arrays,
-    chemical_order_key,
     metric_cache,
     positions,
     strict_negative_candidates,
@@ -173,6 +172,51 @@ def _base_order(false: np.ndarray, geometry: QueryGeometry) -> np.ndarray:
     ), dtype=np.int64)
 
 
+def chemical_rejection_order_key(
+    slot: int, row: int, center: int, metrics: Mapping[str, np.ndarray],
+    current_score: float, strict: bool,
+) -> tuple[float, ...]:
+    """Rank false candidates by *directed* chemical rejection.
+
+    A false candidate is useful as a ChemAware negative when the center arm
+    rejects it more strongly than the median of the other three arms.  Using
+    an absolute center-vs-null contrast is invalid here: it also rewards a
+    center arm that promotes the false candidate and makes the correct and
+    content-permuted arms select the same molecules.  Strict directional
+    correction/protection events retain first priority.
+    """
+    arms = metrics["action_top_fraction"].shape[0]
+    others = np.asarray([index for index in range(arms) if index != center])
+
+    def rejection(name: str) -> float:
+        values = metrics[name]
+        return float(np.median(values[others, row, slot]) - values[center, row, slot])
+
+    contrasts = (
+        rejection("action_top_fraction"),
+        rejection("action_largest_region_fraction"),
+        rejection("action_best_advantage_over_baseline"),
+        rejection("candidate_rule_max"),
+        rejection("delta_rule_max"),
+    )
+    positive = tuple(max(0.0, value) for value in contrasts)
+    rank = metrics["candidate_rule_rank_fraction"]
+    return (
+        float(strict),
+        float(sum(value > 0.0 for value in contrasts)),
+        *positive,
+        -float(rank[center, row, slot]),
+        -float(metrics["candidate_rule_max"][center, row, slot]),
+        -float(metrics["candidate_rule_top2_mean"][center, row, slot]),
+        -float(metrics["delta_rule_max"][center, row, slot]),
+        -float(metrics["delta_rule_top2_mean"][center, row, slot]),
+        -float(metrics["action_top_fraction"][center, row, slot]),
+        -float(metrics["action_largest_region_fraction"][center, row, slot]),
+        -float(metrics["action_same_neighbor_fraction"][center, row, slot]),
+        float(current_score),
+    )
+
+
 def select_candidate_slots(
     evidence: Mapping[str, np.ndarray], manifest: Mapping[str, np.ndarray],
     metrics: Mapping[str, np.ndarray], row: int, center: int,
@@ -205,7 +249,7 @@ def select_candidate_slots(
         candidate_slot = {
             int(proposed[slot]): int(slot)
             for slot in np.flatnonzero(valid)
-            if int(proposed[slot]) not in truth and int(proposed[slot]) not in selected
+            if int(proposed[slot]) not in truth
         }
         hardest_score = float(geometry.molecule_scores[int(ordered[0])])
         eligible = [
@@ -228,7 +272,7 @@ def select_candidate_slots(
         if eligible:
             def key(candidate: int) -> tuple[float, ...]:
                 if candidate in candidate_slot:
-                    chemistry = chemical_order_key(
+                    chemistry = chemical_rejection_order_key(
                         candidate_slot[candidate], row, center, metrics,
                         float(geometry.molecule_scores[candidate]), candidate in strict,
                     )
@@ -240,10 +284,10 @@ def select_candidate_slots(
                     float(geometry.activation_probability[candidate]),
                 )
             chemical_budget = min(
-                int(chemical_candidates_per_query), budget - len(selected),
+                int(chemical_candidates_per_query), budget,
             )
             for chemical in sorted(eligible, key=key, reverse=True)[:chemical_budget]:
-                tag = CHEMICAL_HARD
+                tag = selected.get(int(chemical), 0) | CHEMICAL_HARD
                 if chemical in strict:
                     tag |= STRICT_SPECIFIC
                 selected[int(chemical)] = tag

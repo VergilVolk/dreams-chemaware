@@ -12,6 +12,7 @@ from build_chemaware_reference_aligned_native_triplets import (
     SECONDARY_HARD,
     STRICT_SPECIFIC,
     QueryGeometry,
+    chemical_rejection_order_key,
     retain_query_events,
     select_candidate_slots,
 )
@@ -70,6 +71,29 @@ def main() -> None:
     assert chosen[2] & SECONDARY_HARD
     assert chosen[3] & CHEMICAL_HARD
     assert chosen[3] & STRICT_SPECIFIC
+
+    # A chemically justified candidate must retain its chemical role when it
+    # is already the checkpoint-hardest false molecule.  The historical code
+    # silently left such candidates tagged as generic safety events.
+    hardest_protection = np.asarray([[True, False, False]])
+    chosen = dict(select_candidate_slots(
+        evidence, manifest, metrics, 0, 0, correction, hardest_protection, geometry,
+        candidates_per_query=3, chemical_hardness_window=0.5,
+        min_chemical_activation_probability=0.05,
+        chemical_candidates_per_query=1,
+    ))
+    assert chosen[1] & PRIMARY_HARD
+    assert chosen[1] & CHEMICAL_HARD
+    assert chosen[1] & STRICT_SPECIFIC
+
+    # Direction matters: prefer a false candidate rejected by the center arm,
+    # not one promoted by it with an equally large absolute contrast.
+    signed = {name: value.copy() for name, value in metrics.items()}
+    signed["candidate_rule_max"][:, 0, 1] = (0.0, 0.8, 0.8, 0.8)
+    signed["candidate_rule_max"][:, 0, 2] = (0.8, 0.0, 0.0, 0.0)
+    rejected_key = chemical_rejection_order_key(1, 0, 0, signed, 0.76, False)
+    promoted_key = chemical_rejection_order_key(2, 0, 0, signed, 0.74, False)
+    assert rejected_key > promoted_key
 
     # A chemically suggested candidate with no active native hinge cannot
     # displace the arm-independent hard fallback.

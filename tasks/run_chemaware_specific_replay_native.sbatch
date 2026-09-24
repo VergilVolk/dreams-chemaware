@@ -21,7 +21,7 @@ EVIDENCE="data/validation/chemaware_high_coverage_native/run_2340524/evidence"
 SOURCE_RUN="data/validation/chemaware_pair_expanded_native/run_2342187"
 CACHE="$SOURCE_RUN/stage1_embedding_cache"
 OUT="data/validation/chemaware_specific_replay_native/run_${SLURM_JOB_ID}"
-PAIR_BANK="$OUT/wide_pair_expanded_triplets"
+PAIR_BANK="$OUT/candidate_discovery_bank"
 BANK="$OUT/specific_replay_triplets"
 CORRECT="$OUT/training_correct"
 
@@ -55,16 +55,17 @@ done
 
 python -u tasks/test_chemaware_specific_replay_native_triplets.py
 
-# Re-open the complete frozen candidate tensor.  The previous bank allowed two
-# chemical candidates per query; that discretization left only 103 queries
-# after counterfactual matching.  Five chemically ranked candidates are now
-# retained before the same strict correct-vs-null replay filter is applied.
+# This is a discovery bank, not the optimizer curriculum. Re-open the frozen
+# candidate tensor to recover at most two directional chemical candidates;
+# generic fallback events below are discarded by the specific-replay builder.
+# Keeping two candidates prevents the four arms from manufacturing agreement
+# merely by exhausting the same small candidate set.
 python -u tasks/build_chemaware_reference_aligned_native_triplets.py \
   --evidence-dir "$EVIDENCE" --embedding-cache "$CACHE" \
   --manifest data/validation/chemaware_corrected_candidate_manifest_v1/manifest.npz \
   --data data/models/MassSpecGym_MurckoHist_split.hdf5 \
   --output "$PAIR_BANK" --margin 0.1 --candidates-per-query 8 \
-  --chemical-candidates-per-query 5 \
+  --chemical-candidates-per-query 2 \
   --negative-references-per-candidate 2 \
   --explicit-positive-references-per-negative 2 \
   --max-active-spectrum-events-per-query 18 \
@@ -85,11 +86,14 @@ python -u tasks/build_chemaware_specific_replay_native_triplets.py \
   --min-train-queries 3500 --min-specific-chemical-events 300 \
   --min-specific-chemical-queries 150 --min-chemical-fraction 0.06 \
   --min-active-chemical-fraction 0.15 \
-  --max-null-mean-hinge-gap 0.05 --max-null-mean-activation-gap 0.10
+  --max-null-mean-hinge-gap 0.05 --max-null-mean-activation-gap 0.10 \
+  --max-null-event-hinge-gap 0.25 --max-null-event-activation-gap 0.25
 
 # The model, optimizer, preprocessing and loss remain the native DreaMS stack.
-# A smaller LR reflects that this is a residual continuation from the confirmed
-# +1.8144 pp stage-1 checkpoint, not a fresh full fine-tune.
+# This is a low-dose residual continuation from the confirmed +1.8144 pp
+# checkpoint. The failed pair-expanded run showed that 2,000--3,000 further
+# steps can exchange corrections for new errors, so this run is capped below
+# one complete pass through the approximately 4.8k-event curriculum.
 srun --export=ALL --preserve-env python -u tasks/train_chemaware_dreams_native.py \
   --data data/models/MassSpecGym_MurckoHist_split.hdf5 \
   --train-pool "$BANK/train_pool.npz" --val-pool "$BANK/selection_pool.npz" \
@@ -97,16 +101,16 @@ srun --export=ALL --preserve-env python -u tasks/train_chemaware_dreams_native.p
   --architecture-checkpoint dreams/models/pretrained/ssl_model_server.pt \
   --output "$CORRECT" --seed 3407 --lr 3e-6 --weight-decay 0 \
   --triplet-loss-margin 0.1 --batch-size 4 --num-workers 0 \
-  --max-epochs 20 --max-steps 3000 --checkpoint-mode fixed_steps \
-  --save-every-n-steps 500 --n-highest-peaks 100 --device cuda
+  --max-epochs 2 --max-steps 1000 --checkpoint-mode fixed_steps \
+  --save-every-n-steps 250 --n-highest-peaks 100 --device cuda
 
 checkpoint_args=(
   --checkpoint "official=data/e1/official_embedding_slim.pt"
   --checkpoint "stage1_base=$BASE_CHECKPOINT"
 )
 mapfile -t trained_checkpoints < <(find "$CORRECT" -maxdepth 1 -type f -name 'step-*.ckpt' | sort)
-[[ ${#trained_checkpoints[@]} -eq 6 ]] || {
-  echo "Expected six specific-replay checkpoints, found ${#trained_checkpoints[@]}" >&2
+[[ ${#trained_checkpoints[@]} -eq 4 ]] || {
+  echo "Expected four residual checkpoints, found ${#trained_checkpoints[@]}" >&2
   exit 5
 }
 for checkpoint in "${trained_checkpoints[@]}"; do
