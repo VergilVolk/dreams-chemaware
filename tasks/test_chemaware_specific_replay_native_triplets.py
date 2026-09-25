@@ -1,6 +1,7 @@
 """CPU contracts for ChemAware counterfactual-specific safety replay pools."""
 from __future__ import annotations
 
+import ast
 from pathlib import Path
 
 import numpy as np
@@ -139,7 +140,46 @@ def main() -> None:
         assert "--max-steps 1000 --checkpoint-mode fixed_steps" in text
         assert "--save-every-n-steps 250" in text
         assert "Expected four residual checkpoints" in text
+        assert text.count("train_chemaware_specific_replay_native.py") == 4
+        assert "train_chemaware_specific_replay_native.py --help" in text
+        assert "python -u tasks/train_chemaware_dreams_native.py" not in text
+        assert "correct_checkpoint_sha256.tsv" in text
+        assert "1073741824" in text
+        assert "/bin/rm -f -- \"$checkpoint\"" in text
+        assert "$null_output/last.ckpt" not in text
+        assert "Expected one compact null checkpoint" in text
         assert "--max-steps 3000" not in text
+        compact_entry = (
+            Path(__file__).resolve().parent
+            / "train_chemaware_specific_replay_native.py"
+        ).read_text(encoding="utf-8")
+        compact_tree = ast.parse(compact_entry)
+        progress_class = next(
+            node for node in compact_tree.body
+            if isinstance(node, ast.ClassDef)
+            and node.name == "ChemAwareSlurmLineProgress"
+        )
+        batch_end = next(
+            node for node in progress_class.body
+            if isinstance(node, ast.FunctionDef) and node.name == "on_train_batch_end"
+        )
+        assert len(batch_end.body) == 1 and isinstance(batch_end.body[0], ast.If)
+        assert "import train_chemaware_dreams_native as native" in compact_entry
+        assert 'kwargs["save_last"] = False' in compact_entry
+        assert 'kwargs["save_weights_only"] = True' in compact_entry
+        assert "native.SlurmLineProgress = ChemAwareSlurmLineProgress" in compact_entry
+        assert "def forward(" not in compact_entry
+        assert "def training_step(" not in compact_entry
+        assert "def configure_optimizers(" not in compact_entry
+        for noise_path in (
+            Path(__file__).resolve().parent / "run_noise_dreams_native_2gpu.sbatch",
+            Path(__file__).resolve().parent / "evaluate_noise_dreams_native.py",
+            Path(__file__).resolve().parent / "train_noise_reference_native.py",
+        ):
+            if noise_path.exists():
+                assert "train_chemaware_specific_replay_native" not in noise_path.read_text(
+                    encoding="utf-8"
+                )
     print("PASS: ChemAware specific-replay native-triplet contracts")
 
 

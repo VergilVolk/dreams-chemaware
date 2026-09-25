@@ -39,6 +39,7 @@ required_files=(
   tasks/build_chemaware_specific_replay_native_triplets.py
   tasks/test_chemaware_specific_replay_native_triplets.py
   tasks/train_chemaware_dreams_native.py
+  tasks/train_chemaware_specific_replay_native.py
   tasks/evaluate_chemaware_v2_direct_triplet.py
   tasks/select_chemaware_residual_checkpoint.py
   data/validation/chemaware_corrected_candidate_manifest_v1/manifest.npz
@@ -54,6 +55,7 @@ for required_file in "${required_files[@]}"; do
 done
 
 python -u tasks/test_chemaware_specific_replay_native_triplets.py
+python -u tasks/train_chemaware_specific_replay_native.py --help >/dev/null
 
 # This is a discovery bank, not the optimizer curriculum. Re-open the frozen
 # candidate tensor to recover at most two directional chemical candidates;
@@ -94,7 +96,7 @@ python -u tasks/build_chemaware_specific_replay_native_triplets.py \
 # checkpoint. The failed pair-expanded run showed that 2,000--3,000 further
 # steps can exchange corrections for new errors, so this run is capped below
 # one complete pass through the approximately 4.8k-event curriculum.
-srun --export=ALL --preserve-env python -u tasks/train_chemaware_dreams_native.py \
+srun --export=ALL --preserve-env python -u tasks/train_chemaware_specific_replay_native.py \
   --data data/models/MassSpecGym_MurckoHist_split.hdf5 \
   --train-pool "$BANK/train_pool.npz" --val-pool "$BANK/selection_pool.npz" \
   --official-checkpoint "$BASE_CHECKPOINT" \
@@ -113,6 +115,21 @@ mapfile -t trained_checkpoints < <(find "$CORRECT" -maxdepth 1 -type f -name 'st
   echo "Expected four residual checkpoints, found ${#trained_checkpoints[@]}" >&2
   exit 5
 }
+
+# Preserve immutable provenance before removing role-2-rejected weights.  The
+# evaluation JSON keeps the paired metrics; this ledger keeps content identity.
+CHECKPOINT_LEDGER="$OUT/correct_checkpoint_sha256.tsv"
+printf 'sha256\tbytes\tpath\n' > "$CHECKPOINT_LEDGER"
+for checkpoint in "${trained_checkpoints[@]}"; do
+  checkpoint_sha256="$(sha256sum "$checkpoint" | awk '{print $1}')"
+  checkpoint_bytes="$(stat -c '%s' "$checkpoint")"
+  [[ "$checkpoint_bytes" -le 1073741824 ]] || {
+    echo "Weights-only checkpoint unexpectedly exceeds 1 GiB: $checkpoint ($checkpoint_bytes bytes)" >&2
+    exit 7
+  }
+  printf '%s\t%s\t%s\n' \
+    "$checkpoint_sha256" "$checkpoint_bytes" "$checkpoint" >> "$CHECKPOINT_LEDGER"
+done
 for checkpoint in "${trained_checkpoints[@]}"; do
   stem="$(basename "$checkpoint" .ckpt)"
   checkpoint_args+=(--checkpoint "specific_${stem}=$checkpoint")
@@ -133,16 +150,28 @@ SELECTED="$(tr -d '\r\n' < "$OUT/checkpoint_selection.checkpoint.txt")"
 SELECTED_STEP="$(tr -d '\r\n' < "$OUT/checkpoint_selection.step.txt")"
 
 if [[ "$SELECTED_STEP" == "0" ]]; then
+  for checkpoint in "${trained_checkpoints[@]}"; do
+    /bin/rm -f -- "$checkpoint"
+  done
   echo "COMPLETE: specific chemical replay did not pass the frozen role-2 gate"
   exit 0
 fi
+
+SELECTED_REAL="$(realpath "$SELECTED")"
+for checkpoint in "${trained_checkpoints[@]}"; do
+  checkpoint_real="$(realpath "$checkpoint")"
+  if [[ "$checkpoint_real" != "$SELECTED_REAL" ]]; then
+    /bin/rm -f -- "$checkpoint"
+  fi
+done
+test -f "$SELECTED_REAL"
 
 # Only a role-2-qualified correct arm earns the three exact-schedule null runs.
 null_names=(content_permuted content_permuted_b content_permuted_c)
 null_checkpoints=()
 for null_name in "${null_names[@]}"; do
   null_output="$OUT/training_${null_name}"
-  srun --export=ALL --preserve-env python -u tasks/train_chemaware_dreams_native.py \
+  srun --export=ALL --preserve-env python -u tasks/train_chemaware_specific_replay_native.py \
     --data data/models/MassSpecGym_MurckoHist_split.hdf5 \
     --train-pool "$BANK/train_pool_${null_name}.npz" \
     --val-pool "$BANK/selection_pool_${null_name}.npz" \
@@ -152,7 +181,16 @@ for null_name in "${null_names[@]}"; do
     --triplet-loss-margin 0.1 --batch-size 4 --num-workers 0 \
     --max-epochs 20 --max-steps "$SELECTED_STEP" --checkpoint-mode fixed_steps \
     --save-every-n-steps "$SELECTED_STEP" --n-highest-peaks 100 --device cuda
-  null_checkpoints+=(--checkpoint "null_${null_name}=$null_output/last.ckpt")
+  mapfile -t produced_null_checkpoints < <(
+    find "$null_output" -maxdepth 1 -type f -name 'step-*.ckpt' | sort
+  )
+  [[ ${#produced_null_checkpoints[@]} -eq 1 ]] || {
+    echo "Expected one compact null checkpoint for $null_name, found ${#produced_null_checkpoints[@]}" >&2
+    exit 6
+  }
+  null_checkpoints+=(
+    --checkpoint "null_${null_name}=${produced_null_checkpoints[0]}"
+  )
 done
 
 srun --export=ALL --preserve-env python -u tasks/evaluate_chemaware_v2_direct_triplet.py \
