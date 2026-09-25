@@ -1,5 +1,10 @@
 # ChemAware fixed-budget surgical native curriculum
 
+> Status: `STOPPED_BEFORE_GPU_SUBMISSION / SUPERSEDED`.  This proposal focused
+> on matched semantic attribution rather than the demonstrated max-reference
+> sampling and error-budget bottlenecks.  It must not be submitted.  The active
+> performance experiment is `CHEMAWARE_MAX_BOUNDARY_NATIVE_V4_20260925.md`.
+
 ## Decision
 
 The next embedding experiment is a joint retraining from the official DreaMS

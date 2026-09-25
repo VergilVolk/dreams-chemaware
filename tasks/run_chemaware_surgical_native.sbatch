@@ -9,6 +9,8 @@
 #SBATCH --error=data/validation/chem_surgical_%j.err
 
 set -euo pipefail
+echo "STOPPED: superseded by tasks/run_chemaware_max_boundary_native.sbatch; no GPU work was authorized" >&2
+exit 2
 cd /data02/run01/scv7tsl/DreaMS
 source /data02/home/scv7tsl/run/miniconda3/etc/profile.d/conda.sh
 conda activate dreams
