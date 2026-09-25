@@ -31,7 +31,7 @@ from build_chemaware_action_hard_native_triplets import (
     OFFICIAL_HARD,
     SPECIFIC_HARD,
 )
-from build_chemaware_dreams_native_triplets import audit_identity_edges
+from build_chemaware_dreams_native_triplets import audit_identity_edges, molecule_rows
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -73,6 +73,13 @@ def arguments() -> argparse.Namespace:
     parser.add_argument("--dreams-replay-events", type=int, default=1024)
     parser.add_argument("--seed", type=int, default=3407)
     parser.add_argument("--min-error-event-fraction", type=float, default=0.20)
+    parser.add_argument(
+        "--current-geometry-remine", action="store_true",
+        help=(
+            "Recompute each training query's current hardest false molecule from "
+            "the complete candidate graph instead of reusing the official baseline."
+        ),
+    )
     return parser.parse_args()
 
 
@@ -307,9 +314,158 @@ def build_focused_pool(
         "error_official_max_boundary_events": int(error_official_events),
         "error_chemical_max_boundary_events": int(error_chemical_events),
         "error_max_boundary_events": int(error_official_events + error_chemical_events),
-        "minimum_events_per_error_query": int(min(error_query_event_counts.values())),
+        "minimum_events_per_error_query": int(
+            min(error_query_event_counts.values(), default=0)
+        ),
         "candidate_rows_examined": int(candidate_rows_examined),
         "inactive_chemical_candidates_rejected": int(inactive_chemical_candidates),
+    }
+
+
+def build_current_geometry_pool(
+    base: Mapping[str, np.ndarray], evidence: Mapping[str, np.ndarray],
+    manifest: Mapping[str, np.ndarray], cache: FrozenEmbeddings,
+    writer: PoolWriter, margin: float, negative_references_per_error: int,
+    chemical_candidates_per_error: int,
+) -> dict[str, object]:
+    """Re-mine the actual max-reference boundary under a current checkpoint."""
+    if negative_references_per_error < 1 or chemical_candidates_per_error < 0:
+        raise ValueError("invalid current-geometry event cap")
+    queries = np.asarray(evidence["query"], dtype=np.int64)
+    if len(np.unique(queries)) != len(queries):
+        raise RuntimeError("frozen evidence repeats training queries")
+    base_by_query: dict[int, list[int]] = {}
+    for event, query in enumerate(np.asarray(base["source_query"], dtype=np.int64)):
+        base_by_query.setdefault(int(query), []).append(event)
+    if set(base_by_query) != set(map(int, queries)):
+        raise RuntimeError("base triplet queries do not match remine evidence")
+
+    current_error_queries = current_correct_queries = 0
+    error_official_events = error_chemical_events = safe_events = 0
+    new_hardest_candidates = inactive_chemical_candidates = 0
+    error_query_event_counts: dict[int, int] = {}
+    for query in sorted(base_by_query):
+        anchor = int(manifest["query_row"][query])
+        anchor_embedding = cache.get([anchor])[0]
+        molecule_left, molecule_right = map(
+            int, manifest["query_ptr"][query:query + 2],
+        )
+        labels = np.asarray(
+            manifest["molecule_label"][molecule_left:molecule_right], dtype=bool,
+        )
+        true_candidates = np.flatnonzero(labels)
+        false_candidates = np.flatnonzero(~labels)
+        if not len(true_candidates) or not len(false_candidates):
+            raise RuntimeError(f"query {query} lacks a true or false candidate")
+        positive_rows = np.unique(np.concatenate([
+            molecule_rows(manifest, query, int(candidate))
+            for candidate in true_candidates
+        ]))
+        positive_rows = positive_rows[positive_rows != anchor]
+        if not len(positive_rows):
+            raise RuntimeError(f"query {query} lacks a distinct positive reference")
+        positive_scores = cache.get(positive_rows) @ anchor_embedding
+        positive_row = int(positive_rows[int(np.argmax(positive_scores))])
+        positive_score = float(np.max(positive_scores))
+
+        candidate_geometry: dict[int, tuple[np.ndarray, np.ndarray]] = {}
+        for candidate in false_candidates:
+            candidate = int(candidate)
+            rows = np.unique(molecule_rows(manifest, query, candidate))
+            scores = cache.get(rows) @ anchor_embedding
+            order = np.argsort(-scores, kind="stable")
+            candidate_geometry[candidate] = (rows[order], scores[order])
+        hardest_candidate = max(
+            map(int, false_candidates),
+            key=lambda candidate: float(candidate_geometry[candidate][1][0]),
+        )
+        hardest_score = float(candidate_geometry[hardest_candidate][1][0])
+        current_error = hardest_score >= positive_score
+
+        base_tags = {
+            int(base["negative_candidate"][event]): int(base["source_tag"][event])
+            for event in base_by_query[query]
+        }
+        if hardest_candidate not in base_tags:
+            new_hardest_candidates += 1
+        hardest_tag = base_tags.get(hardest_candidate, 0) | OFFICIAL_HARD
+
+        if not current_error:
+            current_correct_queries += 1
+            writer.append(
+                anchor, [positive_row],
+                [int(candidate_geometry[hardest_candidate][0][0])],
+                query, hardest_candidate, hardest_tag, SAFE_MAX_BOUNDARY,
+            )
+            safe_events += 1
+            continue
+
+        current_error_queries += 1
+        selected: list[tuple[int, int, int]] = [
+            (hardest_candidate, hardest_tag, ERROR_OFFICIAL_MAX_BOUNDARY),
+        ]
+        chemical: list[tuple[int, int, float]] = []
+        for candidate, tag in base_tags.items():
+            if candidate == hardest_candidate or not (tag & (ACTION_HARD | SPECIFIC_HARD)):
+                continue
+            if candidate not in candidate_geometry:
+                raise RuntimeError("base chemical candidate is absent from current graph")
+            maximum_hinge = (
+                margin + float(candidate_geometry[candidate][1][0]) - positive_score
+            )
+            if maximum_hinge <= 0.0:
+                inactive_chemical_candidates += 1
+                continue
+            chemical.append((candidate, tag, maximum_hinge))
+        chemical.sort(key=lambda row: (
+            bool(row[1] & SPECIFIC_HARD), row[2], -row[0],
+        ), reverse=True)
+        selected.extend(
+            (candidate, tag, ERROR_CHEMICAL_MAX_BOUNDARY)
+            for candidate, tag, _ in chemical[:chemical_candidates_per_error]
+        )
+
+        before = len(writer.anchor)
+        for candidate, tag, role in selected:
+            rows, scores = candidate_geometry[candidate]
+            active = rows[(margin + scores - positive_score) > 0.0]
+            if not len(active):
+                if role == ERROR_OFFICIAL_MAX_BOUNDARY:
+                    raise RuntimeError(
+                        f"current-error query {query} has no active hardest boundary"
+                    )
+                continue
+            for negative_row in active[:negative_references_per_error]:
+                writer.append(
+                    anchor, [positive_row], [int(negative_row)], query,
+                    candidate, tag, role,
+                )
+                if role == ERROR_OFFICIAL_MAX_BOUNDARY:
+                    error_official_events += 1
+                else:
+                    error_chemical_events += 1
+        error_query_event_counts[query] = len(writer.anchor) - before
+        if error_query_event_counts[query] < 1:
+            raise RuntimeError(f"current-error query {query} produced no event")
+
+    return {
+        "queries": int(len(queries)),
+        "official_error_queries": int(current_error_queries),
+        "official_correct_queries": int(current_correct_queries),
+        "safe_max_boundary_events": int(safe_events),
+        "error_official_max_boundary_events": int(error_official_events),
+        "error_chemical_max_boundary_events": int(error_chemical_events),
+        "error_max_boundary_events": int(error_official_events + error_chemical_events),
+        "minimum_events_per_error_query": int(
+            min(error_query_event_counts.values(), default=0)
+        ),
+        "candidate_rows_examined": int(sum(
+            int(manifest["query_ptr"][query + 1] - manifest["query_ptr"][query])
+            for query in queries
+        )),
+        "inactive_chemical_candidates_rejected": int(inactive_chemical_candidates),
+        "new_current_hardest_candidates": int(new_hardest_candidates),
+        "geometry": "current checkpoint complete-candidate max-reference scores",
     }
 
 
@@ -345,10 +501,16 @@ def main() -> None:
     replay = load_npz(args.dreams_replay_pool)
     cache = FrozenEmbeddings(args.embedding_rows, args.official_embeddings)
     writer = PoolWriter()
-    focused = build_focused_pool(
-        base, evidence, cache, writer, args.margin,
-        args.negative_references_per_error, args.chemical_candidates_per_error,
-    )
+    if args.current_geometry_remine:
+        focused = build_current_geometry_pool(
+            base, evidence, manifest, cache, writer, args.margin,
+            args.negative_references_per_error, args.chemical_candidates_per_error,
+        )
+    else:
+        focused = build_focused_pool(
+            base, evidence, cache, writer, args.margin,
+            args.negative_references_per_error, args.chemical_candidates_per_error,
+        )
     replay_audit = append_dreams_replay(
         writer, replay, args.dreams_replay_events, args.seed,
     )
@@ -367,7 +529,8 @@ def main() -> None:
     gates = {
         "all_training_queries_covered": focused["queries"] == len(scheduled_queries),
         "all_official_error_queries_covered": (
-            focused["minimum_events_per_error_query"] >= 1
+            focused["official_error_queries"] == 0
+            or focused["minimum_events_per_error_query"] >= 1
         ),
         "focused_events_are_singleton_max_boundaries": focused_singleton,
         "no_chemical_event_on_official_correct_query": int(np.sum(
@@ -402,6 +565,7 @@ def main() -> None:
         "margin": float(args.margin),
         "negative_references_per_error": int(args.negative_references_per_error),
         "chemical_candidates_per_error": int(args.chemical_candidates_per_error),
+        "current_geometry_remine": bool(args.current_geometry_remine),
         "focused": focused,
         "dreams_replay": replay_audit,
         "total_events": int(len(output["anchor_idx"])),
