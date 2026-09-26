@@ -29,6 +29,7 @@ SOURCE_FILES = (
     "tasks/select_chemaware_residual_checkpoint.py",
     "tasks/freeze_chemaware_true_support_artifact.py",
     "tasks/test_chemaware_dense_true_support_native.py",
+    "tasks/recover_chemaware_dense_true_support_run_2344909.sbatch",
     "tasks/run_chemaware_dense_true_support_native.sbatch",
     "tasks/run_chemaware_true_support_native.sbatch",
 )

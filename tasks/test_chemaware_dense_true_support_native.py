@@ -34,18 +34,23 @@ def test_executed_full_graph_construction() -> None:
     }
     with np.load(LOCAL / "train_pool.npz", allow_pickle=False) as pool:
         assert "sampling_weight" not in pool.files
-        assert len(pool["anchor_idx"]) == report["events"]["total"]
+        anchors = np.asarray(pool["anchor_idx"], dtype=np.int64)
+        positive_ptr = np.asarray(pool["positive_ptr"], dtype=np.int64)
+        positive_idx = np.asarray(pool["positive_idx"], dtype=np.int64)
+        negative_ptr = np.asarray(pool["negative_ptr"], dtype=np.int64)
+        negative_idx = np.asarray(pool["negative_idx"], dtype=np.int64)
+        assert len(anchors) == report["events"]["total"]
         signatures = set()
-        for event, anchor in enumerate(pool["anchor_idx"]):
-            p0, p1 = map(int, pool["positive_ptr"][event:event + 2])
-            n0, n1 = map(int, pool["negative_ptr"][event:event + 2])
+        for event, anchor in enumerate(anchors):
+            p0, p1 = map(int, positive_ptr[event:event + 2])
+            n0, n1 = map(int, negative_ptr[event:event + 2])
             signature = (
-                int(anchor), tuple(map(int, pool["positive_idx"][p0:p1])),
-                tuple(map(int, pool["negative_idx"][n0:n1])),
+                int(anchor), tuple(map(int, positive_idx[p0:p1])),
+                tuple(map(int, negative_idx[n0:n1])),
             )
             assert signature not in signatures
             signatures.add(signature)
-        assert len(signatures) == len(pool["anchor_idx"])
+        assert len(signatures) == len(anchors)
 
 
 def test_formal_builder_and_one_gpu_entrypoint() -> None:
@@ -69,6 +74,17 @@ def test_formal_builder_and_one_gpu_entrypoint() -> None:
     assert "--paired-reference phaseA_base --formula-role 2" in text
     assert "--require-positive-formula-ci" in text
     assert "tasks/run_noise" not in text
+
+    recovery = (
+        ROOT / "tasks/recover_chemaware_dense_true_support_run_2344909.sbatch"
+    ).read_text(encoding="utf-8")
+    assert "#SBATCH --gpus=1" in recovery
+    assert "#SBATCH --mem" not in recovery
+    assert "tasks/train_chemaware_dreams_native.py" not in recovery
+    assert "steps=(000250 000500 000750 001000 001250)" in recovery
+    assert 'checkpoint="$RUN/training/step-${step}.ckpt"' in recovery
+    assert "step-001500.ckpt" in recovery
+    assert "known-incomplete final checkpoint" in recovery
 
 
 def main() -> None:
