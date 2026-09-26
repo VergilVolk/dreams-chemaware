@@ -49,6 +49,7 @@ required_files=(
   tasks/train_chemaware_specific_replay_native.py
   tasks/evaluate_chemaware_v2_direct_triplet.py
   tasks/select_chemaware_residual_checkpoint.py
+  tasks/freeze_chemaware_phasea_2pp_artifact.py
 )
 for required_file in "${required_files[@]}"; do
   [[ -f "$required_file" ]] || {
@@ -159,11 +160,18 @@ SELECTED="$(tr -d '\r\n' < "$OUT/checkpoint_selection.checkpoint.txt")"
 SELECTED_STEP="$(tr -d '\r\n' < "$OUT/checkpoint_selection.step.txt")"
 
 if [[ "$SELECTED_STEP" == "0" ]]; then
-  /bin/rm -f -- "$PHASE_A_CHECKPOINT"
+  # A checkpoint can fail the incremental stage-1 gate while remaining a
+  # reproducible absolute improvement over official DreaMS.  Archive the exact
+  # +2.1266 pp Phase-A artifact before removing expendable Phase-B weights.
+  python -u tasks/freeze_chemaware_phasea_2pp_artifact.py \
+    --checkpoint "$PHASE_A_CHECKPOINT" \
+    --evaluation "$OUT/role2_checkpoint_evaluation.json" \
+    --triplet-report "$PHASE_A/triplets/report.json" \
+    --output "$OUT/protected_phase_a_2pp"
   for checkpoint in "${phase_b_checkpoints[@]}"; do
     /bin/rm -f -- "$checkpoint"
   done
-  echo "CHEMAWARE_DYNAMIC_REMINE_ROLE2_STOP: current-boundary remine did not safely beat +1.8144 pp"
+  echo "CHEMAWARE_DYNAMIC_REMINE_ROLE2_STOP: incremental gate failed; absolute +2.1266 pp Phase-A artifact protected"
   exit 0
 fi
 

@@ -1,0 +1,86 @@
+{
+  "status": "CHEMAWARE_PHASEA_2PP_ROLE2_EVIDENCE_FROZEN",
+  "run_id": "2343962",
+  "date": "2026-09-26",
+  "evidence_class": "ROLE2_DEVELOPMENT_RESULT_NOT_ROLE3_CONFIRMED",
+  "method": "max-reference-aligned ChemAware triplets plus unmodified DreaMS 10-ppm native replay",
+  "shared_embedding": true,
+  "reranker": false,
+  "distillation": false,
+  "custom_loss": false,
+  "custom_model": false,
+  "custom_optimizer": false,
+  "checkpoint": {
+    "historical_path": "/data02/run01/scv7tsl/DreaMS/data/validation/chemaware_max_boundary_remine/run_2343962/phase_a/training/step-002000.ckpt",
+    "sha256_before_historical_cleanup": "0a11e8dd44d18ac3f8500ed7ad48c586f7c61337e4535ad6317883988fb84180",
+    "kind": "official_embedding",
+    "optimizer_steps": 2000,
+    "seed": 3407,
+    "learning_rate": 0.000005,
+    "triplet_margin": 0.1,
+    "batch_size": 4
+  },
+  "formula_role": 2,
+  "queries": 1975,
+  "official": {
+    "recall1": 0.8962025316455696,
+    "recall3": 0.9843037974683544,
+    "recall5": 0.9939240506329113,
+    "recall10": 0.9979746835443037,
+    "recall20": 1.0,
+    "recall50": 1.0,
+    "mrr": 0.939887730619674,
+    "micro_auc": 0.9374444483934508,
+    "macro_auc": 0.9552286688678506
+  },
+  "phase_a_step_2000": {
+    "recall1": 0.9174683544303798,
+    "recall3": 0.9913924050632912,
+    "recall5": 0.9959493670886076,
+    "recall10": 0.9979746835443037,
+    "recall20": 1.0,
+    "recall50": 1.0,
+    "mrr": 0.9535324675324675,
+    "mean_positive_margin": 0.3700934946537018,
+    "micro_auc": 0.9460788300632443,
+    "macro_auc": 0.9668947043733658,
+    "mean_cosine_to_official_embedding": 0.7952901721000671
+  },
+  "paired_vs_official": {
+    "delta_recall1": 0.021265822784810127,
+    "delta_recall1_percentage_points": 2.1265822784810124,
+    "delta_mrr": 0.013644736912793443,
+    "corrected_at_1": 54,
+    "introduced_at_1": 12,
+    "net_corrected_at_1": 42,
+    "formula_cluster_bootstrap_delta_recall1_ci95": [
+      0.012761450292214895,
+      0.030303400755723492
+    ],
+    "formula_cluster_bootstrap_delta_recall1_ci95_percentage_points": [
+      1.2761450292214895,
+      3.030340075572349
+    ]
+  },
+  "paired_vs_released_stage1": {
+    "released_stage1_role2_recall1": 0.9113924050632911,
+    "delta_recall1": 0.0060759493670886075,
+    "corrected_at_1": 37,
+    "introduced_at_1": 25,
+    "risk_utility_corrected_minus_2x_introduced": -13,
+    "formula_cluster_bootstrap_delta_recall1_ci95": [
+      -0.001595944265399506,
+      0.014293202656578501
+    ],
+    "incremental_gate_passed": false
+  },
+  "interpretation": {
+    "absolute_official_improvement_supported": true,
+    "independent_role3_confirmation": false,
+    "released_model_replacement_authorized": false,
+    "dynamic_remine_improved_phase_a": false,
+    "allowed_claim": "On frozen formula role 2, the ChemAware Phase-A shared embedding improved Recall@1 over official DreaMS by 2.1266 percentage points.",
+    "forbidden_claim": "This result is not independently role-3 confirmed and must not be presented as an outer-tested released replacement for the +1.8144 pp checkpoint."
+  },
+  "reconstruction_entrypoint": "sbatch tasks/run_chemaware_phasea_2pp_protect.sbatch"
+}

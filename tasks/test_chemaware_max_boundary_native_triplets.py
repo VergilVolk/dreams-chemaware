@@ -129,6 +129,7 @@ def main() -> None:
     assert "encode_chemaware_checkpoint_manifest_rows.py" in remine
     assert "--official-checkpoint \"$PHASE_A_CHECKPOINT\"" in remine
     assert "--triplet-loss-margin 0.1" in remine
+    assert "freeze_chemaware_phasea_2pp_artifact.py" in remine
     print("PASS: ChemAware max-boundary native-triplet contracts")
 
 

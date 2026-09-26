@@ -68,3 +68,33 @@ Entry point:
 ```bash
 sbatch tasks/run_chemaware_max_boundary_remine.sbatch
 ```
+
+## Protected +2.1266 pp development artifact
+
+Run `2343962` reproduced the Phase-A result exactly on frozen role 2:
+
+- official Recall@1: `0.8962025316455696`;
+- Phase-A Recall@1: `0.9174683544303798`;
+- paired gain: `+0.021265822784810127`, or `+2.1266 pp`;
+- corrected / introduced top-1 outcomes: `54 / 12`;
+- formula-cluster 95% CI: `[+1.2761,+3.0303] pp`;
+- checkpoint SHA-256 before the old stop cleanup:
+  `0a11e8dd44d18ac3f8500ed7ad48c586f7c61337e4535ad6317883988fb84180`.
+
+This is a real shared-embedding result: the DreaMS backbone and projection
+head weights changed, and no reranker or candidate-side inference input was
+used.  Its evidence class remains `ROLE2_DEVELOPMENT_RESULT_NOT_ROLE3_CONFIRMED`.
+The independently confirmed release therefore remains the `+1.8144 pp`
+role-3 checkpoint.
+
+The historical stop branch may already have deleted the `run_2343962`
+checkpoint.  The exact low-cost reconstruction and immutable manifest entry is:
+
+```bash
+sbatch tasks/run_chemaware_phasea_2pp_protect.sbatch
+```
+
+The protection job reuses the original checkpoint if it is still present;
+otherwise it rebuilds only the 2,000-step Phase A, repeats role-2 evaluation,
+requires the exact `54/12` transition counts and `+2.1266 pp` gain, and stores
+the weights, evidence, hashes, and claim boundary under a new protected run.
