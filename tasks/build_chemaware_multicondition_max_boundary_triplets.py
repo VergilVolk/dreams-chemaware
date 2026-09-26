@@ -22,6 +22,7 @@ Formula roles 2--4 are never used by this builder.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
 import shutil
@@ -57,6 +58,59 @@ BASE_CHEMICAL_BOUNDARY = 3
 EXTRA_SAFE_BOUNDARY = 5
 EXTRA_ERROR_BOUNDARY = 6
 EXTRA_CHEMICAL_BOUNDARY = 7
+
+
+def pool_prefix_semantic_sha256(pool: Mapping[str, np.ndarray], events: int) -> str:
+    """Hash one CSR triplet prefix independent of compact integer dtypes."""
+    if events < 0 or events > len(pool["anchor_idx"]):
+        raise ValueError("invalid triplet-prefix length")
+    digest = hashlib.sha256()
+    for key in (
+        "anchor_idx", "source_query", "negative_candidate", "source_tag",
+        "curriculum_role",
+    ):
+        values = np.asarray(pool[key][:events], dtype=np.int64)
+        digest.update(key.encode("utf-8"))
+        digest.update(np.ascontiguousarray(values).tobytes())
+    for pointer_key, index_key in (
+        ("positive_ptr", "positive_idx"),
+        ("negative_ptr", "negative_idx"),
+    ):
+        pointers = np.asarray(pool[pointer_key][:events + 1], dtype=np.int64)
+        edge_count = int(pointers[-1]) if len(pointers) else 0
+        indices = np.asarray(pool[index_key][:edge_count], dtype=np.int64)
+        digest.update(pointer_key.encode("utf-8"))
+        digest.update(np.ascontiguousarray(pointers).tobytes())
+        digest.update(index_key.encode("utf-8"))
+        digest.update(np.ascontiguousarray(indices).tobytes())
+    return digest.hexdigest()
+
+
+def pool_prefix_equal(
+    expected: Mapping[str, np.ndarray], observed: Mapping[str, np.ndarray], events: int,
+) -> bool:
+    """Require exact semantic equality for every native-triplet prefix field."""
+    for key in (
+        "anchor_idx", "source_query", "negative_candidate", "source_tag",
+        "curriculum_role",
+    ):
+        if not np.array_equal(expected[key][:events], observed[key][:events]):
+            return False
+    for pointer_key, index_key in (
+        ("positive_ptr", "positive_idx"),
+        ("negative_ptr", "negative_idx"),
+    ):
+        expected_ptr = np.asarray(expected[pointer_key][:events + 1], dtype=np.int64)
+        observed_ptr = np.asarray(observed[pointer_key][:events + 1], dtype=np.int64)
+        if not np.array_equal(expected_ptr, observed_ptr):
+            return False
+        expected_edges = int(expected_ptr[-1])
+        observed_edges = int(observed_ptr[-1])
+        if expected_edges != observed_edges or not np.array_equal(
+            expected[index_key][:expected_edges], observed[index_key][:observed_edges],
+        ):
+            return False
+    return True
 
 
 def arguments() -> argparse.Namespace:
@@ -435,6 +489,11 @@ def main() -> None:
         base, evidence, cache, writer, args.margin,
         args.negative_references_per_error, args.chemical_candidates_per_error,
     )
+    base_focused_events = len(writer.anchor)
+    base_focused_snapshot = writer.arrays()
+    base_focused_sha256 = pool_prefix_semantic_sha256(
+        base_focused_snapshot, base_focused_events,
+    )
     selected_queries: list[int] = []
     selected_by_identity: dict[str, int] = {}
     geometry_by_query: dict[int, dict[str, object]] = {}
@@ -497,6 +556,12 @@ def main() -> None:
     replay_events = int(round(focused_events * args.replay_fraction / (1.0 - args.replay_fraction)))
     append_dreams_replay(writer, replay_pool, replay_events, args.seed)
     output = writer.arrays()
+    phase_a_prefix_immutable = pool_prefix_equal(
+        base_focused_snapshot, output, base_focused_events,
+    )
+    observed_base_focused_sha256 = pool_prefix_semantic_sha256(
+        output, base_focused_events,
+    )
     weights, weight_audit = identity_equal_sampling_weights(
         output, args.data, args.replay_fraction, args.error_sampling_fraction,
     )
@@ -519,6 +584,10 @@ def main() -> None:
     selected_folds = folds[selected_queries_array]
     gates = {
         "all_frozen_base_queries_retained": set(map(int, base_queries)).issubset(selected_queries),
+        "phase_a_base_event_prefix_immutable": (
+            phase_a_prefix_immutable
+            and observed_base_focused_sha256 == base_focused_sha256
+        ),
         "only_training_formula_roles_used": set(map(int, np.unique(selected_folds))) == {0, 1},
         "outer_roles_2_3_4_untouched": True,
         "anchor_cap_respected": max(selected_by_identity.values()) <= args.max_anchors_per_identity,
@@ -579,6 +648,12 @@ def main() -> None:
             "new_hardest_identity_extra_anchors": int(boundary_novel_extras),
             "identities_with_one_anchor": int(sum(value == 1 for value in selected_by_identity.values())),
             "identities_with_multiple_anchors": int(sum(value > 1 for value in selected_by_identity.values())),
+        },
+        "phase_a_base_preservation": {
+            "events": int(base_focused_events),
+            "semantic_sha256_before_expansion": base_focused_sha256,
+            "semantic_sha256_after_expansion": observed_base_focused_sha256,
+            "exact_prefix_equal": bool(phase_a_prefix_immutable),
         },
         "events": {
             **{key: int(value) for key, value in sorted(counts.items())},

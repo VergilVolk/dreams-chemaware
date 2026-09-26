@@ -1,4 +1,4 @@
-"""Freeze one short residual-continuation checkpoint on formula role 2."""
+"""Select one short residual-continuation checkpoint on formula role 2."""
 from __future__ import annotations
 
 import argparse
@@ -96,9 +96,12 @@ def main() -> None:
         ),
         "formula_role": 2,
         "base_name": args.base_name,
+        "advanced_beyond_base": advanced,
+        # Backward-compatible field retained for older consumers.  New code
+        # must use advanced_beyond_base because the comparator may be Phase A.
         "advanced_beyond_stage1": advanced,
         "selection_rule": (
-            "maximize corrected-2*introduced versus stage1; require positive "
+            f"maximize corrected-2*introduced versus {args.base_name}; require positive "
             "Recall@1 and MRR plus nonnegative Recall@3, micro-AUC and macro-AUC"
             + (
                 "; require strictly positive formula-cluster Recall@1 CI"

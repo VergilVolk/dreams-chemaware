@@ -129,6 +129,14 @@ cross-condition robustness. Formula role 4 remains inaccessible.
 
 No checkpoint is deleted automatically, including negative runs.
 
+If a role-2-advancing checkpoint reaches role 3, the checkpoint, selection
+ledger, triplet report, role-2 and role-3 evaluations, and full-role evaluation
+are atomically hard-linked or copied into `protected_artifact/` with both
+triplet pools, the training report, an exact source-code snapshot, a manifest,
+and recursive `SHA256SUMS`. A role-3 failure is still preserved, but its
+manifest is explicitly labelled role-2-only rather than a confirmed release
+candidate.
+
 ## Execution
 
 The only server command is:

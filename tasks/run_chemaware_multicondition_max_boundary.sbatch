@@ -70,6 +70,7 @@ required_files=(
   tasks/evaluate_chemaware_v2_direct_triplet.py
   tasks/evaluate_chemaware_full_role_native.py
   tasks/select_chemaware_residual_checkpoint.py
+  tasks/freeze_chemaware_multicondition_artifact.py
   tasks/test_chemaware_multicondition_max_boundary.py
 )
 for required_file in "${required_files[@]}"; do
@@ -166,8 +167,22 @@ srun --export=ALL --preserve-env python -u tasks/evaluate_chemaware_full_role_na
   --output "$OUT/role2_role3_full_evaluation.json" \
   --batch-size 64 --bootstrap-draws 5000 --device cuda
 
+python -u tasks/freeze_chemaware_multicondition_artifact.py \
+  --checkpoint "$SELECTED_REAL" \
+  --selection "$OUT/checkpoint_selection.json" \
+  --role2-evaluation "$OUT/role2_checkpoint_evaluation.json" \
+  --role3-evaluation "$OUT/role3_evaluation.json" \
+  --full-evaluation "$OUT/role2_role3_full_evaluation.json" \
+  --triplet-report "$OUT/triplets/report.json" \
+  --train-pool "$OUT/triplets/train_pool.npz" \
+  --val-pool "$OUT/triplets/val_pool.npz" \
+  --training-report "$OUT/training/report.json" \
+  --output "$OUT/protected_artifact"
+
 test -f "$OUT/triplets/report.json"
 test -f "$OUT/checkpoint_selection.json"
 test -f "$OUT/role3_evaluation.json"
 test -f "$OUT/role2_role3_full_evaluation.json"
+test -f "$OUT/protected_artifact/artifact_manifest.json"
+test -f "$OUT/protected_artifact/SHA256SUMS"
 echo "COMPLETE: ChemAware multi-condition max-boundary embedding -> $OUT"

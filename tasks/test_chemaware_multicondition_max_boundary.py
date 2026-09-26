@@ -12,6 +12,8 @@ from build_chemaware_multicondition_max_boundary_triplets import (
     append_query_events,
     condition_signature,
     identity_equal_sampling_weights,
+    pool_prefix_equal,
+    pool_prefix_semantic_sha256,
     query_geometry,
     select_identity_anchors,
 )
@@ -114,6 +116,22 @@ def sampling_contract() -> None:
     assert audit["replay"]["identities"] == 2
 
 
+def immutable_prefix_contract() -> None:
+    writer = PoolWriter()
+    writer.append(10, [11], [12], 1, 0, 1, 1)
+    writer.append(20, [21], [22], 2, 1, 2, 2)
+    frozen = writer.arrays()
+    expected_hash = pool_prefix_semantic_sha256(frozen, 2)
+    writer.append(30, [31], [32], 3, 2, 3, 3)
+    expanded = writer.arrays()
+    assert pool_prefix_equal(frozen, expanded, 2)
+    assert pool_prefix_semantic_sha256(expanded, 2) == expected_hash
+    changed = {key: value.copy() for key, value in expanded.items()}
+    changed["negative_idx"][0] = 99
+    assert not pool_prefix_equal(frozen, changed, 2)
+    assert pool_prefix_semantic_sha256(changed, 2) != expected_hash
+
+
 def full_role_metric_contract() -> None:
     ranks = np.asarray([1, 3, 1, 2], dtype=np.int32)
     positive = np.asarray([0.9, 0.4, 0.8, 0.6], dtype=np.float32)
@@ -147,6 +165,8 @@ def source_isolation_contract() -> None:
     assert "#SBATCH --mem" not in sbatch
     assert "train_chemaware_weighted_native.py" in sbatch
     assert "evaluate_chemaware_full_role_native.py" in sbatch
+    assert "freeze_chemaware_multicondition_artifact.py" in sbatch
+    assert "protected_artifact/SHA256SUMS" in sbatch
     assert "--formula-role 2" in sbatch and "--formula-role 3" in sbatch
     assert "--formula-role 4" not in sbatch
     assert "/bin/rm" not in sbatch and "rm -f" not in sbatch
@@ -157,6 +177,7 @@ def main() -> None:
     geometry_contract()
     selection_contract()
     sampling_contract()
+    immutable_prefix_contract()
     full_role_metric_contract()
     source_isolation_contract()
     print("PASS: ChemAware multi-condition max-boundary native contracts", flush=True)
