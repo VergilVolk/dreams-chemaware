@@ -12,6 +12,18 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def run_checked(command: list[str]) -> None:
+    """Run a child contract without hiding the diagnostic that caused failure."""
+    completed = subprocess.run(command, capture_output=True, text=True)
+    if completed.returncode != 0:
+        raise RuntimeError(
+            "artifact freezer failed "
+            f"(exit={completed.returncode})\n"
+            f"--- stdout ---\n{completed.stdout}"
+            f"--- stderr ---\n{completed.stderr}"
+        )
+
+
 def metrics(recall1: float, recall3: float, mrr: float, micro: float, macro: float):
     return {
         "queries": 100, "recall1": recall1, "recall3": recall3,
@@ -82,18 +94,26 @@ def freeze(root: Path, role3_passes: bool) -> Path:
     train_pool.write_bytes(b"train pool")
     val_pool.write_bytes(b"validation pool")
     output = root / ("protected_pass" if role3_passes else "protected_role2")
-    subprocess.run([
+    run_checked([
         sys.executable, str(ROOT / "tasks/freeze_chemaware_true_support_artifact.py"),
         "--checkpoint", str(checkpoint), "--selection", str(selection),
         "--role2-evaluation", str(role2), "--role3-evaluation", str(role3),
         "--full-evaluation", str(full), "--triplet-report", str(triplets),
         "--train-pool", str(train_pool), "--val-pool", str(val_pool),
         "--training-report", str(training), "--output", str(output),
-    ], check=True, capture_output=True, text=True)
+    ])
     return output
 
 
 def main() -> None:
+    # A protected artifact may snapshot executable task sources, but its
+    # creation must not depend on a documentation file that is not deployed by
+    # the one-GPU sbatch entrypoint.
+    from freeze_chemaware_true_support_artifact import SOURCE_FILES
+    assert SOURCE_FILES
+    assert all(Path(relative).parts[0] == "tasks" for relative in SOURCE_FILES)
+    assert not any(Path(relative).suffix.lower() == ".md" for relative in SOURCE_FILES)
+
     with tempfile.TemporaryDirectory(prefix="chem_true_support_freeze_") as raw:
         root = Path(raw)
         confirmed = freeze(root / "confirmed", True)

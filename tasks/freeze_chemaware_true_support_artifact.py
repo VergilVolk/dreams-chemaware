@@ -12,7 +12,6 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_FILES = (
-    "docs/CHEMAWARE_TRUE_SUPPORT_NATIVE_TRIPLETS_V7_20260926.md",
     "tasks/build_chemaware_true_support_native_triplets.py",
     "tasks/encode_chemaware_formula_role_checkpoint_rows.py",
     "tasks/build_chemaware_multicondition_max_boundary_triplets.py",
