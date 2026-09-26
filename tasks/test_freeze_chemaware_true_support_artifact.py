@@ -47,7 +47,7 @@ def write(path: Path, body: dict[str, object]) -> None:
     path.write_text(json.dumps(body), encoding="utf-8")
 
 
-def freeze(root: Path, role3_passes: bool) -> Path:
+def freeze(root: Path, role3_passes: bool, dense: bool = False) -> Path:
     root.mkdir(parents=True, exist_ok=False)
     checkpoint = root / "step-000100.ckpt"
     checkpoint.write_bytes(b"evaluated true-support checkpoint")
@@ -85,11 +85,24 @@ def freeze(root: Path, role3_passes: bool) -> Path:
         ],
     })
     write(full, {"formula_roles": [2, 3], "outer_role_4_accessed": False, "results": []})
-    write(triplets, {
-        "status": "CHEMAWARE_TRUE_SUPPORT_NATIVE_TRIPLETS_COMPLETE",
-        "settings": {"rule_metrics": ["a", "b", "c", "d"]},
-        "gates": {"one": True, "two": True},
-    })
+    if dense:
+        write(triplets, {
+            "status": "CHEMAWARE_DENSE_TRUE_SUPPORT_NATIVE_TRIPLETS_COMPLETE",
+            "cache_kind": "protected_phasea",
+            "events": {"unique_correction_triplets": 1200},
+            "coverage": {
+                "correction_queries": 250,
+                "distinct_identity_false_boundaries": 220,
+            },
+            "sampler": {"custom_sampling_weight_present": False},
+            "gates": {"one": True, "two": True},
+        })
+    else:
+        write(triplets, {
+            "status": "CHEMAWARE_TRUE_SUPPORT_NATIVE_TRIPLETS_COMPLETE",
+            "settings": {"rule_metrics": ["a", "b", "c", "d"]},
+            "gates": {"one": True, "two": True},
+        })
     write(training, {"status": "CHEMAWARE_DREAMS_NATIVE_TRAINING_COMPLETE"})
     train_pool.write_bytes(b"train pool")
     val_pool.write_bytes(b"validation pool")
@@ -130,6 +143,12 @@ def main() -> None:
         manifest = json.loads((role2_only / "artifact_manifest.json").read_text())
         assert manifest["status"] == "CHEMAWARE_TRUE_SUPPORT_ROLE2_ONLY_ARTIFACT_PROTECTED"
         assert manifest["role3_confirmed"] is False
+
+        dense = freeze(root / "dense", True, dense=True)
+        manifest = json.loads((dense / "artifact_manifest.json").read_text())
+        assert manifest["triplet_status"] == "CHEMAWARE_DENSE_TRUE_SUPPORT_NATIVE_TRIPLETS_COMPLETE"
+        assert manifest["triplet_method_contract"] == "dense_true_support"
+        assert (dense / "source/tasks/build_chemaware_dense_true_support_native_triplets.py").is_file()
     print("PASS: ChemAware true-support artifact-protection contracts")
 
 

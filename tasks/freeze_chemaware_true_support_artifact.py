@@ -12,12 +12,14 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_FILES = (
+    "tasks/build_chemaware_dense_true_support_native_triplets.py",
     "tasks/build_chemaware_true_support_native_triplets.py",
     "tasks/encode_chemaware_formula_role_checkpoint_rows.py",
     "tasks/build_chemaware_multicondition_max_boundary_triplets.py",
     "tasks/build_chemaware_max_boundary_native_triplets.py",
     "tasks/build_chemaware_dreams_native_triplets.py",
     "tasks/chemaware_numpy_sampling.py",
+    "tasks/encode_chemaware_checkpoint_manifest_rows.py",
     "tasks/train_chemaware_weighted_native.py",
     "tasks/train_chemaware_dreams_native.py",
     "tasks/train_chemaware_specific_replay_native.py",
@@ -26,6 +28,8 @@ SOURCE_FILES = (
     "tasks/chemaware_v2_triplet_eval_core.py",
     "tasks/select_chemaware_residual_checkpoint.py",
     "tasks/freeze_chemaware_true_support_artifact.py",
+    "tasks/test_chemaware_dense_true_support_native.py",
+    "tasks/run_chemaware_dense_true_support_native.sbatch",
     "tasks/run_chemaware_true_support_native.sbatch",
 )
 
@@ -120,6 +124,19 @@ def main() -> None:
     role2_model = row_by_name(role2, selected_name)
     role3_base = row_by_name(role3, "phaseA_base")
     role3_model = row_by_name(role3, "true_support")
+    triplet_status = triplets.get("status")
+    legacy_triplet_contract = bool(
+        triplet_status == "CHEMAWARE_TRUE_SUPPORT_NATIVE_TRIPLETS_COMPLETE"
+        and len(triplets.get("settings", {}).get("rule_metrics", [])) == 4
+    )
+    dense_triplet_contract = bool(
+        triplet_status == "CHEMAWARE_DENSE_TRUE_SUPPORT_NATIVE_TRIPLETS_COMPLETE"
+        and triplets.get("cache_kind") == "protected_phasea"
+        and int(triplets.get("events", {}).get("unique_correction_triplets", 0)) >= 1000
+        and int(triplets.get("coverage", {}).get("correction_queries", 0)) >= 200
+        and int(triplets.get("coverage", {}).get("distinct_identity_false_boundaries", 0)) >= 200
+        and triplets.get("sampler", {}).get("custom_sampling_weight_present") is False
+    )
     provenance_gates = {
         "selection_advanced_beyond_phase_a": bool(
             selection.get("advanced_beyond_base")
@@ -132,9 +149,12 @@ def main() -> None:
         "role3_is_formula_role_3": int(role3.get("formula_role", -1)) == 3,
         "full_evaluation_is_roles_2_and_3": list(full.get("formula_roles", [])) == [2, 3],
         "role4_never_accessed": not any(bool(report.get("outer_role_4_accessed")) for report in (role2, role3, full)),
-        "triplet_status_is_true_support": triplets.get("status") == "CHEMAWARE_TRUE_SUPPORT_NATIVE_TRIPLETS_COMPLETE",
+        "triplet_status_is_supported": triplet_status in {
+            "CHEMAWARE_TRUE_SUPPORT_NATIVE_TRIPLETS_COMPLETE",
+            "CHEMAWARE_DENSE_TRUE_SUPPORT_NATIVE_TRIPLETS_COMPLETE",
+        },
         "triplet_gates_passed": bool(triplets.get("gates")) and all(triplets["gates"].values()),
-        "triplets_are_three_null_exclusive": len(triplets.get("settings", {}).get("rule_metrics", [])) == 4,
+        "triplet_method_contract_passed": legacy_triplet_contract or dense_triplet_contract,
     }
     if not all(provenance_gates.values()):
         raise RuntimeError(f"artifact provenance gates failed: {provenance_gates}")
@@ -188,6 +208,10 @@ def main() -> None:
             "role3_confirmed": role3_confirmed,
             "outer_role4_accessed": False,
             "provenance_gates": provenance_gates,
+            "triplet_status": triplet_status,
+            "triplet_method_contract": (
+                "dense_true_support" if dense_triplet_contract else "legacy_true_support"
+            ),
             "source_files": list(SOURCE_FILES),
             "allowed_claim": (
                 "The true-support ChemAware shared embedding passed frozen role-2 "
