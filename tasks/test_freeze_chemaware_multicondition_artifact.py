@@ -167,6 +167,31 @@ def main() -> None:
             "CHEMAWARE_MULTICONDITION_ROLE2_ONLY_ARTIFACT_PROTECTED"
         )
         assert manifest["role3_confirmed"] is False
+
+        output_phasea_residual = root / "protected_phasea_residual"
+        write(triplet_path, {
+            "status": "CHEMAWARE_PHASEA_RESIDUAL_CONSENSUS_TRIPLETS_COMPLETE",
+            "gates": {"phase_a_base_prefix_immutable": True},
+        })
+        subprocess.run([
+            sys.executable, str(ROOT / "tasks/freeze_chemaware_multicondition_artifact.py"),
+            "--checkpoint", str(checkpoint),
+            "--selection", str(selection),
+            "--role2-evaluation", str(role2_path),
+            "--role3-evaluation", str(role3_path),
+            "--full-evaluation", str(full_path),
+            "--triplet-report", str(triplet_path),
+            "--train-pool", str(train_pool),
+            "--val-pool", str(val_pool),
+            "--training-report", str(training_report),
+            "--output", str(output_phasea_residual),
+        ], check=True, capture_output=True, text=True)
+        manifest = json.loads(
+            (output_phasea_residual / "artifact_manifest.json").read_text()
+        )
+        assert manifest["status"] == (
+            "CHEMAWARE_PHASEA_RESIDUAL_CONSENSUS_ROLE2_ONLY_ARTIFACT_PROTECTED"
+        )
     print("PASS: ChemAware multi-condition artifact protection contracts", flush=True)
 
 

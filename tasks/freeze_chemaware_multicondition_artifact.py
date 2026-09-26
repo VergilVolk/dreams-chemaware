@@ -17,6 +17,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_FILES = (
+    "tasks/encode_chemaware_formula_role_checkpoint_rows.py",
+    "tasks/build_chemaware_phasea_residual_consensus_triplets.py",
     "tasks/build_chemaware_multicondition_max_boundary_triplets.py",
     "tasks/build_chemaware_max_boundary_native_triplets.py",
     "tasks/build_chemaware_action_hard_native_triplets.py",
@@ -31,6 +33,7 @@ SOURCE_FILES = (
     "tasks/select_chemaware_residual_checkpoint.py",
     "tasks/freeze_chemaware_multicondition_artifact.py",
     "tasks/run_chemaware_multicondition_max_boundary.sbatch",
+    "tasks/run_chemaware_phasea_residual_consensus.sbatch",
 )
 
 
@@ -145,12 +148,13 @@ def main() -> None:
         "role4_never_accessed": not any(bool(report.get("outer_role_4_accessed")) for report in (
             role2, role3, full,
         )),
-        "triplets_are_multicondition_v5": (
-            triplets.get("status")
-            == "CHEMAWARE_MULTICONDITION_MAX_BOUNDARY_TRIPLETS_COMPLETE"
-        ),
+        "triplets_are_approved_residual_curriculum": triplets.get("status") in {
+            "CHEMAWARE_MULTICONDITION_MAX_BOUNDARY_TRIPLETS_COMPLETE",
+            "CHEMAWARE_PHASEA_RESIDUAL_CONSENSUS_TRIPLETS_COMPLETE",
+        },
         "phase_a_prefix_was_immutable": bool(
             triplets.get("gates", {}).get("phase_a_base_event_prefix_immutable")
+            or triplets.get("gates", {}).get("phase_a_base_prefix_immutable")
         ),
     }
     role2_base = row_by_name(role2, "phaseA_base")
@@ -195,10 +199,16 @@ def main() -> None:
             destination = source_directory / relative
             destination.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(source, destination)
+        method_label = (
+            "PHASEA_RESIDUAL_CONSENSUS"
+            if triplets.get("status")
+            == "CHEMAWARE_PHASEA_RESIDUAL_CONSENSUS_TRIPLETS_COMPLETE"
+            else "MULTICONDITION"
+        )
         status = (
-            "CHEMAWARE_MULTICONDITION_ROLE3_CONFIRMED_ARTIFACT_PROTECTED"
+            f"CHEMAWARE_{method_label}_ROLE3_CONFIRMED_ARTIFACT_PROTECTED"
             if role3_confirmed
-            else "CHEMAWARE_MULTICONDITION_ROLE2_ONLY_ARTIFACT_PROTECTED"
+            else f"CHEMAWARE_{method_label}_ROLE2_ONLY_ARTIFACT_PROTECTED"
         )
         manifest = {
             "status": status,

@@ -92,7 +92,7 @@ def main() -> None:
     output = {
         "status": (
             "CHEMAWARE_RESIDUAL_CHECKPOINT_SELECTED"
-            if advanced else "CHEMAWARE_RESIDUAL_CHECKPOINT_RETAIN_STAGE1"
+            if advanced else "CHEMAWARE_RESIDUAL_CHECKPOINT_RETAIN_BASE"
         ),
         "formula_role": 2,
         "base_name": args.base_name,
