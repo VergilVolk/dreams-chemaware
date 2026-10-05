@@ -1,12 +1,14 @@
-# GNPS 文章基准天梯（已验证版）
+﻿
+> **本文件为 10 方法历史版。终版（12 方法，含 MS2DeepScore/SpecVec 公开基线）见 [GLM_GNPS_ARTICLE_LADDER_20261006.md](GLM_GNPS_ARTICLE_LADDER_20261006.md)。**
+# GNPS 鏂囩珷鍩哄噯澶╂锛堝凡楠岃瘉鐗堬級
 
-**运行：** run_2349091 · 2026-10-05 装订 · 来源 deliverables/GLM_gnps_article_ladder/run_2349091/
+**杩愯锛?* run_2349091 路 2026-10-05 瑁呰 路 鏉ユ簮 deliverables/GLM_gnps_article_ladder/run_2349091/
 
-**零误差声明：** 天梯中每个 recall@k、MRR、rank、margin、near 指标与 corrected/introduced/risk-net 均由逐 query 表独立重算，与冻结评估器报告在 1e-9 内逐项相等（0 处不一致，验证状态 GLM_GNPS_LADDER_VERIFIED）。macro AUPRC ≡ MRR 为数学恒等式（单正例 query 的 AP = 1/rank），非字段错误。
+**闆惰宸０鏄庯細** 澶╂涓瘡涓?recall@k銆丮RR銆乺ank銆乵argin銆乶ear 鎸囨爣涓?corrected/introduced/risk-net 鍧囩敱閫?query 琛ㄧ嫭绔嬮噸绠楋紝涓庡喕缁撹瘎浼板櫒鎶ュ憡鍦?1e-9 鍐呴€愰」鐩哥瓑锛? 澶勪笉涓€鑷达紝楠岃瘉鐘舵€?GLM_GNPS_LADDER_VERIFIED锛夈€俶acro AUPRC 鈮?MRR 涓烘暟瀛︽亽绛夊紡锛堝崟姝ｄ緥 query 鐨?AP = 1/rank锛夛紝闈炲瓧娈甸敊璇€?
 
-## identity-disjoint（n=10,995）
+## identity-disjoint锛坣=10,995锛?
 
-| # | 方法 | R@1 | R@5 | R@10 | R@20 | MRR | near R@1 | macro AUROC | micro AUROC | pooled AUROC | pooled AUPRC | corr/intro vs official |
+| # | 鏂规硶 | R@1 | R@5 | R@10 | R@20 | MRR | near R@1 | macro AUROC | micro AUROC | pooled AUROC | pooled AUPRC | corr/intro vs official |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | 1 | weighted spectral entropy | 87.37 | 97.01 | 98.70 | 99.67 | 91.66 | 82.51 | 0.9433 | 0.9420 | 0.9402 | 0.7292 | 470/249 |
 | 2 | P2b frozen on noise V1 | 87.13 | 97.44 | 98.80 | 99.75 | 91.65 | 82.13 | 0.9444 | 0.9430 | 0.9416 | 0.7247 | 454/259 |
@@ -15,13 +17,13 @@
 | 5 | P2b frozen on official | 86.98 | 97.44 | 98.79 | 99.75 | 91.54 | 81.92 | 0.9433 | 0.9424 | 0.9412 | 0.7172 | 443/265 |
 | 6 | neutral-loss sqrt-cosine (P2b channel) | 86.81 | 97.31 | 98.84 | 99.76 | 91.43 | 81.76 | 0.9432 | 0.9410 | 0.9396 | 0.7168 | 459/299 |
 | 7 | **noise V1 (ours)** | 86.56 | 97.17 | 98.74 | 99.83 | 91.27 | 81.44 | 0.9413 | 0.9436 | 0.9413 | 0.7337 | 328/196 |
-| 8 | official DreaMS | 85.36 | 97.02 | 98.76 | 99.76 | 90.52 | 79.94 | 0.9373 | 0.9319 | 0.9287 | 0.6519 | — |
+| 8 | official DreaMS | 85.36 | 97.02 | 98.76 | 99.76 | 90.52 | 79.94 | 0.9373 | 0.9319 | 0.9287 | 0.6519 | 鈥?|
 | 9 | cosine | 85.04 | 96.71 | 98.58 | 99.73 | 90.19 | 79.82 | 0.9337 | 0.9332 | 0.9300 | 0.7027 | 468/503 |
 | 10 | modified cosine | 85.03 | 96.71 | 98.58 | 99.73 | 90.18 | 79.82 | 0.9336 | 0.9331 | 0.9299 | 0.7027 | 468/504 |
 
-## formula-disjoint（n=5,261）
+## formula-disjoint锛坣=5,261锛?
 
-| # | 方法 | R@1 | R@5 | R@10 | R@20 | MRR | near R@1 | macro AUROC | micro AUROC | pooled AUROC | pooled AUPRC | corr/intro vs official |
+| # | 鏂规硶 | R@1 | R@5 | R@10 | R@20 | MRR | near R@1 | macro AUROC | micro AUROC | pooled AUROC | pooled AUPRC | corr/intro vs official |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | 1 | weighted spectral entropy | 88.27 | 98.69 | 99.66 | 99.96 | 92.80 | 80.10 | 0.9390 | 0.9284 | 0.9265 | 0.7474 | 210/133 |
 | 2 | P2b frozen on noise V1 | 88.25 | 99.01 | 99.66 | 99.96 | 92.90 | 80.06 | 0.9401 | 0.9262 | 0.9248 | 0.7370 | 200/124 |
@@ -32,17 +34,17 @@
 | 7 | neutral-loss sqrt-cosine (P2b channel) | 87.87 | 98.92 | 99.68 | 99.96 | 92.67 | 79.62 | 0.9384 | 0.9235 | 0.9219 | 0.7291 | 197/141 |
 | 8 | cosine | 87.17 | 98.75 | 99.60 | 99.96 | 92.26 | 78.91 | 0.9337 | 0.9225 | 0.9181 | 0.7392 | 225/206 |
 | 9 | modified cosine | 87.15 | 98.75 | 99.60 | 99.96 | 92.25 | 78.91 | 0.9336 | 0.9224 | 0.9181 | 0.7391 | 225/207 |
-| 10 | official DreaMS | 86.81 | 98.67 | 99.58 | 99.98 | 92.02 | 77.99 | 0.9319 | 0.9072 | 0.9033 | 0.6484 | — |
+| 10 | official DreaMS | 86.81 | 98.67 | 99.58 | 99.98 | 92.02 | 77.99 | 0.9319 | 0.9072 | 0.9033 | 0.6484 | 鈥?|
 
-## 三个直接配对 CI（identity R@1 / formula R@1，pp）
+## 涓変釜鐩存帴閰嶅 CI锛坕dentity R@1 / formula R@1锛宲p锛?
 
-- WSE vs noise V1：**+0.81 [+0.03, +1.62]** / +0.21 [-1.03, +1.43] —— identity 下界恰为正，按 24 假设族校正后不稳；formula 跨零
-- P2b(noise V1) vs noise V1：+0.57 [-0.21, +1.37] / +0.19 [-0.97, +1.32]
-- WSE vs P2b(noise V1)：+0.24 [-0.33, +0.82] / +0.02 [-0.84, +0.87]
+- WSE vs noise V1锛?*+0.81 [+0.03, +1.62]** / +0.21 [-1.03, +1.43] 鈥斺€?identity 涓嬬晫鎭颁负姝ｏ紝鎸?24 鍋囪鏃忔牎姝ｅ悗涓嶇ǔ锛沠ormula 璺ㄩ浂
+- P2b(noise V1) vs noise V1锛?0.57 [-0.21, +1.37] / +0.19 [-0.97, +1.32]
+- WSE vs P2b(noise V1)锛?0.24 [-0.33, +0.82] / +0.02 [-0.84, +0.87]
 
-## 边界
+## 杈圭晫
 
-1. 分层报告：8 个谱学方法 vs 2 个冻结重排器（不同信息层级，禁止跨层直接排名次）；
-2. 待补行：MS2DeepScore 2.0 / Spec2Vec（权重未落 third_party，落位后零改动入表）；
-3. 结构库工具（SIRIUS/CSI、MetFrag、CFM-ID）按设计不在本表——本表比较的是同一封存候选图上的谱学相似度信息提取；
-4. [M+H]+ 单加合物、严格 10 ppm、与 MSG/MoNA 训练语料身份/公式双零重叠；非 NIST20 复现。
+1. 鍒嗗眰鎶ュ憡锛? 涓氨瀛︽柟娉?vs 2 涓喕缁撻噸鎺掑櫒锛堜笉鍚屼俊鎭眰绾э紝绂佹璺ㄥ眰鐩存帴鎺掑悕娆★級锛?
+2. 寰呰ˉ琛岋細MS2DeepScore 2.0 / Spec2Vec锛堟潈閲嶆湭钀?third_party锛岃惤浣嶅悗闆舵敼鍔ㄥ叆琛級锛?
+3. 缁撴瀯搴撳伐鍏凤紙SIRIUS/CSI銆丮etFrag銆丆FM-ID锛夋寜璁捐涓嶅湪鏈〃鈥斺€旀湰琛ㄦ瘮杈冪殑鏄悓涓€灏佸瓨鍊欓€夊浘涓婄殑璋卞鐩镐技搴︿俊鎭彁鍙栵紱
+4. [M+H]+ 鍗曞姞鍚堢墿銆佷弗鏍?10 ppm銆佷笌 MSG/MoNA 璁粌璇枡韬唤/鍏紡鍙岄浂閲嶅彔锛涢潪 NIST20 澶嶇幇銆?
