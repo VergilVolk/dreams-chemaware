@@ -111,24 +111,46 @@ def _cap_queries(frame: pd.DataFrame, weights: np.ndarray, cap: float) -> np.nda
     return weights * scale
 
 
-def _normalize_within_family(frame: pd.DataFrame, utility: np.ndarray) -> np.ndarray:
-    """Use a common scale without changing within-family action ordering.
+def _allocate_query_mass(
+    frame: pd.DataFrame, utility: np.ndarray, static_exposure: float,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Allocate bounded action mass and leave an explicit no-op residual.
 
-    Formula, identity and family equal exposure belongs in the stratified
-    sampler.  Multiplying inverse abundance into utility can erase or reverse
-    the conditional action signal that this protocol is designed to test.
+    A query with many registered cells must not receive more total noise merely
+    because it has more rows.  Dynamic exposure is the family-balanced mean
+    utility.  Family mass is proportional to its mean utility and action mass
+    within a family is proportional to action utility.  The static comparator
+    uses a frozen neutral exposure and equal family/action allocation.
     """
-    output = utility.copy()
-    families = frame["family"].astype(str).to_numpy()
-    for family in sorted(set(families)):
-        mask = families == family
-        positive = utility[mask] > 0
-        if not np.any(positive):
-            output[mask] = 0.0
-            continue
-        scale = float(np.mean(utility[mask][positive]))
-        output[mask] = utility[mask] / max(scale, 1e-12)
-    return output
+    weights = np.zeros(len(frame), dtype=np.float64)
+    no_op = np.ones(len(frame), dtype=np.float64)
+    positions = pd.Series(np.arange(len(frame)), index=frame.index)
+    for _, query_block in frame.groupby("query_index", sort=False):
+        query_pos = positions.loc[query_block.index].to_numpy(np.int64)
+        families = query_block["family"].astype(str).to_numpy()
+        family_names = sorted(set(families))
+        family_means = np.asarray([
+            float(np.mean(utility[query_pos][families == family]))
+            for family in family_names
+        ], dtype=np.float64)
+        if static_exposure >= 0:
+            exposure = float(static_exposure)
+            family_mass = np.full(len(family_names), exposure / len(family_names))
+        else:
+            exposure = float(np.clip(np.mean(family_means), 0.0, 1.0))
+            total_family_utility = float(family_means.sum())
+            family_mass = (
+                exposure * family_means / total_family_utility
+                if total_family_utility > 0 else np.zeros(len(family_names), dtype=np.float64)
+            )
+        for family, mass in zip(family_names, family_mass):
+            local = query_pos[families == family]
+            values = utility[local]
+            total = float(values.sum())
+            if total > 0:
+                weights[local] = float(mass) * values / total
+        no_op[query_pos] = 1.0 - float(weights[query_pos].sum())
+    return weights, no_op
 
 
 def build_action_weights(
@@ -157,16 +179,25 @@ def build_action_weights(
             * (1.0 - work["risk"].to_numpy(np.float64))
         )
     else:
-        raw = np.ones(len(work), dtype=np.float64)
+        # 0.5 is the neutral probability before observing directional
+        # evidence.  It gives the static target arm an explicit 50% no-op
+        # comparator rather than forcing every query to receive an action.
+        raw = np.full(len(work), 0.5, dtype=np.float64)
 
     # Preserve conditional utility.  Dataset-abundance correction is deferred
     # to the stratified sampler so it cannot reverse action ordering here.
     work["raw_utility"] = raw.astype(np.float32)
-    weights = _normalize_within_family(work, raw)
+    weights, no_op_by_row = _allocate_query_mass(
+        work, raw, static_exposure=(0.5 if mode == "static" else -1.0),
+    )
     weights = np.minimum(weights, config.max_action_weight)
     weights = _cap_queries(work, weights, config.max_query_weight)
 
     work["weight"] = weights.astype(np.float32)
+    # Recompute the residual after every cap and publish it on every row so a
+    # downstream sampler cannot silently treat an implicit no-op as zero.
+    totals = pd.Series(weights, index=work.index).groupby(work["query_index"], sort=False).transform("sum")
+    work["no_op_weight"] = (1.0 - totals.to_numpy(np.float64)).astype(np.float32)
     family_rows = []
     for family, block in work.groupby("family", sort=True):
         values = block["weight"].to_numpy(np.float64)
@@ -193,6 +224,11 @@ def build_action_weights(
         "zero_weight_fraction": float(np.mean(weights == 0)),
         "maximum_action_weight": float(np.max(weights)),
         "maximum_query_weight": float(np.max(query_totals)),
+        "minimum_no_op_weight": float(work.groupby("query_index")["no_op_weight"].first().min()),
+        "mean_no_op_weight": float(work.groupby("query_index")["no_op_weight"].first().mean()),
+        "queries_with_positive_no_op": int(
+            work.groupby("query_index")["no_op_weight"].first().gt(0).sum()
+        ),
         "all_family_ess_pass": bool(all(row["learnable"] for row in family_rows)),
         "exposure_equalization": "stratified sampler, not action utility",
     }
@@ -201,6 +237,8 @@ def build_action_weights(
         raise RuntimeError("action weight cap failed")
     if report["maximum_query_weight"] > config.max_query_weight + tolerance:
         raise RuntimeError("query weight cap failed")
+    if report["minimum_no_op_weight"] <= 0:
+        raise RuntimeError("explicit no-op mass collapsed to zero")
     return work, report
 
 
@@ -240,6 +278,91 @@ def formula_equal_weights(formulas: Iterable[str]) -> np.ndarray:
     counts = values.groupby(values, sort=False).transform("size").to_numpy(np.float64)
     weights = 1.0 / counts
     return weights / float(np.mean(weights))
+
+
+def formula_identity_query_equal_weights(
+    formulas: Iterable[str], identities: Iterable[str], queries: Iterable[int],
+) -> np.ndarray:
+    """Equalize formulas, then identities within formula, then queries.
+
+    The returned weights have mean one.  Repeated spectra from one identity
+    therefore cannot dominate a formula, while every formula retains equal
+    total training mass.
+    """
+    frame = pd.DataFrame({
+        "formula": list(map(str, formulas)),
+        "identity": list(map(str, identities)),
+        "query": list(queries),
+    })
+    if frame.empty or frame.isna().any().any():
+        raise ValueError("hierarchical weights require complete observations")
+    if frame["query"].duplicated().any():
+        raise ValueError("hierarchical weights require one row per query")
+    identities_per_formula = frame.groupby("formula", sort=False)["identity"].transform("nunique")
+    queries_per_identity = frame.groupby(["formula", "identity"], sort=False)["query"].transform("size")
+    weights = 1.0 / (
+        identities_per_formula.to_numpy(np.float64)
+        * queries_per_identity.to_numpy(np.float64)
+    )
+    return weights / float(np.mean(weights))
+
+
+def stratified_action_schedule(
+    frame: pd.DataFrame,
+    seed: int,
+    epochs: int,
+    actions_per_identity_family: int,
+) -> pd.DataFrame:
+    """Build an outcome-independent, epoch-cycling action schedule.
+
+    Every identity-family stratum contributes at most ``K`` actions per epoch.
+    Its deterministically hashed action order is traversed across epochs before
+    cycling, maximizing cell/dose/query coverage without outcome-based schedule
+    membership.  Repetition is allowed across epochs only after a stratum is
+    exhausted; it is never allowed within an epoch.
+    """
+    required = {"action_id", "query_index", "identity", "formula", "family", "cell_id"}
+    if missing := required - set(frame.columns):
+        raise RuntimeError(f"schedule frame misses columns: {sorted(missing)}")
+    if epochs < 1 or actions_per_identity_family < 1:
+        raise ValueError("epochs and actions_per_identity_family must be positive")
+    if frame["action_id"].astype(str).duplicated().any():
+        raise RuntimeError("schedule action ids must be globally unique")
+
+    selected: list[pd.DataFrame] = []
+    for (_, _), block in frame.groupby(["family", "identity"], sort=True):
+        ordered = block.copy()
+        ordered["_hash"] = [
+            hashlib.sha256(f"{seed}|{value}".encode("utf-8")).hexdigest()
+            for value in ordered["action_id"].astype(str)
+        ]
+        ordered = ordered.sort_values(["_hash", "action_id"], kind="stable").drop(columns="_hash")
+        count = len(ordered)
+        take = min(actions_per_identity_family, count)
+        for epoch in range(1, epochs + 1):
+            positions = [((epoch - 1) * take + offset) % count for offset in range(take)]
+            part = ordered.iloc[positions].copy()
+            part["epoch"] = epoch
+            selected.append(part)
+    output = pd.concat(selected, ignore_index=True)
+    if output.duplicated(["epoch", "action_id"]).any():
+        raise RuntimeError("within-epoch action recycling detected")
+    if int(output.groupby(["epoch", "identity", "family"]).size().max()) > actions_per_identity_family:
+        raise RuntimeError("epoch identity-family exposure cap failed")
+
+    # Stable hash order interleaves formulas and families without reading a
+    # model outcome or action utility.
+    output["_order"] = [
+        hashlib.sha256(
+            f"{seed}|{int(epoch)}|{formula}|{family}|{action}".encode("utf-8")
+        ).hexdigest()
+        for epoch, formula, family, action in output[
+            ["epoch", "formula", "family", "action_id"]
+        ].itertuples(index=False, name=None)
+    ]
+    output = output.sort_values(["epoch", "_order"], kind="stable").drop(columns="_order")
+    output["epoch_schedule_index"] = output.groupby("epoch", sort=False).cumcount().astype(np.int64)
+    return output.reset_index(drop=True)
 
 
 def stratified_action_epoch(

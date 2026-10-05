@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=chemaware_v3_g2pd
-#SBATCH --partition=gpu
-#SBATCH --gpus=1
+##SBATCH --partition=gpu
+##SBATCH --gpus=1
 #SBATCH --cpus-per-task=2
 #SBATCH --time=00:30:00
 #SBATCH --output=data/validation/chemaware_v3_g2_pilot_decision_%j.out

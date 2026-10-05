@@ -1,12 +1,15 @@
 #!/bin/bash
 #SBATCH --job-name=chemaware_v3_g2bp
-#SBATCH --partition=gpu
-#SBATCH --gpus=1
-#SBATCH --cpus-per-task=6
-#SBATCH --time=18:00:00
-#SBATCH --array=0-4%2
+##SBATCH --partition=gpu
+##SBATCH --gpus=1
+#SBATCH --cpus-per-task=1
+#SBATCH --time=00:01:00
+##SBATCH --array=0-4%2
 #SBATCH --output=data/validation/chemaware_v3_g2b_pilot_%A_%a.out
 #SBATCH --error=data/validation/chemaware_v3_g2b_pilot_%A_%a.err
+
+echo "BLOCKED: legacy shared-v3 G2b pilot is superseded by the current causal protocol" >&2
+exit 64
 
 # Independent five-arm development pilot for the targeted frozen-probe
 # objective.  This branch does not replace or share outputs with G2.

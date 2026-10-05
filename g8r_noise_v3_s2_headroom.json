@@ -1,0 +1,299 @@
+{
+  "status": "noise_v3_s2_sequential_headroom_complete",
+  "queries": 23876,
+  "official_errors": 1805,
+  "s1c_single_peak_recoverable": 553,
+  "s2_sequence_recoverable": 473,
+  "s2_unique_beyond_s1c": 110,
+  "combined_no_op_aware_oracle": {
+    "recoverable_errors": 663,
+    "recall1": 0.9521695426369576,
+    "delta_recall1": 0.02776847043055788,
+    "introduced": 0,
+    "claim_limit": "Outcome-selected action/stop upper bound; not a policy result."
+  },
+  "stepwise_incremental_headroom": {
+    "1": {
+      "sequence_recoverable_at_this_step": 292,
+      "new_beyond_s1c_and_earlier_steps": 0,
+      "combined_recoverable": 553,
+      "combined_delta_recall1": 0.023161333556709667
+    },
+    "2": {
+      "sequence_recoverable_at_this_step": 342,
+      "new_beyond_s1c_and_earlier_steps": 65,
+      "combined_recoverable": 618,
+      "combined_delta_recall1": 0.025883732618529068
+    },
+    "3": {
+      "sequence_recoverable_at_this_step": 363,
+      "new_beyond_s1c_and_earlier_steps": 45,
+      "combined_recoverable": 663,
+      "combined_delta_recall1": 0.02776847043055788
+    }
+  },
+  "near_headroom": {
+    "official_near_errors": 1446,
+    "combined_recoverable_near_errors": 502,
+    "fraction_recoverable": 0.34716459197787,
+    "note": "The denominator is the full candidate graph; the recoverable numerator is limited to queries with complete paired paths."
+  },
+  "action_results": {
+    "candidate_gradient|a=0.50|step=1": {
+      "queries": 16107,
+      "identities": 2343,
+      "formulas": 1010,
+      "corrected": 117,
+      "introduced": 97,
+      "net": 20,
+      "identity_target_minus_random_top1_95ci": [
+        0.05159774436090225,
+        0.08457608306480485
+      ],
+      "formula_target_minus_random_top1_95ci": [
+        0.04127332366617612,
+        0.08287049310692823
+      ],
+      "specificity_gate": true,
+      "safety_gate": true
+    },
+    "candidate_gradient|a=0.50|step=2": {
+      "queries": 13136,
+      "identities": 2197,
+      "formulas": 957,
+      "corrected": 138,
+      "introduced": 84,
+      "net": 54,
+      "identity_target_minus_random_top1_95ci": [
+        0.06711618513684545,
+        0.10553124011232394
+      ],
+      "formula_target_minus_random_top1_95ci": [
+        0.07055019046522207,
+        0.12844058926052526
+      ],
+      "specificity_gate": true,
+      "safety_gate": true
+    },
+    "candidate_gradient|a=0.50|step=3": {
+      "queries": 11360,
+      "identities": 2088,
+      "formulas": 920,
+      "corrected": 153,
+      "introduced": 69,
+      "net": 84,
+      "identity_target_minus_random_top1_95ci": [
+        0.07938084466573866,
+        0.12183369456172018
+      ],
+      "formula_target_minus_random_top1_95ci": [
+        0.0827117842835572,
+        0.1394327858262523
+      ],
+      "specificity_gate": true,
+      "safety_gate": true
+    },
+    "candidate_gradient|a=1.00|step=1": {
+      "queries": 16134,
+      "identities": 2347,
+      "formulas": 1012,
+      "corrected": 237,
+      "introduced": 439,
+      "net": -202,
+      "identity_target_minus_random_top1_95ci": [
+        0.0695096758009315,
+        0.11283503868623365
+      ],
+      "formula_target_minus_random_top1_95ci": [
+        0.06821181249311482,
+        0.1281707691294857
+      ],
+      "specificity_gate": true,
+      "safety_gate": false
+    },
+    "candidate_gradient|a=1.00|step=2": {
+      "queries": 13110,
+      "identities": 2203,
+      "formulas": 962,
+      "corrected": 283,
+      "introduced": 452,
+      "net": -169,
+      "identity_target_minus_random_top1_95ci": [
+        0.11434425856067647,
+        0.1645436014372581
+      ],
+      "formula_target_minus_random_top1_95ci": [
+        0.11162707705716247,
+        0.17748643536956643
+      ],
+      "specificity_gate": true,
+      "safety_gate": false
+    },
+    "candidate_gradient|a=1.00|step=3": {
+      "queries": 11308,
+      "identities": 2091,
+      "formulas": 924,
+      "corrected": 303,
+      "introduced": 425,
+      "net": -122,
+      "identity_target_minus_random_top1_95ci": [
+        0.13423524844720494,
+        0.19007949447895098
+      ],
+      "formula_target_minus_random_top1_95ci": [
+        0.12243232416244992,
+        0.1892673998077388
+      ],
+      "specificity_gate": true,
+      "safety_gate": false
+    },
+    "role_confounder|a=0.50|step=1": {
+      "queries": 1652,
+      "identities": 1033,
+      "formulas": 508,
+      "corrected": 8,
+      "introduced": 2,
+      "net": 6,
+      "identity_target_minus_random_top1_95ci": [
+        0.002757760532150777,
+        0.022172949002217297
+      ],
+      "formula_target_minus_random_top1_95ci": [
+        0.0014684287812041117,
+        0.029006057268722445
+      ],
+      "specificity_gate": true,
+      "safety_gate": true
+    },
+    "role_confounder|a=0.50|step=2": {
+      "queries": 1180,
+      "identities": 869,
+      "formulas": 438,
+      "corrected": 3,
+      "introduced": 0,
+      "net": 3,
+      "identity_target_minus_random_top1_95ci": [
+        -0.0024875621890547263,
+        0.010572139303482588
+      ],
+      "formula_target_minus_random_top1_95ci": [
+        -0.0035714285714285713,
+        0.017276785714285633
+      ],
+      "specificity_gate": false,
+      "safety_gate": true
+    },
+    "role_confounder|a=0.50|step=3": {
+      "queries": 878,
+      "identities": 709,
+      "formulas": 375,
+      "corrected": 4,
+      "introduced": 0,
+      "net": 4,
+      "identity_target_minus_random_top1_95ci": [
+        -0.0014084507042253522,
+        0.018309859154929577
+      ],
+      "formula_target_minus_random_top1_95ci": [
+        -0.002577319587628866,
+        0.027706185567010308
+      ],
+      "specificity_gate": false,
+      "safety_gate": true
+    },
+    "role_confounder|a=1.00|step=1": {
+      "queries": 1672,
+      "identities": 1039,
+      "formulas": 511,
+      "corrected": 33,
+      "introduced": 6,
+      "net": 27,
+      "identity_target_minus_random_top1_95ci": [
+        0.02028023598820059,
+        0.05771109882005897
+      ],
+      "formula_target_minus_random_top1_95ci": [
+        0.027027873924900355,
+        0.08388425634571008
+      ],
+      "specificity_gate": true,
+      "safety_gate": true
+    },
+    "role_confounder|a=1.00|step=2": {
+      "queries": 1181,
+      "identities": 870,
+      "formulas": 436,
+      "corrected": 36,
+      "introduced": 2,
+      "net": 34,
+      "identity_target_minus_random_top1_95ci": [
+        0.0297029702970297,
+        0.07611386138613861
+      ],
+      "formula_target_minus_random_top1_95ci": [
+        0.038773384353741495,
+        0.10748589208410636
+      ],
+      "specificity_gate": true,
+      "safety_gate": true
+    },
+    "role_confounder|a=1.00|step=3": {
+      "queries": 878,
+      "identities": 707,
+      "formulas": 376,
+      "corrected": 37,
+      "introduced": 1,
+      "net": 36,
+      "identity_target_minus_random_top1_95ci": [
+        0.038623595505617975,
+        0.09129213483146068
+      ],
+      "formula_target_minus_random_top1_95ci": [
+        0.05169871794871794,
+        0.13205341880341878
+      ],
+      "specificity_gate": true,
+      "safety_gate": true
+    }
+  },
+  "specific_and_safe_step2_or_step3_actions": [
+    "candidate_gradient|a=0.50|step=2",
+    "candidate_gradient|a=0.50|step=3",
+    "role_confounder|a=1.00|step=2",
+    "role_confounder|a=1.00|step=3"
+  ],
+  "performance_targets": {
+    "1.0pp": {
+      "required_net_corrections": 239,
+      "within_combined_oracle_headroom": true
+    },
+    "2.0pp": {
+      "required_net_corrections": 478,
+      "within_combined_oracle_headroom": true
+    },
+    "4.0pp": {
+      "required_net_corrections": 956,
+      "within_combined_oracle_headroom": false
+    }
+  },
+  "preregistered_thresholds": {
+    "minimum_headroom_pp": 2.0,
+    "minimum_recoverable_queries": 600
+  },
+  "decision_rule": "Only proceed to cross-fitted policy learning when the combined no-op-aware oracle passes both locked headroom/query thresholds and at least one step-2/3 action is safer than no intervention and specifically outperforms matched random paths.",
+  "provenance": {
+    "s1c_paired_sha256": "59cb29e365d7bc501a2f272277454cde2e98788487ab69c82cd498a55189a854",
+    "s1c_validation_sha256": "5661c89d533bcc48074e7d42c83874ab79a8dc190b83a4c9358dcce1152e59e7",
+    "s2_paired_sha256": "ebadaf5aa6f603b10b611da31f0125f2565902d0fdb6bb4376fde1c8ae985259",
+    "s2_validation_sha256": "dd559cf5bc6c7b96fc5abcf3b59ea49891254c4a1be795c0b9c45a333d24b5b2",
+    "s2_report_sha256": "3b22b1aba37e9dc0d0f5eb1cd66944b9bf5cc4acbd7cdb6a99d15e3799a19bca",
+    "script_sha256": "bef74cf099419602599a4b4d24ac45c8e7c35ae843c203aad024185af71db9d1"
+  },
+  "gates": {
+    "combined_oracle_headroom_ge_preregistered_target": true,
+    "combined_recoverable_queries_ge_preregistered_minimum": true,
+    "sequential_paths_add_new_recoveries": true,
+    "specific_safe_step2_or_step3_exists": true,
+    "pass_to_policy_design": true
+  }
+}

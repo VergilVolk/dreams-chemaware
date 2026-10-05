@@ -1,8 +1,9 @@
-"""Test whether observable confidence can safely route a raw-spectral consensus.
+"""Test whether candidate-set confidence can route a raw-spectral consensus.
 
-This is a teacher-applicability audit, not DreaMS training.  Candidate scores
-are rebuilt from frozen pair tables.  Features contain only observable ranking
-geometry (top-two margins, view agreement, and candidate counts).  A logistic
+This is a candidate-set teacher audit, not a clean-input observability audit and
+not DreaMS training. Candidate scores are rebuilt from frozen pair tables.
+Features contain candidate ranking geometry (top-two margins, view agreement,
+and candidate counts), which is unavailable to a single-spectrum encoder. A logistic
 gate is cross-fitted by molecular formula on discovery, its threshold is chosen
 once from discovery OOF risk utility, and the frozen gate is evaluated once on
 formula-disjoint confirmation.  The untouched test split is never read.
@@ -328,6 +329,8 @@ def main() -> None:
         "training_was_run": False,
         "teacher_gate_was_fit": True,
         "features_are_identity_label_free_at_application": True,
+        "clean_spectrum_only": False,
+        "candidate_set_features_used": True,
         "features": list(FEATURES),
         "discovery_route_candidates": len(route_discovery),
         "discovery_beneficial_route_prevalence": float(route_discovery["beneficial_route"].mean()),
@@ -370,8 +373,9 @@ def main() -> None:
         },
         "provenance": {name: {"path": str(path), "sha256": sha256(path)} for name, path in files.items()},
         "claim_limit": (
-            "The gate uses candidate reference spectra and is only a training-teacher applicability "
-            "test. It is not a shared-embedding result, not P3, and does not authorize model training."
+            "The gate uses candidate reference spectra and candidate-set ranking geometry. It is only "
+            "a candidate-set teacher audit, not clean-input observability, not a shared-embedding result, "
+            "not P3, and does not authorize model training."
         ),
     }
     args.output.write_text(json.dumps(output, ensure_ascii=False, indent=2), encoding="utf-8")

@@ -8,6 +8,7 @@ Formula role 4 is intentionally unreachable.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -37,6 +38,9 @@ DEFAULT_POLICY = (
 DEFAULT_DATA = ROOT / "data/models/MassSpecGym_MurckoHist_split.hdf5"
 DEFAULT_ARCHITECTURE = ROOT / "dreams/models/pretrained/ssl_model_server.pt"
 DEFAULT_OFFICIAL = ROOT / "data/e1/official_embedding_slim.pt"
+DEFAULT_ROLE_CONTRACT_DIR = (
+    ROOT / "data/validation/chemaware_high_coverage_native/run_2340524/evidence"
+)
 
 
 def arguments() -> argparse.Namespace:
@@ -57,12 +61,24 @@ def arguments() -> argparse.Namespace:
     parser.add_argument("--seed", type=int, default=20260920)
     parser.add_argument("--formula-role", type=int, default=3)
     parser.add_argument(
+        "--role-contract-dir", type=Path, default=DEFAULT_ROLE_CONTRACT_DIR,
+        help=(
+            "Frozen evidence directory used to prove that --policy is exactly "
+            "the requested formula-role panel."
+        ),
+    )
+    parser.add_argument(
         "--paired-reference", default=None,
         help="Optional checkpoint name for an additional paired comparison.",
     )
     parser.add_argument("--device", default="cuda")
     parser.add_argument("--replay-tie-tolerance", type=float, default=5e-7)
     parser.add_argument("--maximum-replay-boundary-fraction", type=float, default=0.005)
+    parser.add_argument("--maximum-replay-boundary-exclusions", type=int, default=3)
+    parser.add_argument(
+        "--expected-replay-exclusion-sha256",
+        help="Optional frozen hash of the exact excluded manifest-query array.",
+    )
     return parser.parse_args()
 
 
@@ -107,7 +123,41 @@ def required_rows(manifest: dict[str, np.ndarray], queries: np.ndarray) -> np.nd
         pair_left = int(manifest["molecule_ptr"][molecule_left])
         pair_right = int(manifest["molecule_ptr"][molecule_right])
         rows.append(np.asarray(manifest["pair_candidate_row"][pair_left:pair_right]))
-    return np.unique(np.concatenate(rows).astype(np.int64))
+    output = np.unique(np.concatenate(rows).astype(np.int64))
+    if not len(output) or np.any(np.diff(output) <= 0):
+        raise RuntimeError("manifest row registry is empty or not strictly increasing")
+    return output
+
+
+def validate_formula_role_policy(
+    policy: dict[str, np.ndarray], formula_role: int, contract_dir: Path,
+) -> Path:
+    """Fail unless the supplied policy is the exact frozen panel for its role."""
+    file_name = {
+        2: "selection_triplet_evidence.npz",
+        3: "confirmation_triplet_evidence.npz",
+    }.get(int(formula_role))
+    if file_name is None:
+        raise ValueError("ChemAware direct-triplet evaluation supports formula roles 2 and 3")
+    canonical_path = contract_dir / file_name
+    if not canonical_path.is_file():
+        raise FileNotFoundError(canonical_path)
+    with np.load(canonical_path, allow_pickle=False) as loaded:
+        canonical = {key: np.asarray(loaded[key]) for key in loaded.files}
+    for key in ("query", "formula", "identity", "baseline_rank"):
+        if key not in policy or key not in canonical:
+            raise RuntimeError(f"formula-role contract lacks required field: {key}")
+        observed = np.asarray(policy[key])
+        expected = np.asarray(canonical[key])
+        if observed.dtype.kind in "OUS" or expected.dtype.kind in "OUS":
+            equal = np.array_equal(observed.astype(str), expected.astype(str))
+        else:
+            equal = np.array_equal(observed, expected)
+        if not equal:
+            raise RuntimeError(
+                f"policy does not match frozen formula role {formula_role}: {key}"
+            )
+    return canonical_path.resolve()
 
 
 @torch.no_grad()
@@ -142,6 +192,9 @@ def main() -> None:
         manifest = {key: np.asarray(loaded[key]) for key in loaded.files}
     with np.load(args.policy, allow_pickle=False) as loaded:
         policy = {key: np.asarray(loaded[key]) for key in loaded.files}
+    canonical_role_policy = validate_formula_role_policy(
+        policy, args.formula_role, args.role_contract_dir,
+    )
     queries = np.asarray(policy["query"], dtype=np.int64)
     formulas = np.asarray(policy["formula"]).astype(str)
     expected_baseline = np.asarray(policy["baseline_rank"], dtype=np.int32)
@@ -181,6 +234,7 @@ def main() -> None:
                 encoded, rows, manifest, queries, expected_baseline, ranks,
                 tie_tolerance=args.replay_tie_tolerance,
                 maximum_fraction=args.maximum_replay_boundary_fraction,
+                maximum_count=args.maximum_replay_boundary_exclusions,
             )
             if mismatch:
                 evaluated_queries = queries[replay_stable]
@@ -189,7 +243,14 @@ def main() -> None:
                     encoded, rows, manifest, evaluated_queries,
                 )
         metrics = summarize(ranks, positive, negative, auc)
-        row = {"name": name, "checkpoint": str(path.resolve()), "kind": kind, "metrics": metrics}
+        row = {
+            "name": name, "checkpoint": str(path.resolve()), "kind": kind,
+            "metrics": metrics,
+            "recall1_boundary_ties_at_tolerance": int(np.sum(
+                np.abs(np.asarray(negative) - np.asarray(positive))
+                <= args.replay_tie_tolerance
+            )),
+        }
         if index == 0:
             row["frozen_ledger_rank_mismatches"] = mismatch
             row["numerical_boundary_exclusions"] = int(np.sum(~replay_stable))
@@ -228,16 +289,35 @@ def main() -> None:
                 args.bootstrap_draws, args.seed + 10_000 + index,
             )
 
+    if replay_stable is None:
+        raise AssertionError("official replay audit was not executed")
+    excluded_queries = np.asarray(queries[~replay_stable], dtype=np.int64)
+    exclusion_digest = hashlib.sha256()
+    exclusion_digest.update(excluded_queries.tobytes(order="C"))
+    exclusion_sha256 = exclusion_digest.hexdigest()
+    if (
+        args.expected_replay_exclusion_sha256 is not None
+        and exclusion_sha256 != args.expected_replay_exclusion_sha256
+    ):
+        raise RuntimeError(
+            "official replay exclusion set drifted: "
+            f"expected={args.expected_replay_exclusion_sha256} observed={exclusion_sha256}"
+        )
     report = {
         "status": "CHEMAWARE_V2_DIRECT_TRIPLET_SHARED_EMBEDDING_EVALUATION_COMPLETE",
         "shared_embedding_result": True,
         "candidate_features_used_at_inference": False,
         "chemical_rules_used_at_inference": False,
         "formula_role": int(args.formula_role),
+        "formula_role_contract_passed": True,
+        "canonical_role_policy": str(canonical_role_policy),
         "outer_role_4_accessed": False,
         "queries_before_numerical_boundary_exclusion": int(len(queries)),
         "queries": int(np.sum(replay_stable)) if replay_stable is not None else 0,
         "numerical_boundary_exclusions": int(np.sum(~replay_stable)) if replay_stable is not None else 0,
+        "numerical_boundary_excluded_manifest_queries": excluded_queries.tolist(),
+        "numerical_boundary_exclusion_sha256": exclusion_sha256,
+        "maximum_replay_boundary_exclusions": args.maximum_replay_boundary_exclusions,
         "numerical_boundary_policy": (
             "exclude only frozen-rank mismatches whose expected rank lies inside "
             "the explicit float32 score-tie interval; fail closed otherwise"

@@ -238,9 +238,10 @@ def load_base_model(
     preprocessor = SpectrumPreprocessor(model_args.dformat, n_highest_peaks=n_highest_peaks)
     print("  Constructing the 116M-parameter backbone", flush=True)
     backbone = DreaMS(model_args, preprocessor)
-    missing, unexpected = backbone.load_state_dict(backbone_state, strict=False)
-    if missing or unexpected:
-        print(f"Checkpoint load: {len(missing)} missing, {len(unexpected)} unexpected keys")
+    # Embedding comparisons are invalid if the architecture and checkpoint do
+    # not match exactly.  The former fail-open load only printed incompatible
+    # keys, allowing a partially random backbone to reach evaluation.
+    backbone.load_state_dict(backbone_state, strict=True)
     model = IdentityEmbeddingModel(backbone, int(model_args.d_model))
     if head_state is not None:
         model.head.load_state_dict(head_state, strict=True)

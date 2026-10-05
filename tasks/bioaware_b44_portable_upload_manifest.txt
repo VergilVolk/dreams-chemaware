@@ -1,0 +1,34 @@
+# Upload these files relative to the DreaMS repository root.
+
+# Single submission entry and portable evaluator
+tasks/run_bioaware_b44_portable_once.sbatch
+tasks/validate_bioaware_b44_portable_bundle.py
+tasks/test_bioaware_b44_massbank_once.py
+tasks/evaluate_bioaware_b44_massbank_once.py
+tasks/validate_bioaware_b44_massbank_once.py
+tasks/bioaware_portable_hgb.py
+
+# Existing DreaMS inference helpers used by the official checkpoint
+tasks/pilot_paired_layer_cka.py
+tasks/shared_dreams_inference.py
+tasks/e1_checkpoint_io.py
+tasks/train_e1_identity.py
+dreams/models/chem_aware/shared_embedding_v2.py
+dreams/models/chem_aware/peft_v3.py
+dreams/models/chem_aware/global_embedding_adapter.py
+
+# One small sealed directory; upload the directory recursively
+data/validation/bioaware_b44_portable_bundle_20260913_v3/report.json
+data/validation/bioaware_b44_portable_bundle_20260913_v3/preprocessed_spectra.npz
+data/validation/bioaware_b44_portable_bundle_20260913_v3/panel/report.json
+data/validation/bioaware_b44_portable_bundle_20260913_v3/panel/queries.csv.gz
+data/validation/bioaware_b44_portable_bundle_20260913_v3/panel/candidate_references.csv.gz
+data/validation/bioaware_b44_portable_bundle_20260913_v3/panel/reference_library.csv.gz
+data/validation/bioaware_b44_portable_bundle_20260913_v3/artifact/report.json
+data/validation/bioaware_b44_portable_bundle_20260913_v3/artifact/portable_model.npz
+data/validation/bioaware_b44_portable_bundle_20260913_v3/artifact/catalogue_lookup.csv.gz
+data/validation/bioaware_b44_portable_bundle_20260913_v3/artifact/oof_gate_ledger.csv.gz
+
+# Frozen official DreaMS checkpoints; do not upload again if already present
+data/e1/official_embedding_slim.pt
+dreams/models/pretrained/ssl_model_server.pt

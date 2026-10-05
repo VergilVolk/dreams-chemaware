@@ -14,6 +14,7 @@ def numerical_rank_replay_audit(
     *,
     tie_tolerance: float = 5e-7,
     maximum_fraction: float = 0.005,
+    maximum_count: int = 3,
 ) -> tuple[np.ndarray, list[dict[str, object]]]:
     """Identify only rank changes explainable by float32 boundary ties.
 
@@ -27,7 +28,7 @@ def numerical_rank_replay_audit(
     observed_rank = np.asarray(observed_rank, dtype=np.int64)
     if len(queries) != len(expected_rank) or len(queries) != len(observed_rank):
         raise ValueError("rank replay arrays do not align")
-    if tie_tolerance < 0 or not 0 < maximum_fraction <= 0.01:
+    if tie_tolerance < 0 or not 0 < maximum_fraction <= 0.01 or maximum_count < 0:
         raise ValueError("invalid numerical replay audit tolerance")
 
     position = {int(row): index for index, row in enumerate(rows)}
@@ -71,7 +72,7 @@ def numerical_rank_replay_audit(
         if not explained:
             unexplained.append(row)
 
-    maximum = max(1, int(np.ceil(maximum_fraction * len(queries))))
+    maximum = min(maximum_count, max(1, int(np.ceil(maximum_fraction * len(queries)))))
     if unexplained or len(mismatch) > maximum:
         raise RuntimeError(
             "official retrieval replay differs beyond the audited numerical-boundary "
@@ -166,17 +167,29 @@ def paired_summary(
     formulas, inverse = np.unique(formula.astype(str), return_inverse=True)
     cluster_sum = np.bincount(inverse, weights=delta)
     cluster_count = np.bincount(inverse)
+    cluster_mean = cluster_sum / cluster_count
     rng = np.random.default_rng(seed)
     samples = np.empty(draws, dtype=np.float64)
+    equal_formula_samples = np.empty(draws, dtype=np.float64)
     for draw in range(draws):
         selected = rng.integers(0, len(formulas), size=len(formulas))
         samples[draw] = cluster_sum[selected].sum() / cluster_count[selected].sum()
+        equal_formula_samples[draw] = np.mean(cluster_mean[selected])
     return {
         "delta_recall1": float(np.mean(delta)),
+        "delta_recall1_estimand": "query_weighted",
         "delta_mrr": float(np.mean(1.0 / current) - np.mean(1.0 / baseline)),
         "corrected_at_1": int(np.sum((baseline > 1) & (current == 1))),
         "introduced_at_1": int(np.sum((baseline == 1) & (current > 1))),
         "formula_cluster_bootstrap_delta_recall1_ci95": [
             float(np.quantile(samples, 0.025)), float(np.quantile(samples, 0.975)),
+        ],
+        "equal_formula_delta_recall1_sensitivity": float(np.mean(cluster_mean)),
+        "equal_formula_cluster_bootstrap_delta_recall1_ci95": [
+            float(np.quantile(equal_formula_samples, 0.025)),
+            float(np.quantile(equal_formula_samples, 0.975)),
+        ],
+        "formula_cluster_size_range": [
+            int(np.min(cluster_count)), int(np.max(cluster_count)),
         ],
     }

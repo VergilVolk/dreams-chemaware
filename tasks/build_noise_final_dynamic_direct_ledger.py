@@ -131,19 +131,39 @@ def fit_crossfit(
     harmful: np.ndarray,
     outer_fold: int,
     seed: int,
+    minimum_train_formulas: int = 50,
+    min_samples_leaf: int = 100,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, dict[str, float]]:
+    arrays = (x, formulas, folds, gain, positive, harmful)
+    if any(len(value) != len(x) for value in arrays[1:]):
+        raise ValueError("P crossfit inputs must have identical row counts")
+    if len(x) == 0 or x.ndim != 2:
+        raise ValueError("P crossfit requires a non-empty two-dimensional feature matrix")
+    if outer_fold not in range(5):
+        raise ValueError("outer_fold must be in 0..4")
+    if minimum_train_formulas < 2 or min_samples_leaf < 1:
+        raise ValueError("invalid P crossfit support thresholds")
     pred_gain = np.full(len(x), np.nan, dtype=np.float32)
     p_positive = np.full(len(x), np.nan, dtype=np.float32)
     p_harmful = np.full(len(x), np.nan, dtype=np.float32)
     for fold in sorted(set(map(int, folds)) - {outer_fold}):
         test = folds == fold
         train = (folds != fold) & (folds != outer_fold)
-        if not np.any(test) or len(set(formulas[train])) < 50:
-            raise RuntimeError(f"P crossfit fold {fold} has insufficient formula support")
+        train_formula_count = len(set(formulas[train]))
+        if not np.any(test) or train_formula_count < minimum_train_formulas:
+            raise RuntimeError(
+                f"P crossfit fold {fold} has insufficient formula support: "
+                f"train_formulas={train_formula_count}, required={minimum_train_formulas}, "
+                f"test_rows={int(test.sum())}"
+            )
+        if np.unique(positive[train]).size != 2 or np.unique(harmful[train]).size != 2:
+            raise RuntimeError(
+                f"P crossfit fold {fold} lacks both outcome classes in its training partition"
+            )
         weights = formula_equal_weights(formulas[train])
         common = dict(
             learning_rate=0.05, max_iter=150, max_leaf_nodes=15,
-            min_samples_leaf=100, l2_regularization=1.0, random_state=seed + fold,
+            min_samples_leaf=min_samples_leaf, l2_regularization=1.0, random_state=seed + fold,
         )
         regressor = HistGradientBoostingRegressor(**common).fit(x[train], gain[train], sample_weight=weights)
         positive_model = HistGradientBoostingClassifier(**common).fit(
@@ -374,8 +394,16 @@ def main() -> None:
     static, static_report = build_action_weights(actions, "static", WeightConfig())
     actions["dynamic_weight"] = dynamic["weight"].to_numpy(np.float32)
     actions["static_weight"] = static["weight"].to_numpy(np.float32)
-    if not np.isclose(actions["dynamic_weight"].sum(), actions["static_weight"].sum(), rtol=0.02):
-        raise RuntimeError("dynamic/static total target exposure differs by more than 2%")
+    actions["dynamic_no_op_weight"] = dynamic["no_op_weight"].to_numpy(np.float32)
+    actions["static_no_op_weight"] = static["no_op_weight"].to_numpy(np.float32)
+    for prefix in ("dynamic", "static"):
+        per_query = actions.groupby("query_index", sort=False).agg(
+            action=(f"{prefix}_weight", "sum"), no_op=(f"{prefix}_no_op_weight", "first"),
+        )
+        if not np.allclose(per_query["action"] + per_query["no_op"], 1.0, atol=2e-6):
+            raise RuntimeError(f"{prefix} explicit action/no-op mass does not sum to one")
+        if not per_query["no_op"].gt(0).all():
+            raise RuntimeError(f"{prefix} no-op mass collapsed for at least one query")
     cell_counts = actions.groupby(["source", "family", "cell_id"], as_index=False).agg(
         actions=("action_id", "size"), queries=("query_index", "nunique"),
         identities=("identity", "nunique"), formulas=("formula", "nunique"),
@@ -393,7 +421,7 @@ def main() -> None:
         "P_crossfit": p_reports, "dynamic_weight": dynamic_report, "static_weight": static_report,
         "contracts": {
             "all_30_cells_retained": True, "multiple_actions_per_query_retained": True,
-            "no_op_implicit_and_always_available": True,
+            "no_op_explicit_and_positive_for_every_query": True,
             "outer_held_formulas_absent": True, "raw_P_outcomes_published": False,
             "P2b": "forbidden", "P3_consumed": False,
         },

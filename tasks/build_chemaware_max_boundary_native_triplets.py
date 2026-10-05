@@ -168,11 +168,17 @@ class PoolWriter:
         negative: np.ndarray | list[int], source_query: int,
         negative_candidate: int, source_tag: int, curriculum_role: int,
     ) -> None:
+        # Preserve the serialized event exactly (Phase-A is an immutable byte-
+        # level prefix), but canonicalize only the deduplication key because
+        # reference iteration order is not distinct chemical evidence.
         positive_tuple = tuple(map(int, positive))
         negative_tuple = tuple(map(int, negative))
         if not positive_tuple or not negative_tuple:
             raise RuntimeError("empty edge set reached max-boundary writer")
-        signature = (int(anchor), positive_tuple, negative_tuple)
+        signature = (
+            int(anchor), tuple(sorted(set(positive_tuple))),
+            tuple(sorted(set(negative_tuple))),
+        )
         if signature in self.signatures:
             return
         self.signatures.add(signature)

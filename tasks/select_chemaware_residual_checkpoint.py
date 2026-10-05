@@ -11,7 +11,18 @@ def arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--evaluation", type=Path, required=True)
     parser.add_argument("--base-name", default="stage1_base")
+    parser.add_argument(
+        "--protected-baseline-name",
+        help="Additional protected checkpoint that every selected arm must not regress.",
+    )
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument(
+        "--exclude-name", action="append", default=[],
+        help=(
+            "Checkpoint name retained in the evaluation for context only; repeat for "
+            "non-candidate baselines such as an earlier protected model."
+        ),
+    )
     parser.add_argument(
         "--require-positive-formula-ci", action="store_true",
         help="Require the formula-cluster Recall@1 CI lower bound to exceed zero.",
@@ -31,14 +42,31 @@ def main() -> None:
     report = json.loads(args.evaluation.read_text(encoding="utf-8"))
     if int(report.get("formula_role", -1)) != 2:
         raise RuntimeError("residual checkpoint selection must use formula role 2")
+    if report.get("formula_role_contract_passed") is not True:
+        raise RuntimeError("role-2 evaluation lacks an exact frozen panel contract")
     rows = {row["name"]: row for row in report["results"]}
     if args.base_name not in rows:
         raise KeyError(f"base checkpoint is absent: {args.base_name}")
+    if (
+        args.protected_baseline_name is not None
+        and args.protected_baseline_name not in rows
+    ):
+        raise KeyError(
+            f"protected baseline is absent: {args.protected_baseline_name}"
+        )
     base = rows[args.base_name]
+    protected = (
+        rows[args.protected_baseline_name]
+        if args.protected_baseline_name is not None else None
+    )
     paired_field = f"paired_vs_{args.base_name}"
+    excluded = {"official", args.base_name, *args.exclude_name}
+    unknown_exclusions = set(args.exclude_name).difference(rows)
+    if unknown_exclusions:
+        raise KeyError(f"excluded checkpoints are absent: {sorted(unknown_exclusions)}")
     candidates = []
     for name, row in rows.items():
-        if name in {"official", args.base_name}:
+        if name in excluded:
             continue
         paired = row.get(paired_field)
         if paired is None:
@@ -58,6 +86,12 @@ def main() -> None:
             gates["formula_cluster_ci_strictly_positive"] = float(
                 paired["formula_cluster_bootstrap_delta_recall1_ci95"][0]
             ) > 0.0
+        if protected is not None:
+            protected_metrics = protected["metrics"]
+            for metric in ("recall1", "recall3", "mrr", "micro_auc", "macro_auc"):
+                gates[f"protected_{metric}_nonnegative"] = (
+                    float(metrics[metric]) >= float(protected_metrics[metric])
+                )
         candidates.append({
             "name": name,
             "checkpoint": row["checkpoint"],
@@ -78,13 +112,18 @@ def main() -> None:
         ))
         advanced = True
     else:
+        fallback_name = (
+            args.protected_baseline_name
+            if args.protected_baseline_name is not None else args.base_name
+        )
+        fallback = rows[fallback_name]
         selected = {
-            "name": args.base_name,
-            "checkpoint": base["checkpoint"],
+            "name": fallback_name,
+            "checkpoint": fallback["checkpoint"],
             "step": 0,
             "risk_utility_vs_base": 0,
             "paired_vs_base": None,
-            "metrics": base["metrics"],
+            "metrics": fallback["metrics"],
             "gates": {},
             "admissible": True,
         }
@@ -92,10 +131,12 @@ def main() -> None:
     output = {
         "status": (
             "CHEMAWARE_RESIDUAL_CHECKPOINT_SELECTED"
-            if advanced else "CHEMAWARE_RESIDUAL_CHECKPOINT_RETAIN_BASE"
+            if advanced else "CHEMAWARE_RESIDUAL_CHECKPOINT_RETAIN_PROTECTED_BASELINE"
         ),
         "formula_role": 2,
         "base_name": args.base_name,
+        "context_only_checkpoints": sorted(set(args.exclude_name)),
+        "protected_baseline_name": args.protected_baseline_name,
         "advanced_beyond_base": advanced,
         # Backward-compatible field retained for older consumers.  New code
         # must use advanced_beyond_base because the comparator may be Phase A.

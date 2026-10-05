@@ -50,6 +50,15 @@ def arguments() -> argparse.Namespace:
     parser.add_argument("--p-intensity-dir", type=Path, default=validation / "g8r_noise_final_positive_guided_matrix")
     parser.add_argument("--p-transfer-dir", type=Path, default=validation / "g8r_noise_final_positive_peak_transfer")
     parser.add_argument("--initial-checkpoint", type=Path, required=True)
+    parser.add_argument(
+        "--initialization-contract", choices=("l0_exact", "mature_e4_current_replay"),
+        default="l0_exact",
+        help=(
+            "l0_exact preserves the original L0/L1 geometry. mature_e4_current_replay "
+            "allows a fold-matched passing E4-A checkpoint only when every action is "
+            "replayed and crossfit again before training."
+        ),
+    )
     parser.add_argument("--outer-fold", type=int, required=True)
     parser.add_argument("--formula-fold-seed", type=int, default=20260825)
     parser.add_argument("--output-dir", type=Path, required=True)
@@ -183,7 +192,10 @@ def main() -> None:
         raise RuntimeError("L0 candidate graph provenance differs from the requested graph")
     if l0_report.get("provenance", {}).get("hdf5_sha256") != data_hash:
         raise RuntimeError("L0 HDF5 provenance differs from the requested data")
-    if l0_report.get("provenance", {}).get("clean_checkpoint_sha256") != initial_hash:
+    l0_geometry_match = (
+        l0_report.get("provenance", {}).get("clean_checkpoint_sha256") == initial_hash
+    )
+    if args.initialization_contract == "l0_exact" and not l0_geometry_match:
         raise RuntimeError(
             "initial checkpoint is not the exact clean geometry used to define L0/L1 action labels"
         )
@@ -288,8 +300,12 @@ def main() -> None:
         raise RuntimeError("initial checkpoint and requested outer fold do not match")
     if int(configuration.get("formula_fold_seed", -1)) != args.formula_fold_seed:
         raise RuntimeError("initial checkpoint formula-fold seed does not match")
-    if configuration.get("causal_arm") != "clean_duplicate":
-        raise RuntimeError("dynamic-direct initialization must be the L0 clean-duplicate geometry")
+    if args.initialization_contract == "l0_exact":
+        if configuration.get("causal_arm") != "clean_duplicate":
+            raise RuntimeError("l0_exact initialization must be the L0 clean-duplicate geometry")
+    else:
+        if initial_decision.get("pass_to_multifold") is not True:
+            raise RuntimeError("mature E4 initialization did not pass its shared-embedding gates")
 
     held_formulas = sorted(set(query_formula[np.asarray([
         stable_fold(value, 5, args.formula_fold_seed) == args.outer_fold for value in query_formula
@@ -325,6 +341,11 @@ def main() -> None:
             "checkpoint": str(args.initial_checkpoint.resolve()),
             "outer_fold": int(configuration["outer_fold"]),
             "seed": int(configuration["seed"]), "sha256": initial_hash,
+            "contract": args.initialization_contract,
+            "matches_legacy_l0_geometry": bool(l0_geometry_match),
+            "requires_complete_current_geometry_replay": bool(
+                args.initialization_contract == "mature_e4_current_replay"
+            ),
         },
         "phase_a_arms": ["clean_continuation", "matched_random", "static_target", "dynamic_np"],
         "contracts": {

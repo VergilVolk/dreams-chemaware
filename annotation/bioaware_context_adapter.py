@@ -185,6 +185,77 @@ class BiologicalEvidenceContextAdapter(nn.Module):
         return adapted, delta, gate
 
 
+class MonotoneEvidenceTangentLift(nn.Module):
+    """Identity-blind, evidence-monotone contextual embedding update.
+
+    The learnable part sees only non-negative biological evidence.  It cannot
+    inspect a candidate or query embedding and therefore cannot memorise that a
+    particular molecular identity was usually the labelled answer.  Evidence
+    is converted to a non-negative support value and moves the candidate along
+    the unit-sphere tangent pointing toward the query.  With zero evidence the
+    candidate is returned bit-for-bit; increasing any evidence coordinate can
+    never turn that coordinate into a penalty.
+
+    This is deliberately a low-capacity falsification model.  If it fails under
+    identity/formula isolation, a larger free adapter is not justified by the
+    current evidence table.
+    """
+
+    def __init__(
+        self, embedding_dim: int, evidence_dim: int, delta_bound: float = 0.05,
+        initial_weight: float = 0.02,
+    ):
+        super().__init__()
+        if min(embedding_dim, evidence_dim) <= 0:
+            raise ValueError("invalid monotone-lift dimensions")
+        if not (0 < delta_bound <= 1):
+            raise ValueError("delta_bound must be in (0, 1]")
+        if initial_weight <= 0:
+            raise ValueError("initial_weight must be positive")
+        self.embedding_dim = int(embedding_dim)
+        self.evidence_dim = int(evidence_dim)
+        self.delta_bound = float(delta_bound)
+        # Squaring is non-negative and, unlike a tiny softplus value, retains a
+        # useful derivative at a small initial support weight.  This avoids an
+        # optimisation no-op in which 40 epochs barely changed any weight.
+        raw = torch.sqrt(torch.tensor(float(initial_weight)))
+        self.raw_weight = nn.Parameter(raw.repeat(evidence_dim))
+
+    def forward(
+        self, candidate_embedding: torch.Tensor, evidence: torch.Tensor,
+        context_mask: torch.Tensor, query_embedding: torch.Tensor,
+    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+        if candidate_embedding.ndim != 2 or evidence.ndim != 2:
+            raise RuntimeError("candidate/evidence rank mismatch")
+        if candidate_embedding.shape != query_embedding.shape:
+            raise RuntimeError("candidate/query embedding shape mismatch")
+        if candidate_embedding.shape[1] != self.embedding_dim:
+            raise RuntimeError("candidate embedding dimension mismatch")
+        if evidence.shape != (candidate_embedding.shape[0], self.evidence_dim):
+            raise RuntimeError("evidence shape mismatch")
+        if context_mask.shape != (candidate_embedding.shape[0],):
+            raise RuntimeError("context mask shape mismatch")
+        if torch.any(evidence < -1e-8):
+            raise RuntimeError("monotone lift requires non-negative evidence")
+
+        candidate = F.normalize(candidate_embedding.float(), dim=-1)
+        query = F.normalize(query_embedding.float(), dim=-1)
+        weight = self.raw_weight.square()
+        evidence_mass = torch.sum(torch.clamp_min(evidence.float(), 0) * weight, dim=-1)
+        support = (1.0 - torch.exp(-evidence_mass)) * context_mask.float()
+        cosine = torch.sum(candidate * query, dim=-1, keepdim=True)
+        tangent = query - cosine * candidate
+        delta = self.delta_bound * support[:, None] * tangent
+        normalized = F.normalize(candidate + delta, dim=-1)
+        no_support = (support == 0)[:, None]
+        adapted = torch.where(no_support, candidate_embedding.float(), normalized)
+        return adapted, delta, support
+
+    @torch.no_grad()
+    def evidence_weights(self) -> torch.Tensor:
+        return self.raw_weight.square().detach().clone()
+
+
 def context_training_loss(
     query_embedding: torch.Tensor,
     contextual_candidate_embeddings: torch.Tensor,

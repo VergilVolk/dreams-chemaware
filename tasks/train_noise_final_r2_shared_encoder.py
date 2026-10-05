@@ -432,8 +432,16 @@ def evaluate_embeddings(graph: CandidateGraph, rows: np.ndarray, encoded: np.nda
     }
 
 
-def formula_bootstrap_delta(old: np.ndarray, new: np.ndarray, formulas: np.ndarray,
-                            resamples: int, seed: int) -> dict[str, float]:
+def formula_bootstrap_delta(
+    old: np.ndarray,
+    new: np.ndarray,
+    formulas: np.ndarray,
+    resamples: int,
+    seed: int,
+    alpha: float = 0.05,
+) -> dict[str, float]:
+    if not 0.0 < alpha < 1.0:
+        raise ValueError("formula-bootstrap alpha must be strictly between zero and one")
     unique, inverse = np.unique(formulas.astype(str), return_inverse=True)
     effect = (new == 1).astype(float) - (old == 1).astype(float)
     sums = np.bincount(inverse, weights=effect)
@@ -445,8 +453,8 @@ def formula_bootstrap_delta(old: np.ndarray, new: np.ndarray, formulas: np.ndarr
         draws[index] = sums[sampled].sum() / counts[sampled].sum()
     return {
         "mean": float(np.mean(effect)),
-        "ci_low": float(np.quantile(draws, 0.025)),
-        "ci_high": float(np.quantile(draws, 0.975)),
+        "ci_low": float(np.quantile(draws, alpha / 2.0)),
+        "ci_high": float(np.quantile(draws, 1.0 - alpha / 2.0)),
     }
 
 

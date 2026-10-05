@@ -3,7 +3,6 @@
 #SBATCH --partition=gpu
 #SBATCH --gpus=1
 #SBATCH --cpus-per-task=8
-#SBATCH --mem=30G
 #SBATCH --time=04:00:00
 #SBATCH --output=data/validation/noise_dd_preflight_%j.out
 #SBATCH --error=data/validation/noise_dd_preflight_%j.err
@@ -26,6 +25,7 @@ echo "=== dynamic direct model-free preflight fold=${FOLD} started: $(date) ==="
 python -u tasks/test_noise_final_dynamic_direct_core.py
 python -u tasks/test_noise_final_dynamic_direct_preflight.py
 python -u tasks/test_noise_final_dynamic_direct_ledger.py
+python -u tasks/test_noise_final_dynamic_direct_schedule.py
 python -u tasks/audit_noise_final_dynamic_direct_implementation.py
 echo "=== exact artifact hashes and provenance ==="
 python -u tasks/audit_noise_final_dynamic_direct_preflight.py \

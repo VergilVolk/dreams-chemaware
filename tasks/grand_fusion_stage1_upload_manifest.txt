@@ -1,0 +1,38 @@
+# Grand-fusion stage-1 transfer manifest
+# Generated for the one-command Slurm entry point on 2026-10-04.
+
+[upload_code]
+# Safest option: synchronize the complete tasks/ directory.  It contains the
+# entry point, child sbatch files, component registry, trainers, evaluators,
+# score-cache utilities, tests and the truth-blind routing ledger writer.
+tasks/
+
+# These two runtime files are outside tasks/ and must also exist on the server.
+dreams/models/chem_aware/global_embedding_adapter.py
+third_party/noise_article_wheels/ms_entropy-1.5.2-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl
+
+# This tracked rule table is normally already present in the server checkout;
+# synchronize it as well if the server is not on the same repository revision.
+dreams/models/chem_aware/chem_rules_data.json
+
+[server_frozen_artifacts_do_not_replace_with_local_guesses]
+data/models/MassSpecGym_MurckoHist_split.hdf5
+dreams/models/pretrained/ssl_model_server.pt
+data/e1/official_embedding_slim.pt
+data/validation/noise_relation_t1_t3_run_2347055/checkpoint/primary_seed_3407_slim.pt
+data/validation/noise_corrected_candidate_graph_v1_20260906/
+data/validation/gnps_gold_silver_10ppm_benchmark_v1/
+data/validation/gnps_absolute_baselines_run_2347472/
+data/validation/noise_gnps_article_benchmark_run_2349091/
+data/validation/chemaware_high_coverage_native/run_2340721_resume_2340524/training/best.ckpt
+data/validation/chemaware_corrected_candidate_manifest_v1/
+data/validation/chemaware_corrected_manifest_tokens_v1/
+
+[single_submission]
+cd /data02/run01/scv7tsl/DreaMS
+sbatch tasks/run_grand_fusion_stage1_submit.sbatch
+
+[not_in_stage1_by_default]
+# BioAware B47 is submitted only when B47_U3_DIR and all seven canonical score
+# paths are explicitly exported.  Fixed-consensus diagnostics remain disabled
+# unless RUN_FIXED_CONSENSUS=1 is explicitly supplied.

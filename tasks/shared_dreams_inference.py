@@ -20,6 +20,9 @@ from dreams.models.chem_aware.shared_embedding_v2 import (  # noqa: E402
 from dreams.models.chem_aware.peft_v3 import (  # noqa: E402
     DreaMSPEFTConfig, install_dreams_peft, load_peft_state_dict,
 )
+from dreams.models.chem_aware.global_embedding_adapter import (  # noqa: E402
+    GlobalResidualEmbeddingAdapter, SharedEmbeddingPostAdapter,
+)
 
 
 ALLOWED_SHARED_STATUSES = {
@@ -32,6 +35,12 @@ CHEMAWARE_SHARED_STATUSES = {
 CHEMAWARE_PEFT_STATUSES = {
     "chemaware_shared_v3_clean_peft",
     "chemaware_shared_v3_molecule_teacher_peft",
+}
+CHEMAWARE_GLOBAL_STATUSES = {
+    "chemaware_full_candidate_aligned_embedding",
+}
+CHEMAWARE_DIRECT_STATUSES = {
+    "chemaware_full_candidate_direct_shared_encoder",
 }
 
 
@@ -65,13 +74,51 @@ def load_inference_model(
             raise FileNotFoundError(shared_checkpoint)
         package = torch_load_compat(shared_checkpoint, map_location="cpu")
         status = package.get("status")
-        if status not in ALLOWED_SHARED_STATUSES | CHEMAWARE_SHARED_STATUSES | CHEMAWARE_PEFT_STATUSES:
+        if status not in (ALLOWED_SHARED_STATUSES | CHEMAWARE_SHARED_STATUSES
+                          | CHEMAWARE_PEFT_STATUSES | CHEMAWARE_GLOBAL_STATUSES
+                          | CHEMAWARE_DIRECT_STATUSES):
             raise RuntimeError(
                 f"unsupported shared-encoder checkpoint status: {status!r}"
             )
         if package.get("P2b_used") is not False:
             raise RuntimeError("shared-encoder checkpoint violates the P2b-free contract")
-        if status in CHEMAWARE_PEFT_STATUSES:
+        if status in CHEMAWARE_GLOBAL_STATUSES:
+            if package.get("format") != "chemaware_global_embedding_adapter_v1":
+                raise RuntimeError("global ChemAware adapter has an unsupported format")
+            if package.get("query_reference_encoder_shared") is not True:
+                raise RuntimeError("global ChemAware adapter is not shared")
+            if package.get("candidate_inputs_at_inference") is not False:
+                raise RuntimeError("global ChemAware adapter requires candidate inputs")
+            if package.get("molecule_projector_state") is not None:
+                raise RuntimeError("global ChemAware package carries a molecule projector")
+            if package.get("formal") is not True or package.get("validation_pass") is not True:
+                raise RuntimeError("global ChemAware adapter is not a passed formal checkpoint")
+            config = package.get("adapter_config", {})
+            required = {"dimension", "hidden_dim", "dropout"}
+            if required - set(config) or not isinstance(package.get("adapter_state"), dict):
+                raise RuntimeError("global ChemAware adapter lacks state/config")
+            if int(config["dimension"]) != int(model.head.out_features):
+                raise RuntimeError("global ChemAware adapter dimension disagrees with DreaMS")
+            provenance = package.get("provenance", {})
+            if provenance.get("official_checkpoint_sha256") != sha256_file(official_checkpoint):
+                raise RuntimeError("global ChemAware adapter belongs to different official weights")
+            adapter = GlobalResidualEmbeddingAdapter(
+                int(config["dimension"]), int(config["hidden_dim"]), float(config["dropout"]),
+            ).to(device)
+            adapter.load_state_dict(package["adapter_state"], strict=True)
+            model = SharedEmbeddingPostAdapter(model, adapter).to(device)
+            metadata.update({
+                "kind": "experimental_chemaware_global_shared_embedding",
+                "checkpoint": str(shared_checkpoint.resolve()),
+                "checkpoint_sha256": sha256_file(shared_checkpoint),
+                "training_seed": int(package.get("seed", -1)),
+                "training_outer_fold": int(package.get("outer_fold", -1)),
+                "chemical_supervision": bool(package.get("chemical_supervision")),
+                "teacher_control": package.get("teacher_control"),
+                "formal_training": True,
+                "training_only_molecule_projector_loaded": False,
+            })
+        elif status in CHEMAWARE_PEFT_STATUSES:
             if package.get("format") != "chemaware_shared_v3_peft_v1":
                 raise RuntimeError("ChemAware PEFT checkpoint has an unsupported format")
             if package.get("query_reference_encoder_shared") is not True:
@@ -161,6 +208,30 @@ def load_inference_model(
                 "teacher_control": package.get("teacher_control"),
                 "formal_training": bool(package.get("formal")),
                 "training_only_molecule_projector_loaded": False,
+            })
+        elif status in CHEMAWARE_DIRECT_STATUSES:
+            if (package.get("inference_clean_spectrum_only") is not True
+                    or package.get("query_reference_encoder_shared") is not True
+                    or package.get("candidate_inputs_at_inference") is not False
+                    or package.get("formal") is not True
+                    or package.get("validation_pass") is not True):
+                raise RuntimeError("direct ChemAware checkpoint is not a passed deployable encoder")
+            provenance = package.get("provenance", {})
+            if provenance.get("official_checkpoint_sha256") != sha256_file(official_checkpoint):
+                raise RuntimeError("direct ChemAware checkpoint belongs to different official weights")
+            if provenance.get("raw_checkpoint_sha256") != sha256_file(architecture_checkpoint):
+                raise RuntimeError("direct ChemAware checkpoint belongs to a different architecture")
+            if "model_state" not in package:
+                raise RuntimeError("direct ChemAware checkpoint has no model state")
+            model.load_state_dict(package["model_state"], strict=True)
+            metadata.update({
+                "kind": "experimental_chemaware_direct_shared_embedding",
+                "checkpoint": str(shared_checkpoint.resolve()),
+                "checkpoint_sha256": sha256_file(shared_checkpoint),
+                "training_seed": int(package.get("seed", -1)),
+                "training_outer_fold": int(package.get("outer_fold", -1)),
+                "formal_training": True,
+                "candidate_inputs_at_inference": False,
             })
         else:
             if package.get("inference_clean_only") is not True:

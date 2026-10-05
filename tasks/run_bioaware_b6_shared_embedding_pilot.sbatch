@@ -1,0 +1,87 @@
+#!/bin/bash
+#SBATCH --job-name=bio_b6_pilot
+#SBATCH --partition=gpu
+#SBATCH --gpus=1
+#SBATCH --cpus-per-task=8
+#SBATCH --time=06:00:00
+#SBATCH --array=0-3
+#SBATCH --output=bioaware_b6_%A_%a.out
+#SBATCH --error=bioaware_b6_%A_%a.err
+
+set -euo pipefail
+cd /data02/run01/scv7tsl/DreaMS
+source /data02/home/scv7tsl/run/miniconda3/etc/profile.d/conda.sh
+conda activate dreams
+export PYTHONPATH="$PWD:$PWD/tasks:${PYTHONPATH:-}"
+export PYTHONUNBUFFERED=1
+export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK:-8}"
+
+MANIFEST=data/validation/bioaware_b4_direct_shared_embedding_v1_20260905/manifest
+TEACHER=data/validation/bioaware_b5_pretraining_gate_v2_20260905_2331643/teacher
+TASK_ID="${SLURM_ARRAY_TASK_ID:?missing SLURM_ARRAY_TASK_ID}"
+ARRAY_JOB="${SLURM_ARRAY_JOB_ID:?missing SLURM_ARRAY_JOB_ID}"
+
+case "$TASK_ID" in
+  0) ARM=full_bioaware_safe; MODE=direct_onehot ;;
+  1) ARM=full_bioaware_safe; MODE=bioaware_soft ;;
+  2) ARM=full_no_edge_high_recall; MODE=direct_onehot ;;
+  3) ARM=full_no_edge_high_recall; MODE=bioaware_soft ;;
+  *) echo "Invalid array task: $TASK_ID" >&2; exit 2 ;;
+esac
+
+FINAL="data/validation/bioaware_b6_shared_embedding_pilot_v1_20260905_${ARRAY_JOB}_${TASK_ID}"
+test ! -e "$FINAL" || { echo "Refusing to overwrite: $FINAL" >&2; exit 3; }
+
+required=(
+  "$MANIFEST/manifest.npz"
+  "$MANIFEST/report.json"
+  "$TEACHER/report.json"
+  "$TEACHER/candidate_teacher_scores.csv.gz"
+  "$TEACHER/teacher_actions.csv.gz"
+  data/e1/official_embedding_slim.pt
+  dreams/models/pretrained/ssl_model_server.pt
+  annotation/bioaware_supervision.py
+  tasks/train_bioaware_b4_direct_shared_embedding.py
+  tasks/test_bioaware_b6_candidate_supervision.py
+)
+for path in "${required[@]}"; do
+  test -s "$path" || { echo "Missing dependency: $path" >&2; exit 4; }
+done
+
+python -c "import numpy,pandas,torch; assert torch.cuda.is_available(); print('[BioAware B6 dependencies] PASS')"
+python -m py_compile \
+  annotation/bioaware_supervision.py \
+  tasks/train_bioaware_b4_direct_shared_embedding.py \
+  tasks/test_bioaware_b6_candidate_supervision.py
+python -u tasks/test_bioaware_b6_candidate_supervision.py
+
+echo "=== BioAware B6 arm=$ARM mode=$MODE fold=0 started: $(date) ==="
+python -u tasks/train_bioaware_b4_direct_shared_embedding.py \
+  --manifest-dir "$MANIFEST" \
+  --candidate-teacher-dir "$TEACHER" \
+  --output "$FINAL" \
+  --arm "$ARM" \
+  --supervision-mode "$MODE" \
+  --outer-fold 0 \
+  --epochs 2 \
+  --steps-per-epoch 32 \
+  --batch-queries 4 \
+  --references-per-molecule 2 \
+  --corrective-fraction 0.5 \
+  --unfreeze-blocks 1 \
+  --backbone-lr 1e-6 \
+  --head-lr 5e-6 \
+  --temperature 0.10 \
+  --teacher-temperature 1.0 \
+  --lambda-listwise 0.5 \
+  --lambda-corrective 1.0 \
+  --lambda-safety-floor 2.0 \
+  --lambda-preserve 5.0 \
+  --no-amp \
+  --device cuda
+
+test -s "$FINAL/report.json" || { echo "Missing B6 report" >&2; exit 5; }
+test -s "$FINAL/held_per_query.csv.gz" || { echo "Missing B6 held ledger" >&2; exit 5; }
+test -s "$FINAL/final_trainable_state.pt" || { echo "Missing B6 checkpoint" >&2; exit 5; }
+echo "=== BioAware B6 completed: $(date) ==="
+echo "Result: $FINAL"

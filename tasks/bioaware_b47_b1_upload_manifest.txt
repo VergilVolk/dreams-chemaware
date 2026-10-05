@@ -1,0 +1,15 @@
+tasks/bioaware_b47_truthblind_io.py
+tasks/bioaware_b47_seed_core.py
+tasks/build_bioaware_b47_truthblind_seeds.py
+tasks/test_bioaware_b47_seed_core.py
+tasks/validate_bioaware_b47_truthblind_embeddings.py
+tasks/validate_bioaware_b47_truthblind_seeds.py
+tasks/bioaware_b47_u0_core.py
+tasks/audit_bioaware_b47_u0_reference_bias.py
+tasks/test_bioaware_b47_u0_reference_bias.py
+tasks/validate_bioaware_b47_u0_reference_bias.py
+tasks/audit_bioaware_b47_b1_artifact_registry.py
+tasks/test_bioaware_b47_b1_artifact_registry.py
+tasks/validate_bioaware_b47_b1_artifact_registry.py
+tasks/run_bioaware_b47_b1_provenance_u0.sbatch
+docs/BIOAWARE_B47_B1_PROVENANCE_U0_RUNBOOK_20260921.md

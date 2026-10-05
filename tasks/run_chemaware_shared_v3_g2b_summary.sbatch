@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=chemaware_v3_g2b_sum
-#SBATCH --partition=gpu
-#SBATCH --gpus=1
+##SBATCH --partition=gpu
+##SBATCH --gpus=1
 #SBATCH --cpus-per-task=4
 #SBATCH --time=01:00:00
 #SBATCH --output=data/validation/chemaware_v3_g2b_summary_%j.out

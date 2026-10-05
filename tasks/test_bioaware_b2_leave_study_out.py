@@ -7,6 +7,7 @@ from pathlib import Path
 import sys
 
 import numpy as np
+import pandas as pd
 import torch
 import torch.nn.functional as F
 
@@ -16,7 +17,9 @@ for location in (ROOT, ROOT / "tasks"):
         sys.path.insert(0, str(location))
 
 from annotation.bioaware_context_adapter import BiologicalEvidenceContextAdapter
-from train_bioaware_b2_leave_study_out import batch_loss, score_query
+from train_bioaware_b2_leave_study_out import (
+    EVIDENCE_MODES, batch_loss, cluster_bootstrap, identity_balanced_epoch, score_query,
+)
 
 
 class FakeData:
@@ -47,6 +50,17 @@ class FakeData:
 
 
 def main() -> None:
+    assert EVIDENCE_MODES["full"][0] == tuple(range(12))
+    assert EVIDENCE_MODES["full"][1] == tuple(range(10))
+    assert EVIDENCE_MODES["smn_rt"][0] == (8, 9, 10, 11)
+    assert EVIDENCE_MODES["smn_rt"][1] == (8, 9)
+    assert EVIDENCE_MODES["rt_only"][1] == (10, 11)
+    balanced = identity_balanced_epoch(
+        np.asarray([0, 1, 2, 3]), np.asarray(["A", "A", "B", "C"]),
+        np.random.default_rng(17),
+    )
+    assert len(balanced) == 3
+    assert set(np.asarray(["A", "A", "B", "C"])[balanced]) == {"A", "B", "C"}
     data = FakeData()
     model = BiologicalEvidenceContextAdapter(16, 12, hidden_dim=16, update_rank=4)
     args = Namespace(
@@ -69,6 +83,27 @@ def main() -> None:
     assert preservation > .99
     assert 0 <= gate <= 1
     assert set(components) == {"rank", "safety", "preservation", "gate"}
+
+    # The vectorised bootstrap must remain exactly equivalent to physically
+    # concatenating each sampled formula cluster.
+    bootstrap_frame = pd.DataFrame({
+        "truth_formula": ["A", "A", "B", "C", "C", "C"],
+        "delta": [1, 0, -1, 1, 1, 0],
+    })
+    repeats = 200
+    seed = 31
+    observed = cluster_bootstrap(bootstrap_frame, repeats, seed)
+    groups = [
+        group.delta.to_numpy(dtype=float)
+        for _, group in bootstrap_frame.groupby("truth_formula", sort=True)
+    ]
+    rng = np.random.default_rng(seed)
+    reference = []
+    for _ in range(repeats):
+        draw = rng.integers(0, len(groups), size=len(groups))
+        reference.append(float(np.concatenate([groups[index] for index in draw]).mean()))
+    assert observed["ci_low"] == float(np.quantile(reference, .025))
+    assert observed["ci_high"] == float(np.quantile(reference, .975))
     print("[test_bioaware_b2_leave_study_out] PASS")
 
 

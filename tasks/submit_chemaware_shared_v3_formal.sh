@@ -10,7 +10,7 @@ set -euo pipefail
 }
 
 cat >&2 <<'EOF'
-ChemAware formal submission is paused fail-closed.
+BLOCKED: ChemAware formal submission is paused fail-closed.
 The frozen candidate graph was built from the obsolete real_train_primary
 interpretation of MassSpecGym SIMULATION_CHALLENGE. That field is benchmark
 subset membership, not spectrum provenance. Rebuild and re-audit the

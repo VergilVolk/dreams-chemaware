@@ -79,12 +79,28 @@ def main() -> None:
     for unit in UNITS:
         root = args.root / unit
         ledger_path = root / "ledger" / "candidate_evidence.csv.gz"
+        ledger_report_path = root / "ledger" / "report.json"
         scores_path = root / "scores" / "candidate_scores.csv.gz"
         embeddings_path = root / "scores" / "embeddings.npz"
         queries_path = root / "cache" / "queries.csv.gz"
-        for path in (ledger_path, scores_path, embeddings_path, queries_path):
+        for path in (ledger_path, ledger_report_path, scores_path, embeddings_path, queries_path):
             if not path.exists():
                 raise FileNotFoundError(path)
+        ledger_report = json.loads(ledger_report_path.read_text(encoding="utf-8"))
+        ledger_contracts = ledger_report.get("contracts", {})
+        if ledger_report.get("status") != "bioaware_candidate_evidence_ledger_complete":
+            raise RuntimeError(f"{unit} ledger report status mismatch")
+        if ledger_report.get("formal") is not True:
+            raise RuntimeError(f"{unit} ledger is not formal")
+        if ledger_contracts.get("P2b") != "forbidden" or ledger_contracts.get("phenotype") != "forbidden":
+            raise RuntimeError(f"{unit} ledger violates P2b/phenotype contract")
+        if ledger_contracts.get("rotation_aggregation") != (
+            "median/fraction over preregistered truth-identity-heldout rotations"
+        ):
+            raise RuntimeError(f"{unit} ledger is not truth-identity-heldout OOF evidence")
+        rotation_range = ledger_report.get("rotation_count_range", {})
+        if int(rotation_range.get("minimum", 0)) < 2:
+            raise RuntimeError(f"{unit} has insufficient heldout evidence rotations")
         ledger = pd.read_csv(ledger_path)
         scores = pd.read_csv(scores_path)
         queries = pd.read_csv(queries_path)
@@ -155,6 +171,7 @@ def main() -> None:
             offsets.append(len(candidate_ids))
         provenance[unit] = {
             "ledger_sha256": sha256(ledger_path),
+            "ledger_report_sha256": sha256(ledger_report_path),
             "scores_sha256": sha256(scores_path),
             "embeddings_sha256": sha256(embeddings_path),
             "queries_sha256": sha256(queries_path),

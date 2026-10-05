@@ -275,3 +275,89 @@ Phase A 通过后才运行 N/P 消融；至少一个 N/P 分支相对其 matched
 下一步不是重新发现动作、重新做梯度共识，也不是先做蒸馏。下一步是复用已验证的 N/P action 与 clean-visible 信号，完成一次 formula-crossfit、动态软加权、完整候选、直接共享 encoder 微调，并以同权重 matched-random arm 作唯一方向性对照。
 
 除非本合同的首轮门失败且失败类型被明确记录，否则不得转向新算法；门失败时也只按第 5.3 节进入对应分支，不得重新回到随机噪声、P2b 或无边界超参扫描。
+
+## 10. Implementation amendment after the fold-0 ledger audit (2026-09-04)
+
+The first formal ledger exposed three implementation risks that must be fixed before training:
+
+1. Action weights summed to exactly one for every outer-train query, so the claimed no-op had zero observable mass. Every mode must now publish positive per-query no-op mass and prove action mass plus no-op mass equals one.
+2. Current-geometry replay must cover every ledger action before schedule sampling. Replaying only a sampled epoch is forbidden because it leaves unselected actions with stale labels.
+3. The common Phase-A schedule is frozen only after current-geometry outcomes are crossfit again. All four arms must use one action membership/order ledger; family and identity exposure is bounded without replacement.
+
+The historical P matrices remain provenance and recipe evidence. They cannot be the final current-geometry labels because their embeddings differ from the mature E4-A clean-duplicate initialization.
+
+## 11. 成熟 E4 起点与唯一大训练入口（2026-09-04）
+
+M1 在 clean-duplicate geometry 上完整回放了 304,209 条动作。P-transfer 的 action-event corrected/introduced 为 1,565/328，N 为 425/193；P-intensity 为 2,013/1,467。故动作空间并不弱，但 P-intensity 全局风险很高，必须由当前几何的 formula-OOF benefit/risk 进行条件降权。上述计数是动作事件，不是 unique-query 增益或新 embedding 性能。
+
+首个正式 Phase-A 大训练从 fold 对齐的成熟 E4-A high-LR shared encoder 继续：`seed_20260830/fold_0`。该权重在对应 held fold 上相对 official 为 `+0.574 pp`、38 corrected/4 introduced。因为初始化 geometry 已改变，上一轮 clean-duplicate M1 的动作权重不得直接搬用；作业必须先在成熟 E4 上重新执行全部 action/control replay，再生成新的 formula-OOF 权重和共同 schedule。
+
+这不是蒸馏、residual head 或 P2b。四臂均更新同一个 projection head 与最后一个 Transformer block，并在完整候选 molecule 边界上直接优化 clean/action listwise ranking、初始化 margin floor 和 geometry preservation。推理仅输入 clean spectrum，输出新的共享 embedding。
+
+唯一提交入口：
+
+```bash
+sbatch tasks/run_noise_final_dynamic_direct_e4_phase_a_big.sbatch
+```
+
+作业申请一张 GPU、不显式申请内存，并使用 `${SLURM_JOB_ID}` 唯一输出目录。它串行完成成熟 E4 当前几何全量重放、M2 crossfit、共同 schedule、四臂大训练与配对 formula-cluster 汇总。该结果仍是已消费开发 fold 的因果训练，不是 P3 或最终 SOTA 声明。
+
+## 12. M2 当前几何 crossfit 的科学结论与边界（2026-09-04）
+
+### 12.1 M2 实际回答的科学问题
+
+M2 不回答“新 embedding 是否提高检索性能”，而回答更靠前、也不可省略的问题：**在成熟 E4 shared-encoder 的当前几何中，仅由 clean spectrum 可见的信息，能否跨未见 formula 预测某个冻结 N/P 峰动作相对匹配随机对照的条件价值，而不只是记住 action family/cell 的平均好坏？**
+
+答案是肯定的，而且三个来源均有独立证据。M2 在 outer fold 0 的训练侧对 304,209 条动作、17,953 个 query 和全部 30 个固定 cells 重新做当前几何回放；每个公式只出现在一个 crossfit fold，比较 `full clean+cell`、`cell-only` 和 `permuted-clean+cell`。主证据不是未校正的 pooled AUPRC，而是按 formula cluster 重采样的 positive-label Brier improvement：
+
+| 来源 | actions / formulas | full positive AUPRC | cell-only | permuted-clean | Brier gain vs cell-only, formula 95% CI | Brier gain vs permuted, formula 95% CI |
+|---|---:|---:|---:|---:|---:|---:|
+| N | 28,509 / 689 | 0.6850 | 0.5888 | 0.5713 | 0.0255 [0.0083, 0.0447] | 0.0340 [0.0174, 0.0541] |
+| P-intensity | 215,436 / 857 | 0.8136 | 0.7550 | 0.7540 | 0.0219 [0.0143, 0.0308] | 0.0234 [0.0161, 0.0323] |
+| P-transfer | 60,264 / 676 | 0.8808 | 0.7489 | 0.7417 | 0.0588 [0.0443, 0.0751] | 0.0605 [0.0465, 0.0763] |
+
+三个来源的两组 formula-cluster CI 下界均严格大于零，因此不能再把动作价值解释为“某个 cell 全局平均有效”或数据量造成的假象。**P-transfer 是最强的 query-conditional 分支**：加入 clean 信息后 Brier improvement 约 5.9–6.0 个百分点，且 gain Pearson 从 cell-only 的 0.140、permuted 的 0.079 提高到 0.446。N 的 clean-visible 信号较弱但真实存在。P-intensity 的 full 模型也显著优于两个对照，但其 cell-only 已经很强，说明其大部分可预测性来自全局 cell/dose 规律，query-specific 增量小于 P-transfer。
+
+因此 M2 关闭了此前最关键的逻辑缺口：成熟动作并非只能在看过 outcome 后由 oracle 选择；clean 输入确实携带跨 formula 可泛化的条件动作价值。这为“按 query 动态加权后直接训练共享 encoder”提供了必要依据。
+
+### 12.2 M2 同时证明的工程可行性
+
+- 30 个冻结 cells、N/P 三个来源和 304,209 条当前几何动作全部进入 refit，没有再次发生 E14/L2 的单动作或单 family 坍缩。
+- 动态权重保留连续曝光而非硬阈值删样本；所有 family 的 ESS 均通过，最大单 action 权重为 0.1323。
+- 每个 query 都保留显式 no-op；平均 no-op 权重为 0.6076、最小值为 0.2123，最大总 action 权重为 0.7877。因此动作不能无条件淹没 clean continuation。
+- action utility 与 identity/family exposure 分离；后者由共同的分层 sampler 控制，不能用原始 action 数量冒充证据强度。
+- 标签来自成熟 E4 当前几何的 target/control 全量回放；P2b 未使用，P3 未消费。
+
+### 12.3 结果中仍然没有解决的问题
+
+1. **没有产生新 embedding。** M2 的 optimizer steps 为零；没有 trained-model corrected/introduced、held clean Recall@1、near 或 MRR。因此 `pass_to_schedule=true` 只授权后续四臂训练，不能写成模型性能提升。
+2. **没有证明 dynamic 优于 static。** 这只能由 Phase A 的 `NP dynamic-direct - static-target` 配对结果回答。
+3. **没有证明 target payload 优于 matched random。** 这只能由 `NP dynamic-direct - weight-matched-random` 回答。
+4. **没有证明超过 mature E4、official DreaMS、P2b 或 SOTA。** fold 0 是开发 fold，P3 仍被封存。
+5. **positive 并不等于“必然改正 Top-1”。** 当前 positive 标签还包含不引入错误且 paired advantage 至少 0.01 的 margin 改善动作；AUPRC 是复合动作价值的预测能力，不是 correction probability。
+6. **pooled AUPRC 和 Pearson 不能充当独立重复。** 同 query 有多个 actions；跨 formula 的 Brier CI 才是本阶段主要统计证据。后续模型评价仍必须以 query 与 formula cluster 为单位。
+7. **风险学习仍是最薄弱环节。** harmful AUPRC 仅为 N 0.130、P-intensity 0.134、P-transfer 0.074。虽然 harmful prevalence 分别只有 10.1%、7.0%、2.6%，且风险权重取 `max(full, cell-only)` 作保守上界，但现有报告没有给 harmful Brier/ECE、top-exposure harmful enrichment 或加权后的 expected harm。不得声称“新增错误已经被准确识别”。
+8. **所有 action 权重均大于零。** 这符合预注册的连续 soft weighting，也避免 family 被噪声硬清零；但它意味着已知有害动作仍可能获得很小曝光。真正的安全性必须由显式 no-op、bounded sampler、margin floor、preservation loss 和四臂 held 结果共同验证。
+9. **动态权重含训练期 current-geometry evidence。** 该量只在 outer-train 使用并按 epoch 滞后一轮，不是推理期 selector。Phase A 验证的是 `clean-visible prior + lagged replay evidence + conservative risk` 的联合训练策略，不能把全部增量单独归因给 clean predictor。
+
+### 12.4 “这对吗”的裁决
+
+**对，但只能在上述窄问题上判定为通过。** 设计正确地使用 formula-OOF、cell-only 与 permuted-clean 对照，且三类来源的主要 clustered Brier 证据均为严格正值；所以继续进入共同 schedule 和四臂直接共享-encoder 训练是有依据的，不是拍脑袋扩大训练。
+
+同时，M2 的 `gates` 主要是工程完整性门，并未显式把上述 Brier CI 和风险校准写成 formal gate。已完成制品及 SHA 不做事后修改；本节作为不可回写原结果的解释性补充，冻结以下裁决：
+
+- 三个来源的 positive clean-visible learnability 通过；
+- P-transfer 为当前最强 conditional signal；
+- P-intensity 只能在风险/no-op 保护下进入训练，不能凭高 AUPRC 获得无条件高曝光；
+- harmful-risk calibration 未闭合，必须在 Phase A 汇总中报告按来源和 exposure quantile 的 weighted positive/harmful mass、introduced errors 及 candidate switches；
+- 只有 `NP>C1`、`NP>C2`、`NP>C0` 与 clean held 安全门共同通过，才能声称动态定向噪声成功转移进更好的 shared embedding。
+
+因此本次 M2 的正确表述是：**已证明成熟 E4 clean spectrum 对 N、P-intensity、P-transfer 的动作收益存在跨 formula 的条件可学习性，并已形成无 family 坍缩、保留 no-op 的训练权重；尚未证明这些权重能改善模型。**
+
+## 13. 正式大训练前的共同决策冻结
+
+对现有 Phase-A trainer 的逐项审计发现，当前实现仍存在会影响科学归因或动作利用率的未决项：epoch-adaptive 定义未兑现、static 与 conditional 总 action dose 不匹配、P wrong-direction control 被统称为 matched-random、单次 schedule 在四个 epoch 重复、loss 未实现 formula 内 identity 等权，以及 contextual peak tokens 仍来自 official 而非 mature E4 geometry。
+
+这些问题不推翻 M2 的 clean-visible learnability 结论，但必须在正式训练前共同裁决。详细数据、候选方案、建议组合和十二项训练前审计页见：`docs/NOISE_FINAL_SHARED_EMBEDDING_BATTLE_PLAN_DRAFT_20260904.md`。在该文档第 8 节的五项选择冻结前，旧大训练入口只保留为历史实现，不视为最终决战版本。
+
+用户随后授权按精简的必要修正实施。最终冻结为：复用现有 M2、冻结 conditional policy、保留并如实区分 N matched-random 与 P wrong-direction control、30-cell 跨 epoch 轮换、conditional/static 每-query 剂量匹配、0.35/0.45/0.55/0.55 action curriculum、formula→identity→query 三级等权；不增加 token 重编码、epoch-adaptive replay、蒸馏或新动作矩阵。唯一正式入口更新为 `tasks/run_noise_final_dynamic_direct_e4_phase_a_final.sbatch`，旧 `..._big.sbatch` 仅保留历史用途。

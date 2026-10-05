@@ -1,0 +1,64 @@
+{
+  "schema_version": "bioaware-unified-benchmark-methods-v1",
+  "baseline_method": "official_dreams",
+  "tracks": {
+    "spectrum_reference": {
+      "scientific_question": "How well does a query spectrum retrieve the correct molecule through a frozen reference-spectral library?",
+      "required_methods": [
+        "modified_cosine",
+        "spectral_entropy",
+        "spec2vec",
+        "ms2deepscore_2",
+        "official_dreams"
+      ]
+    },
+    "spectrum_structure": {
+      "scientific_question": "How well does a spectrum rank candidate molecular structures when molecular structure is an explicit model input?",
+      "required_methods": [
+        "mist",
+        "jestr",
+        "flare",
+        "iceberg_2"
+      ]
+    },
+    "sample_context": {
+      "scientific_question": "Does truth-blind sample-local biochemical context add ranking value beyond the frozen unary method?",
+      "required_methods": [
+        "frozen_unary",
+        "catalogue_degree_only",
+        "metdna3_or_kgmn",
+        "bioaware_exact_event"
+      ]
+    }
+  },
+  "rules": {
+    "candidate_sets_identical_within_track": true,
+    "negative_ties_count_against_truth": true,
+    "one_truth_per_query": true,
+    "opened_development_and_sealed_external_reported_separately": true,
+    "released_frozen_weights_and_equal_data_retraining_reported_separately": true,
+    "context_methods_must_abstain_when_context_is_absent": true
+  },
+  "mandatory_metrics": [
+    "recall_at_1",
+    "recall_at_2",
+    "recall_at_5",
+    "recall_at_10",
+    "recall_at_20",
+    "mrr",
+    "ndcg_at_5",
+    "ndcg_at_10",
+    "median_rank",
+    "macro_query_auroc",
+    "corrected",
+    "introduced",
+    "risk_net_lambda_2",
+    "formula_cluster_top1_ci",
+    "source_cluster_top1_ci"
+  ],
+  "pairwise_dreams_style_metric": {
+    "reported_separately": true,
+    "name": "10ppm_pooled_spectrum_pair_auroc",
+    "warning": "This is not macro-query AUROC and is not an exact reproduction of DreaMS NIST20 AUROC unless the original NIST20 protocol and disjointness ledger are reproduced."
+  }
+}

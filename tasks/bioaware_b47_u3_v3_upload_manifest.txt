@@ -1,0 +1,10 @@
+annotation/bioaware.py
+annotation/bioaware_relations.py
+tasks/bioaware_b47_u3_core.py
+tasks/audit_bioaware_b47_u3_event_yield.py
+tasks/test_bioaware_b47_u3_event_yield.py
+tasks/validate_bioaware_b47_u3_event_yield.py
+tasks/run_bioaware_b47_u3_event_yield.sbatch
+docs/BIOAWARE_B47_U3_EVENT_YIELD_PROTOCOL_AMENDMENT_20260921.md
+docs/PROJECT_AGENT_EXECUTION_REGISTRY_20260919.md
+docs/PROJECT_CLAIM_REGISTRY_20260919.md

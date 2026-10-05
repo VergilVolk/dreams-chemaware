@@ -1,0 +1,30 @@
+{
+  "schema": "dreams_grand_fusion_component_registry_v1",
+  "frozen_on": "2026-10-04",
+  "principle": "Every component is registered and ablated. Provisional components may enter one preregistered frozen-system trial without result-conditioned inclusion; production requires the integrated gate, while audit-only and retired components never affect scores.",
+  "components": [
+    {"name": "official_dreams", "layer": "spectral", "role": "baseline", "deployment": "enabled"},
+    {"name": "noise_v1", "layer": "shared_encoder", "role": "condition_robust_representation", "deployment": "enabled"},
+    {"name": "cosine_greedy", "layer": "spectral", "role": "classical_control", "deployment": "audit_only"},
+    {"name": "modified_cosine", "layer": "spectral", "role": "classical_control", "deployment": "audit_only"},
+    {"name": "weighted_spectral_entropy", "layer": "spectral", "role": "strong_default_expert", "deployment": "enabled"},
+    {"name": "p2b_sqrt_cosine", "layer": "spectral", "role": "P2b_source_expert", "deployment": "enabled"},
+    {"name": "p2b_unweighted_entropy", "layer": "spectral", "role": "P2b_source_expert", "deployment": "enabled"},
+    {"name": "neutral_loss_sqrt_cosine", "layer": "spectral", "role": "neutral_loss_expert", "deployment": "enabled"},
+    {"name": "noise_p2b_v1", "layer": "reranker", "role": "local_spectral_fusion", "deployment": "enabled"},
+    {"name": "noise_p2b_official", "layer": "reranker", "role": "ablation_control", "deployment": "audit_only"},
+    {"name": "noise_rrf_1_7", "layer": "reranker", "role": "historical_exploratory_expert", "deployment": "retired_audit_only", "reason": "Stage-1 and GNPS confirmation failed"},
+    {"name": "noise_msg_fusion_stack_v1", "layer": "reranker", "role": "candidate_level_score_stack", "deployment": "provisional", "gate": "formula-OOF freeze followed by one GNPS evaluation"},
+    {"name": "chemaware_v2_reranker", "layer": "reranker", "role": "fragmentation_chemistry_expert", "deployment": "provisional", "gate": "frozen GNPS identity and formula panels"},
+    {"name": "chemaware_stage1_encoder", "layer": "shared_encoder", "role": "chemistry_task_vector", "deployment": "provisional", "gate": "external validation after composition"},
+    {"name": "chemaware_phase_a_encoder", "layer": "shared_encoder", "role": "chemistry_task_vector_alternative", "deployment": "audit_only", "gate": "role-3 and external confirmation"},
+    {"name": "bioaware_b35", "layer": "context", "role": "development_predecessor", "deployment": "audit_only"},
+    {"name": "bioaware_b47_exact_event", "layer": "context", "role": "sparse_sample_specific_residual", "deployment": "sealed_pending_gate", "gate": "authorized repaired action ledger plus external event benchmark"}
+  ],
+  "production_order": [
+    "shared encoder candidate scores",
+    "query-level spectral expert router",
+    "authorized sparse BioAware residual",
+    "strict molecule ranking"
+  ]
+}

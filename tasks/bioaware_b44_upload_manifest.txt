@@ -1,0 +1,58 @@
+# BioAware B44 files required on the server, relative to the DreaMS root.
+
+# Entry point and B44 code
+tasks/run_bioaware_b44_full_pipeline.sbatch
+tasks/build_bioaware_b44_massbank_blind_panel.py
+tasks/validate_bioaware_b44_massbank_blind_panel.py
+tasks/test_bioaware_b44_massbank_blind_panel.py
+tasks/freeze_bioaware_b44_catalogue_v1.py
+tasks/validate_bioaware_b44_catalogue_v1.py
+tasks/test_bioaware_b44_catalogue_v1.py
+tasks/evaluate_bioaware_b44_massbank_once.py
+tasks/validate_bioaware_b44_massbank_once.py
+tasks/test_bioaware_b44_massbank_once.py
+
+# Imported BioAware implementation (must match the local versions)
+tasks/audit_bioaware_b11_catalog_interaction_action.py
+tasks/audit_bioaware_b12_multicohort_catalog_action.py
+tasks/audit_bioaware_b16_pairwise_nonlinear_action.py
+tasks/audit_bioaware_b36_reaction_specificity_ablation.py
+tasks/audit_bioaware_b41_cross_catalog_topology.py
+tasks/audit_bioaware_b42_independent_catalog_topology.py
+tasks/evaluate_bioaware_b39_m2_fixed_action.py
+tasks/audit_bioaware_b5_graph_prior_external_transfer.py
+tasks/develop_bioaware_b1_multisource_action.py
+tasks/develop_bioaware_metdna3_negative_loso_ranker.py
+tasks/pilot_paired_layer_cka.py
+tasks/shared_dreams_inference.py
+tasks/e1_checkpoint_io.py
+tasks/train_e1_identity.py
+dreams/models/chem_aware/shared_embedding_v2.py
+dreams/models/chem_aware/peft_v3.py
+dreams/models/chem_aware/global_embedding_adapter.py
+
+# Frozen B42 opened-development outputs
+data/validation/bioaware_b42_independent_catalog_topology_localcheck_20260913_v2/report.json
+data/validation/bioaware_b42_independent_catalog_topology_localcheck_20260913_v2/candidate_catalog_features.csv.gz
+data/validation/bioaware_b42_independent_catalog_topology_localcheck_20260913_v2/cross_catalog_transitions.csv.gz
+
+# Six-domain B42 training inputs
+data/validation/bioaware_b3_reaction_coabundance_local_20260906/candidate_features.csv.gz
+data/validation/bioaware_st001154_hilic_extension_v3_evaluation_v1/candidate_features.csv.gz
+data/validation/bioaware_st001154_hilic_extension_v3_evaluation_v1/per_query.csv.gz
+data/validation/bioaware_kgmn200std_hidden_seed_v1/candidate_features.csv.gz
+data/validation/bioaware_kgmn200std_confirmation_manifest_v2/seed_features.csv.gz
+
+# Catalogue resources
+data/reference/metdna2_kegg_network_20260828/metdna2_kegg_edges.csv.gz
+data/reference/metdna2_emrn_network_20260828/metdna2_emrn_edges.csv.gz
+data/reference/bioaware_rhea_offline_20260827/rhea_participants.csv.gz
+
+# Independent MassBank inputs
+data/massbank/massbank_full.hdf5
+data/massbank/massbank_full.mgf
+data/massbank/massbank_202406_msms.csv
+
+# Frozen official DreaMS model
+data/e1/official_embedding_slim.pt
+dreams/models/pretrained/ssl_model_server.pt

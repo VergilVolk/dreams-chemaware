@@ -1,0 +1,680 @@
+{
+  "schema": "chemaware_executable_action_knowledge_v2",
+  "scientific_type": "structure_conditioned_spectral_action_knowledge",
+  "rules": [],
+  "observation_candidates": [
+    {
+      "channel_id": "OBS:NL:0000",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0001",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0002",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0003",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0004",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0005",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0006",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0007",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0008",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0009",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0010",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0011",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0012",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0013",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0014",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0015",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0016",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0017",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0018",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0019",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0020",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0021",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0022",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0023",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0024",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0025",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0026",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0027",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0028",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0029",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0030",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0031",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0032",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0033",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0034",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0035",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0036",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0037",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0038",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0039",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0040",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0041",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0042",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0043",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0044",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0045",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0046",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0047",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0048",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0049",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0050",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0051",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0052",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0053",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0054",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0055",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0056",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0057",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0058",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0059",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0060",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0061",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0062",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0063",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0064",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0065",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0066",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0067",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0068",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0069",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0070",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0071",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0072",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0073",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0074",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0075",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0076",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0077",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0078",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0079",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0080",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0081",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0082",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0083",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0084",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0085",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0086",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0087",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0088",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0089",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0090",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0091",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0092",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0093",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0094",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:NL:0095",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:CF:0096",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:CF:0097",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:CF:0098",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:CF:0099",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:CF:0100",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:CF:0101",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:CF:0102",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:CF:0103",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:CF:0104",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:CF:0105",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:CF:0106",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:CF:0107",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:CF:0108",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:CF:0109",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:CF:0110",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:CF:0111",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:CF:0112",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:CF:0113",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:CF:0114",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:CF:0115",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:CF:0116",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:CF:0117",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:CF:0118",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    },
+    {
+      "channel_id": "OBS:CF:0119",
+      "formal_action_enabled": false,
+      "reason": "missing_parent_structure_prerequisite_or_formula_disjoint_admission"
+    }
+  ],
+  "action_families": [
+    {
+      "action_id": "corrective_conflict_attenuation",
+      "role": "corrective",
+      "selector": "training_only_true_minus_same_formula_counterfactual_evidence",
+      "operation": "attenuate_observed_peak_intensity",
+      "may_add_new_mz": false,
+      "requires_matched_controls": [
+        "candidate_swapped",
+        "peak_evidence_permuted",
+        "clean_duplicate"
+      ],
+      "formal_enabled": false
+    },
+    {
+      "action_id": "corrective_support_amplification",
+      "role": "corrective",
+      "selector": "training_only_true_minus_same_formula_counterfactual_evidence",
+      "operation": "amplify_observed_peak_intensity",
+      "may_add_new_mz": false,
+      "requires_matched_controls": [
+        "candidate_swapped",
+        "peak_evidence_permuted",
+        "clean_duplicate"
+      ],
+      "formal_enabled": false
+    },
+    {
+      "action_id": "corrective_signed_reweighting",
+      "role": "corrective",
+      "selector": "training_only_true_minus_same_formula_counterfactual_evidence",
+      "operation": "bidirectionally_reweight_observed_peak_intensity",
+      "may_add_new_mz": false,
+      "requires_matched_controls": [
+        "candidate_swapped",
+        "peak_evidence_permuted",
+        "clean_duplicate"
+      ],
+      "formal_enabled": false
+    },
+    {
+      "action_id": "mechanistic_supported_peak_dropout",
+      "role": "robustness",
+      "selector": "admitted_parent_conditioned_rule_matches_observed_peak",
+      "operation": "attenuate_observed_peak_intensity",
+      "may_add_new_mz": false,
+      "requires_matched_controls": [
+        "matched_random_peak_dropout",
+        "clean_duplicate"
+      ],
+      "formal_enabled": false
+    }
+  ],
+  "contracts": {
+    "rule_and_action_are_separate_objects": true,
+    "record_specific_mass_difference_is_not_a_rule": true,
+    "parent_structure_predicate_required": true,
+    "observed_peaks_only": true,
+    "new_peak_synthesis_forbidden": true,
+    "teacher_structure_training_only": true,
+    "inference_input_one_clean_spectrum": true,
+    "direct_training_must_not_match_teacher_scores_or_embeddings": true,
+    "formula_disjoint_action_admission_required": true,
+    "global_action_setting_selected_before_confirmation": true,
+    "embedding_evaluation_formulas_action_unseen": true,
+    "outer_formulas_action_unseen": true
+  },
+  "provenance": {
+    "legacy_core_sha256": "d66c085e8718c14eeebc6e99959ba54741e44726421d5d7d36ac7d684e63a498",
+    "legacy_massbank_sha256": "c88e1de1a27601cc9e7915c02454663a18ae6241b64f8e13700adbf9e0c293a3",
+    "observation_registry_sha256": "f192b25b55fffcaeccd6f2fa9d72118202b120fc9ba6e4f990675523df2c3549",
+    "curated_rules_sha256": null
+  }
+}

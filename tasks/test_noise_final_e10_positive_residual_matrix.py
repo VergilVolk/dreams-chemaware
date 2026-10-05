@@ -12,13 +12,19 @@ def main() -> None:
     clean[0] = torch.tensor([500.0, 1.0])
     clean[1] = torch.tensor([100.0, 1.0])
     clean[2] = torch.tensor([150.0, 0.5])
-    prevalence = torch.tensor([0, 1, 1, 0, 0, 0], dtype=torch.float32).numpy()
+    prevalence = torch.tensor([0, 1, 0.4, 0, 0, 0], dtype=torch.float32).numpy()
     target = clean[:, 1].numpy().copy()
     target[2] = 0.2
     intensity = cell_variant(clean, (prevalence, target), torch.empty((0, 2)).numpy(),
                              "consensus_projection", 0.5)
     if torch.equal(intensity, clean):
         raise AssertionError("E10 intensity action did not change the spectrum")
+    prevalence_only = cell_variant(
+        clean, (prevalence, target), torch.empty((0, 2)).numpy(),
+        "prevalence_attenuation", 0.5,
+    )
+    if torch.equal(prevalence_only, clean):
+        raise AssertionError("restored prevalence action did not change the spectrum")
     expanded = action_cells("expanded")
     if len(expanded) != 38 or len(set(expanded)) != 38:
         raise AssertionError("E10-B must contain 19 positive cells and 19 controls")

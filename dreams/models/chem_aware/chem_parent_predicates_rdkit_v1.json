@@ -1,0 +1,781 @@
+{
+  "schema": "chemaware_parent_predicate_registry_v1",
+  "scientific_type": "structure_predicate_hypothesis_vocabulary",
+  "predicates": [
+    {
+      "predicate_id": "RDKIT_FG:000:fr_C_O",
+      "name": "fr_C_O",
+      "smarts_any": [
+        "[C&X3]=[O&X1]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:001:fr_C_O_noCOO",
+      "name": "fr_C_O_noCOO",
+      "smarts_any": [
+        "[C&!$(C-[O&H1])]=O"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:002:fr_Al_OH",
+      "name": "fr_Al_OH",
+      "smarts_any": [
+        "[C&!$(C=O)]-[O&H1]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:003:fr_Ar_OH",
+      "name": "fr_Ar_OH",
+      "smarts_any": [
+        "c[O&H1]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:004:fr_methoxy",
+      "name": "fr_methoxy",
+      "smarts_any": [
+        "[O&X2](-[#6])-[C&H3]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:005:fr_oxime",
+      "name": "fr_oxime",
+      "smarts_any": [
+        "[C&X3]=[N&X2]-[O&X2]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:006:fr_ester",
+      "name": "fr_ester",
+      "smarts_any": [
+        "[#6][C&X3](=O)[O&X2&H0][#6]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:007:fr_Al_COO",
+      "name": "fr_Al_COO",
+      "smarts_any": [
+        "C-C(=O)[O;H1,-]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:008:fr_Ar_COO",
+      "name": "fr_Ar_COO",
+      "smarts_any": [
+        "c-C(=O)[O;H1,-]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:009:fr_COO",
+      "name": "fr_COO",
+      "smarts_any": [
+        "[#6]C(=O)[O;H1,-]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:010:fr_COO2",
+      "name": "fr_COO2",
+      "smarts_any": [
+        "[C&X3](=O)[O&X1&H0&-,O&X2&H1]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:011:fr_ketone",
+      "name": "fr_ketone",
+      "smarts_any": [
+        "[#6][C&X3](=O)[#6]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:012:fr_ether",
+      "name": "fr_ether",
+      "smarts_any": [
+        "[O&D2]([#6])[#6]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:013:fr_phenol",
+      "name": "fr_phenol",
+      "smarts_any": [
+        "[O&X2&H1]-c1ccccc1"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:014:fr_aldehyde",
+      "name": "fr_aldehyde",
+      "smarts_any": [
+        "[C&X3&H1](=O)[#6]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:015:fr_quatN",
+      "name": "fr_quatN",
+      "smarts_any": [
+        "[$([N&X4&+]),$([N&X4]=*)]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:016:fr_NH2",
+      "name": "fr_NH2",
+      "smarts_any": [
+        "[N&H2,n&H2]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:017:fr_NH1",
+      "name": "fr_NH1",
+      "smarts_any": [
+        "[N&H1,n&H1]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:018:fr_NH0",
+      "name": "fr_NH0",
+      "smarts_any": [
+        "[N&H0,n&H0]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:019:fr_Ar_N",
+      "name": "fr_Ar_N",
+      "smarts_any": [
+        "n"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:020:fr_Ar_NH",
+      "name": "fr_Ar_NH",
+      "smarts_any": [
+        "[n&H1]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:021:fr_aniline",
+      "name": "fr_aniline",
+      "smarts_any": [
+        "c-[N&X3&!$(N=*)]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:022:fr_Imine",
+      "name": "fr_Imine",
+      "smarts_any": [
+        "[N&v3](=C)-[#6]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:023:fr_nitrile",
+      "name": "fr_nitrile",
+      "smarts_any": [
+        "[N&X1]#[C&X2]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:024:fr_hdrzine",
+      "name": "fr_hdrzine",
+      "smarts_any": [
+        "[N&X3]-[N&X3]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:025:fr_hdrzone",
+      "name": "fr_hdrzone",
+      "smarts_any": [
+        "C=N-[N&X3]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:026:fr_nitroso",
+      "name": "fr_nitroso",
+      "smarts_any": [
+        "[N&!$(N-O)]=O"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:027:fr_N_O",
+      "name": "fr_N_O",
+      "smarts_any": [
+        "[N&!$(N=O)](-O)-C"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:028:fr_nitro",
+      "name": "fr_nitro",
+      "smarts_any": [
+        "[$([N&X3](=O)=O),$([N&X3&+](=O)[O&-])][!#8]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:029:fr_azo",
+      "name": "fr_azo",
+      "smarts_any": [
+        "[#6]-N=N-[#6]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:030:fr_diazo",
+      "name": "fr_diazo",
+      "smarts_any": [
+        "[N&+]#N"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:031:fr_azide",
+      "name": "fr_azide",
+      "smarts_any": [
+        "[$(*-[N&X2&-]-[N&X2&+]#[N&X1]),$(*-[N&X2]=[N&X2&+]=[N&X1&-])]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:032:fr_amide",
+      "name": "fr_amide",
+      "smarts_any": [
+        "C(=O)-N"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:033:fr_priamide",
+      "name": "fr_priamide",
+      "smarts_any": [
+        "C(=O)-[N&H2]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:034:fr_amidine",
+      "name": "fr_amidine",
+      "smarts_any": [
+        "C(=N)(-N)-[!#7]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:035:fr_guanido",
+      "name": "fr_guanido",
+      "smarts_any": [
+        "C(=N)(N)N"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:036:fr_Nhpyrrole",
+      "name": "fr_Nhpyrrole",
+      "smarts_any": [
+        "[n&H1]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:037:fr_imide",
+      "name": "fr_imide",
+      "smarts_any": [
+        "N(-C=O)-C=O"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:038:fr_isocyan",
+      "name": "fr_isocyan",
+      "smarts_any": [
+        "N=C=O"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:039:fr_isothiocyan",
+      "name": "fr_isothiocyan",
+      "smarts_any": [
+        "N=C=S"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:040:fr_thiocyan",
+      "name": "fr_thiocyan",
+      "smarts_any": [
+        "S-C#N"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:041:fr_halogen",
+      "name": "fr_halogen",
+      "smarts_any": [
+        "[#9,#17,#35,#53]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:042:fr_alkyl_halide",
+      "name": "fr_alkyl_halide",
+      "smarts_any": [
+        "[C&X4]-[Cl,Br,I,F]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:043:fr_sulfide",
+      "name": "fr_sulfide",
+      "smarts_any": [
+        "[S&X2](-[#6])-C"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:044:fr_SH",
+      "name": "fr_SH",
+      "smarts_any": [
+        "[S&H1]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:045:fr_C_S",
+      "name": "fr_C_S",
+      "smarts_any": [
+        "C=[S&X1]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:046:fr_sulfone",
+      "name": "fr_sulfone",
+      "smarts_any": [
+        "S(=,-[O&X1;+0,-])(=,-[O&X1;+0,-])(-[#6])-[#6]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:047:fr_sulfonamd",
+      "name": "fr_sulfonamd",
+      "smarts_any": [
+        "N-S(=,-[O&X1;+0,-])(=,-[O&X1;+0,-])-[#6]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:048:fr_prisulfonamd",
+      "name": "fr_prisulfonamd",
+      "smarts_any": [
+        "[N&H2]-S(=,-[O&X1;+0,-])(=,-[O&X1;+0,-])-[#6]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:049:fr_barbitur",
+      "name": "fr_barbitur",
+      "smarts_any": [
+        "C1C(=O)NC(=O)NC1=O"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:050:fr_urea",
+      "name": "fr_urea",
+      "smarts_any": [
+        "C(=O)(-N)-N"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:051:fr_term_acetylene",
+      "name": "fr_term_acetylene",
+      "smarts_any": [
+        "C#[C&H1]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:052:fr_imidazole",
+      "name": "fr_imidazole",
+      "smarts_any": [
+        "n1cncc1"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:053:fr_furan",
+      "name": "fr_furan",
+      "smarts_any": [
+        "o1cccc1"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:054:fr_thiophene",
+      "name": "fr_thiophene",
+      "smarts_any": [
+        "s1cccc1"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:055:fr_thiazole",
+      "name": "fr_thiazole",
+      "smarts_any": [
+        "c1scnc1"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:056:fr_oxazole",
+      "name": "fr_oxazole",
+      "smarts_any": [
+        "c1ocnc1"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:057:fr_pyridine",
+      "name": "fr_pyridine",
+      "smarts_any": [
+        "n1ccccc1"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:058:fr_piperdine",
+      "name": "fr_piperdine",
+      "smarts_any": [
+        "N1CCCCC1"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:059:fr_piperzine",
+      "name": "fr_piperzine",
+      "smarts_any": [
+        "N1CCNCC1"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:060:fr_morpholine",
+      "name": "fr_morpholine",
+      "smarts_any": [
+        "O1CCNCC1"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:061:fr_lactam",
+      "name": "fr_lactam",
+      "smarts_any": [
+        "N1C(=O)CC1"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:062:fr_lactone",
+      "name": "fr_lactone",
+      "smarts_any": [
+        "[C&R1](=O)[O&R1][C&R1]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:063:fr_tetrazole",
+      "name": "fr_tetrazole",
+      "smarts_any": [
+        "c1nnnn1"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:064:fr_epoxide",
+      "name": "fr_epoxide",
+      "smarts_any": [
+        "O1CC1"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:065:fr_unbrch_alkane",
+      "name": "fr_unbrch_alkane",
+      "smarts_any": [
+        "[C&R0;D2,D1][C&R0&D2][C&R0&D2][C&R0;D2,D1]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:066:fr_bicyclic",
+      "name": "fr_bicyclic",
+      "smarts_any": [
+        "[R2][R2]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:067:fr_benzene",
+      "name": "fr_benzene",
+      "smarts_any": [
+        "c1ccccc1"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:068:fr_phos_acid",
+      "name": "fr_phos_acid",
+      "smarts_any": [
+        "[$(P(=[O&X1])([$([O&X2&H1]),$([O&X1&-]),$([O&X2]P)])([$([O&X2&H1]),$([O&X1&-]),$([O&X2]P)])[$([O&X2&H1]),$([O&X1&-]),$([O&X2]P)]),$([P&+]([O&X1&-])([$([O&X2&H1]),$([O&X1&-]),$([O&X2]P)])([$([O&X2&H1]),$([O&X1&-]),$([O&X2]P)])[$([O&X2&H1]),$([O&X1&-]),$([O&X2]P)])]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:069:fr_phos_ester",
+      "name": "fr_phos_ester",
+      "smarts_any": [
+        "[$(P(=[O&X1])([O&X2][#6])([$([O&X2&H1]),$([O&X1&-]),$([O&X2][#6])])[$([O&X2&H1]),$([O&X1&-]),$([O&X2][#6]),$([O&X2]P)]),$([P&+]([O&X1&-])([O&X2][#6])([$([O&X2&H1]),$([O&X1&-]),$([O&X2][#6])])[$([O&X2&H1]),$([O&X1&-]),$([O&X2][#6]),$([O&X2]P)])]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:070:fr_nitro_arom",
+      "name": "fr_nitro_arom",
+      "smarts_any": [
+        "[$(c1(-[$([N&X3](=O)=O),$([N&X3&+](=O)[O&-])])ccccc1)]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:071:fr_nitro_arom_nonortho",
+      "name": "fr_nitro_arom_nonortho",
+      "smarts_any": [
+        "[$(c1(-[$([N&X3](=O)=O),$([N&X3&+](=O)[O&-])])ccccc1)&!$(cc-&!:*)]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:072:fr_dihydropyridine",
+      "name": "fr_dihydropyridine",
+      "smarts_any": [
+        "[$([N&X3&H1]1-C=C-C-C=C1),$([N&v3]1=C-C-C=C-C1),$([N&v3]1=C-C=C-C-C1),$([N&X3&H1]1-C-C=C-C=C1)]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:073:fr_phenol_noOrthoHbond",
+      "name": "fr_phenol_noOrthoHbond",
+      "smarts_any": [
+        "[$(c1(-[O&X2&H1])ccccc1)&!$(cc-&!:[C&H2]-[O&X2&H1])&!$(cc-&!:C(=O)[O;H1,-])&!$(cc-&!:C(=O)-[N&H2])]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:074:fr_Al_OH_noTert",
+      "name": "fr_Al_OH_noTert",
+      "smarts_any": [
+        "[$(C-[O&X2&H1])&!$([C&X3](-[O&X2&H1])=[O&X1])&!$([C&D4]-[O&X2&H1])]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:075:fr_benzodiazepine",
+      "name": "fr_benzodiazepine",
+      "smarts_any": [
+        "[c&R2]12[c&R1][c&R1][c&R1][c&R1][c&R2]1[N&R1][C&R1][C&R1][N&R1]=[C&R1]2"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:076:fr_para_hydroxylation",
+      "name": "fr_para_hydroxylation",
+      "smarts_any": [
+        "[$([c&H1]1[c&H1]cc(c[c&H1]1)~[$([#8,$([#8]~[H1,c,C])])]),$([c&H1]1[c&H1]cc(c[c&H1]1)~[$([#7&X3,$([#7](~[H1,c,C])~[H1,c,C])])]),$([c&H1]1[c&H1]cc(c[c&H1]1)-&!:[$([N&X3&H1,$(NC(=O)[H1,c,C])])])]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:077:fr_allylic_oxid",
+      "name": "fr_allylic_oxid",
+      "smarts_any": [
+        "[$(C=C-C)&!$(C=C-C-[N,O,S])&!$(C=C-C-C-[N,O])&!$(C12=CC(=O)CCC1C1C(C3C(CCC3)CC1)CC2)]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:078:fr_aryl_methyl",
+      "name": "fr_aryl_methyl",
+      "smarts_any": [
+        "[$(a-[C&H3]),$(a-[C&H2]-[C&H3]),$(a-[C&H2]-[C&H2]~[!N&!O]);!$(a(:a!:*):a!:*)]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:079:fr_Ndealkylation1",
+      "name": "fr_Ndealkylation1",
+      "smarts_any": [
+        "[$(N(-[C&H3])-C-[$(C~O),$(C-a),$(C-N),$(C=C)]),$(N(-[C&H2][C&H3])-C-[$(C~O),$(C-a),$(C-N),$(C=C)])]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:080:fr_Ndealkylation2",
+      "name": "fr_Ndealkylation2",
+      "smarts_any": [
+        "[$([N&R1]1(-C)CCC1),$([N&R1]1(-C)CCCC1),$([N&R1]1(-C)CCCCC1),$([N&R1]1(-C)CCCCCC1),$([N&R1]1(-C)CCCCCCC1)]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:081:fr_alkyl_carbamate",
+      "name": "fr_alkyl_carbamate",
+      "smarts_any": [
+        "C[N&H1]C(=O)OC"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:082:fr_ketone_Topliss",
+      "name": "fr_ketone_Topliss",
+      "smarts_any": [
+        "[$([C&X3](=[O&X1])(C)[c,C])&!$([C&X3](=[O&X1])([C&H1]=C)[c,C])]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:083:fr_ArN",
+      "name": "fr_ArN",
+      "smarts_any": [
+        "[$(a-[N&X3&H2]),$(a-[N&H1][N&H2]),$(a-C(=[O&X1])[N&H1][N&H2]),$(a-C(=[N&H1])[N&H2])]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    },
+    {
+      "predicate_id": "RDKIT_FG:084:fr_HOCCN",
+      "name": "fr_HOCCN",
+      "smarts_any": [
+        "[$([O&X2&H1][C&X4][C&X4&H2][N&X3&R1]),$([O&H1][C&X4][C&X4&H2][N&X3][C&X4](C)(C)C)]"
+      ],
+      "scientific_status": "parent_structure_hypothesis_only",
+      "may_define_fragmentation_rule": false
+    }
+  ],
+  "contracts": {
+    "fragmentation_claim": false,
+    "association_claim": false,
+    "formula_disjoint_empirical_confirmation_required": true,
+    "matched_formula_controls_required": true
+  },
+  "provenance": {
+    "source": "RDKit Chem.Fragments built-in functional-group queries",
+    "rdkit_version": "2026.03.5"
+  }
+}

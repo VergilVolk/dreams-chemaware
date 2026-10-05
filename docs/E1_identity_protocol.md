@@ -73,7 +73,8 @@ Training diagnostics:
 
 Formal E1-versus-E0 metrics:
 
-- pooled 10-ppm ROC-AUC (paper-compatible primary metric)
+- pooled 10-ppm ROC-AUC on the frozen MassSpecGym pair set (same metric family
+  as DreaMS Fig. 4b, but not an exact NIST20 protocol reproduction)
 - query-macro ROC-AUC (project robustness co-primary metric)
 - average precision
 - positive-negative cosine separation

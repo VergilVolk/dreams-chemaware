@@ -8,6 +8,10 @@
 #SBATCH --error=bioaware_b0_signal_%j.err
 
 set -euo pipefail
+echo "RETIRED: this B0 protocol uses an insufficient matched-nonedge design." >&2
+echo "Run no BioAware embedding training until the model-free B0-M0 matching preflight is implemented and passes." >&2
+exit 4
+
 cd /data02/run01/scv7tsl/DreaMS
 source /data02/home/scv7tsl/run/miniconda3/etc/profile.d/conda.sh
 conda activate dreams

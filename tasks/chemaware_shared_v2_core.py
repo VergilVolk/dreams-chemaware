@@ -379,19 +379,35 @@ def ranks_and_margins_for_queries(
     query_subset: np.ndarray,
 ) -> tuple[np.ndarray, np.ndarray]:
     """Strict ranks and positive-vs-best-negative molecule margins."""
-    query_position = np.asarray([store.position[int(row)] for row in graph.query_row])
-    candidate_position = np.asarray([store.position[int(row)] for row in graph.pair_candidate_row])
-    molecule_query = np.repeat(np.arange(graph.n_queries), np.diff(graph.query_ptr))
-    pair_query = np.repeat(molecule_query, np.diff(graph.molecule_ptr))
-    pair_scores = np.einsum(
-        "ij,ij->i", encoded[query_position[pair_query]], encoded[candidate_position]
-    )
-    molecule_scores = np.maximum.reduceat(pair_scores, graph.molecule_ptr[:-1])
+    query_subset = np.asarray(query_subset, dtype=np.int64)
+    if query_subset.ndim != 1 or len(query_subset) == 0:
+        raise ValueError("evaluation query subset must be a non-empty vector")
     ranks = []
     margins = []
-    for query in np.asarray(query_subset, dtype=np.int64):
-        left, right = map(int, graph.query_ptr[query:query + 2])
-        scores = molecule_scores[left:right]
+    for query in query_subset:
+        if query < 0 or query >= graph.n_queries:
+            raise IndexError(f"query index outside candidate graph: {query}")
+        molecule_left, molecule_right = map(int, graph.query_ptr[query:query + 2])
+        pair_left = int(graph.molecule_ptr[molecule_left])
+        pair_right = int(graph.molecule_ptr[molecule_right])
+        try:
+            query_position = store.position[int(graph.query_row[query])]
+        except KeyError as error:
+            raise RuntimeError(
+                f"query row absent for evaluated query {int(query)}: {error}"
+            ) from error
+        candidate_rows = graph.pair_candidate_row[pair_left:pair_right]
+        try:
+            candidate_position = np.asarray(
+                [store.position[int(row)] for row in candidate_rows], dtype=np.int64,
+            )
+        except KeyError as error:
+            raise RuntimeError(
+                f"candidate row absent for evaluated query {int(query)}: {error}"
+            ) from error
+        pair_scores = encoded[candidate_position] @ encoded[query_position]
+        local_ptr = graph.molecule_ptr[molecule_left:molecule_right + 1] - pair_left
+        scores = np.maximum.reduceat(pair_scores, local_ptr[:-1])
         ranks.append(strict_rank(scores))
         margins.append(float(scores[0] - np.max(scores[1:])))
     return np.asarray(ranks, dtype=np.int32), np.asarray(margins, dtype=np.float32)
@@ -418,6 +434,14 @@ def paired_evaluation(
     query_subset: np.ndarray,
 ) -> dict:
     query_subset = np.asarray(query_subset, dtype=np.int64)
+    encoded = np.asarray(encoded)
+    official_encoded = np.asarray(official_encoded)
+    if encoded.ndim != 2 or encoded.shape != official_encoded.shape:
+        raise ValueError("current and official embedding matrices must be aligned rank-2 arrays")
+    if len(encoded) != len(store.position):
+        raise ValueError("embedding matrices do not align with the spectrum store")
+    if not np.all(np.isfinite(encoded)) or not np.all(np.isfinite(official_encoded)):
+        raise RuntimeError("evaluation embeddings contain non-finite values")
     old_rank, old_margin = ranks_and_margins_for_queries(
         official_encoded, store, graph, query_subset
     )

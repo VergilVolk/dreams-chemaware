@@ -101,3 +101,14 @@
 - 权重实现也已纠正：不再把 identity/formula/family 逆频率直接乘进 action utility；那会覆盖动态信号。action utility 保持单调，等暴露由 sampler/层级聚合负责。
 - 当前唯一获准作业为 `sbatch tasks/run_noise_final_dynamic_direct_preflight.sbatch`。该作业先运行 CPU 数值测试和静态实现审计，再验证所有 SHA/schema/fold，最后建立 outer-train 30-cell ledger；它不加载 DreaMS，不产生新的 embedding。
 - 该作业通过后，下一步才是 GPU action/control replay + tiny overfit，再生成 Phase A 四臂正式训练。不得把 preflight/ledger PASS 写成性能提升。
+# Slurm N26 submission constraint (2026-09-04)
+
+- New noise-route GPU jobs must request GPU resources explicitly with `#SBATCH --gpus=1` (or the deliberately chosen GPU count).
+- Do not write `#SBATCH --mem`, `#SBATCH --mem-per-cpu`, or another explicit Slurm memory request for N26 jobs. The partition assigns memory per GPU and rejects an explicit over-request.
+- The dynamic direct-finetuning preflight implementation audit enforces both requirements before model training is authorized.
+
+## Dynamic-direct ledger regression fix (2026-09-04)
+
+- The first ledger unit-test fixture contained 80 formulas. With one outer fold and one inner test fold removed, only 48 training formulas remained, while the production crossfit contract correctly required 50. The failure was therefore a test-fixture/production-threshold coupling bug, not evidence that the real P action space lacked support.
+- `fit_crossfit` now exposes explicit production-default support parameters, validates aligned inputs and both outcome classes before fitting, and reports observed versus required formula support.
+- The numerical regression test now uses 125 formulas, executes every outer fold 0-4, retains the production 50-formula threshold, and separately verifies that an undersized panel fails deliberately. The full core, preflight, ledger, implementation and shell chain passes locally with NumPy, sklearn and h5py available.

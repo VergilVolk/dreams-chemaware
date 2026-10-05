@@ -8,7 +8,7 @@ set -euo pipefail
   exit 2
 }
 cat >&2 <<'EOF'
-ChemAware G2b submission is paused fail-closed.
+BLOCKED: ChemAware G2b submission is paused fail-closed.
 This launcher is bound to the historical real_train_primary candidate graph
 and to a rejected structure/frozen-probe branch. It is retained only as an
 audit trail and must not authorize new ChemAware training.

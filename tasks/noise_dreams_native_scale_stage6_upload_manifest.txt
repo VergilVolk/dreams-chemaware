@@ -1,0 +1,8 @@
+tasks/build_noise_dreams_native_scale_stage6.py
+tasks/train_noise_dreams_native_scale_stage6.py
+tasks/test_noise_dreams_native_scale_stage6.py
+tasks/run_noise_dreams_native_scale_stage6_2gpu.sbatch
+tasks/summarize_noise_dreams_native_residual_stage2.py
+tasks/summarize_noise_dreams_native_stage4_gnps.py
+docs/NOISE_DREAMS_NATIVE_SCALE_STAGE6_20260928.md
+docs/NOISE_DREAMS_NATIVE_BROAD_POSITIVE_STAGE4_20260928.md

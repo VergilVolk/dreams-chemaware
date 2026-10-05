@@ -6,6 +6,7 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+import sys
 
 import numpy as np
 import pandas as pd
@@ -13,7 +14,14 @@ import torch
 import torch.nn.functional as F
 from scipy.stats import binomtest
 
-from annotation.bioaware_context_adapter import BiologicalEvidenceContextAdapter
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from annotation.bioaware_context_adapter import (
+    BiologicalEvidenceContextAdapter,
+    MonotoneEvidenceTangentLift,
+)
 
 
 def strict_rank(scores: np.ndarray, positive: int) -> int:
@@ -30,8 +38,57 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+EVIDENCE_MODES = {
+    # ``full`` exactly preserves the v1 activation semantics: RT may shape an
+    # already-active update, but RT alone cannot switch the adapter on.
+    "full": (tuple(range(12)), tuple(range(10))),
+    # B3 treats RT as a valid support source in its own right.  This is a new
+    # preregistered mode, not a reinterpretation of the frozen B2 primary.
+    "full_support": (tuple(range(12)), tuple(range(12))),
+    "reaction_smn": (tuple(range(10)), tuple(range(10))),
+    "reaction_only": (tuple(range(8)), tuple(range(8))),
+    "known_reaction_only": (tuple(range(4)), tuple(range(4))),
+    "predicted_reaction_only": (tuple(range(4, 8)), tuple(range(4, 8))),
+    "smn_only": ((8, 9), (8, 9)),
+    "smn_rt": ((8, 9, 10, 11), (8, 9)),
+    "rt_only": ((10, 11), (10, 11)),
+}
+
+FORMAL_RECIPE = {
+    "seeds": [20260830, 20260831, 20260832],
+    "epochs": 40,
+    "batch_size": 32,
+    "hidden_dim": 64,
+    "update_rank": 16,
+    "delta_bound": .05,
+    "learning_rate": 5e-4,
+    "temperature": .08,
+    "correct_query_weight": 2.0,
+    "safety_weight": 4.0,
+    "safety_slack": .005,
+    "preserve_weight": 8.0,
+    "gate_weight": .005,
+}
+
+B3_MONOTONE_FORMAL_RECIPE = {
+    "seeds": [20260830, 20260831, 20260832],
+    "epochs": 200,
+    "batch_size": 32,
+    "hidden_dim": 64,
+    "update_rank": 16,
+    "delta_bound": .05,
+    "learning_rate": 1e-2,
+    "temperature": .08,
+    "correct_query_weight": 2.0,
+    "safety_weight": 8.0,
+    "safety_slack": 0.0,
+    "preserve_weight": 8.0,
+    "gate_weight": .005,
+}
+
+
 class Dataset:
-    def __init__(self, path: Path, device: torch.device):
+    def __init__(self, path: Path, device: torch.device, evidence_mode: str = "full"):
         body = np.load(path)
         self.query_ids = body["query_ids"].astype(str)
         self.unit_ids = body["unit_ids"].astype(str)
@@ -43,10 +100,22 @@ class Dataset:
         self.positive = body["positive_indices"].astype(np.int64)
         self.candidate_ids = body["candidate_ids"].astype(str)
         self.candidate = torch.from_numpy(body["candidate_embeddings"]).to(device)
-        self.evidence_raw = body["evidence"].astype(np.float32)
+        all_evidence = body["evidence"].astype(np.float32)
+        all_columns = body["evidence_columns"].astype(str)
+        if evidence_mode not in EVIDENCE_MODES:
+            raise RuntimeError(f"unknown evidence mode: {evidence_mode}")
+        feature_indices, activation_indices = EVIDENCE_MODES[evidence_mode]
+        if all_evidence.shape[1] != 12 or len(all_columns) != 12:
+            raise RuntimeError("B2 evidence contract expects exactly 12 ordered columns")
+        self.evidence_raw = all_evidence[:, feature_indices]
         self.evidence = torch.from_numpy(self.evidence_raw).to(device)
-        self.context = torch.from_numpy(body["context_mask"].astype(bool)).to(device)
-        self.evidence_columns = body["evidence_columns"].astype(str)
+        # Activation is recomputed from the frozen evidence family rather than
+        # inherited from the full model.  This makes every ablation executable
+        # and prevents a removed family from silently opening the context gate.
+        context = np.any(np.abs(all_evidence[:, activation_indices]) > 1e-8, axis=1)
+        self.context = torch.from_numpy(context.astype(bool)).to(device)
+        self.evidence_columns = all_columns[list(feature_indices)]
+        self.evidence_mode = evidence_mode
         if len(self.offsets) != len(self.query_ids) + 1:
             raise RuntimeError("dataset offset/query mismatch")
         if self.offsets[-1] != len(self.candidate_ids):
@@ -57,6 +126,8 @@ class Dataset:
 
 
 def evidence_scaler(data: Dataset, query_indices: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    if len(query_indices) == 0:
+        raise RuntimeError("cannot fit evidence scaler on zero queries")
     flat = np.concatenate([
         np.arange(data.offsets[index], data.offsets[index + 1], dtype=np.int64)
         for index in query_indices
@@ -68,14 +139,55 @@ def evidence_scaler(data: Dataset, query_indices: np.ndarray) -> tuple[np.ndarra
     return mean.astype(np.float32), scale.astype(np.float32)
 
 
+def candidate_identity_set(data: Dataset, query_indices: np.ndarray) -> set[str]:
+    if len(query_indices) == 0:
+        return set()
+    return set(np.concatenate([
+        data.candidate_ids[data.section(int(index))] for index in query_indices
+    ]).tolist())
+
+
+def identity_balanced_epoch(
+    query_indices: np.ndarray, truth_ids: np.ndarray, rng: np.random.Generator,
+) -> np.ndarray:
+    """Draw exactly one active query per truth identity for one epoch."""
+    groups: dict[str, list[int]] = {}
+    for index in query_indices:
+        groups.setdefault(str(truth_ids[int(index)]), []).append(int(index))
+    if not groups:
+        return np.asarray([], dtype=np.int64)
+    selected = np.asarray([
+        int(rng.choice(groups[identity])) for identity in sorted(groups)
+    ], dtype=np.int64)
+    return rng.permutation(selected)
+
+
 def standardised_evidence(
     data: Dataset, flat: torch.Tensor, mean: torch.Tensor, scale: torch.Tensor,
 ) -> torch.Tensor:
     return (data.evidence[flat] - mean) / scale
 
 
+def adapt_candidates(
+    model: torch.nn.Module, data: Dataset, index: int, flat: torch.Tensor,
+    mean: torch.Tensor, scale: torch.Tensor, adapter_type: str,
+) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    """Apply one registered adapter without silently changing its inputs."""
+    section = data.section(int(index))
+    universal = data.candidate[section]
+    if adapter_type == "free":
+        return model(
+            universal, standardised_evidence(data, flat, mean, scale),
+            data.context[section],
+        )
+    if adapter_type == "monotone_evidence_lift":
+        query = data.query[int(index)].expand_as(universal)
+        return model(universal, data.evidence[flat], data.context[section], query)
+    raise RuntimeError(f"unknown adapter type: {adapter_type}")
+
+
 def batch_loss(
-    model: BiologicalEvidenceContextAdapter, data: Dataset, indices: np.ndarray,
+    model: torch.nn.Module, data: Dataset, indices: np.ndarray,
     mean: torch.Tensor, scale: torch.Tensor, args: argparse.Namespace,
 ) -> tuple[torch.Tensor, dict[str, float]]:
     losses: list[torch.Tensor] = []
@@ -86,8 +198,8 @@ def batch_loss(
         section = data.section(int(index))
         flat = torch.arange(section.start, section.stop, device=data.query.device)
         universal = data.candidate[section]
-        adapted, _, gates = model(
-            universal, standardised_evidence(data, flat, mean, scale), data.context[section],
+        adapted, _, gates = adapt_candidates(
+            model, data, int(index), flat, mean, scale, args.adapter_type,
         )
         scores = adapted @ data.query[index]
         baseline = universal @ data.query[index]
@@ -126,14 +238,14 @@ def batch_loss(
 
 @torch.no_grad()
 def score_query(
-    model: BiologicalEvidenceContextAdapter, data: Dataset, index: int,
-    mean: torch.Tensor, scale: torch.Tensor,
+    model: torch.nn.Module, data: Dataset, index: int,
+    mean: torch.Tensor, scale: torch.Tensor, adapter_type: str = "free",
 ) -> tuple[np.ndarray, float, float]:
     section = data.section(index)
     flat = torch.arange(section.start, section.stop, device=data.query.device)
     universal = data.candidate[section]
-    adapted, _, gate = model(
-        universal, standardised_evidence(data, flat, mean, scale), data.context[section],
+    adapted, _, gate = adapt_candidates(
+        model, data, index, flat, mean, scale, adapter_type,
     )
     return (
         (adapted @ data.query[index]).cpu().numpy(),
@@ -151,6 +263,11 @@ def metrics(frame: pd.DataFrame) -> dict:
         "baseline_recall1": float(frame.baseline_correct.mean()),
         "recall1": float(frame.final_correct.mean()),
         "delta_recall1": float(frame.delta.mean()),
+        "baseline_mrr": float(frame.baseline_reciprocal_rank.mean()),
+        "mrr": float(frame.final_reciprocal_rank.mean()),
+        "delta_mrr": float(
+            (frame.final_reciprocal_rank - frame.baseline_reciprocal_rank).mean()
+        ),
         "corrected": corrected,
         "introduced": introduced,
         "risk_weighted_net_lambda2": corrected - 2 * introduced,
@@ -162,21 +279,34 @@ def metrics(frame: pd.DataFrame) -> dict:
 
 
 def cluster_bootstrap(frame: pd.DataFrame, repeats: int, seed: int) -> dict:
-    work = frame.copy()
-    work["cluster"] = work.truth_formula.astype(str)
-    groups = {str(key): group for key, group in work.groupby("cluster", sort=True)}
-    keys = sorted(groups)
+    """Formula-cluster bootstrap without repeatedly concatenating data frames.
+
+    Sampling a cluster with replacement gives every row in that cluster one
+    additional copy.  Consequently, a draw can be evaluated exactly from the
+    per-cluster delta sums and row counts.  This is mathematically identical to
+    concatenating the sampled clusters, but avoids 10,000 pandas concatenations.
+    """
+    work = frame.assign(cluster=frame.truth_formula.astype(str))
+    grouped = work.groupby("cluster", sort=True).delta.agg(["sum", "count"])
+    sums = grouped["sum"].to_numpy(dtype=np.float64)
+    counts = grouped["count"].to_numpy(dtype=np.float64)
+    cluster_count = len(grouped)
+    if cluster_count == 0:
+        raise RuntimeError("formula-cluster bootstrap received no clusters")
     rng = np.random.default_rng(seed)
     values = np.empty(repeats, dtype=float)
-    for index in range(repeats):
-        draw = rng.choice(keys, len(keys), replace=True)
-        sample = pd.concat([groups[str(key)] for key in draw], ignore_index=True)
-        values[index] = float(sample.delta.mean())
+    # Chunking keeps peak memory bounded if a future formal run uses far more
+    # clusters or resamples.
+    for start in range(0, repeats, 2048):
+        stop = min(start + 2048, repeats)
+        draw = rng.integers(0, cluster_count, size=(stop - start, cluster_count))
+        values[start:stop] = sums[draw].sum(axis=1) / counts[draw].sum(axis=1)
     return {
         "mean": float(work.delta.mean()),
         "ci_low": float(np.quantile(values, .025)),
         "ci_high": float(np.quantile(values, .975)),
-        "clusters": len(keys), "resamples": repeats,
+        "clusters": cluster_count, "resamples": repeats,
+        "implementation": "vectorised_cluster_sum_count_v1",
     }
 
 
@@ -204,82 +334,232 @@ def main() -> None:
     parser.add_argument("--preserve-weight", type=float, default=8.0)
     parser.add_argument("--gate-weight", type=float, default=.005)
     parser.add_argument("--bootstrap-resamples", type=int, default=10000)
+    parser.add_argument("--evidence-mode", choices=sorted(EVIDENCE_MODES), default="full")
+    parser.add_argument(
+        "--adapter-type", choices=("free", "monotone_evidence_lift"), default="free",
+        help=("free reproduces B2; monotone_evidence_lift prevents candidate-identity "
+              "memorisation and treats every evidence coordinate as support-only."),
+    )
+    parser.add_argument(
+        "--training-isolation", choices=("study", "truth_identity", "truth_formula"),
+        default="study",
+        help=("Outer study is always excluded. Stricter modes additionally remove "
+              "training queries whose truth identity/formula occurs in the held-out study."),
+    )
+    parser.add_argument(
+        "--formal", action="store_true",
+        help="Require the frozen three-seed/40-epoch recipe and label the result formal.",
+    )
     parser.add_argument("--device", default="cuda")
     args = parser.parse_args()
     if args.output_dir.exists() and any(args.output_dir.iterdir()):
         raise RuntimeError(f"fail-closed: non-empty output: {args.output_dir}")
     if args.device.startswith("cuda") and not torch.cuda.is_available():
         raise RuntimeError("CUDA requested but unavailable")
+    if args.formal:
+        recipe = (
+            B3_MONOTONE_FORMAL_RECIPE
+            if args.adapter_type == "monotone_evidence_lift" else FORMAL_RECIPE
+        )
+        for key, expected in recipe.items():
+            observed = getattr(args, key)
+            if observed != expected:
+                raise RuntimeError(
+                    f"formal recipe violation: {key}={observed!r}, expected {expected!r}"
+                )
+        if args.bootstrap_resamples < 10000:
+            raise RuntimeError("formal run requires at least 10000 bootstrap resamples")
     args.output_dir.mkdir(parents=True)
     device = torch.device(args.device)
-    data = Dataset(args.dataset, device)
+    data = Dataset(args.dataset, device, args.evidence_mode)
     studies = sorted(set(data.study_ids))
     if len(studies) != 4:
         raise RuntimeError(f"expected four studies, found {studies}")
+    print(json.dumps({
+        "stage": "dataset_loaded", "queries": int(len(data.query_ids)),
+        "candidates": int(len(data.candidate_ids)), "studies": studies,
+        "evidence_mode": args.evidence_mode,
+        "training_isolation": args.training_isolation,
+        "formal": bool(args.formal), "device": str(device),
+    }), flush=True)
 
     transitions: list[dict] = []
     run_reports: list[dict] = []
     preservation_values: list[float] = []
     gate_values: list[float] = []
+    overlap_reports: list[dict] = []
     for outer_study in studies:
         train = np.flatnonzero(data.study_ids != outer_study)
         heldout = np.flatnonzero(data.study_ids == outer_study)
+        heldout_truth_ids = set(data.truth_ids[heldout].tolist())
+        heldout_formulas = set(data.formulas[heldout].tolist())
+        heldout_candidate_ids = candidate_identity_set(data, heldout)
+        if args.training_isolation == "truth_identity":
+            train = train[np.asarray([
+                data.truth_ids[int(index)] not in heldout_truth_ids for index in train
+            ], dtype=bool)]
+        elif args.training_isolation == "truth_formula":
+            train = train[np.asarray([
+                data.formulas[int(index)] not in heldout_formulas for index in train
+            ], dtype=bool)]
+        # In both strict sensitivity protocols, a held-out candidate identity
+        # must not re-enter through a negative slot of another training query.
+        if args.training_isolation != "study":
+            train = np.asarray([
+                int(index) for index in train
+                if not (
+                    set(data.candidate_ids[data.section(int(index))].tolist())
+                    & heldout_candidate_ids
+                )
+            ], dtype=np.int64)
+        remaining_id_overlap = set(data.truth_ids[train].tolist()) & heldout_truth_ids
+        remaining_formula_overlap = set(data.formulas[train].tolist()) & heldout_formulas
+        remaining_candidate_ids = candidate_identity_set(data, train)
+        overlap_reports.append({
+            "outer_study": outer_study,
+            "training_queries_after_isolation": int(len(train)),
+            "heldout_queries": int(len(heldout)),
+            "heldout_truth_identities": int(len(heldout_truth_ids)),
+            "heldout_truth_formulas": int(len(heldout_formulas)),
+            "remaining_truth_identity_overlap": int(len(remaining_id_overlap)),
+            "remaining_truth_formula_overlap": int(len(remaining_formula_overlap)),
+            "remaining_candidate_identity_overlap": int(
+                len(remaining_candidate_ids & heldout_candidate_ids)
+            ),
+        })
         active_train = np.asarray([
             index for index in train if bool(data.context[data.section(int(index))].any())
         ], dtype=np.int64)
-        if len(active_train) < 100 or len(heldout) < 50:
+        active_identities = len(set(data.truth_ids[active_train].tolist()))
+        # Attribution cells can have fewer active identities than the full
+        # primary even under the same study split (the observed minimum is 95
+        # for SMN-only).  Ninety is therefore a preregistered computability
+        # floor for study-level attribution, not an efficacy or power claim.
+        # Strict formula sensitivities are smaller still and use 30 only as a
+        # computability floor.  Actual counts remain explicit in every report.
+        minimum_active = 90 if args.training_isolation == "study" else 30
+        if active_identities < minimum_active or len(heldout) < 50:
             raise RuntimeError(f"{outer_study}: insufficient active train or heldout queries")
+        print(json.dumps({
+            "stage": "outer_fold", "outer_study": outer_study,
+            "training_queries": int(len(train)),
+            "active_training_queries": int(len(active_train)),
+            "active_training_identities": int(active_identities),
+            "minimum_active_training_identities": int(minimum_active),
+            "heldout_queries": int(len(heldout)),
+        }), flush=True)
         mean_np, scale_np = evidence_scaler(data, train)
         mean = torch.from_numpy(mean_np).to(device)
         scale = torch.from_numpy(scale_np).to(device)
         ensemble: dict[int, list[np.ndarray]] = {int(index): [] for index in heldout}
         for seed in args.seeds:
+            print(json.dumps({
+                "stage": "seed_started", "outer_study": outer_study,
+                "seed": seed, "epochs": args.epochs,
+            }), flush=True)
             torch.manual_seed(seed)
             np.random.seed(seed)
             if device.type == "cuda":
                 torch.cuda.manual_seed_all(seed)
-            model = BiologicalEvidenceContextAdapter(
-                data.query.shape[1], data.evidence_raw.shape[1],
-                hidden_dim=args.hidden_dim, update_rank=args.update_rank,
-                delta_bound=args.delta_bound,
-            ).to(device)
+            if args.adapter_type == "free":
+                model = BiologicalEvidenceContextAdapter(
+                    data.query.shape[1], data.evidence_raw.shape[1],
+                    hidden_dim=args.hidden_dim, update_rank=args.update_rank,
+                    delta_bound=args.delta_bound,
+                ).to(device)
+            else:
+                model = MonotoneEvidenceTangentLift(
+                    data.query.shape[1], data.evidence_raw.shape[1],
+                    delta_bound=args.delta_bound,
+                ).to(device)
             optimizer = torch.optim.AdamW(
                 model.parameters(), lr=args.learning_rate, weight_decay=1e-4,
             )
             rng = np.random.default_rng(seed)
             final_components: dict[str, float] = {}
+            component_sums = {key: 0.0 for key in ("rank", "safety", "preservation", "gate")}
+            safety_active_batches = 0
             steps = 0
             model.train()
-            for _ in range(args.epochs):
-                order = rng.permutation(active_train)
+            for epoch in range(args.epochs):
+                order = identity_balanced_epoch(active_train, data.truth_ids, rng)
                 for start in range(0, len(order), args.batch_size):
                     batch = order[start:start + args.batch_size]
                     optimizer.zero_grad(set_to_none=True)
                     loss, final_components = batch_loss(
                         model, data, batch, mean, scale, args,
                     )
+                    for key in component_sums:
+                        component_sums[key] += final_components[key]
+                    safety_active_batches += int(final_components["safety"] > 0)
                     loss.backward()
                     torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
                     optimizer.step()
                     steps += 1
+                if epoch == 0 or (epoch + 1) % 10 == 0 or epoch + 1 == args.epochs:
+                    print(json.dumps({
+                        "stage": "training_progress", "outer_study": outer_study,
+                        "seed": seed, "epoch": epoch + 1,
+                        "gradient_steps": steps, "loss_components": final_components,
+                    }), flush=True)
             model.eval()
             seed_preservation: list[float] = []
             seed_gate: list[float] = []
             for index in heldout:
-                scores, preservation, gate = score_query(model, data, int(index), mean, scale)
+                scores, preservation, gate = score_query(
+                    model, data, int(index), mean, scale, args.adapter_type,
+                )
                 ensemble[int(index)].append(scores)
                 seed_preservation.append(preservation)
                 seed_gate.append(gate)
             preservation_values.extend(seed_preservation)
             gate_values.extend(seed_gate)
+            artifact_path = args.output_dir / f"model_{outer_study}_seed{seed}.pt"
+            torch.save({
+                "state_dict": {
+                    key: value.detach().cpu() for key, value in model.state_dict().items()
+                },
+                "evidence_mean": mean_np,
+                "evidence_scale": scale_np,
+                "evidence_columns": data.evidence_columns,
+                "outer_study": outer_study,
+                "seed": seed,
+                "configuration": {
+                    "embedding_dim": int(data.query.shape[1]),
+                    "evidence_dim": int(data.evidence_raw.shape[1]),
+                    "hidden_dim": args.hidden_dim,
+                    "update_rank": args.update_rank,
+                    "delta_bound": args.delta_bound,
+                    "evidence_mode": args.evidence_mode,
+                    "training_isolation": args.training_isolation,
+                    "adapter_type": args.adapter_type,
+                },
+            }, artifact_path)
+            learned_weights = (
+                dict(zip(
+                    data.evidence_columns.tolist(),
+                    model.evidence_weights().cpu().numpy().astype(float).tolist(),
+                    strict=True,
+                ))
+                if args.adapter_type == "monotone_evidence_lift" else None
+            )
             run_reports.append({
                 "outer_study": outer_study, "seed": seed,
                 "training_queries": int(len(train)),
                 "active_training_queries": int(len(active_train)),
+                "active_training_identities": int(active_identities),
+                "training_examples_per_epoch": int(active_identities),
                 "heldout_queries": int(len(heldout)), "gradient_steps": steps,
                 "final_components": final_components,
+                "mean_training_components": {
+                    key: value / max(steps, 1) for key, value in component_sums.items()
+                },
+                "safety_active_batch_fraction": safety_active_batches / max(steps, 1),
                 "heldout_preservation": float(np.mean(seed_preservation)),
                 "heldout_gate": float(np.mean(seed_gate)),
+                "learned_evidence_weights": learned_weights,
+                "artifact": artifact_path.name,
+                "artifact_sha256": sha256(artifact_path),
             })
 
         for index in heldout:
@@ -303,6 +583,8 @@ def main() -> None:
                 "truth_formula": str(data.formulas[index]),
                 "truth_candidate_id": str(data.truth_ids[index]),
                 "baseline_rank": baseline_rank, "final_rank": final_rank,
+                "baseline_reciprocal_rank": 1.0 / baseline_rank,
+                "final_reciprocal_rank": 1.0 / final_rank,
                 "baseline_correct": baseline_correct, "final_correct": final_correct,
                 "corrected": (not baseline_correct) and final_correct,
                 "introduced": baseline_correct and (not final_correct),
@@ -329,11 +611,27 @@ def main() -> None:
         "risk_weighted_net_lambda2_positive": overall["risk_weighted_net_lambda2"] > 0,
         "every_study_nonnegative": all(value["delta_recall1"] >= 0 for value in study_results.values()),
         "preservation_ge_0_995": preservation >= .995,
+        "requested_isolation_holds": (
+            args.training_isolation == "study"
+            or all(
+                item["remaining_candidate_identity_overlap"] == 0
+                and item[
+                    "remaining_truth_identity_overlap"
+                    if args.training_isolation == "truth_identity"
+                    else "remaining_truth_formula_overlap"
+                ] == 0
+                for item in overlap_reports
+            )
+        ),
     }
     report = {
         "status": "bioaware_b2_leave_study_out_complete",
-        "formal": True,
-        "protocol": "candidate-context embedding; outer study excluded from every model; fixed three-seed ensemble",
+        "formal": bool(args.formal),
+        "protocol": (
+            "candidate-context embedding; outer study excluded from every model; "
+            f"training_isolation={args.training_isolation}; evidence_mode={args.evidence_mode}; "
+            f"adapter_type={args.adapter_type}; {len(args.seeds)}-seed ensemble"
+        ),
         "overall": overall,
         "context_active": metrics(active),
         "study_formula_cluster_bootstrap": bootstrap,
@@ -343,13 +641,21 @@ def main() -> None:
         "mean_abs_score_delta": float(frame.max_abs_score_delta.mean()),
         "configuration": vars(args) | {"dataset": str(args.dataset), "output_dir": str(args.output_dir)},
         "run_reports": run_reports,
+        "overlap_audit": overlap_reports,
         "gates": gates,
         "pass": bool(all(gates.values())),
         "contracts": {
             "output_is_contextual_embedding": True,
+            "training_unit": "one randomly cycled query per truth identity per epoch",
             "query_embedding_is_unmodified_official": True,
             "no_context_exact_fallback": True,
             "outer_study_outcomes_used_for_training": False,
+            "training_isolation": args.training_isolation,
+            "strict_modes_exclude_heldout_candidates_from_every_training_list": True,
+            "evidence_columns": data.evidence_columns.tolist(),
+            "evidence_mode": args.evidence_mode,
+            "adapter_type": args.adapter_type,
+            "learnable_candidate_or_query_embedding_input": args.adapter_type == "free",
             "reaction_neighbour_is_positive": False,
             "P2b": "forbidden", "phenotype": "forbidden",
         },

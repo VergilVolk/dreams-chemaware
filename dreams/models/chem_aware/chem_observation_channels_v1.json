@@ -1,0 +1,5369 @@
+{
+  "schema": "chemaware_observation_channel_registry_v1",
+  "scientific_type": "spectrum_observation_dictionary_not_mechanistic_rule_library",
+  "task_domain": {
+    "ion_mode": "positive",
+    "adducts": [
+      "[M+H]+",
+      "[M+Na]+"
+    ]
+  },
+  "channels": [
+    {
+      "channel_id": "OBS:NL:0000",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 12.0364,
+      "value_span_da": [
+        12.0364,
+        12.0364
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_O_and_C2H4"
+      ],
+      "observed_species_formulae": [],
+      "citation_text": [
+        "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_O_and_C2H4",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 12.0364,
+          "mode": "pos+neg",
+          "formula": "",
+          "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0001",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 13.9793,
+      "value_span_da": [
+        13.9793,
+        13.9793
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_H2_and_O"
+      ],
+      "observed_species_formulae": [],
+      "citation_text": [
+        "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_H2_and_O",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 13.9793,
+          "mode": "pos+neg",
+          "formula": "",
+          "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0002",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 15.9772,
+      "value_span_da": [
+        15.9772,
+        15.9772
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_O_and_S"
+      ],
+      "observed_species_formulae": [],
+      "citation_text": [
+        "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_O_and_S",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 15.9772,
+          "mode": "pos+neg",
+          "formula": "",
+          "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0003",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 15.9949,
+      "value_span_da": [
+        15.9949,
+        15.9949
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_O"
+      ],
+      "observed_species_formulae": [],
+      "citation_text": [
+        "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_O",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 15.9949,
+          "mode": "pos+neg",
+          "formula": "",
+          "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0004",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 16.0187,
+      "value_span_da": [
+        16.0187,
+        16.0187
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_NH2"
+      ],
+      "observed_species_formulae": [
+        "NH2"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_NH2",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 16.0187,
+          "mode": "pos",
+          "formula": "NH2",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0005",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 17.0027,
+      "value_span_da": [
+        17.0027,
+        17.0027
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_OH"
+      ],
+      "observed_species_formulae": [
+        "OH"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_OH",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 17.0027,
+          "mode": "pos+neg",
+          "formula": "OH",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0006",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 21.9819,
+      "value_span_da": [
+        21.9819,
+        21.9819
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_Na"
+      ],
+      "observed_species_formulae": [],
+      "citation_text": [
+        "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_Na",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 21.9819,
+          "mode": "pos+neg",
+          "formula": "",
+          "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0007",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 28.0061,
+      "value_span_da": [
+        28.0061,
+        28.0061
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_N2"
+      ],
+      "observed_species_formulae": [],
+      "citation_text": [
+        "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_N2",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 28.0061,
+          "mode": "pos+neg",
+          "formula": "",
+          "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0008",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 28.9902,
+      "value_span_da": [
+        28.9902,
+        28.9902
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_H_and_NO"
+      ],
+      "observed_species_formulae": [],
+      "citation_text": [
+        "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_H_and_NO",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 28.9902,
+          "mode": "pos+neg",
+          "formula": "",
+          "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0009",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 29.0027,
+      "value_span_da": [
+        29.0027,
+        29.0027
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_CHO"
+      ],
+      "observed_species_formulae": [],
+      "citation_text": [
+        "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_CHO",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 29.0027,
+          "mode": "pos+neg",
+          "formula": "",
+          "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0010",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 29.9742,
+      "value_span_da": [
+        29.9742,
+        29.9742
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_H2_and_O2"
+      ],
+      "observed_species_formulae": [],
+      "citation_text": [
+        "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_H2_and_O2",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 29.9742,
+          "mode": "pos+neg",
+          "formula": "",
+          "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0011",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 29.998,
+      "value_span_da": [
+        29.998,
+        29.998
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_NO"
+      ],
+      "observed_species_formulae": [
+        "NO"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_NO",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 29.998,
+          "mode": "pos+neg",
+          "formula": "NO",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0012",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 31.0185,
+      "value_span_da": [
+        31.0185,
+        31.0185
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_OCH3"
+      ],
+      "observed_species_formulae": [
+        "CH3O"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_OCH3",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 31.0185,
+          "mode": "pos",
+          "formula": "CH3O",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0013",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 31.0422,
+      "value_span_da": [
+        31.0422,
+        31.0422
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_CH3NH2"
+      ],
+      "observed_species_formulae": [
+        "CH5N"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_CH3NH2",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 31.0422,
+          "mode": "pos",
+          "formula": "CH5N",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0014",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 37.9559,
+      "value_span_da": [
+        37.9559,
+        37.9559
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_K"
+      ],
+      "observed_species_formulae": [],
+      "citation_text": [
+        "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_K",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 37.9559,
+          "mode": "pos+neg",
+          "formula": "",
+          "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0015",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 43.0184,
+      "value_span_da": [
+        43.0184,
+        43.0184
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_CH3CO"
+      ],
+      "observed_species_formulae": [],
+      "citation_text": [
+        "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_CH3CO",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 43.0184,
+          "mode": "pos+neg",
+          "formula": "",
+          "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0016",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 43.0548,
+      "value_span_da": [
+        43.0548,
+        43.0548
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_C3H7"
+      ],
+      "observed_species_formulae": [
+        "C3H7"
+      ],
+      "citation_text": [
+        "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_C3H7",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 43.0548,
+          "mode": "pos",
+          "formula": "C3H7",
+          "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0017",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 44.9851,
+      "value_span_da": [
+        44.9851,
+        44.9851
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_H_and_NO2"
+      ],
+      "observed_species_formulae": [],
+      "citation_text": [
+        "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_H_and_NO2",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 44.9851,
+          "mode": "pos+neg",
+          "formula": "",
+          "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0018",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 44.9977,
+      "value_span_da": [
+        44.9977,
+        44.9977
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_COOH"
+      ],
+      "observed_species_formulae": [
+        "CHO2"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_COOH",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 44.9977,
+          "mode": "pos",
+          "formula": "CHO2",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0019",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 45.0578,
+      "value_span_da": [
+        45.0578,
+        45.0578
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_C2H7N"
+      ],
+      "observed_species_formulae": [
+        "C2H7N"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_C2H7N",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 45.0578,
+          "mode": "pos",
+          "formula": "C2H7N",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0020",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 45.9929,
+      "value_span_da": [
+        45.9929,
+        45.9929
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_NO2"
+      ],
+      "observed_species_formulae": [
+        "NO2"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_NO2",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 45.9929,
+          "mode": "pos+neg",
+          "formula": "NO2",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0021",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 46.0419,
+      "value_span_da": [
+        46.0419,
+        46.0419
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_C2H5"
+      ],
+      "observed_species_formulae": [],
+      "citation_text": [
+        "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_C2H5",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 46.0419,
+          "mode": "pos+neg",
+          "formula": "",
+          "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0022",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 48.0034,
+      "value_span_da": [
+        48.0034,
+        48.0034
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_CH4S"
+      ],
+      "observed_species_formulae": [
+        "CH4S"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_CH4S",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 48.0034,
+          "mode": "pos",
+          "formula": "CH4S",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0023",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 48.0086,
+      "value_span_da": [
+        48.0086,
+        48.0086
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_H2O_NO"
+      ],
+      "observed_species_formulae": [
+        "H2NO2"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_H2O_NO",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 48.0086,
+          "mode": "pos",
+          "formula": "H2NO2",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0024",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 48.9884,
+      "value_span_da": [
+        48.9884,
+        48.9884
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_H3PO4_from_2"
+      ],
+      "observed_species_formulae": [
+        "H3O4P/2"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_H3PO4_from_2",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 48.9884,
+          "mode": "pos",
+          "formula": "H3O4P/2",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0025",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 49.9923,
+      "value_span_da": [
+        49.9923,
+        49.9923
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_PC_CH3Cl"
+      ],
+      "observed_species_formulae": [
+        "CH3Cl"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_PC_CH3Cl",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 49.9923,
+          "mode": "pos",
+          "formula": "CH3Cl",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0026",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 55.0058,
+      "value_span_da": [
+        55.0058,
+        55.0058
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_HCN_CO"
+      ],
+      "observed_species_formulae": [
+        "C2HNO"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_HCN_CO",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 55.0058,
+          "mode": "pos",
+          "formula": "C2HNO",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0027",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 55.9898,
+      "value_span_da": [
+        55.9898,
+        55.9898
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_CO_CO"
+      ],
+      "observed_species_formulae": [
+        "CO+CO"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_CO_CO",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 55.9898,
+          "mode": "pos",
+          "formula": "CO+CO",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0028",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 56.9977,
+      "value_span_da": [
+        56.9977,
+        56.9977
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_CO_CO_H"
+      ],
+      "observed_species_formulae": [
+        "C2HO2"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_CO_CO_H",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 56.9977,
+          "mode": "pos",
+          "formula": "C2HO2",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0029",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 57.0704,
+      "value_span_da": [
+        57.0704,
+        57.0704
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_C4H9"
+      ],
+      "observed_species_formulae": [],
+      "citation_text": [
+        "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_C4H9",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 57.0704,
+          "mode": "pos+neg",
+          "formula": "",
+          "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0030",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 57.9929,
+      "value_span_da": [
+        57.9929,
+        57.9929
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_NO_CO"
+      ],
+      "observed_species_formulae": [
+        "CNO2"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_NO_CO",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 57.9929,
+          "mode": "pos",
+          "formula": "CNO2",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0031",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 58.0055,
+      "value_span_da": [
+        58.0055,
+        58.0055
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_C2H2O2"
+      ],
+      "observed_species_formulae": [
+        "C2H2O2"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_C2H2O2",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 58.0055,
+          "mode": "pos",
+          "formula": "C2H2O2",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0032",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 59.0735,
+      "value_span_da": [
+        59.0735,
+        59.0735
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_TMA"
+      ],
+      "observed_species_formulae": [
+        "C3H9N"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_TMA",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 59.0735,
+          "mode": "pos",
+          "formula": "C3H9N",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0033",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 61.0164,
+      "value_span_da": [
+        61.0164,
+        61.0164
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_CO2_NH3"
+      ],
+      "observed_species_formulae": [
+        "CH3NO2"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_CO2_NH3",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 61.0164,
+          "mode": "pos",
+          "formula": "CH3NO2",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0034",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 63.9983,
+      "value_span_da": [
+        63.9983,
+        63.9983
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_methylsulfenic_acid"
+      ],
+      "observed_species_formulae": [
+        "CH4OS"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_methylsulfenic_acid",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 63.9983,
+          "mode": "pos",
+          "formula": "CH4OS",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0035",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 67.9874,
+      "value_span_da": [
+        67.9874,
+        67.9874
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_Formate_Na"
+      ],
+      "observed_species_formulae": [
+        "CH2O2Na"
+      ],
+      "citation_text": [
+        "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_Formate_Na",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 67.9874,
+          "mode": "pos+neg",
+          "formula": "CH2O2Na",
+          "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0036",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 68.9952,
+      "value_span_da": [
+        68.9952,
+        68.9952
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_CF3"
+      ],
+      "observed_species_formulae": [
+        "CF3"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_CF3",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 68.9952,
+          "mode": "pos",
+          "formula": "CF3",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0037",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 71.9847,
+      "value_span_da": [
+        71.9847,
+        71.9847
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_CO2_CO"
+      ],
+      "observed_species_formulae": [
+        "C2O3"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_CO2_CO",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 71.9847,
+          "mode": "pos",
+          "formula": "C2O3",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0038",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 73.9878,
+      "value_span_da": [
+        73.9878,
+        73.9878
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_NO2_CO"
+      ],
+      "observed_species_formulae": [
+        "CNO3"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_NO2_CO",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 73.9878,
+          "mode": "pos+neg",
+          "formula": "CNO3",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0039",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 74.019,
+      "value_span_da": [
+        74.019,
+        74.019
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_C3H6S"
+      ],
+      "observed_species_formulae": [
+        "C3H6S"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_C3H6S",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 74.019,
+          "mode": "pos",
+          "formula": "C3H6S",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0040",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 77.0391,
+      "value_span_da": [
+        77.0391,
+        77.0391
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_phenyl_radical"
+      ],
+      "observed_species_formulae": [
+        "C6H5"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_phenyl_radical",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 77.0391,
+          "mode": "pos",
+          "formula": "C6H5",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0041",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 77.9985,
+      "value_span_da": [
+        77.9985,
+        77.9985
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_CH2N2_HCl"
+      ],
+      "observed_species_formulae": [
+        "CH3N2Cl"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_CH2N2_HCl",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 77.9985,
+          "mode": "pos",
+          "formula": "CH3N2Cl",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0042",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 78.0469,
+      "value_span_da": [
+        78.0469,
+        78.0469
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_benzene"
+      ],
+      "observed_species_formulae": [
+        "C6H6"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_benzene",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 78.0469,
+          "mode": "pos",
+          "formula": "C6H6",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0043",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 79.9663,
+      "value_span_da": [
+        79.9663,
+        79.9663
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_HPO3"
+      ],
+      "observed_species_formulae": [
+        "HPO3"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_HPO3",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 79.9663,
+          "mode": "pos",
+          "formula": "HPO3",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0044",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 81.9725,
+      "value_span_da": [
+        81.9725,
+        81.9725
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_H2SO3"
+      ],
+      "observed_species_formulae": [
+        "H2SO3"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_H2SO3",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 81.9725,
+          "mode": "pos",
+          "formula": "H2SO3",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0045",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 82.0031,
+      "value_span_da": [
+        82.0031,
+        82.0031
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_Acetate_Na"
+      ],
+      "observed_species_formulae": [],
+      "citation_text": [
+        "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_Acetate_Na",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 82.0031,
+          "mode": "pos+neg",
+          "formula": "",
+          "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0046",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 86.0004,
+      "value_span_da": [
+        86.0004,
+        86.0004
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_Malonyl"
+      ],
+      "observed_species_formulae": [],
+      "citation_text": [
+        "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_Malonyl",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 86.0004,
+          "mode": "pos+neg",
+          "formula": "",
+          "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0047",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 87.9909,
+      "value_span_da": [
+        87.9909,
+        87.9909
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_NO_NO_CO"
+      ],
+      "observed_species_formulae": [
+        "CN2O3"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_NO_NO_CO",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 87.9909,
+          "mode": "pos",
+          "formula": "CN2O3",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0048",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 88.0708,
+      "value_span_da": [
+        88.0708,
+        88.0708
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_pSilox_88"
+      ],
+      "observed_species_formulae": [
+        "C4H12Si"
+      ],
+      "citation_text": [
+        "Fouquet, T et. al. Electrospray_tandem_mass_spectrometry_combined_with_authentic_compound_synthesis_for_structural_chara"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_pSilox_88",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 88.0708,
+          "mode": "pos",
+          "formula": "C4H12Si",
+          "ref": "Fouquet, T et. al. Electrospray_tandem_mass_spectrometry_combined_with_authentic_compound_synthesis_for_structural_chara"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0049",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 90.0317,
+      "value_span_da": [
+        90.0317,
+        90.0317
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_C3H6O3"
+      ],
+      "observed_species_formulae": [
+        "C3H6O3"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_C3H6O3",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 90.0317,
+          "mode": "pos",
+          "formula": "C3H6O3",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0050",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 99.9797,
+      "value_span_da": [
+        99.9797,
+        99.9797
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_CO2_CO_CO"
+      ],
+      "observed_species_formulae": [
+        "C3O4"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_CO2_CO_CO",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 99.9797,
+          "mode": "pos",
+          "formula": "C3O4",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0051",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 102.0681,
+      "value_span_da": [
+        102.0681,
+        102.0681
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_HC_O_OC4H9"
+      ],
+      "observed_species_formulae": [
+        "C5H10O2"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_HC_O_OC4H9",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 102.0681,
+          "mode": "pos",
+          "formula": "C5H10O2",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0052",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 103.0992,
+      "value_span_da": [
+        103.0992,
+        103.0992
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_PC_103"
+      ],
+      "observed_species_formulae": [
+        "C5H13NO"
+      ],
+      "citation_text": [
+        "Br\u00fcgger, B. et. al. Quantitative analysis of biological membrane lipids at the low picomole level by nano-electrospray i"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_PC_103",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 103.0992,
+          "mode": "pos",
+          "formula": "C5H13NO",
+          "ref": "Br\u00fcgger, B. et. al. Quantitative analysis of biological membrane lipids at the low picomole level by nano-electrospray i"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0053",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 103.9858,
+      "value_span_da": [
+        103.9858,
+        103.9858
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_NO_NO2_CO"
+      ],
+      "observed_species_formulae": [
+        "CN2O4"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_NO_NO2_CO",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 103.9858,
+          "mode": "pos",
+          "formula": "CN2O4",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0054",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 105.0248,
+      "value_span_da": [
+        105.0248,
+        105.0248
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_C3H7NOS"
+      ],
+      "observed_species_formulae": [
+        "C3H7NOS"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_C3H7NOS",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 105.0248,
+          "mode": "pos",
+          "formula": "C3H7NOS",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0055",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 108.0575,
+      "value_span_da": [
+        108.0575,
+        108.0575
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_tyrosine_side_chain_hydrogen"
+      ],
+      "observed_species_formulae": [
+        "C7H8O"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_tyrosine_side_chain_hydrogen",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 108.0575,
+          "mode": "pos",
+          "formula": "C7H8O",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0056",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 109.0112,
+      "value_span_da": [
+        109.0112,
+        109.0112
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_phenylthio_radical"
+      ],
+      "observed_species_formulae": [
+        "C6H5S"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_phenylthio_radical",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 109.0112,
+          "mode": "pos",
+          "formula": "C6H5S",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0057",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 111.9797,
+      "value_span_da": [
+        111.9797,
+        111.9797
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_4CO"
+      ],
+      "observed_species_formulae": [
+        "4CO"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_4CO",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 111.9797,
+          "mode": "pos",
+          "formula": "4CO",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0058",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 113.9929,
+      "value_span_da": [
+        113.9929,
+        113.9929
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_TFA"
+      ],
+      "observed_species_formulae": [],
+      "citation_text": [
+        "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_TFA",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 113.9929,
+          "mode": "pos+neg",
+          "formula": "",
+          "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0059",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 119.0041,
+      "value_span_da": [
+        119.0041,
+        119.0041
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_Cys_alanine"
+      ],
+      "observed_species_formulae": [
+        "C3H7NO2"
+      ],
+      "citation_text": [
+        "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_Cys_alanine",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 119.0041,
+          "mode": "pos",
+          "formula": "C3H7NO2",
+          "ref": "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0060",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 119.9807,
+      "value_span_da": [
+        119.9807,
+        119.9807
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_NO2_NO2_CO"
+      ],
+      "observed_species_formulae": [
+        "CN2O5"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_NO2_NO2_CO",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 119.9807,
+          "mode": "pos",
+          "formula": "CN2O5",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0061",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 120.0423,
+      "value_span_da": [
+        120.0423,
+        120.0423
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_C4H8O4"
+      ],
+      "observed_species_formulae": [
+        "C4H8O4"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_C4H8O4",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 120.0423,
+          "mode": "pos",
+          "formula": "C4H8O4",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0062",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 130.063,
+      "value_span_da": [
+        130.063,
+        130.063
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_Anhydro_dideoxyhexose"
+      ],
+      "observed_species_formulae": [
+        "C6H10O3"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_Anhydro_dideoxyhexose",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 130.063,
+          "mode": "pos",
+          "formula": "C6H10O3",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0063",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 132.0423,
+      "value_span_da": [
+        132.0423,
+        132.0423
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_Anhydro_pentose"
+      ],
+      "observed_species_formulae": [
+        "C5H8O4"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_Anhydro_pentose",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 132.0423,
+          "mode": "pos",
+          "formula": "C5H8O4",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0064",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 143.0946,
+      "value_span_da": [
+        143.0946,
+        143.0946
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_Carnitine"
+      ],
+      "observed_species_formulae": [],
+      "citation_text": [
+        "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_Carnitine",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 143.0946,
+          "mode": "pos",
+          "formula": "",
+          "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0065",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 146.0368,
+      "value_span_da": [
+        146.0368,
+        146.0368
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_Coumaroyl"
+      ],
+      "observed_species_formulae": [],
+      "citation_text": [
+        "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_Coumaroyl",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 146.0368,
+          "mode": "pos+neg",
+          "formula": "",
+          "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0066",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 146.0579,
+      "value_span_da": [
+        146.0579,
+        146.0579
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_Anhydro_deoxyhexose"
+      ],
+      "observed_species_formulae": [
+        "C6H10O4"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_Anhydro_deoxyhexose",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 146.0579,
+          "mode": "pos+neg",
+          "formula": "C6H10O4",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0067",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 146.0691,
+      "value_span_da": [
+        146.0691,
+        146.0691
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_Ala_Gly_or_Glut"
+      ],
+      "observed_species_formulae": [],
+      "citation_text": [
+        "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_Ala_Gly_or_Glut",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 146.0691,
+          "mode": "pos+neg",
+          "formula": "",
+          "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0068",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 152.011,
+      "value_span_da": [
+        152.011,
+        152.011
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_Galloyl"
+      ],
+      "observed_species_formulae": [],
+      "citation_text": [
+        "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_Galloyl",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 152.011,
+          "mode": "pos+neg",
+          "formula": "",
+          "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0069",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 154.0031,
+      "value_span_da": [
+        154.0031,
+        154.0031
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_Lyso_PA"
+      ],
+      "observed_species_formulae": [
+        "C3H7O5P"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_Lyso_PA",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 154.0031,
+          "mode": "pos",
+          "formula": "C3H7O5P",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0070",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 156.115,
+      "value_span_da": [
+        156.115,
+        156.115
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_HNE"
+      ],
+      "observed_species_formulae": [
+        "C9H16O2"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_HNE",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 156.115,
+          "mode": "pos",
+          "formula": "C9H16O2",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0071",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 159.9136,
+      "value_span_da": [
+        159.9136,
+        159.9136
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_DiSulf_SO3"
+      ],
+      "observed_species_formulae": [
+        "O3S.O3S"
+      ],
+      "citation_text": [
+        "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_DiSulf_SO3",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 159.9136,
+          "mode": "pos+neg",
+          "formula": "O3S.O3S",
+          "ref": "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0072",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 161.0147,
+      "value_span_da": [
+        161.0147,
+        161.0147
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_NAcCys_Acetamide_59"
+      ],
+      "observed_species_formulae": [
+        "C2H5NO"
+      ],
+      "citation_text": [
+        "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_NAcCys_Acetamide_59",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 161.0147,
+          "mode": "pos",
+          "formula": "C2H5NO",
+          "ref": "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0073",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 161.0688,
+      "value_span_da": [
+        161.0688,
+        161.0688
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_Anhydro_aminodeoxyhexose"
+      ],
+      "observed_species_formulae": [
+        "C6H11NO4"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_Anhydro_aminodeoxyhexose",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 161.0688,
+          "mode": "pos",
+          "formula": "C6H11NO4",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0074",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 172.0137,
+      "value_span_da": [
+        172.0137,
+        172.0137
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_Lyso_PG_172"
+      ],
+      "observed_species_formulae": [
+        "C3H9O6P"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_Lyso_PG_172",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 172.0137,
+          "mode": "pos",
+          "formula": "C3H9O6P",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0075",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 176.0473,
+      "value_span_da": [
+        176.0473,
+        176.0473
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_Feruloyl"
+      ],
+      "observed_species_formulae": [],
+      "citation_text": [
+        "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_Feruloyl",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 176.0473,
+          "mode": "pos+neg",
+          "formula": "",
+          "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0076",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 179.0794,
+      "value_span_da": [
+        179.0794,
+        179.0794
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_MGDG"
+      ],
+      "observed_species_formulae": [
+        "C6H13NO5"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_MGDG",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 179.0794,
+          "mode": "pos",
+          "formula": "C6H13NO5",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0077",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 180.0634,
+      "value_span_da": [
+        180.0634,
+        180.0634
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_AnhydroGlucose"
+      ],
+      "observed_species_formulae": [
+        "C6H10O5"
+      ],
+      "citation_text": [
+        "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_AnhydroGlucose",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 180.0634,
+          "mode": "pos",
+          "formula": "C6H10O5",
+          "ref": "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0078",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 185.0089,
+      "value_span_da": [
+        185.0089,
+        185.0089
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_PS_185"
+      ],
+      "observed_species_formulae": [
+        "C3H8NO6P"
+      ],
+      "citation_text": [
+        "Br\u00fcgger, B. et. al. Quantitative analysis of biological membrane lipids at the low picomole level by nano-electrospray i"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_PS_185",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 185.0089,
+          "mode": "pos",
+          "formula": "C3H8NO6P",
+          "ref": "Br\u00fcgger, B. et. al. Quantitative analysis of biological membrane lipids at the low picomole level by nano-electrospray i"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0079",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 189.0402,
+      "value_span_da": [
+        189.0402,
+        189.0402
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_PG_189"
+      ],
+      "observed_species_formulae": [
+        "C3H12NO6P"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_PG_189",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 189.0402,
+          "mode": "pos",
+          "formula": "C3H12NO6P",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0080",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 192.027,
+      "value_span_da": [
+        192.027,
+        192.027
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_GLN_192"
+      ],
+      "observed_species_formulae": [],
+      "citation_text": [
+        "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_GLN_192",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 192.027,
+          "mode": "pos+neg",
+          "formula": "",
+          "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0081",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 198.014,
+      "value_span_da": [
+        198.014,
+        198.014
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_AnhyGLN_Na"
+      ],
+      "observed_species_formulae": [
+        "C6H8O6Na"
+      ],
+      "citation_text": [
+        "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_AnhyGLN_Na",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 198.014,
+          "mode": "pos+neg",
+          "formula": "C6H8O6Na",
+          "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0082",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 203.0794,
+      "value_span_da": [
+        203.0794,
+        203.0794
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_AnhydroGlcNAc_203"
+      ],
+      "observed_species_formulae": [
+        "C8H13NO5"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_AnhydroGlcNAc_203",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 203.0794,
+          "mode": "pos+neg",
+          "formula": "C8H13NO5",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0083",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 215.9946,
+      "value_span_da": [
+        215.9946,
+        215.9946
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_GLN_Na"
+      ],
+      "observed_species_formulae": [],
+      "citation_text": [
+        "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_GLN_Na",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 215.9946,
+          "mode": "pos+neg",
+          "formula": "",
+          "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0084",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 221.0899,
+      "value_span_da": [
+        221.0899,
+        221.0899
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_GlcNAc_221"
+      ],
+      "observed_species_formulae": [
+        "C8H15NO6"
+      ],
+      "citation_text": [
+        "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_GlcNAc_221",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 221.0899,
+          "mode": "pos+neg",
+          "formula": "C8H15NO6",
+          "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0085",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 248.0532,
+      "value_span_da": [
+        248.0532,
+        248.0532
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_AnhydromalonylGlc"
+      ],
+      "observed_species_formulae": [
+        "C9H12O8"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_AnhydromalonylGlc",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 248.0532,
+          "mode": "pos",
+          "formula": "C9H12O8",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0086",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 250.0623,
+      "value_span_da": [
+        250.0623,
+        250.0623
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_gamma_GluCys"
+      ],
+      "observed_species_formulae": [
+        "C8H14N2O5S"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_gamma_GluCys",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 250.0623,
+          "mode": "pos+neg",
+          "formula": "C8H14N2O5S",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0087",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 255.9889,
+      "value_span_da": [
+        255.9889,
+        255.9889
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_AnhyGLN_SO2"
+      ],
+      "observed_species_formulae": [
+        "C6H8O6.O2S"
+      ],
+      "citation_text": [
+        "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_AnhyGLN_SO2",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 255.9889,
+          "mode": "pos+neg",
+          "formula": "C6H8O6.O2S",
+          "ref": "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0088",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 260.0297,
+      "value_span_da": [
+        260.0297,
+        260.0297
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_Lyso_PI_260"
+      ],
+      "observed_species_formulae": [
+        "C6H13O9P"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_Lyso_PI_260",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 260.0297,
+          "mode": "pos",
+          "formula": "C6H13O9P",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0089",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 261.028,
+      "value_span_da": [
+        261.028,
+        261.028
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_SQVD_261"
+      ],
+      "observed_species_formulae": [
+        "C6H13O9S"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_SQVD_261",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 261.028,
+          "mode": "pos",
+          "formula": "C6H13O9S",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0090",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 266.0638,
+      "value_span_da": [
+        266.0638,
+        266.0638
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_MalonylGlc_266"
+      ],
+      "observed_species_formulae": [
+        "C9H14O9"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_MalonylGlc_266",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 266.0638,
+          "mode": "pos",
+          "formula": "C9H14O9",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0091",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 277.0563,
+      "value_span_da": [
+        277.0563,
+        277.0563
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_PI_277"
+      ],
+      "observed_species_formulae": [
+        "C6H16NO9P"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_PI_277",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 277.0563,
+          "mode": "pos",
+          "formula": "C6H16NO9P",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0092",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 305.0682,
+      "value_span_da": [
+        305.0682,
+        305.0682
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_GSH_AnhydroGlutamic_ac"
+      ],
+      "observed_species_formulae": [
+        "C5H7NO3"
+      ],
+      "citation_text": [
+        "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_GSH_AnhydroGlutamic_ac",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 305.0682,
+          "mode": "pos+neg",
+          "formula": "C5H7NO3",
+          "ref": "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0093",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 341.1322,
+      "value_span_da": [
+        341.1322,
+        341.1322
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_DGDG_341"
+      ],
+      "observed_species_formulae": [
+        "C12H23NO10"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_DGDG_341",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 341.1322,
+          "mode": "pos",
+          "formula": "C12H23NO10",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0094",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 352.0642,
+      "value_span_da": [
+        352.0642,
+        352.0642
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_DiAnhyGLN"
+      ],
+      "observed_species_formulae": [
+        "C6H8O6.C6H8O6"
+      ],
+      "citation_text": [
+        "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_DiAnhyGLN",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 352.0642,
+          "mode": "pos+neg",
+          "formula": "C6H8O6.C6H8O6",
+          "ref": "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:NL:0095",
+      "category": "NL",
+      "observation": "precursor_minus_fragment_da",
+      "match_type": "mass_diff",
+      "value_da": 360.1268,
+      "value_span_da": [
+        360.1268,
+        360.1268
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "NL:cms2_DiAnhyGlucose"
+      ],
+      "observed_species_formulae": [
+        "C6H10O5.C6H10O5"
+      ],
+      "citation_text": [
+        "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+      ],
+      "source_records": [
+        {
+          "name": "NL:cms2_DiAnhyGlucose",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 360.1268,
+          "mode": "pos",
+          "formula": "C6H10O5.C6H10O5",
+          "ref": "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:CF:0096",
+      "category": "CF",
+      "observation": "fragment_mz",
+      "match_type": "peak_mz",
+      "value_da": 44.0495,
+      "value_span_da": [
+        44.0495,
+        44.0495
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "CF:cms2_PE_44"
+      ],
+      "observed_species_formulae": [
+        "C2H6N"
+      ],
+      "citation_text": [
+        "Br\u00fcgger, B. et. al. Quantitative analysis of biological membrane lipids at the low picomole level by nano-electrospray i"
+      ],
+      "source_records": [
+        {
+          "name": "CF:cms2_PE_44",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 44.0495,
+          "mode": "pos",
+          "formula": "C2H6N",
+          "ref": "Br\u00fcgger, B. et. al. Quantitative analysis of biological membrane lipids at the low picomole level by nano-electrospray i"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:CF:0097",
+      "category": "CF",
+      "observation": "fragment_mz",
+      "match_type": "peak_mz",
+      "value_da": 47.0128,
+      "value_span_da": [
+        47.0128,
+        47.0128
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "CF:cms2_Formate_2"
+      ],
+      "observed_species_formulae": [
+        "CH2O4"
+      ],
+      "citation_text": [
+        "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+      ],
+      "source_records": [
+        {
+          "name": "CF:cms2_Formate_2",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 47.0128,
+          "mode": "pos",
+          "formula": "CH2O4",
+          "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:CF:0098",
+      "category": "CF",
+      "observation": "fragment_mz",
+      "match_type": "peak_mz",
+      "value_da": 59.0735,
+      "value_span_da": [
+        59.0735,
+        59.0735
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "CF:cms2_Carn_TMA"
+      ],
+      "observed_species_formulae": [],
+      "citation_text": [
+        "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+      ],
+      "source_records": [
+        {
+          "name": "CF:cms2_Carn_TMA",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 59.0735,
+          "mode": "pos",
+          "formula": "",
+          "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:CF:0099",
+      "category": "CF",
+      "observation": "fragment_mz",
+      "match_type": "peak_mz",
+      "value_da": 60.0808,
+      "value_span_da": [
+        60.0808,
+        60.0808
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "CF:cms2_PC_60"
+      ],
+      "observed_species_formulae": [
+        "C3H10N"
+      ],
+      "citation_text": [
+        "Br\u00fcgger, B. et. al. Quantitative analysis of biological membrane lipids at the low picomole level by nano-electrospray i"
+      ],
+      "source_records": [
+        {
+          "name": "CF:cms2_PC_60",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 60.0808,
+          "mode": "pos",
+          "formula": "C3H10N",
+          "ref": "Br\u00fcgger, B. et. al. Quantitative analysis of biological membrane lipids at the low picomole level by nano-electrospray i"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:CF:0100",
+      "category": "CF",
+      "observation": "fragment_mz",
+      "match_type": "peak_mz",
+      "value_da": 62.06,
+      "value_span_da": [
+        62.06,
+        62.06
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "CF:cms2_PE_62"
+      ],
+      "observed_species_formulae": [
+        "C2H8NO"
+      ],
+      "citation_text": [
+        "Br\u00fcgger, B. et. al. Quantitative analysis of biological membrane lipids at the low picomole level by nano-electrospray i"
+      ],
+      "source_records": [
+        {
+          "name": "CF:cms2_PE_62",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 62.06,
+          "mode": "pos",
+          "formula": "C2H8NO",
+          "ref": "Br\u00fcgger, B. et. al. Quantitative analysis of biological membrane lipids at the low picomole level by nano-electrospray i"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:CF:0101",
+      "category": "CF",
+      "observation": "fragment_mz",
+      "match_type": "peak_mz",
+      "value_da": 68.9947,
+      "value_span_da": [
+        68.9947,
+        68.9947
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "CF:cms2_Formate_Na_2"
+      ],
+      "observed_species_formulae": [
+        "CH2O2Na"
+      ],
+      "citation_text": [
+        "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+      ],
+      "source_records": [
+        {
+          "name": "CF:cms2_Formate_Na_2",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 68.9947,
+          "mode": "pos",
+          "formula": "CH2O2Na",
+          "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:CF:0102",
+      "category": "CF",
+      "observation": "fragment_mz",
+      "match_type": "peak_mz",
+      "value_da": 73.0474,
+      "value_span_da": [
+        73.0474,
+        73.0474
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "CF:cms2_pSilox_73"
+      ],
+      "observed_species_formulae": [
+        "C3H9Si"
+      ],
+      "citation_text": [
+        "Fouquet, T et. al. Electrospray_tandem_mass_spectrometry_combined_with_authentic_compound_synthesis_for_structural_chara"
+      ],
+      "source_records": [
+        {
+          "name": "CF:cms2_pSilox_73",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 73.0474,
+          "mode": "pos",
+          "formula": "C3H9Si",
+          "ref": "Fouquet, T et. al. Electrospray_tandem_mass_spectrometry_combined_with_authentic_compound_synthesis_for_structural_chara"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:CF:0103",
+      "category": "CF",
+      "observation": "fragment_mz",
+      "match_type": "peak_mz",
+      "value_da": 76.0393,
+      "value_span_da": [
+        76.0393,
+        76.0393
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "CF:cms2_GSH_Gly_2"
+      ],
+      "observed_species_formulae": [
+        "C2H6NO2"
+      ],
+      "citation_text": [
+        "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+      ],
+      "source_records": [
+        {
+          "name": "CF:cms2_GSH_Gly_2",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 76.0393,
+          "mode": "pos",
+          "formula": "C2H6NO2",
+          "ref": "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:CF:0104",
+      "category": "CF",
+      "observation": "fragment_mz",
+      "match_type": "peak_mz",
+      "value_da": 83.0103,
+      "value_span_da": [
+        83.0103,
+        83.0103
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "CF:cms2_Acetate_Na_2"
+      ],
+      "observed_species_formulae": [],
+      "citation_text": [
+        "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+      ],
+      "source_records": [
+        {
+          "name": "CF:cms2_Acetate_Na_2",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 83.0103,
+          "mode": "pos",
+          "formula": "",
+          "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:CF:0105",
+      "category": "CF",
+      "observation": "fragment_mz",
+      "match_type": "peak_mz",
+      "value_da": 85.0284,
+      "value_span_da": [
+        85.0284,
+        85.0284
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "CF:cms2_Carn_85"
+      ],
+      "observed_species_formulae": [],
+      "citation_text": [
+        "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+      ],
+      "source_records": [
+        {
+          "name": "CF:cms2_Carn_85",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 85.0284,
+          "mode": "pos",
+          "formula": "",
+          "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:CF:0106",
+      "category": "CF",
+      "observation": "fragment_mz",
+      "match_type": "peak_mz",
+      "value_da": 104.107,
+      "value_span_da": [
+        104.107,
+        104.107
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "CF:cms2_PC_104"
+      ],
+      "observed_species_formulae": [
+        "C5H14NO"
+      ],
+      "citation_text": [
+        "Br\u00fcgger, B. et. al. Quantitative analysis of biological membrane lipids at the low picomole level by nano-electrospray i"
+      ],
+      "source_records": [
+        {
+          "name": "CF:cms2_PC_104",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 104.107,
+          "mode": "pos",
+          "formula": "C5H14NO",
+          "ref": "Br\u00fcgger, B. et. al. Quantitative analysis of biological membrane lipids at the low picomole level by nano-electrospray i"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:CF:0107",
+      "category": "CF",
+      "observation": "fragment_mz",
+      "match_type": "peak_mz",
+      "value_da": 113.0244,
+      "value_span_da": [
+        113.0244,
+        113.0244
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "CF:cms2_AnhyGLN_113"
+      ],
+      "observed_species_formulae": [
+        "C5H5O3"
+      ],
+      "citation_text": [
+        "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+      ],
+      "source_records": [
+        {
+          "name": "CF:cms2_AnhyGLN_113",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 113.0244,
+          "mode": "pos+neg",
+          "formula": "C5H5O3",
+          "ref": "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:CF:0108",
+      "category": "CF",
+      "observation": "fragment_mz",
+      "match_type": "peak_mz",
+      "value_da": 114.9929,
+      "value_span_da": [
+        114.9929,
+        114.9929
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "CF:cms2_TFA_2"
+      ],
+      "observed_species_formulae": [],
+      "citation_text": [
+        "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+      ],
+      "source_records": [
+        {
+          "name": "CF:cms2_TFA_2",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 114.9929,
+          "mode": "pos",
+          "formula": "",
+          "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:CF:0109",
+      "category": "CF",
+      "observation": "fragment_mz",
+      "match_type": "peak_mz",
+      "value_da": 122.027,
+      "value_span_da": [
+        122.027,
+        122.027
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "CF:cms2_Cys_2"
+      ],
+      "observed_species_formulae": [
+        "C3H8NO2S"
+      ],
+      "citation_text": [
+        "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+      ],
+      "source_records": [
+        {
+          "name": "CF:cms2_Cys_2",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 122.027,
+          "mode": "pos",
+          "formula": "C3H8NO2S",
+          "ref": "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:CF:0110",
+      "category": "CF",
+      "observation": "fragment_mz",
+      "match_type": "peak_mz",
+      "value_da": 124.9998,
+      "value_span_da": [
+        124.9998,
+        124.9998
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "CF:cms2_PC_124"
+      ],
+      "observed_species_formulae": [
+        "C2H6O4P"
+      ],
+      "citation_text": [
+        "Br\u00fcgger, B. et. al. Quantitative analysis of biological membrane lipids at the low picomole level by nano-electrospray i"
+      ],
+      "source_records": [
+        {
+          "name": "CF:cms2_PC_124",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 124.9998,
+          "mode": "pos",
+          "formula": "C2H6O4P",
+          "ref": "Br\u00fcgger, B. et. al. Quantitative analysis of biological membrane lipids at the low picomole level by nano-electrospray i"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:CF:0111",
+      "category": "CF",
+      "observation": "fragment_mz",
+      "match_type": "peak_mz",
+      "value_da": 130.0499,
+      "value_span_da": [
+        130.0499,
+        130.0499
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "CF:cms2_GSH_AnhydroGlutamic_ac_2"
+      ],
+      "observed_species_formulae": [
+        "C5H8NO3"
+      ],
+      "citation_text": [
+        "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+      ],
+      "source_records": [
+        {
+          "name": "CF:cms2_GSH_AnhydroGlutamic_ac_2",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 130.0499,
+          "mode": "pos",
+          "formula": "C5H8NO3",
+          "ref": "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:CF:0112",
+      "category": "CF",
+      "observation": "fragment_mz",
+      "match_type": "peak_mz",
+      "value_da": 144.1019,
+      "value_span_da": [
+        144.1019,
+        144.1019
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "CF:cms2_Carn_144"
+      ],
+      "observed_species_formulae": [],
+      "citation_text": [
+        "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+      ],
+      "source_records": [
+        {
+          "name": "CF:cms2_Carn_144",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 144.1019,
+          "mode": "pos",
+          "formula": "",
+          "ref": "Even-electron ions: a systematic study of the neutral species lost in the dissociation of quasi-molecular ions"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:CF:0113",
+      "category": "CF",
+      "observation": "fragment_mz",
+      "match_type": "peak_mz",
+      "value_da": 164.0376,
+      "value_span_da": [
+        164.0376,
+        164.0376
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "CF:cms2_NAcCys_164"
+      ],
+      "observed_species_formulae": [
+        "C5H10NO3S"
+      ],
+      "citation_text": [
+        "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+      ],
+      "source_records": [
+        {
+          "name": "CF:cms2_NAcCys_164",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 164.0376,
+          "mode": "pos",
+          "formula": "C5H10NO3S",
+          "ref": "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:CF:0114",
+      "category": "CF",
+      "observation": "fragment_mz",
+      "match_type": "peak_mz",
+      "value_da": 166.0628,
+      "value_span_da": [
+        166.0628,
+        166.0628
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "CF:cms2_PC_166"
+      ],
+      "observed_species_formulae": [
+        "C5H13NO3P"
+      ],
+      "citation_text": [
+        "Br\u00fcgger, B. et. al. Quantitative analysis of biological membrane lipids at the low picomole level by nano-electrospray i"
+      ],
+      "source_records": [
+        {
+          "name": "CF:cms2_PC_166",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 166.0628,
+          "mode": "pos",
+          "formula": "C5H13NO3P",
+          "ref": "Br\u00fcgger, B. et. al. Quantitative analysis of biological membrane lipids at the low picomole level by nano-electrospray i"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:CF:0115",
+      "category": "CF",
+      "observation": "fragment_mz",
+      "match_type": "peak_mz",
+      "value_da": 216.0632,
+      "value_span_da": [
+        216.0632,
+        216.0632
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "CF:cms2_PE_216"
+      ],
+      "observed_species_formulae": [
+        "C5H15NO6P"
+      ],
+      "citation_text": [
+        "Br\u00fcgger, B. et. al. Quantitative analysis of biological membrane lipids at the low picomole level by nano-electrospray i"
+      ],
+      "source_records": [
+        {
+          "name": "CF:cms2_PE_216",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 216.0632,
+          "mode": "pos",
+          "formula": "C5H15NO6P",
+          "ref": "Br\u00fcgger, B. et. al. Quantitative analysis of biological membrane lipids at the low picomole level by nano-electrospray i"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:CF:0116",
+      "category": "CF",
+      "observation": "fragment_mz",
+      "match_type": "peak_mz",
+      "value_da": 236.1498,
+      "value_span_da": [
+        236.1498,
+        236.1498
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "CF:cms2_DGTS_236"
+      ],
+      "observed_species_formulae": [
+        "C10H22O5N"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "CF:cms2_DGTS_236",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 236.1498,
+          "mode": "pos",
+          "formula": "C10H22O5N",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:CF:0117",
+      "category": "CF",
+      "observation": "fragment_mz",
+      "match_type": "peak_mz",
+      "value_da": 243.0845,
+      "value_span_da": [
+        243.0845,
+        243.0845
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "CF:cms2_MGDG_Na_243"
+      ],
+      "observed_species_formulae": [
+        "C9H16O6Na"
+      ],
+      "citation_text": [
+        "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+      ],
+      "source_records": [
+        {
+          "name": "CF:cms2_MGDG_Na_243",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 243.0845,
+          "mode": "pos",
+          "formula": "C9H16O6Na",
+          "ref": "Yan, M et. al. MS2Analyzer \u0096 A Software for Small Molecule Substructure Annotations from Accurate Tandem Mass Spectra"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:CF:0118",
+      "category": "CF",
+      "observation": "fragment_mz",
+      "match_type": "peak_mz",
+      "value_da": 274.1034,
+      "value_span_da": [
+        274.1034,
+        274.1034
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "CF:cms2_GSH_GluAlaGly_2H_2"
+      ],
+      "observed_species_formulae": [
+        "C10H16N3O6"
+      ],
+      "citation_text": [
+        "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+      ],
+      "source_records": [
+        {
+          "name": "CF:cms2_GSH_GluAlaGly_2H_2",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 274.1034,
+          "mode": "pos",
+          "formula": "C10H16N3O6",
+          "ref": "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    },
+    {
+      "channel_id": "OBS:CF:0119",
+      "category": "CF",
+      "observation": "fragment_mz",
+      "match_type": "peak_mz",
+      "value_da": 308.0911,
+      "value_span_da": [
+        308.0911,
+        308.0911
+      ],
+      "match_tolerance_da": 0.005,
+      "ion_modes": [
+        "positive"
+      ],
+      "adduct_scope": [
+        "[M+H]+",
+        "[M+Na]+"
+      ],
+      "aliases": [
+        "CF:cms2_GSH_2"
+      ],
+      "observed_species_formulae": [
+        "C10H18N3O6S"
+      ],
+      "citation_text": [
+        "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+      ],
+      "source_records": [
+        {
+          "name": "CF:cms2_GSH_2",
+          "source": "CompMS2Miner (Substructure_masses)",
+          "value": 308.0911,
+          "mode": "pos",
+          "formula": "C10H18N3O6S",
+          "ref": "Levsen, K. et. al. Structure elucidation of phase II metabolites by tandem mass spectrometry: an overview, Journal of Ch"
+        }
+      ],
+      "parent_structure_prerequisite": null,
+      "collision_energy_domain": null,
+      "instrument_domain": null,
+      "evidence_class": "curated_package_record_with_citation_text",
+      "mechanistic_rule": false,
+      "training_policy": "empirical_calibration_required",
+      "enabled_for_formal_training": false
+    }
+  ],
+  "contracts": {
+    "mass_degenerate_aliases_merged": true,
+    "alias_count_does_not_increase_channel_weight": true,
+    "negative_mode_records_excluded": true,
+    "unknown_mode_records_excluded": true,
+    "parent_structure_prerequisite_required_for_mechanistic_claim": true,
+    "mechanistic_rules_ready": false,
+    "empirical_calibration_required_before_training": true
+  },
+  "provenance": {
+    "legacy_library": "D:\\DreaMS\\dreams\\models\\chem_aware\\chem_rules_data.json",
+    "legacy_library_sha256": "d66c085e8718c14eeebc6e99959ba54741e44726421d5d7d36ac7d684e63a498",
+    "builder_sha256": "f1014d037829dc12ce923d20c0735ebc2348b3dfbbd5694ec613d7dc2903301d"
+  }
+}

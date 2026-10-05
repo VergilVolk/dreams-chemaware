@@ -11,6 +11,7 @@ sys.path.insert(0, str(ROOT))
 from annotation.bioaware_context_adapter import (  # noqa: E402
     BiologicalContextAdapter,
     BiologicalEvidenceContextAdapter,
+    MonotoneEvidenceTangentLift,
     context_training_loss,
 )
 
@@ -90,6 +91,27 @@ def main() -> None:
     changed, _, _ = evidence_model(base, evidence, context_mask)
     assert torch.equal(changed[0], base[0])
     assert not torch.equal(changed[1], base[1])
+
+    # B3's learnable path is candidate-identity blind and support-monotone.
+    monotone = MonotoneEvidenceTangentLift(
+        dimension, evidence_dim=3, delta_bound=.05,
+    )
+    q = F.normalize(torch.randn(2, dimension), dim=-1)
+    c = F.normalize(torch.randn(2, dimension), dim=-1)
+    low = torch.tensor([[0.0, 0.0, 0.0], [0.2, 0.1, 0.0]])
+    high = torch.tensor([[0.0, 0.0, 0.0], [0.4, 0.1, 0.3]])
+    active = torch.tensor([False, True])
+    low_adapted, _, low_support = monotone(c, low, active, q)
+    high_adapted, _, high_support = monotone(c, high, active, q)
+    assert torch.equal(low_adapted[0], c[0])
+    assert torch.equal(high_adapted[0], c[0])
+    assert high_support[1] >= low_support[1] > 0
+    low_score = torch.sum(low_adapted * q, dim=-1)
+    high_score = torch.sum(high_adapted * q, dim=-1)
+    assert high_score[1] >= low_score[1]
+    (-high_score[1]).backward()
+    assert monotone.raw_weight.grad is not None
+    assert float(monotone.raw_weight.grad.abs().sum()) > 0
     print("[test_bioaware_context_adapter] PASS")
 
 

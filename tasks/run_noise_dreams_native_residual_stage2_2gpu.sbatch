@@ -1,0 +1,211 @@
+#!/bin/bash
+#SBATCH --job-name=noise_native_s2
+#SBATCH --partition=gpu
+#SBATCH --gpus=2
+#SBATCH --cpus-per-task=16
+#SBATCH --time=72:00:00
+#SBATCH --output=data/validation/noise_native_s2_%j.out
+#SBATCH --error=data/validation/noise_native_s2_%j.err
+
+set -euo pipefail
+
+cd /data02/run01/scv7tsl/DreaMS
+source /data02/home/scv7tsl/run/miniconda3/etc/profile.d/conda.sh
+conda activate dreams
+export PYTHONPATH="$PWD:$PWD/tasks:${PYTHONPATH:-}"
+export PYTHONUNBUFFERED=1
+export OMP_NUM_THREADS=8
+
+IFS=',' read -r -a ALLOCATED_GPUS <<< "${CUDA_VISIBLE_DEVICES:-}"
+if (( ${#ALLOCATED_GPUS[@]} != 2 )); then
+  echo "Expected exactly two allocated GPUs, got CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-}" >&2
+  exit 3
+fi
+
+FOLD=0
+STAGE1="data/validation/noise_dreams_hard_positive_native_fold_0_run_2344820"
+GRAPH_DIR="data/validation/noise_corrected_candidate_graph_v1_20260906"
+GRAPH="$GRAPH_DIR/candidate_graph.npz"
+EMBEDDING_CACHE="$GRAPH_DIR/official_embeddings.npz"
+SOURCE_MANIFEST="data/validation/chemaware_corrected_candidate_manifest_v1/manifest.npz"
+DATA="data/models/MassSpecGym_MurckoHist_split.hdf5"
+OFFICIAL_SLIM="data/e1/official_embedding_slim.pt"
+ARCHITECTURE="dreams/models/pretrained/ssl_model_server.pt"
+MATURE_E8="data/validation/g8r_noise_final_e8_direct_transfer/curriculum_all_views4_blocks1_blr_2e-06_hlr_1e-05_e8_baseline_symmetric_shared/seed_20260830/fold_0/final_shared_encoder.pt"
+WARM_START="$STAGE1/checkpoint/targeted_final.ckpt"
+RUN_ROOT="data/validation/noise_dreams_native_residual_stage2_fold_${FOLD}_run_${SLURM_JOB_ID}"
+TRIPLETS="$RUN_ROOT/triplets"
+EVALUATION="$RUN_ROOT/evaluation"
+LOCAL_BASE="${SLURM_TMPDIR:-/tmp}"
+LOCAL_ROOT="$LOCAL_BASE/noise_native_s2_${SLURM_JOB_ID}"
+ARMS="$LOCAL_ROOT/arms"
+SOURCE_SNAPSHOT="$LOCAL_ROOT/source_snapshot"
+REUSE_TRIPLETS="${NOISE_STAGE2_TRIPLETS:-}"
+
+[[ ! -e "$RUN_ROOT" ]] || { echo "Output collision: $RUN_ROOT" >&2; exit 4; }
+mkdir -p "$RUN_ROOT" "$EVALUATION" "$ARMS"
+cleanup_local() { rm -rf -- "$LOCAL_ROOT"; }
+trap cleanup_local EXIT
+LOCAL_FREE_KB=$(df -Pk "$LOCAL_BASE" | awk 'NR==2 {print $4}')
+if [[ -z "$LOCAL_FREE_KB" ]] || (( LOCAL_FREE_KB < 4194304 )); then
+  echo "Node-local checkpoint space below 4 GiB: base=$LOCAL_BASE free_kb=${LOCAL_FREE_KB:-unknown}" >&2
+  exit 4
+fi
+
+required_files=(
+  "$STAGE1/summary/report.json"
+  "$STAGE1/evaluation/targeted/report.json"
+  "$STAGE1/evaluation/targeted/held_per_query.csv.gz"
+  "$STAGE1/triplets/report.json"
+  "$STAGE1/triplets/train_pool.npz"
+  "$STAGE1/triplets/validation_pool.npz"
+  "$STAGE1/triplets/action_spectra.npz"
+  "$STAGE1/triplets/selected_actions.csv.gz"
+  "$WARM_START" "$GRAPH" "$EMBEDDING_CACHE" "$SOURCE_MANIFEST"
+  "$DATA" "$OFFICIAL_SLIM" "$ARCHITECTURE" "$MATURE_E8"
+  tasks/build_noise_dreams_native_residual_stage2.py
+  tasks/train_noise_dreams_native_residual_stage2.py
+  tasks/prepare_official_embedding_checkpoint.py
+  tasks/evaluate_noise_dreams_native.py
+  tasks/summarize_noise_dreams_native_residual_stage2.py
+  tasks/test_noise_dreams_native_residual_stage2.py
+)
+for path in "${required_files[@]}"; do
+  [[ -f "$path" ]] || { echo "Missing Stage-2 input: $path" >&2; exit 5; }
+done
+
+# Freeze the exact Python implementation before any GPU work. Other project
+# agents may edit the live checkout while this allocation is running.
+mkdir -p "$SOURCE_SNAPSHOT"
+cp -a dreams "$SOURCE_SNAPSHOT/dreams"
+cp -a tasks "$SOURCE_SNAPSHOT/tasks"
+export PYTHONPATH="$SOURCE_SNAPSHOT:$SOURCE_SNAPSHOT/tasks:${PYTHONPATH:-}"
+S2_TASKS="$SOURCE_SNAPSHOT/tasks"
+
+python -m py_compile \
+  "$S2_TASKS/build_noise_dreams_native_residual_stage2.py" \
+  "$S2_TASKS/train_noise_dreams_native_residual_stage2.py" \
+  "$S2_TASKS/evaluate_noise_dreams_native.py" \
+  "$S2_TASKS/summarize_noise_dreams_native_residual_stage2.py" \
+  "$S2_TASKS/test_noise_dreams_native_residual_stage2.py"
+python -u "$S2_TASKS/test_noise_dreams_native_residual_stage2.py"
+
+if [[ -n "$REUSE_TRIPLETS" ]]; then
+  for name in report.json train_pool.npz validation_pool.npz action_spectra.npz \
+    selected_actions.csv.gz protection_sentinels.csv.gz; do
+    [[ -f "$REUSE_TRIPLETS/$name" ]] || {
+      echo "Reusable Stage-2 triplets are incomplete: $REUSE_TRIPLETS/$name" >&2
+      exit 5
+    }
+  done
+  cp -a "$REUSE_TRIPLETS" "$TRIPLETS"
+  echo "Reused frozen Stage-2 residual triplets: $REUSE_TRIPLETS"
+else
+  CUDA_VISIBLE_DEVICES="${ALLOCATED_GPUS[0]}" python -u \
+    "$S2_TASKS/build_noise_dreams_native_residual_stage2.py" \
+    --stage1-run "$STAGE1" \
+    --graph "$GRAPH" --embedding-cache "$EMBEDDING_CACHE" \
+    --data "$DATA" --architecture-checkpoint "$ARCHITECTURE" \
+    --output "$TRIPLETS" --outer-fold "$FOLD" \
+    --formula-fold-seed 20260825 --margin 0.1 \
+    --minimum-action-advantage 5e-6 --protection-sentinels 256 \
+    --batch-size 64
+fi
+
+run_arm() {
+  local gpu="$1"
+  local arm="$2"
+  CUDA_VISIBLE_DEVICES="$gpu" python -u \
+    "$S2_TASKS/train_noise_dreams_native_residual_stage2.py" \
+    --data "$DATA" --triplet-dir "$TRIPLETS" \
+    --warm-start-checkpoint "$WARM_START" \
+    --architecture-checkpoint "$ARCHITECTURE" \
+    --output "$ARMS/$arm" --arm "$arm" --seed 3407 \
+    --lr 1e-6 --weight-decay 0 --triplet-loss-margin 0.1 \
+    --batch-size 4 --num-workers 4 --max-epochs 1 \
+    --n-highest-peaks 100 \
+    >"$RUN_ROOT/${arm}.out" 2>"$RUN_ROOT/${arm}.err"
+}
+
+run_arm "${ALLOCATED_GPUS[0]}" targeted &
+PID_TARGETED=$!
+run_arm "${ALLOCATED_GPUS[1]}" control &
+PID_CONTROL=$!
+set +e
+wait "$PID_TARGETED"; STATUS_TARGETED=$?
+wait "$PID_CONTROL"; STATUS_CONTROL=$?
+set -e
+if (( STATUS_TARGETED != 0 || STATUS_CONTROL != 0 )); then
+  tail -n 120 "$RUN_ROOT/targeted.err" >&2 || true
+  tail -n 120 "$RUN_ROOT/control.err" >&2 || true
+  echo "Stage-2 native training failure: targeted=$STATUS_TARGETED control=$STATUS_CONTROL" >&2
+  exit 6
+fi
+
+mkdir -p "$RUN_ROOT/training_reports"
+cp "$ARMS/targeted/report.json" "$RUN_ROOT/training_reports/targeted.json"
+cp "$ARMS/control/report.json" "$RUN_ROOT/training_reports/control.json"
+
+# Strip optimizer/trainer state and the duplicated hyperparameter backbone on
+# node-local storage. Evaluators need weights only; do not write two 1.2-GB
+# Lightning checkpoints to the quota-limited shared validation filesystem.
+python -u "$S2_TASKS/prepare_official_embedding_checkpoint.py" \
+  --source "$ARMS/targeted/final.ckpt" \
+  --output "$ARMS/targeted_slim.pt"
+rm -f -- "$ARMS/targeted/final.ckpt"
+python -u "$S2_TASKS/prepare_official_embedding_checkpoint.py" \
+  --source "$ARMS/control/final.ckpt" \
+  --output "$ARMS/control_slim.pt"
+rm -f -- "$ARMS/control/final.ckpt"
+
+evaluate_arm() {
+  local gpu="$1"
+  local arm="$2"
+  CUDA_VISIBLE_DEVICES="$gpu" python -u "$S2_TASKS/evaluate_noise_dreams_native.py" \
+    --graph "$GRAPH" --embedding-cache "$EMBEDDING_CACHE" \
+    --official-slim-checkpoint "$OFFICIAL_SLIM" \
+    --source-manifest "$SOURCE_MANIFEST" --data "$DATA" \
+    --checkpoint "$ARMS/${arm}_slim.pt" \
+    --architecture-checkpoint "$ARCHITECTURE" \
+    --output "$EVALUATION/$arm" --arm "$arm" \
+    --outer-fold "$FOLD" --formula-fold-seed 20260825 \
+    --batch-size 64 --bootstrap-resamples 10000 --bootstrap-seed 20260926 \
+    --official-finetuned-checkpoint "$OFFICIAL_SLIM" \
+    --mature-e8-checkpoint "$MATURE_E8" \
+    --e8-architecture-checkpoint "$ARCHITECTURE" \
+    --no-write-held-metric-evidence \
+    >"$RUN_ROOT/evaluate_${arm}.out" 2>"$RUN_ROOT/evaluate_${arm}.err"
+}
+
+evaluate_arm "${ALLOCATED_GPUS[0]}" targeted &
+PID_EVAL_TARGETED=$!
+evaluate_arm "${ALLOCATED_GPUS[1]}" control &
+PID_EVAL_CONTROL=$!
+set +e
+wait "$PID_EVAL_TARGETED"; STATUS_EVAL_TARGETED=$?
+wait "$PID_EVAL_CONTROL"; STATUS_EVAL_CONTROL=$?
+set -e
+if (( STATUS_EVAL_TARGETED != 0 || STATUS_EVAL_CONTROL != 0 )); then
+  tail -n 120 "$RUN_ROOT/evaluate_targeted.err" >&2 || true
+  tail -n 120 "$RUN_ROOT/evaluate_control.err" >&2 || true
+  echo "Stage-2 held evaluation failure: targeted=$STATUS_EVAL_TARGETED control=$STATUS_EVAL_CONTROL" >&2
+  exit 7
+fi
+
+python -u "$S2_TASKS/summarize_noise_dreams_native_residual_stage2.py" \
+  --stage1 "$STAGE1/evaluation/targeted" \
+  --targeted "$EVALUATION/targeted" --control "$EVALUATION/control" \
+  --output "$RUN_ROOT/summary" --absolute-target-pp 5.0 \
+  --bootstrap-resamples 10000 --seed 20260926
+
+# Only a promoted Stage-2 model deserves shared storage. The control model and
+# a non-promoted candidate are fully represented by their small metric ledgers.
+PROMOTION_STATUS=$(python -c \
+  'import json,sys; print(json.load(open(sys.argv[1]))["status"])' \
+  "$RUN_ROOT/summary/report.json")
+if [[ "$PROMOTION_STATUS" == "NOISE_DREAMS_NATIVE_RESIDUAL_STAGE2_PROMOTION_PASS" ]]; then
+  mkdir -p "$RUN_ROOT/checkpoint"
+  cp "$ARMS/targeted_slim.pt" "$RUN_ROOT/checkpoint/targeted_slim.pt"
+fi
+
+echo "=== Noise native residual Stage-2 result: $RUN_ROOT ==="

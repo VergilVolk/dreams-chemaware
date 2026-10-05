@@ -1,0 +1,64 @@
+{
+  "schema": "chemaware.fragment-graph-evidence.v1",
+  "status": "DEFINITION_AND_PROVENANCE_ONLY_NOT_A_PERFORMANCE_CLAIM",
+  "implementation_source": {
+    "name": "coleygroup/ms-pred MAGMa fragment enumerator",
+    "repository": "https://github.com/coleygroup/ms-pred",
+    "commit": "cd616f629a82040b950fbf8f0a983cc70ce1cf3b",
+    "license": "MIT",
+    "fragmentation_py_sha256": "5fc6ac347a09ea8486154ce827eea0ea810a0c7f6a277279ffd4c5abd1e93744",
+    "chem_utils_py_sha256": "c9842ef76eb831394c53fdd5050d87842edaebd46427a722d43983286495f96e",
+    "reused_fields": [
+      "fragment atom mask",
+      "parent fragment hashes",
+      "tree depth",
+      "broken-bond budget",
+      "bond-cut score",
+      "neutralized fragment formula and exact mass",
+      "bounded hydrogen-shift capacity"
+    ],
+    "not_reused": [
+      "ICEBERG neural intensity weights",
+      "MassSpecGym-trained fragment probabilities",
+      "candidate labels",
+      "retrieval truth"
+    ]
+  },
+  "scientific_evidence": [
+    {
+      "evidence_id": "MSFINDER_HYDROGEN_REARRANGEMENT_2016",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7063832/",
+      "implemented_semantics": "Positive-mode regular first and later cleavage hypotheses are represented as element-conditioned plus/minus one hydrogen variants. Other variants within plus/minus two hydrogens are retained only as lower-prior semiresolved hypotheses.",
+      "boundary": "This implementation does not claim to reproduce the complete MS-FINDER program, its learned database score, or every diagrammatic rule in Figure 1."
+    },
+    {
+      "evidence_id": "SIRIUS_FRAGMENTATION_TREE_MAP_2016",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4736045/",
+      "implemented_semantics": "Observed peaks are rewarded only through a rooted connected explanation over candidate-fragment parent-child edges; unmatched intermediate fragments may connect observed descendants and every added edge pays an explicit complexity cost.",
+      "boundary": "The local solver is a deterministic greedy prize-collecting approximation, not the SIRIUS ILP and not a SIRIUS score reproduction."
+    },
+    {
+      "evidence_id": "ICEBERG_EXPLICIT_FRAGMENT_DAG_2025",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12154671/",
+      "implemented_semantics": "Candidate structures are expanded into explicit multi-step fragment DAGs with atom-subset identities and hydrogen-shift variants.",
+      "boundary": "No pretrained ICEBERG intensity model is used, preventing MassSpecGym checkpoint overlap from becoming supervision."
+    }
+  ],
+  "training_contract": {
+    "role": "truth-blind candidate-relation selection only",
+    "output": "candidate score ledger with matched controls and an auditable connected explanation ledger",
+    "forbidden": [
+      "using fragment-graph scores as a regression or distillation target",
+      "changing the DreaMS loss, sampler, optimizer, or event weights",
+      "broadcasting a relation to another query or identity",
+      "opening formula roles 2, 3, or 4 during construction or qualification"
+    ],
+    "matched_controls": [
+      "within-candidate fragment-mass-to-graph-node permutation preserving graph topology, mass multiset, hydrogen variants, and capacity",
+      "within-candidate parent-topology permutation preserving node and edge capacity",
+      "deterministic peak-mass shift preserving peak count and intensities"
+    ],
+    "unused_audit_arm": "The core retains a within-query intensity-rank permutation for bounded diagnostics, but the formal full run does not compute it because it neither qualifies the source nor selects a triplet.",
+    "required_next_gate": "formula-disjoint specificity qualification against every matched control before native triplet mining"
+  }
+}

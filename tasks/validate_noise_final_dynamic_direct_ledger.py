@@ -33,7 +33,7 @@ def main() -> None:
         "unique_actions": not actions["action_id"].duplicated().any(),
         "all_cells": len(cells) == 30 and contracts.get("all_30_cells_retained") is True,
         "N_and_P": set(actions["source"].astype(str)) == {"N", "P_intensity", "P_transfer"},
-        "positive_weights": actions[["dynamic_weight", "static_weight"]].gt(0).all().all(),
+        "positive_weights": actions[["dynamic_weight", "static_weight"]].ge(0).all().all(),
         "query_caps": bool(
             actions.groupby("query_index")["dynamic_weight"].sum().max() <= 1.00001
             and actions.groupby("query_index")["static_weight"].sum().max() <= 1.00001
@@ -41,7 +41,20 @@ def main() -> None:
         "no_outcome_columns": not bool(outcome_columns & set(actions.columns)),
         "held_absent": contracts.get("outer_held_formulas_absent") is True,
         "multiple_actions": contracts.get("multiple_actions_per_query_retained") is True,
-        "no_op": contracts.get("no_op_implicit_and_always_available") is True,
+        "no_op": bool(
+            contracts.get("no_op_explicit_and_positive_for_every_query") is True
+            and {"dynamic_no_op_weight", "static_no_op_weight"} <= set(actions.columns)
+            and actions.groupby("query_index")["dynamic_no_op_weight"].first().gt(0).all()
+            and actions.groupby("query_index")["static_no_op_weight"].first().gt(0).all()
+            and np.allclose(
+                actions.groupby("query_index")["dynamic_weight"].sum()
+                + actions.groupby("query_index")["dynamic_no_op_weight"].first(), 1.0, atol=2e-6,
+            )
+            and np.allclose(
+                actions.groupby("query_index")["static_weight"].sum()
+                + actions.groupby("query_index")["static_no_op_weight"].first(), 1.0, atol=2e-6,
+            )
+        ),
         "P2b": contracts.get("P2b") == "forbidden",
         "P3": contracts.get("P3_consumed") is False,
         "pass": report.get("pass_to_gpu_replay") is True,

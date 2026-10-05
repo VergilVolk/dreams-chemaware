@@ -1,0 +1,5 @@
+tasks/repair_noise_dreams_native_multidifficulty_stage3.py
+tasks/train_noise_dreams_native_residual_stage2.py
+tasks/summarize_noise_dreams_native_residual_stage2.py
+tasks/test_noise_dreams_native_stage3_calibrated_repair.py
+tasks/run_noise_dreams_native_stage3_calibrated_repair_2gpu.sbatch

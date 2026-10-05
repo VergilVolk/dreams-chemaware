@@ -1,0 +1,278 @@
+{
+  "status": "noise_v3_s1b_action_headroom_complete",
+  "queries": 23876,
+  "official_errors": 1805,
+  "official_recall1": 0.9244010722063998,
+  "action_results": {
+    "candidate_gradient_r2|a=0.25": {
+      "eligible_queries": 18915,
+      "corrected": 42,
+      "introduced": 13,
+      "net": 29
+    },
+    "candidate_gradient_r2|a=0.50": {
+      "eligible_queries": 18915,
+      "corrected": 85,
+      "introduced": 30,
+      "net": 55
+    },
+    "candidate_gradient_r2|a=0.75": {
+      "eligible_queries": 18915,
+      "corrected": 133,
+      "introduced": 56,
+      "net": 77
+    },
+    "candidate_gradient_r2|a=1.00": {
+      "eligible_queries": 18915,
+      "corrected": 228,
+      "introduced": 132,
+      "net": 96
+    },
+    "candidate_gradient_r3|a=0.25": {
+      "eligible_queries": 17008,
+      "corrected": 31,
+      "introduced": 15,
+      "net": 16
+    },
+    "candidate_gradient_r3|a=0.50": {
+      "eligible_queries": 17008,
+      "corrected": 60,
+      "introduced": 21,
+      "net": 39
+    },
+    "candidate_gradient_r3|a=0.75": {
+      "eligible_queries": 17008,
+      "corrected": 90,
+      "introduced": 32,
+      "net": 58
+    },
+    "candidate_gradient_r3|a=1.00": {
+      "eligible_queries": 17008,
+      "corrected": 143,
+      "introduced": 79,
+      "net": 64
+    },
+    "candidate_gradient_r4|a=0.25": {
+      "eligible_queries": 15245,
+      "corrected": 17,
+      "introduced": 2,
+      "net": 15
+    },
+    "candidate_gradient_r4|a=0.50": {
+      "eligible_queries": 15245,
+      "corrected": 33,
+      "introduced": 4,
+      "net": 29
+    },
+    "candidate_gradient_r4|a=0.75": {
+      "eligible_queries": 15245,
+      "corrected": 57,
+      "introduced": 15,
+      "net": 42
+    },
+    "candidate_gradient_r4|a=1.00": {
+      "eligible_queries": 15245,
+      "corrected": 99,
+      "introduced": 45,
+      "net": 54
+    },
+    "candidate_gradient_r5|a=0.25": {
+      "eligible_queries": 13880,
+      "corrected": 10,
+      "introduced": 2,
+      "net": 8
+    },
+    "candidate_gradient_r5|a=0.50": {
+      "eligible_queries": 13880,
+      "corrected": 25,
+      "introduced": 8,
+      "net": 17
+    },
+    "candidate_gradient_r5|a=0.75": {
+      "eligible_queries": 13880,
+      "corrected": 35,
+      "introduced": 14,
+      "net": 21
+    },
+    "candidate_gradient_r5|a=1.00": {
+      "eligible_queries": 13880,
+      "corrected": 77,
+      "introduced": 38,
+      "net": 39
+    },
+    "candidate_gradient|a=0.25": {
+      "eligible_queries": 21231,
+      "corrected": 72,
+      "introduced": 54,
+      "net": 18
+    },
+    "candidate_gradient|a=0.50": {
+      "eligible_queries": 21231,
+      "corrected": 140,
+      "introduced": 124,
+      "net": 16
+    },
+    "candidate_gradient|a=0.75": {
+      "eligible_queries": 21231,
+      "corrected": 206,
+      "introduced": 275,
+      "net": -69
+    },
+    "candidate_gradient|a=1.00": {
+      "eligible_queries": 21231,
+      "corrected": 303,
+      "introduced": 610,
+      "net": -307
+    },
+    "role_confounder_r2|a=0.25": {
+      "eligible_queries": 3645,
+      "corrected": 2,
+      "introduced": 0,
+      "net": 2
+    },
+    "role_confounder_r2|a=0.50": {
+      "eligible_queries": 3645,
+      "corrected": 7,
+      "introduced": 1,
+      "net": 6
+    },
+    "role_confounder_r2|a=0.75": {
+      "eligible_queries": 3645,
+      "corrected": 11,
+      "introduced": 4,
+      "net": 7
+    },
+    "role_confounder_r2|a=1.00": {
+      "eligible_queries": 3645,
+      "corrected": 39,
+      "introduced": 13,
+      "net": 26
+    },
+    "role_confounder_r3|a=0.25": {
+      "eligible_queries": 2606,
+      "corrected": 2,
+      "introduced": 0,
+      "net": 2
+    },
+    "role_confounder_r3|a=0.50": {
+      "eligible_queries": 2606,
+      "corrected": 8,
+      "introduced": 0,
+      "net": 8
+    },
+    "role_confounder_r3|a=0.75": {
+      "eligible_queries": 2606,
+      "corrected": 11,
+      "introduced": 1,
+      "net": 10
+    },
+    "role_confounder_r3|a=1.00": {
+      "eligible_queries": 2606,
+      "corrected": 29,
+      "introduced": 4,
+      "net": 25
+    },
+    "role_confounder|a=0.25": {
+      "eligible_queries": 6158,
+      "corrected": 8,
+      "introduced": 2,
+      "net": 6
+    },
+    "role_confounder|a=0.50": {
+      "eligible_queries": 6158,
+      "corrected": 24,
+      "introduced": 6,
+      "net": 18
+    },
+    "role_confounder|a=0.75": {
+      "eligible_queries": 6158,
+      "corrected": 43,
+      "introduced": 9,
+      "net": 34
+    },
+    "role_confounder|a=1.00": {
+      "eligible_queries": 6158,
+      "corrected": 106,
+      "introduced": 18,
+      "net": 88
+    }
+  },
+  "no_op_aware_oracle": {
+    "noncontrol_recoverable_errors": 408,
+    "recall1": 0.9414893617021277,
+    "delta_recall1": 0.017088289495727927,
+    "introduced": 0,
+    "claim_limit": "Uses action outcomes to select the action; headroom only."
+  },
+  "selector_complementarity": {
+    "candidate_gradient": {
+      "recoverable_errors": 370,
+      "fraction_of_all_official_errors": 0.20498614958448755
+    },
+    "role_confounder": {
+      "recoverable_errors": 113,
+      "fraction_of_all_official_errors": 0.06260387811634349
+    },
+    "intersection": {
+      "recoverable_errors": 75,
+      "fraction_of_all_official_errors": 0.04155124653739612
+    },
+    "gradient_only": {
+      "recoverable_errors": 295,
+      "fraction_of_all_official_errors": 0.1634349030470914
+    },
+    "confounder_only": {
+      "recoverable_errors": 38,
+      "fraction_of_all_official_errors": 0.021052631578947368
+    },
+    "either_noncontrol": {
+      "recoverable_errors": 408,
+      "fraction_of_all_official_errors": 0.2260387811634349
+    },
+    "identity_negative_control_recoveries": 0
+  },
+  "near_headroom": {
+    "official_near_errors": 1446,
+    "noncontrol_recoverable_near_errors": 347,
+    "fraction_recoverable": 0.23997233748271093
+  },
+  "performance_targets": {
+    "0.5pp": {
+      "required_net_corrections": 120,
+      "within_noncontrol_oracle_headroom": true
+    },
+    "1.0pp": {
+      "required_net_corrections": 239,
+      "within_noncontrol_oracle_headroom": true
+    },
+    "2.0pp": {
+      "required_net_corrections": 478,
+      "within_noncontrol_oracle_headroom": false
+    },
+    "4.0pp": {
+      "required_net_corrections": 956,
+      "within_noncontrol_oracle_headroom": false
+    }
+  },
+  "policy_dataset": {
+    "query_action_rows": 394752,
+    "queries_with_any_noncontrol_rescue": 408,
+    "positive_action_rows": 2176,
+    "harmful_action_rows": 1627
+  },
+  "decision_rule": "Proceed to nonlinear action-policy cross-fitting only if the no-op-aware noncontrol oracle covers at least 1 percentage point and both selectors contribute nonredundant recoveries. Four-point headroom is reported, not promised.",
+  "provenance": {
+    "matrix_report_sha256": "f7bbc455e333ac55e60a04f0b83e31e076e09a28fa4f9691ff0af71f5bcff825",
+    "matrix_validation_sha256": "5661c89d533bcc48074e7d42c83874ab79a8dc190b83a4c9358dcce1152e59e7",
+    "paired_interventions_sha256": "59cb29e365d7bc501a2f272277454cde2e98788487ab69c82cd498a55189a854",
+    "candidate_graph_sha256": "5f2340751c7521c5a93114e2b134d5796f157148736ad9162d545b84c11d9f71",
+    "script_sha256": "e0b54c70775faa22354cee0b292d7e667805554e88331b784cc6c3dee3921495"
+  },
+  "gates": {
+    "oracle_headroom_ge_1pp": true,
+    "gradient_has_unique_recoveries": true,
+    "confounder_has_unique_recoveries": true,
+    "policy_rows_ge_1000": true,
+    "pass_to_policy_design": true
+  }
+}

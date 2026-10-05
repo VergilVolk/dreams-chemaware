@@ -31,6 +31,10 @@ sys.path.insert(0, str(ROOT / "tasks"))
 from dreams.models.heads.heads import ContrastiveHead  # noqa: E402
 from dreams.utils.data import ContrastiveSpectraDataset  # noqa: E402
 from dreams.utils.spectra import MSnSpectrum  # noqa: E402
+from e1_checkpoint_io import torch_load_compat  # noqa: E402
+from chemaware_native_adam import (  # noqa: E402
+    adam_state_steps, restore_native_adam_state,
+)
 from train_e1_identity import load_base_model  # noqa: E402
 
 
@@ -70,12 +74,48 @@ class SlurmLineProgress(pl.Callback):
             )
 
 
+class RestoreAndReleaseNativeAdamState(pl.Callback):
+    """Continue Adam moments without resuming the already-completed loop."""
+
+    def __init__(self, state: dict, expected_lr: float, expected_weight_decay: float):
+        super().__init__()
+        self.state = state
+        self.expected_lr = float(expected_lr)
+        self.expected_weight_decay = float(expected_weight_decay)
+        self.restored = False
+        self.initial_steps: dict[int, int] = {}
+        self.final_steps: dict[int, int] = {}
+
+    def on_fit_start(self, trainer, pl_module) -> None:
+        if len(trainer.optimizers) != 1:
+            raise RuntimeError("ChemAware continuation expected exactly one optimizer")
+        optimizer = trainer.optimizers[0]
+        self.initial_steps = restore_native_adam_state(
+            optimizer, self.state, self.expected_lr, self.expected_weight_decay,
+        )
+        self.state = {}
+        self.restored = True
+
+    def on_fit_end(self, trainer, pl_module) -> None:
+        if not self.restored or len(trainer.optimizers) != 1:
+            raise RuntimeError("ChemAware Adam restoration did not execute")
+        self.final_steps = adam_state_steps(trainer.optimizers[0].state_dict())
+        if set(self.initial_steps) != set(self.final_steps):
+            raise RuntimeError("ChemAware Adam parameter registry changed during continuation")
+        if any(self.final_steps[key] <= value for key, value in self.initial_steps.items()):
+            raise RuntimeError("ChemAware Adam step counters did not advance")
+
+
 def arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--data", type=Path, required=True)
     parser.add_argument("--train-pool", type=Path, required=True)
     parser.add_argument("--val-pool", type=Path, required=True)
     parser.add_argument("--official-checkpoint", type=Path, required=True)
+    parser.add_argument(
+        "--restore-adam-from", type=Path,
+        help="Checkpoint whose single native Adam state must continue with the weights.",
+    )
     parser.add_argument("--architecture-checkpoint", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--seed", type=int, default=3407)
@@ -87,14 +127,14 @@ def arguments() -> argparse.Namespace:
         "--num-workers", type=int, default=0,
         help="Keep zero for the one-GPU native run; CUDA-before-fork can deadlock workers.",
     )
-    parser.add_argument("--max-epochs", type=int, default=301)
+    parser.add_argument("--max-epochs", type=int, default=3)
     parser.add_argument(
-        "--max-steps", type=int, default=-1,
+        "--max-steps", type=int, default=1000,
         help="Optional optimizer-step cap; use for short residual curricula.",
     )
     parser.add_argument(
         "--checkpoint-mode", choices=("train_loss", "fixed_steps"),
-        default="train_loss",
+        default="fixed_steps",
     )
     parser.add_argument("--save-every-n-steps", type=int, default=1000)
     parser.add_argument("--n-highest-peaks", type=int, default=100)
@@ -189,6 +229,29 @@ def main() -> None:
     model.head.load_state_dict(initialized.head.state_dict(), strict=True)
     model.unfreeze_backbone_at_epoch = 0
     del initialized
+    optimizer_restore = None
+    adam_source_sha256 = None
+    if args.restore_adam_from is not None:
+        if not args.restore_adam_from.is_file():
+            raise FileNotFoundError(args.restore_adam_from)
+        if args.restore_adam_from.resolve() != args.official_checkpoint.resolve():
+            raise RuntimeError(
+                "Adam state must come from the same checkpoint used for model weights"
+            )
+        package = torch_load_compat(args.restore_adam_from, map_location="cpu")
+        optimizer_states = package.get("optimizer_states")
+        if not isinstance(optimizer_states, list) or len(optimizer_states) != 1:
+            raise RuntimeError("continuation checkpoint lacks exactly one native Adam state")
+        import hashlib
+        digest = hashlib.sha256()
+        with args.restore_adam_from.open("rb") as handle:
+            for block in iter(lambda: handle.read(1024 * 1024), b""):
+                digest.update(block)
+        adam_source_sha256 = digest.hexdigest()
+        optimizer_restore = RestoreAndReleaseNativeAdamState(
+            optimizer_states[0], args.lr, args.weight_decay,
+        )
+        del package, optimizer_states
     print("DreaMS model initialized; loading native triplet spectra", flush=True)
     if int(model.backbone.spec_preproc.n_highest_peaks) != args.n_highest_peaks:
         raise RuntimeError("DreaMS preprocessor peak count drifted from official configuration")
@@ -257,10 +320,13 @@ def main() -> None:
             save_on_train_epoch_end=False,
         )
     progress = SlurmLineProgress(every_n_batches=50)
+    callbacks = [callback, progress]
+    if optimizer_restore is not None:
+        callbacks.append(optimizer_restore)
     trainer = pl.Trainer(
         accelerator="gpu", devices=1, max_epochs=args.max_epochs,
         max_steps=args.max_steps,
-        precision="32-true", logger=False, callbacks=[callback, progress],
+        precision="32-true", logger=False, callbacks=callbacks,
         num_sanity_val_steps=0, log_every_n_steps=5,
         enable_progress_bar=False,
     )
@@ -314,6 +380,31 @@ def main() -> None:
         ),
         "checkpoint_monitor": checkpoint_monitor,
         "best_train_loss": best_train_loss,
+        "adam_continuation": {
+            "requested": args.restore_adam_from is not None,
+            "source_checkpoint": (
+                str(args.restore_adam_from.resolve())
+                if args.restore_adam_from is not None else None
+            ),
+            "source_sha256": adam_source_sha256,
+            "restored": bool(optimizer_restore and optimizer_restore.restored),
+            "initial_step_min": (
+                min(optimizer_restore.initial_steps.values())
+                if optimizer_restore and optimizer_restore.initial_steps else None
+            ),
+            "initial_step_max": (
+                max(optimizer_restore.initial_steps.values())
+                if optimizer_restore and optimizer_restore.initial_steps else None
+            ),
+            "final_step_min": (
+                min(optimizer_restore.final_steps.values())
+                if optimizer_restore and optimizer_restore.final_steps else None
+            ),
+            "final_step_max": (
+                max(optimizer_restore.final_steps.values())
+                if optimizer_restore and optimizer_restore.final_steps else None
+            ),
+        },
     }
     (args.output / "report.json").write_text(
         json.dumps(report, indent=2), encoding="utf-8",

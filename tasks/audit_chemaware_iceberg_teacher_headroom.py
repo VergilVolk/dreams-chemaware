@@ -20,6 +20,7 @@ import argparse
 import hashlib
 import json
 import math
+import ssl
 import subprocess
 import sys
 import time
@@ -78,11 +79,16 @@ def parse_args() -> argparse.Namespace:
         default=Path("data/validation/chemaware_iceberg_teacher_headroom_inner_v1"),
     )
     parser.add_argument("--max-queries", type=int, default=50)
+    parser.add_argument(
+        "--selection-mode", choices=("balanced", "all_unique"), default="balanced",
+        help="Balanced is the original headroom panel; all_unique expands training coverage.",
+    )
     parser.add_argument("--batch-size", type=int, default=8)
     parser.add_argument("--max-nodes", type=int, default=100)
     parser.add_argument("--seed", type=int, default=20260904)
     parser.add_argument("--bootstrap-draws", type=int, default=10_000)
     parser.add_argument("--torch-threads", type=int, default=4)
+    parser.add_argument("--device", default="cpu")
     parser.add_argument(
         "--reuse-output",
         type=Path,
@@ -223,9 +229,11 @@ def build_eligible_records(
     return records, counters
 
 
-def take_unique_identity(records: list[QueryRecord], count: int) -> list[QueryRecord]:
+def take_unique_identity(
+    records: list[QueryRecord], count: int, excluded: set[str] | None = None,
+) -> list[QueryRecord]:
     selected: list[QueryRecord] = []
-    seen: set[str] = set()
+    seen: set[str] = set() if excluded is None else set(excluded)
     for record in records:
         if record.identity in seen:
             continue
@@ -252,13 +260,35 @@ def select_balanced(records: list[QueryRecord], max_queries: int) -> list[QueryR
         key=lambda record: (abs(record.official_margin), record.query_index),
     )
     selected_errors = take_unique_identity(errors, n_error)
-    selected_correct = take_unique_identity(correct, n_correct)
+    # Identity uniqueness is a panel-wide invariant.  Enforcing it separately
+    # inside the error and correct strata permits the same molecule to occupy
+    # both halves through different query spectra and overstates independent
+    # support.  Freeze the error identities before filling the correct stratum.
+    selected_correct = take_unique_identity(
+        correct, n_correct, {record.identity for record in selected_errors},
+    )
     if len(selected_errors) != n_error or len(selected_correct) != n_correct:
         raise RuntimeError(
             f"not enough identity-distinct eligible records: errors={len(selected_errors)}/{n_error}, "
             f"correct={len(selected_correct)}/{n_correct}"
         )
     return sorted(selected_errors + selected_correct, key=lambda record: record.query_index)
+
+
+def select_all_unique(records: list[QueryRecord], max_queries: int) -> list[QueryRecord]:
+    """One spectrum per identity, prioritizing errors then near-boundary cases."""
+    ordered = sorted(
+        records,
+        key=lambda record: (
+            record.official_rank == 1,
+            abs(record.official_margin),
+            record.query_index,
+        ),
+    )
+    selected = take_unique_identity(ordered, max_queries)
+    if not selected:
+        raise RuntimeError("no identity-distinct eligible records")
+    return sorted(selected, key=lambda record: record.query_index)
 
 
 def bin_true_spectrum(common: object, h5: h5py.File, row: int) -> np.ndarray:
@@ -406,11 +436,31 @@ def main() -> None:
     args = parse_args()
     if args.batch_size < 1 or args.max_nodes < 1 or args.bootstrap_draws < 1:
         raise ValueError("batch-size, max-nodes and bootstrap-draws must be positive")
+    if args.device.startswith("cuda") and not torch.cuda.is_available():
+        raise RuntimeError("CUDA requested for ICEBERG teacher but unavailable")
     args.output.mkdir(parents=True, exist_ok=True)
     source_python = args.source_root / "src"
     if not source_python.exists():
         raise FileNotFoundError(source_python)
     sys.path.insert(0, str(source_python.resolve()))
+    # Some Windows certificate stores contain malformed ASN.1 entries.  Aiohttp
+    # constructs an SSL context at pygmtools import time even though this audit
+    # performs no network request.  Fall back to certifi only when the ordinary
+    # verified system context itself fails; verification is never disabled.
+    try:
+        ssl.create_default_context()
+    except ssl.SSLError:
+        import certifi  # noqa: PLC0415
+
+        original_create_default_context = ssl.create_default_context
+
+        def certifi_default_context(*context_args, **context_kwargs):
+            if (len(context_args) < 2
+                    and not any(context_kwargs.get(key) for key in ("cafile", "capath", "cadata"))):
+                context_kwargs["cafile"] = certifi.where()
+            return original_create_default_context(*context_args, **context_kwargs)
+
+        ssl.create_default_context = certifi_default_context
     from ms_pred import common  # noqa: PLC0415
     from ms_pred.dag_pred import joint_model  # noqa: PLC0415
 
@@ -424,7 +474,11 @@ def main() -> None:
             set(common.ion2onehot_pos),
             set(common.instrument2onehot_pos),
         )
-        selected = select_balanced(eligible, args.max_queries)
+        selected = (
+            select_balanced(eligible, args.max_queries)
+            if args.selection_mode == "balanced"
+            else select_all_unique(eligible, args.max_queries)
+        )
         print(
             f"eligible={len(eligible)}/{exclusions['total']} selected={len(selected)} "
             f"official_errors={sum(record.official_rank > 1 for record in selected)}",
@@ -493,7 +547,7 @@ def main() -> None:
                 adduct=[flat_adduct[value] for value in index],
                 instrument=[flat_instrument[value] for value in index],
                 threshold=0.0,
-                device="cpu",
+                device=args.device,
                 max_nodes=args.max_nodes,
                 binned_out=True,
                 canonical_root_smi=False,
@@ -598,6 +652,9 @@ def main() -> None:
             "selection": (
                 "Equal counts of identity-distinct near-boundary official errors and official-correct "
                 "queries, ranked by absolute official margin. This is deliberately enriched and biased."
+                if args.selection_mode == "balanced" else
+                "One eligible spectrum per identity, prioritizing official errors and then near-boundary "
+                "official-correct queries. This expanded panel is for training coverage, not prevalence."
             ),
             "checkpoint_overlap_warning": (
                 "The ICEBERG weights were trained on MassSpecGym and this local graph is derived from "
@@ -621,9 +678,11 @@ def main() -> None:
         },
         "protocol": {
             "seed": args.seed,
+            "selection_mode": args.selection_mode,
             "max_queries": args.max_queries,
             "selected_query_sha256": sha256_array(selection_array),
             "batch_size": args.batch_size,
+            "device": args.device,
             "max_nodes": args.max_nodes,
             "binned_bins": 15_000,
             "binned_upper_mz": 1_500,

@@ -20,7 +20,16 @@ from torch.nn.utils import parametrize
 class LowRankAdditiveParametrization(nn.Module):
     """Return ``weight + scale * (B @ A)`` with an exact zero delta at init."""
 
-    def __init__(self, out_features: int, in_features: int, rank: int, alpha: float):
+    def __init__(
+        self,
+        out_features: int,
+        in_features: int,
+        rank: int,
+        alpha: float,
+        *,
+        device: torch.device | str | None = None,
+        dtype: torch.dtype | None = None,
+    ):
         super().__init__()
         if rank < 1 or rank > min(out_features, in_features):
             raise ValueError("rank must be in 1..min(weight.shape)")
@@ -28,8 +37,12 @@ class LowRankAdditiveParametrization(nn.Module):
             raise ValueError("alpha must be positive")
         self.rank = int(rank)
         self.scale = float(alpha) / float(rank)
-        self.A = nn.Parameter(torch.empty(rank, in_features))
-        self.B = nn.Parameter(torch.zeros(out_features, rank))
+        # register_parametrization executes forward immediately.  Constructing
+        # these matrices on the default CPU would therefore fail whenever the
+        # backbone had already been moved to CUDA (the production path).
+        factory_kwargs = {"device": device, "dtype": dtype}
+        self.A = nn.Parameter(torch.empty(rank, in_features, **factory_kwargs))
+        self.B = nn.Parameter(torch.zeros(out_features, rank, **factory_kwargs))
         nn.init.kaiming_uniform_(self.A, a=5 ** 0.5)
 
     def forward(self, weight: torch.Tensor) -> torch.Tensor:
@@ -54,9 +67,25 @@ def _register(module: nn.Module, parameter_name: str, rank: int, alpha: float) -
     parametrize.register_parametrization(
         module,
         parameter_name,
-        LowRankAdditiveParametrization(out_features, in_features, rank, alpha),
+        LowRankAdditiveParametrization(
+            out_features,
+            in_features,
+            rank,
+            alpha,
+            device=parameter.device,
+            dtype=parameter.dtype,
+        ),
     )
-    getattr(module.parametrizations, parameter_name).original.requires_grad_(False)
+    parametrizations = getattr(module.parametrizations, parameter_name)
+    parametrizations.original.requires_grad_(False)
+    adapter = parametrizations[0]
+    if not (
+        adapter.A.device == parametrizations.original.device
+        and adapter.B.device == parametrizations.original.device
+        and adapter.A.dtype == parametrizations.original.dtype
+        and adapter.B.dtype == parametrizations.original.dtype
+    ):
+        raise RuntimeError("PEFT parameters did not inherit base device and dtype")
 
 
 def install_dreams_peft(model: nn.Module, config: DreaMSPEFTConfig) -> dict:

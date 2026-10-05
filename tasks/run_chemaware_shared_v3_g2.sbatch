@@ -1,12 +1,15 @@
 #!/bin/bash
 #SBATCH --job-name=chemaware_v3_g2
-#SBATCH --partition=gpu
-#SBATCH --gpus=1
-#SBATCH --cpus-per-task=6
-#SBATCH --time=18:00:00
-#SBATCH --array=0-74%3
+##SBATCH --partition=gpu
+##SBATCH --gpus=1
+#SBATCH --cpus-per-task=1
+#SBATCH --time=00:01:00
+##SBATCH --array=0-74%3
 #SBATCH --output=data/validation/chemaware_v3_g2_%A_%a.out
 #SBATCH --error=data/validation/chemaware_v3_g2_%A_%a.err
+
+echo "BLOCKED: legacy shared-v3 G2 matrix is superseded by the current causal protocol" >&2
+exit 64
 
 # Submit only after the fail-closed five-arm G2 pilot decision passes.
 set -euo pipefail

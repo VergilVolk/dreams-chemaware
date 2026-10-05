@@ -14,7 +14,8 @@ sys.path.insert(0, str(ROOT / "tasks"))
 from noise_final_dynamic_direct_core import (  # noqa: E402
     N_CELLS, PHASE_A_ARMS, WeightConfig, assert_outer_formula_disjoint,
     build_action_weights, formula_equal_weights, stable_control_index,
-    stratified_action_epoch, validate_n_cells,
+    formula_identity_query_equal_weights, stratified_action_epoch,
+    stratified_action_schedule, validate_n_cells,
 )
 
 
@@ -52,6 +53,16 @@ def main() -> None:
         raise RuntimeError("synthetic family ESS unexpectedly failed")
     if dynamic.groupby("query_index")["weight"].sum().max() > 1.000002:
         raise RuntimeError("query exposure cap failed")
+    for name, weighted in (("dynamic", dynamic), ("static", static)):
+        grouped = weighted.groupby("query_index")
+        action = grouped["weight"].sum()
+        no_op = grouped["no_op_weight"].first()
+        if not np.allclose(action + no_op, 1.0, atol=2e-6):
+            raise RuntimeError(f"{name} action/no-op mass is not conserved")
+        if not no_op.gt(0).all():
+            raise RuntimeError(f"{name} no-op collapsed")
+    if not np.allclose(static.groupby("query_index")["weight"].sum(), 0.5, atol=2e-6):
+        raise RuntimeError("static neutral action exposure is not 0.5")
     candidate = dynamic.loc[dynamic["family"].eq("candidate_gradient")].copy()
     raw_order_signal = candidate["raw_utility"].to_numpy()
     if np.corrcoef(raw_order_signal, candidate["weight"].to_numpy())[0, 1] <= 0.5:
@@ -64,12 +75,28 @@ def main() -> None:
                            "weight": formula_weights}).groupby("formula")["weight"].sum()
     if not np.allclose(totals, totals.iloc[0]):
         raise RuntimeError("formula-equal weights are not equal")
+    hierarchical = formula_identity_query_equal_weights(
+        ["a", "a", "a", "b"], ["i1", "i1", "i2", "i3"], [0, 1, 2, 3],
+    )
+    table = pd.DataFrame({
+        "formula": ["a", "a", "a", "b"], "identity": ["i1", "i1", "i2", "i3"],
+        "weight": hierarchical,
+    })
+    formula_total = table.groupby("formula")["weight"].sum()
+    identity_total = table.loc[table["formula"].eq("a")].groupby("identity")["weight"].sum()
+    if not np.allclose(formula_total, formula_total.iloc[0]) or not np.allclose(identity_total, identity_total.iloc[0]):
+        raise RuntimeError("formula-identity-query hierarchical weights are not balanced")
     sampled = stratified_action_epoch(dynamic, "weight", 17, 1)
     if sampled["action_id"].duplicated().any():
         raise RuntimeError("stratified sampler recycled an action")
     per_identity_family = sampled.groupby(["identity", "family"]).size()
     if int(per_identity_family.max()) > 1:
         raise RuntimeError("stratified sampler violated its exposure cap")
+    cycle_frame = dynamic.copy()
+    cycle_frame["cell_id"] = cycle_frame["family"].astype(str)
+    cycling = stratified_action_schedule(cycle_frame, 17, 2, 1)
+    if cycling.duplicated(["epoch", "action_id"]).any():
+        raise RuntimeError("cycling sampler repeated an action within an epoch")
 
     n_rows = pd.DataFrame([
         {"selector": selector, "attenuation": attenuation, "step": step}

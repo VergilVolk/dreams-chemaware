@@ -112,7 +112,9 @@ def cell_variant(clean: torch.Tensor, profile: tuple[np.ndarray, np.ndarray],
                  missing: np.ndarray, family: str, dose: float,
                  auxiliary_dose: float = 0.0) -> torch.Tensor:
     prevalence, target = profile
-    if family in {"consensus_projection", "matched_intensity_transport"}:
+    if family in {
+        "consensus_projection", "matched_intensity_transport", "prevalence_attenuation",
+    }:
         return apply_action(clean, prevalence, target, family, dose)
     if family in {"recurrent_union_mix", "recurrent_peak_graft", "balanced_peak_exchange"}:
         variant, _ = apply_transfer(clean, missing, prevalence, family, dose)

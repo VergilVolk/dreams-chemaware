@@ -1,0 +1,13 @@
+GRAND_FUSION_PREFLIGHT_OK
+CHEM_CHECKPOINT=data/validation/chemaware_high_coverage_native/run_2340721_resume_2340524/training/best.ckpt
+CHEMAWARE_V2_POLICY_DIR=data/validation/chemaware_multinull_deployment_safe_full_20260919
+CHEMAWARE_V2_POLICY_SOURCE=rebuild_from_frozen_recipe
+RUN_FIXED_CONSENSUS=0
+MSG/evidence job: 2349961
+Task-vector job: 2349962
+Fixed-consensus diagnostic skipped (default; no GPU spent).
+ChemAware V2 aligned export job (after MSG): 2349963
+Risk-router job (after MSG + ChemAware): 2349964
+After the task-vector job finishes, select exactly one protected arm and submit:
+  sbatch --export=ALL,SELECTED_CHECKPOINT=<path> tasks/run_grand_fusion_selected_encoder_gnps_1gpu.sbatch
+B47 remediation not submitted: B47_U3_DIR is unset.

@@ -1,0 +1,952 @@
+Looking in indexes: http://mirrors.tencentyun.com/pypi/simple
+Processing ./third_party/noise_article_wheels/ms_entropy-1.5.2-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl
+Installing collected packages: ms-entropy
+Successfully installed ms-entropy-1.5.2
+[test_noise_msg_fusion] PASS tests=6
+=== [stage 1/5] encoding official + V1 MassSpecGym shards (progress below) ===
+[encode official shard 0] starting on gpu 0
+[encode official shard 1] starting on gpu 1
+Loading DreaMS initialization checkpoint (first import may be slow)...
+Loading DreaMS initialization checkpoint (first import may be slow)...
+  Initialization format: official_embedding_slim  Initialization format: official_embedding_slim
+
+  DreaMS modules imported
+  Constructing the 116M-parameter backbone
+  DreaMS modules imported
+  Constructing the 116M-parameter backbone
+  Reused the official contrastive projection head
+  Reused the official contrastive projection head
+  Model ready: 117,101,029 parameters
+  Model ready: 117,101,029 parameters
+[full-msg-shard-0-held-encode] 1,280/115,552; 12s
+[full-msg-shard-1-held-encode] 1,280/115,552; 12s
+[full-msg-shard-0-held-encode] 2,560/115,552; 20s
+[full-msg-shard-1-held-encode] 2,560/115,552; 22s
+[full-msg-shard-0-held-encode] 3,840/115,552; 29s
+[full-msg-shard-1-held-encode] 3,840/115,552; 33s
+[full-msg-shard-0-held-encode] 5,120/115,552; 37s
+[full-msg-shard-1-held-encode] 5,120/115,552; 43s
+[full-msg-shard-0-held-encode] 6,400/115,552; 46s
+[full-msg-shard-1-held-encode] 6,400/115,552; 53s
+[full-msg-shard-0-held-encode] 7,680/115,552; 54s
+[full-msg-shard-0-held-encode] 8,960/115,552; 63s
+[full-msg-shard-1-held-encode] 7,680/115,552; 63s
+[full-msg-shard-0-held-encode] 10,240/115,552; 71s
+[full-msg-shard-1-held-encode] 8,960/115,552; 73s
+[full-msg-shard-0-held-encode] 11,520/115,552; 80s
+[full-msg-shard-1-held-encode] 10,240/115,552; 84s
+[full-msg-shard-0-held-encode] 12,800/115,552; 89s
+[full-msg-shard-1-held-encode] 11,520/115,552; 94s
+[full-msg-shard-0-held-encode] 14,080/115,552; 97s
+[full-msg-shard-1-held-encode] 12,800/115,552; 104s
+[full-msg-shard-0-held-encode] 15,360/115,552; 106s
+[full-msg-shard-1-held-encode] 14,080/115,552; 114s
+[full-msg-shard-0-held-encode] 16,640/115,552; 115s
+[full-msg-shard-0-held-encode] 17,920/115,552; 123s
+[full-msg-shard-1-held-encode] 15,360/115,552; 125s
+[full-msg-shard-0-held-encode] 19,200/115,552; 132s
+[full-msg-shard-1-held-encode] 16,640/115,552; 135s
+[full-msg-shard-0-held-encode] 20,480/115,552; 141s
+[full-msg-shard-1-held-encode] 17,920/115,552; 146s
+[full-msg-shard-0-held-encode] 21,760/115,552; 150s
+[full-msg-shard-1-held-encode] 19,200/115,552; 157s
+[full-msg-shard-0-held-encode] 23,040/115,552; 158s
+[full-msg-shard-1-held-encode] 20,480/115,552; 167s
+[full-msg-shard-0-held-encode] 24,320/115,552; 167s
+[full-msg-shard-0-held-encode] 25,600/115,552; 176s
+[full-msg-shard-1-held-encode] 21,760/115,552; 177s
+[full-msg-shard-0-held-encode] 26,880/115,552; 184s
+[full-msg-shard-1-held-encode] 23,040/115,552; 187s
+[full-msg-shard-0-held-encode] 28,160/115,552; 193s
+[full-msg-shard-1-held-encode] 24,320/115,552; 198s
+[full-msg-shard-0-held-encode] 29,440/115,552; 202s
+[full-msg-shard-1-held-encode] 25,600/115,552; 208s
+[full-msg-shard-0-held-encode] 30,720/115,552; 210s
+[full-msg-shard-1-held-encode] 26,880/115,552; 218s
+[full-msg-shard-0-held-encode] 32,000/115,552; 219s
+[full-msg-shard-0-held-encode] 33,280/115,552; 227s
+[full-msg-shard-1-held-encode] 28,160/115,552; 229s
+[full-msg-shard-0-held-encode] 34,560/115,552; 236s
+[full-msg-shard-1-held-encode] 29,440/115,552; 239s
+[full-msg-shard-0-held-encode] 35,840/115,552; 245s
+[full-msg-shard-1-held-encode] 30,720/115,552; 249s
+[full-msg-shard-0-held-encode] 37,120/115,552; 253s
+[full-msg-shard-1-held-encode] 32,000/115,552; 260s
+[full-msg-shard-0-held-encode] 38,400/115,552; 262s
+[full-msg-shard-1-held-encode] 33,280/115,552; 270s
+[full-msg-shard-0-held-encode] 39,680/115,552; 270s
+[full-msg-shard-0-held-encode] 40,960/115,552; 279s
+[full-msg-shard-1-held-encode] 34,560/115,552; 280s
+[full-msg-shard-0-held-encode] 42,240/115,552; 288s
+[full-msg-shard-1-held-encode] 35,840/115,552; 291s
+[full-msg-shard-0-held-encode] 43,520/115,552; 297s
+[full-msg-shard-1-held-encode] 37,120/115,552; 301s
+[full-msg-shard-0-held-encode] 44,800/115,552; 305s
+[full-msg-shard-1-held-encode] 38,400/115,552; 311s
+[full-msg-shard-0-held-encode] 46,080/115,552; 314s
+[full-msg-shard-1-held-encode] 39,680/115,552; 322s
+[full-msg-shard-0-held-encode] 47,360/115,552; 323s
+[full-msg-shard-0-held-encode] 48,640/115,552; 331s
+[full-msg-shard-1-held-encode] 40,960/115,552; 332s
+[full-msg-shard-0-held-encode] 49,920/115,552; 340s
+[full-msg-shard-1-held-encode] 42,240/115,552; 343s
+[full-msg-shard-0-held-encode] 51,200/115,552; 349s
+[full-msg-shard-1-held-encode] 43,520/115,552; 353s
+[full-msg-shard-0-held-encode] 52,480/115,552; 357s
+[full-msg-shard-1-held-encode] 44,800/115,552; 363s
+[full-msg-shard-0-held-encode] 53,760/115,552; 366s
+[full-msg-shard-1-held-encode] 46,080/115,552; 373s
+[full-msg-shard-0-held-encode] 55,040/115,552; 374s
+[full-msg-shard-0-held-encode] 56,320/115,552; 383s
+[full-msg-shard-1-held-encode] 47,360/115,552; 384s
+[full-msg-shard-0-held-encode] 57,600/115,552; 392s
+[full-msg-shard-1-held-encode] 48,640/115,552; 394s
+[full-msg-shard-0-held-encode] 58,880/115,552; 400s
+[full-msg-shard-1-held-encode] 49,920/115,552; 404s
+[full-msg-shard-0-held-encode] 60,160/115,552; 409s
+[full-msg-shard-1-held-encode] 51,200/115,552; 414s
+[full-msg-shard-0-held-encode] 61,440/115,552; 418s
+[full-msg-shard-1-held-encode] 52,480/115,552; 424s
+[full-msg-shard-0-held-encode] 62,720/115,552; 427s
+[full-msg-shard-1-held-encode] 53,760/115,552; 432s
+[full-msg-shard-0-held-encode] 64,000/115,552; 437s
+[full-msg-shard-1-held-encode] 55,040/115,552; 442s
+[full-msg-shard-0-held-encode] 65,280/115,552; 446s
+[full-msg-shard-1-held-encode] 56,320/115,552; 450s
+[full-msg-shard-0-held-encode] 66,560/115,552; 456s
+[full-msg-shard-1-held-encode] 57,600/115,552; 459s
+[full-msg-shard-0-held-encode] 67,840/115,552; 464s
+[full-msg-shard-1-held-encode] 58,880/115,552; 468s
+[full-msg-shard-0-held-encode] 69,120/115,552; 473s
+[full-msg-shard-1-held-encode] 60,160/115,552; 476s
+[full-msg-shard-0-held-encode] 70,400/115,552; 482s
+[full-msg-shard-1-held-encode] 61,440/115,552; 485s
+[full-msg-shard-0-held-encode] 71,680/115,552; 490s
+[full-msg-shard-1-held-encode] 62,720/115,552; 493s
+[full-msg-shard-0-held-encode] 72,960/115,552; 499s
+[full-msg-shard-1-held-encode] 64,000/115,552; 503s
+[full-msg-shard-0-held-encode] 74,240/115,552; 509s
+[full-msg-shard-1-held-encode] 65,280/115,552; 512s
+[full-msg-shard-0-held-encode] 75,520/115,552; 519s
+[full-msg-shard-1-held-encode] 66,560/115,552; 520s
+[full-msg-shard-1-held-encode] 67,840/115,552; 529s
+[full-msg-shard-0-held-encode] 76,800/115,552; 529s
+[full-msg-shard-1-held-encode] 69,120/115,552; 538s
+[full-msg-shard-0-held-encode] 78,080/115,552; 540s
+[full-msg-shard-1-held-encode] 70,400/115,552; 546s
+[full-msg-shard-0-held-encode] 79,360/115,552; 550s
+[full-msg-shard-1-held-encode] 71,680/115,552; 555s
+[full-msg-shard-0-held-encode] 80,640/115,552; 561s
+[full-msg-shard-1-held-encode] 72,960/115,552; 563s
+[full-msg-shard-0-held-encode] 81,920/115,552; 571s
+[full-msg-shard-1-held-encode] 74,240/115,552; 572s
+[full-msg-shard-1-held-encode] 75,520/115,552; 581s
+[full-msg-shard-0-held-encode] 83,200/115,552; 581s
+[full-msg-shard-1-held-encode] 76,800/115,552; 589s
+[full-msg-shard-0-held-encode] 84,480/115,552; 591s
+[full-msg-shard-1-held-encode] 78,080/115,552; 598s
+[full-msg-shard-0-held-encode] 85,760/115,552; 602s
+[full-msg-shard-1-held-encode] 79,360/115,552; 607s
+[full-msg-shard-0-held-encode] 87,040/115,552; 612s
+[full-msg-shard-1-held-encode] 80,640/115,552; 615s
+[full-msg-shard-0-held-encode] 88,320/115,552; 622s
+[full-msg-shard-1-held-encode] 81,920/115,552; 624s
+[full-msg-shard-1-held-encode] 83,200/115,552; 632s
+[full-msg-shard-0-held-encode] 89,600/115,552; 632s
+[full-msg-shard-1-held-encode] 84,480/115,552; 641s
+[full-msg-shard-0-held-encode] 90,880/115,552; 643s
+[full-msg-shard-1-held-encode] 85,760/115,552; 650s
+[full-msg-shard-0-held-encode] 92,160/115,552; 653s
+[full-msg-shard-1-held-encode] 87,040/115,552; 658s
+[full-msg-shard-0-held-encode] 93,440/115,552; 663s
+[full-msg-shard-1-held-encode] 88,320/115,552; 667s
+[full-msg-shard-0-held-encode] 94,720/115,552; 674s
+[full-msg-shard-1-held-encode] 89,600/115,552; 676s
+[full-msg-shard-0-held-encode] 96,000/115,552; 684s
+[full-msg-shard-1-held-encode] 90,880/115,552; 684s
+[full-msg-shard-1-held-encode] 92,160/115,552; 693s
+[full-msg-shard-0-held-encode] 97,280/115,552; 694s
+[full-msg-shard-1-held-encode] 93,440/115,552; 701s
+[full-msg-shard-0-held-encode] 98,560/115,552; 704s
+[full-msg-shard-1-held-encode] 94,720/115,552; 710s
+[full-msg-shard-0-held-encode] 99,840/115,552; 715s
+[full-msg-shard-1-held-encode] 96,000/115,552; 719s
+[full-msg-shard-0-held-encode] 101,120/115,552; 725s
+[full-msg-shard-1-held-encode] 97,280/115,552; 727s
+[full-msg-shard-0-held-encode] 102,400/115,552; 734s
+[full-msg-shard-1-held-encode] 98,560/115,552; 736s
+[full-msg-shard-0-held-encode] 103,680/115,552; 742s
+[full-msg-shard-1-held-encode] 99,840/115,552; 744s
+[full-msg-shard-0-held-encode] 104,960/115,552; 751s
+[full-msg-shard-1-held-encode] 101,120/115,552; 753s
+[full-msg-shard-0-held-encode] 106,240/115,552; 759s
+[full-msg-shard-1-held-encode] 102,400/115,552; 762s
+[full-msg-shard-0-held-encode] 107,520/115,552; 768s
+[full-msg-shard-1-held-encode] 103,680/115,552; 770s
+[full-msg-shard-0-held-encode] 108,800/115,552; 777s
+[full-msg-shard-1-held-encode] 104,960/115,552; 779s
+[full-msg-shard-0-held-encode] 110,080/115,552; 785s
+[full-msg-shard-1-held-encode] 106,240/115,552; 787s
+[full-msg-shard-0-held-encode] 111,360/115,552; 794s
+[full-msg-shard-1-held-encode] 107,520/115,552; 796s
+[full-msg-shard-0-held-encode] 112,640/115,552; 802s
+[full-msg-shard-1-held-encode] 108,800/115,552; 804s
+[full-msg-shard-0-held-encode] 113,920/115,552; 811s
+[full-msg-shard-1-held-encode] 110,080/115,552; 813s
+[full-msg-shard-0-held-encode] 115,200/115,552; 820s
+[full-msg-shard-1-held-encode] 111,360/115,552; 822s
+[full-msg-shard-0-held-encode] 115,552/115,552; 822s
+{
+  "status": "noise_massspecgym_checkpoint_shard_complete",
+  "checkpoint_kind": "official_embedding_slim",
+  "checkpoint_sha256": "8928f908606c0bd652c5a4107d3c35102f660622958c225a1f625abe4b1ba245",
+  "data_sha256": "ccda2c4114d9b21413977df03376ca0fc097956a7fa304b861a3154a2b81e64f",
+  "total_rows": 231104,
+  "shard_index": 0,
+  "shard_count": 2,
+  "rows": 115552,
+  "embedding_dimension": 1024
+}
+[encode official shard 0] OK
+[full-msg-shard-1-held-encode] 112,640/115,552; 830s
+[full-msg-shard-1-held-encode] 113,920/115,552; 839s
+[full-msg-shard-1-held-encode] 115,200/115,552; 848s
+[full-msg-shard-1-held-encode] 115,552/115,552; 850s
+{
+  "status": "noise_massspecgym_checkpoint_shard_complete",
+  "checkpoint_kind": "official_embedding_slim",
+  "checkpoint_sha256": "8928f908606c0bd652c5a4107d3c35102f660622958c225a1f625abe4b1ba245",
+  "data_sha256": "ccda2c4114d9b21413977df03376ca0fc097956a7fa304b861a3154a2b81e64f",
+  "total_rows": 231104,
+  "shard_index": 1,
+  "shard_count": 2,
+  "rows": 115552,
+  "embedding_dimension": 1024
+}
+[encode official shard 1] OK
+[encode v1 shard 0] starting on gpu 0
+[encode v1 shard 1] starting on gpu 1
+Loading DreaMS initialization checkpoint (first import may be slow)...
+Loading DreaMS initialization checkpoint (first import may be slow)...
+  Initialization format: official_embedding_slim  Initialization format: official_embedding_slim
+
+  DreaMS modules imported
+  DreaMS modules imported
+  Constructing the 116M-parameter backbone
+  Constructing the 116M-parameter backbone
+  Reused the official contrastive projection head
+  Reused the official contrastive projection head
+  Model ready: 117,101,029 parameters
+  Model ready: 117,101,029 parameters
+[full-msg-shard-1-held-encode] 1,280/115,552; 9s
+[full-msg-shard-0-held-encode] 1,280/115,552; 11s
+[full-msg-shard-1-held-encode] 2,560/115,552; 18s
+[full-msg-shard-0-held-encode] 2,560/115,552; 22s
+[full-msg-shard-1-held-encode] 3,840/115,552; 26s
+[full-msg-shard-0-held-encode] 3,840/115,552; 32s
+[full-msg-shard-1-held-encode] 5,120/115,552; 35s
+[full-msg-shard-0-held-encode] 5,120/115,552; 42s
+[full-msg-shard-1-held-encode] 6,400/115,552; 43s
+[full-msg-shard-1-held-encode] 7,680/115,552; 52s
+[full-msg-shard-0-held-encode] 6,400/115,552; 52s
+[full-msg-shard-1-held-encode] 8,960/115,552; 60s
+[full-msg-shard-0-held-encode] 7,680/115,552; 63s
+[full-msg-shard-1-held-encode] 10,240/115,552; 69s
+[full-msg-shard-0-held-encode] 8,960/115,552; 73s
+[full-msg-shard-1-held-encode] 11,520/115,552; 77s
+[full-msg-shard-0-held-encode] 10,240/115,552; 83s
+[full-msg-shard-1-held-encode] 12,800/115,552; 86s
+[full-msg-shard-0-held-encode] 11,520/115,552; 92s
+[full-msg-shard-1-held-encode] 14,080/115,552; 95s
+[full-msg-shard-1-held-encode] 15,360/115,552; 103s
+[full-msg-shard-0-held-encode] 12,800/115,552; 104s
+[full-msg-shard-1-held-encode] 16,640/115,552; 113s
+[full-msg-shard-0-held-encode] 14,080/115,552; 114s
+[full-msg-shard-1-held-encode] 17,920/115,552; 123s
+[full-msg-shard-0-held-encode] 15,360/115,552; 125s
+[full-msg-shard-1-held-encode] 19,200/115,552; 134s
+[full-msg-shard-0-held-encode] 16,640/115,552; 135s
+[full-msg-shard-1-held-encode] 20,480/115,552; 145s
+[full-msg-shard-0-held-encode] 17,920/115,552; 148s
+[full-msg-shard-1-held-encode] 21,760/115,552; 156s
+[full-msg-shard-0-held-encode] 19,200/115,552; 158s
+[full-msg-shard-1-held-encode] 23,040/115,552; 167s
+[full-msg-shard-0-held-encode] 20,480/115,552; 168s
+[full-msg-shard-1-held-encode] 24,320/115,552; 177s
+[full-msg-shard-0-held-encode] 21,760/115,552; 179s
+[full-msg-shard-1-held-encode] 25,600/115,552; 187s
+[full-msg-shard-0-held-encode] 23,040/115,552; 189s
+[full-msg-shard-1-held-encode] 26,880/115,552; 196s
+[full-msg-shard-0-held-encode] 24,320/115,552; 200s
+[full-msg-shard-1-held-encode] 28,160/115,552; 204s
+[full-msg-shard-0-held-encode] 25,600/115,552; 210s
+[full-msg-shard-1-held-encode] 29,440/115,552; 213s
+[full-msg-shard-0-held-encode] 26,880/115,552; 220s
+[full-msg-shard-1-held-encode] 30,720/115,552; 221s
+[full-msg-shard-1-held-encode] 32,000/115,552; 230s
+[full-msg-shard-0-held-encode] 28,160/115,552; 231s
+[full-msg-shard-1-held-encode] 33,280/115,552; 238s
+[full-msg-shard-0-held-encode] 29,440/115,552; 241s
+[full-msg-shard-1-held-encode] 34,560/115,552; 247s
+[full-msg-shard-0-held-encode] 30,720/115,552; 251s
+[full-msg-shard-1-held-encode] 35,840/115,552; 256s
+[full-msg-shard-0-held-encode] 32,000/115,552; 261s
+[full-msg-shard-1-held-encode] 37,120/115,552; 264s
+[full-msg-shard-0-held-encode] 33,280/115,552; 271s
+[full-msg-shard-1-held-encode] 38,400/115,552; 273s
+[full-msg-shard-1-held-encode] 39,680/115,552; 281s
+[full-msg-shard-0-held-encode] 34,560/115,552; 282s
+[full-msg-shard-1-held-encode] 40,960/115,552; 290s
+[full-msg-shard-0-held-encode] 35,840/115,552; 292s
+[full-msg-shard-1-held-encode] 42,240/115,552; 298s
+[full-msg-shard-0-held-encode] 37,120/115,552; 303s
+[full-msg-shard-1-held-encode] 43,520/115,552; 307s
+[full-msg-shard-0-held-encode] 38,400/115,552; 313s
+[full-msg-shard-1-held-encode] 44,800/115,552; 315s
+[full-msg-shard-0-held-encode] 39,680/115,552; 323s
+[full-msg-shard-1-held-encode] 46,080/115,552; 324s
+[full-msg-shard-1-held-encode] 47,360/115,552; 333s
+[full-msg-shard-0-held-encode] 40,960/115,552; 334s
+[full-msg-shard-1-held-encode] 48,640/115,552; 341s
+[full-msg-shard-0-held-encode] 42,240/115,552; 344s
+[full-msg-shard-1-held-encode] 49,920/115,552; 350s
+[full-msg-shard-0-held-encode] 43,520/115,552; 354s
+[full-msg-shard-1-held-encode] 51,200/115,552; 358s
+[full-msg-shard-0-held-encode] 44,800/115,552; 365s
+[full-msg-shard-1-held-encode] 52,480/115,552; 367s
+[full-msg-shard-0-held-encode] 46,080/115,552; 375s
+[full-msg-shard-1-held-encode] 53,760/115,552; 376s
+[full-msg-shard-1-held-encode] 55,040/115,552; 384s
+[full-msg-shard-0-held-encode] 47,360/115,552; 385s
+[full-msg-shard-1-held-encode] 56,320/115,552; 393s
+[full-msg-shard-0-held-encode] 48,640/115,552; 396s
+[full-msg-shard-1-held-encode] 57,600/115,552; 401s
+[full-msg-shard-0-held-encode] 49,920/115,552; 406s
+[full-msg-shard-1-held-encode] 58,880/115,552; 410s
+[full-msg-shard-0-held-encode] 51,200/115,552; 416s
+[full-msg-shard-1-held-encode] 60,160/115,552; 418s
+[full-msg-shard-1-held-encode] 61,440/115,552; 427s
+[full-msg-shard-0-held-encode] 52,480/115,552; 427s
+[full-msg-shard-1-held-encode] 62,720/115,552; 436s
+[full-msg-shard-0-held-encode] 53,760/115,552; 438s
+[full-msg-shard-1-held-encode] 64,000/115,552; 445s
+[full-msg-shard-0-held-encode] 55,040/115,552; 449s
+[full-msg-shard-1-held-encode] 65,280/115,552; 454s
+[full-msg-shard-0-held-encode] 56,320/115,552; 459s
+[full-msg-shard-1-held-encode] 66,560/115,552; 463s
+[full-msg-shard-0-held-encode] 57,600/115,552; 470s
+[full-msg-shard-1-held-encode] 67,840/115,552; 473s
+[full-msg-shard-0-held-encode] 58,880/115,552; 481s
+[full-msg-shard-1-held-encode] 69,120/115,552; 482s
+[full-msg-shard-1-held-encode] 70,400/115,552; 491s
+[full-msg-shard-0-held-encode] 60,160/115,552; 491s
+[full-msg-shard-1-held-encode] 71,680/115,552; 499s
+[full-msg-shard-0-held-encode] 61,440/115,552; 502s
+[full-msg-shard-1-held-encode] 72,960/115,552; 508s
+[full-msg-shard-0-held-encode] 62,720/115,552; 512s
+[full-msg-shard-1-held-encode] 74,240/115,552; 517s
+[full-msg-shard-0-held-encode] 64,000/115,552; 523s
+[full-msg-shard-1-held-encode] 75,520/115,552; 525s
+[full-msg-shard-0-held-encode] 65,280/115,552; 533s
+[full-msg-shard-1-held-encode] 76,800/115,552; 534s
+[full-msg-shard-1-held-encode] 78,080/115,552; 542s
+[full-msg-shard-0-held-encode] 66,560/115,552; 543s
+[full-msg-shard-1-held-encode] 79,360/115,552; 551s
+[full-msg-shard-0-held-encode] 67,840/115,552; 554s
+[full-msg-shard-1-held-encode] 80,640/115,552; 560s
+[full-msg-shard-0-held-encode] 69,120/115,552; 564s
+[full-msg-shard-1-held-encode] 81,920/115,552; 568s
+[full-msg-shard-0-held-encode] 70,400/115,552; 575s
+[full-msg-shard-1-held-encode] 83,200/115,552; 577s
+[full-msg-shard-0-held-encode] 71,680/115,552; 586s
+[full-msg-shard-1-held-encode] 84,480/115,552; 586s
+[full-msg-shard-1-held-encode] 85,760/115,552; 595s
+[full-msg-shard-0-held-encode] 72,960/115,552; 596s
+[full-msg-shard-1-held-encode] 87,040/115,552; 603s
+[full-msg-shard-0-held-encode] 74,240/115,552; 606s
+[full-msg-shard-1-held-encode] 88,320/115,552; 612s
+[full-msg-shard-0-held-encode] 75,520/115,552; 617s
+[full-msg-shard-1-held-encode] 89,600/115,552; 621s
+[full-msg-shard-0-held-encode] 76,800/115,552; 628s
+[full-msg-shard-1-held-encode] 90,880/115,552; 630s
+[full-msg-shard-1-held-encode] 92,160/115,552; 639s
+[full-msg-shard-0-held-encode] 78,080/115,552; 639s
+[full-msg-shard-1-held-encode] 93,440/115,552; 647s
+[full-msg-shard-0-held-encode] 79,360/115,552; 649s
+[full-msg-shard-1-held-encode] 94,720/115,552; 656s
+[full-msg-shard-0-held-encode] 80,640/115,552; 660s
+[full-msg-shard-1-held-encode] 96,000/115,552; 665s
+[full-msg-shard-0-held-encode] 81,920/115,552; 670s
+[full-msg-shard-1-held-encode] 97,280/115,552; 673s
+[full-msg-shard-0-held-encode] 83,200/115,552; 681s
+[full-msg-shard-1-held-encode] 98,560/115,552; 682s
+[full-msg-shard-1-held-encode] 99,840/115,552; 691s
+[full-msg-shard-0-held-encode] 84,480/115,552; 692s
+[full-msg-shard-1-held-encode] 101,120/115,552; 700s
+[full-msg-shard-0-held-encode] 85,760/115,552; 703s
+[full-msg-shard-1-held-encode] 102,400/115,552; 709s
+[full-msg-shard-0-held-encode] 87,040/115,552; 714s
+[full-msg-shard-1-held-encode] 103,680/115,552; 717s
+[full-msg-shard-0-held-encode] 88,320/115,552; 725s
+[full-msg-shard-1-held-encode] 104,960/115,552; 726s
+[full-msg-shard-1-held-encode] 106,240/115,552; 735s
+[full-msg-shard-0-held-encode] 89,600/115,552; 736s
+[full-msg-shard-1-held-encode] 107,520/115,552; 744s
+[full-msg-shard-0-held-encode] 90,880/115,552; 747s
+[full-msg-shard-1-held-encode] 108,800/115,552; 753s
+[full-msg-shard-0-held-encode] 92,160/115,552; 757s
+[full-msg-shard-1-held-encode] 110,080/115,552; 761s
+[full-msg-shard-0-held-encode] 93,440/115,552; 768s
+[full-msg-shard-1-held-encode] 111,360/115,552; 770s
+[full-msg-shard-0-held-encode] 94,720/115,552; 778s
+[full-msg-shard-1-held-encode] 112,640/115,552; 779s
+[full-msg-shard-1-held-encode] 113,920/115,552; 787s
+[full-msg-shard-0-held-encode] 96,000/115,552; 788s
+[full-msg-shard-1-held-encode] 115,200/115,552; 796s
+[full-msg-shard-0-held-encode] 97,280/115,552; 798s
+[full-msg-shard-1-held-encode] 115,552/115,552; 798s
+{
+  "status": "noise_massspecgym_checkpoint_shard_complete",
+  "checkpoint_kind": "official_embedding_slim",
+  "checkpoint_sha256": "01ac8c7bfa75d89862e0b1eb2b5ffb297955cffae471fd483ad6c38d13f33beb",
+  "data_sha256": "ccda2c4114d9b21413977df03376ca0fc097956a7fa304b861a3154a2b81e64f",
+  "total_rows": 231104,
+  "shard_index": 1,
+  "shard_count": 2,
+  "rows": 115552,
+  "embedding_dimension": 1024
+}
+[encode v1 shard 1] OK
+[full-msg-shard-0-held-encode] 98,560/115,552; 808s
+[full-msg-shard-0-held-encode] 99,840/115,552; 818s
+[full-msg-shard-0-held-encode] 101,120/115,552; 827s
+[full-msg-shard-0-held-encode] 102,400/115,552; 835s
+[full-msg-shard-0-held-encode] 103,680/115,552; 845s
+[full-msg-shard-0-held-encode] 104,960/115,552; 853s
+[full-msg-shard-0-held-encode] 106,240/115,552; 862s
+[full-msg-shard-0-held-encode] 107,520/115,552; 871s
+[full-msg-shard-0-held-encode] 108,800/115,552; 880s
+[full-msg-shard-0-held-encode] 110,080/115,552; 888s
+[full-msg-shard-0-held-encode] 111,360/115,552; 897s
+[full-msg-shard-0-held-encode] 112,640/115,552; 906s
+[full-msg-shard-0-held-encode] 113,920/115,552; 915s
+[full-msg-shard-0-held-encode] 115,200/115,552; 923s
+[full-msg-shard-0-held-encode] 115,552/115,552; 926s
+{
+  "status": "noise_massspecgym_checkpoint_shard_complete",
+  "checkpoint_kind": "official_embedding_slim",
+  "checkpoint_sha256": "01ac8c7bfa75d89862e0b1eb2b5ffb297955cffae471fd483ad6c38d13f33beb",
+  "data_sha256": "ccda2c4114d9b21413977df03376ca0fc097956a7fa304b861a3154a2b81e64f",
+  "total_rows": 231104,
+  "shard_index": 0,
+  "shard_count": 2,
+  "rows": 115552,
+  "embedding_dimension": 1024
+}
+[encode v1 shard 0] OK
+=== [stage 1/5] embedding shards complete ===
+=== [stage 2/5] building 6.2M-edge pair evidence (16 workers) ===
+[pair-evidence] 83,619 queries, 6,220,661 edges
+[pair-evidence] prepared 87,848 spectra
+[pair-evidence] 500,000/6,220,661 edges
+[pair-evidence] 1,000,000/6,220,661 edges
+[pair-evidence] 1,500,000/6,220,661 edges
+[pair-evidence] 2,000,000/6,220,661 edges
+[pair-evidence] 2,500,000/6,220,661 edges
+[pair-evidence] 3,000,000/6,220,661 edges
+[pair-evidence] 3,500,000/6,220,661 edges
+[pair-evidence] 4,000,000/6,220,661 edges
+[pair-evidence] 4,500,000/6,220,661 edges
+[pair-evidence] 5,000,000/6,220,661 edges
+[pair-evidence] 5,500,000/6,220,661 edges
+[pair-evidence] 6,000,000/6,220,661 edges
+[pair-evidence] 6,220,661/6,220,661 edges
+[pair-evidence-cosine] 20,000/83,619 queries
+[pair-evidence-cosine] 40,000/83,619 queries
+[pair-evidence-cosine] 60,000/83,619 queries
+[pair-evidence-cosine] 80,000/83,619 queries
+{
+  "status": "NOISE_MSG_PAIR_EVIDENCE_COMPLETE",
+  "edges": 6220661,
+  "queries": 83619,
+  "workers": 16,
+  "fragment_tolerance_da": 0.02,
+  "wse_backend": "ms_entropy_1.5.2",
+  "formula_folds": "stable_fold(formula, 5, 20260825) joined by the trainer",
+  "provenance": {
+    "graph_sha256": "8a57bb3a9cccdf69a738f2b093bfad8f6fc4393b23f1342c7a035ac54ce58fa1",
+    "data_sha256": "ccda2c4114d9b21413977df03376ca0fc097956a7fa304b861a3154a2b81e64f",
+    "v1_shards": [
+      "a1798cbf42236d073253047562e8acd978e89e12fa426c2e81640f852830964c",
+      "e320cbfcef993eca792afe34d120a2689500a418e6c982305d1cc9a83bda2517"
+    ],
+    "official_shards": [
+      "f579c4eb5fdbe125c3e72af30c27f62cab276fdf78c4f3e29c74ca4943557e3a",
+      "0e25ef3c53b0851d7d3b8e0a93d51d804829c64720b26d4456641e9f86cd4058"
+    ]
+  },
+  "claim_limit": "Deployment-visible pair evidence only; labels stay in the graph ledger."
+}
+=== [stage 2/5] pair evidence complete ===
+=== [stage 3/5] formula-OOF fusion training + freeze ===
+{"fold": 0, "held_queries": 18333, "held_molecules": 88197, "fused_oof_top1": 0.9452899143620793, "references_held_fold_top1": {"v1": 0.9427807778323243, "wse": 0.9334533355151912, "p2b_fused": 0.9390170730376916}}
+{"fold": 1, "held_queries": 16742, "held_molecules": 78753, "fused_oof_top1": 0.9568749253374746, "references_held_fold_top1": {"v1": 0.9517381435909689, "wse": 0.935909688209294, "p2b_fused": 0.9415840401385737}}
+{"fold": 2, "held_queries": 17742, "held_molecules": 81658, "fused_oof_top1": 0.9764964491038215, "references_held_fold_top1": {"v1": 0.9752000901814902, "wse": 0.9338293315297035, "p2b_fused": 0.9422274828091535}}
+{"fold": 3, "held_queries": 16039, "held_molecules": 75173, "fused_oof_top1": 0.9730033044454143, "references_held_fold_top1": {"v1": 0.9700729471912214, "wse": 0.9263046324583827, "p2b_fused": 0.9372778851549348}}
+{"fold": 4, "held_queries": 14763, "held_molecules": 68448, "fused_oof_top1": 0.9660638081690713, "references_held_fold_top1": {"v1": 0.9634220686852266, "wse": 0.9126193863035968, "p2b_fused": 0.9253539253539254}}
+{
+  "status": "NOISE_MSG_FUSION_FROZEN",
+  "recipe": {
+    "features": [
+      "v1_cosine",
+      "official_cosine",
+      "weighted_entropy",
+      "sqrt_cosine",
+      "entropy_similarity",
+      "neutral_loss_sqrt_cosine",
+      "p2b_fused",
+      "v1_percentile",
+      "official_percentile",
+      "wse_percentile",
+      "sqrt_percentile",
+      "entropy_percentile",
+      "neutral_loss_percentile",
+      "p2b_percentile",
+      "query_molecules",
+      "query_edges",
+      "v1_top1_gap",
+      "wse_top1_gap",
+      "p2b_top1_gap",
+      "v1_wse_top1_agree",
+      "v1_p2b_top1_agree",
+      "log_query_edges"
+    ],
+    "training_unit": "candidate molecule after reference-spectrum max pooling",
+    "model": "HistGradientBoostingClassifier",
+    "settings": {
+      "max_iter": 400,
+      "learning_rate": 0.06,
+      "max_leaf_nodes": 31,
+      "min_samples_leaf": 200,
+      "l2_regularization": 1.0,
+      "max_bins": 255,
+      "early_stopping": false,
+      "random_state": 20261003
+    },
+    "sample_weights": "each query totals 1.0; positive 0.5; negatives share 0.5",
+    "folds": "stable_fold(query_formula, 5, 20260825), formula-disjoint"
+  },
+  "oof": {
+    "fused_top1_all_folds": 0.9632141020581447,
+    "references_top1_all_folds": {
+      "v1_cosine": 0.9603319819658211,
+      "weighted_entropy": 0.928975472081704,
+      "p2b_fused": 0.9374663652997525
+    },
+    "fused_minus_reference_pp": {
+      "v1_cosine": 0.2882120092323581,
+      "weighted_entropy": 3.423862997644078,
+      "p2b_fused": 2.574773675839226
+    },
+    "per_fold": [
+      {
+        "fold": 0,
+        "held_queries": 18333,
+        "held_molecules": 88197,
+        "fused_oof_top1": 0.9452899143620793,
+        "references_held_fold_top1": {
+          "v1": 0.9427807778323243,
+          "wse": 0.9334533355151912,
+          "p2b_fused": 0.9390170730376916
+        }
+      },
+      {
+        "fold": 1,
+        "held_queries": 16742,
+        "held_molecules": 78753,
+        "fused_oof_top1": 0.9568749253374746,
+        "references_held_fold_top1": {
+          "v1": 0.9517381435909689,
+          "wse": 0.935909688209294,
+          "p2b_fused": 0.9415840401385737
+        }
+      },
+      {
+        "fold": 2,
+        "held_queries": 17742,
+        "held_molecules": 81658,
+        "fused_oof_top1": 0.9764964491038215,
+        "references_held_fold_top1": {
+          "v1": 0.9752000901814902,
+          "wse": 0.9338293315297035,
+          "p2b_fused": 0.9422274828091535
+        }
+      },
+      {
+        "fold": 3,
+        "held_queries": 16039,
+        "held_molecules": 75173,
+        "fused_oof_top1": 0.9730033044454143,
+        "references_held_fold_top1": {
+          "v1": 0.9700729471912214,
+          "wse": 0.9263046324583827,
+          "p2b_fused": 0.9372778851549348
+        }
+      },
+      {
+        "fold": 4,
+        "held_queries": 14763,
+        "held_molecules": 68448,
+        "fused_oof_top1": 0.9660638081690713,
+        "references_held_fold_top1": {
+          "v1": 0.9634220686852266,
+          "wse": 0.9126193863035968,
+          "p2b_fused": 0.9253539253539254
+        }
+      }
+    ]
+  },
+  "gnps_usage": "none; GNPS is untouched by training, freezing and selection",
+  "provenance": {
+    "evidence_sha256": "16b7c70d5d35a031f4bf4c339690ec509c84a1fb2c63780b5eda57e9ea4def66",
+    "evidence_report_sha256": "bb52af120c942624a4d89a6b26d29bbffaa6667fc208a0335c03deb3047a9fd3",
+    "oof_pair_scores_sha256": "fd307e1f7fa3845a304eb74c45c0b0d86905ec2c4314c722489fdbd405638337"
+  },
+  "claim_limit": "OOF numbers are MassSpecGym train-side development evidence; the deployable claim is decided only by the frozen GNPS evaluation."
+}
+=== [stage 3/5] fusion model frozen ===
+=== [stage 4/5] applying frozen fusion to sealed GNPS panels ===
+[fusion-apply] identity_disjoint: 175,171 edges scored
+[fusion-apply] formula_disjoint: 47,724 edges scored
+{
+  "status": "gnps_fusion_pair_scores_complete"
+}
+=== [stage 4/5] GNPS fusion scores complete ===
+=== [stage 5/5] sealed evaluations: fusion vs official / V1 / WSE ===
+{"status": "pair_score_cache_extracted", "method": "official_dreams"}
+{"status": "pair_score_cache_extracted", "method": "noise_v1"}
+          },
+          "macro_query_auprc": {
+            "delta": -0.006890925254546176,
+            "delta_pp": -0.6890925254546176,
+            "ci_low": -0.02293069872518773,
+            "ci_high": 0.009131456520364095,
+            "ci_low_pp": -2.293069872518773,
+            "ci_high_pp": 0.9131456520364095,
+            "formula_clusters": 1021,
+            "bootstrap_resamples": 10000,
+            "familywise_hypotheses": 24
+          },
+          "positive_vs_best_negative_margin": {
+            "delta": 0.30858306117867423,
+            "delta_pp": 30.858306117867425,
+            "ci_low": 0.2667683182009543,
+            "ci_high": 0.34876427880634603,
+            "ci_low_pp": 26.67683182009543,
+            "ci_high_pp": 34.8764278806346,
+            "formula_clusters": 1021,
+            "bootstrap_resamples": 10000,
+            "familywise_hypotheses": 24
+          },
+          "signed_top1_top2_gap": {
+            "delta": 0.32243037765073085,
+            "delta_pp": 32.24303776507308,
+            "ci_low": 0.2827792476749315,
+            "ci_high": 0.36045611197392646,
+            "ci_low_pp": 28.27792476749315,
+            "ci_high_pp": 36.045611197392645,
+            "formula_clusters": 1021,
+            "bootstrap_resamples": 10000,
+            "familywise_hypotheses": 24
+          }
+        }
+      }
+    }
+  },
+  "claim_limit": "Frozen GNPS Gold/Silver identity/formula-disjoint transfer benchmark; identical graph and aggregation across methods; not an exact NIST20 replication."
+}
+          },
+          "macro_query_auprc": {
+            "delta": -0.019866460997974743,
+            "delta_pp": -1.9866460997974744,
+            "ci_low": -0.03141241174383039,
+            "ci_high": -0.009707204684997367,
+            "ci_low_pp": -3.1412411743830386,
+            "ci_high_pp": -0.9707204684997367,
+            "formula_clusters": 1021,
+            "bootstrap_resamples": 10000,
+            "familywise_hypotheses": 24
+          },
+          "positive_vs_best_negative_margin": {
+            "delta": 0.23200123537569145,
+            "delta_pp": 23.200123537569144,
+            "ci_low": 0.19769550900349173,
+            "ci_high": 0.2647779055344592,
+            "ci_low_pp": 19.769550900349174,
+            "ci_high_pp": 26.477790553445917,
+            "formula_clusters": 1021,
+            "bootstrap_resamples": 10000,
+            "familywise_hypotheses": 24
+          },
+          "signed_top1_top2_gap": {
+            "delta": 0.24376420761739118,
+            "delta_pp": 24.37642076173912,
+            "ci_low": 0.21215190233472545,
+            "ci_high": 0.2747212502160703,
+            "ci_low_pp": 21.215190233472544,
+            "ci_high_pp": 27.47212502160703,
+            "formula_clusters": 1021,
+            "bootstrap_resamples": 10000,
+            "familywise_hypotheses": 24
+          }
+        }
+      }
+    }
+  },
+  "claim_limit": "Frozen GNPS Gold/Silver identity/formula-disjoint transfer benchmark; identical graph and aggregation across methods; not an exact NIST20 replication."
+}
+{"status": "pair_score_cache_extracted", "method": "weighted_spectral_entropy"}
+          },
+          "macro_query_auprc": {
+            "delta": -0.018432309312064746,
+            "delta_pp": -1.8432309312064747,
+            "ci_low": -0.03412775304100785,
+            "ci_high": -0.0033907614016559736,
+            "ci_low_pp": -3.4127753041007844,
+            "ci_high_pp": -0.33907614016559734,
+            "formula_clusters": 1021,
+            "bootstrap_resamples": 10000,
+            "familywise_hypotheses": 24
+          },
+          "positive_vs_best_negative_margin": {
+            "delta": 0.16608454847661908,
+            "delta_pp": 16.608454847661907,
+            "ci_low": 0.13321696704511324,
+            "ci_high": 0.1977624617698881,
+            "ci_low_pp": 13.321696704511323,
+            "ci_high_pp": 19.77624617698881,
+            "formula_clusters": 1021,
+            "bootstrap_resamples": 10000,
+            "familywise_hypotheses": 24
+          },
+          "signed_top1_top2_gap": {
+            "delta": 0.17871976785291482,
+            "delta_pp": 17.871976785291483,
+            "ci_low": 0.14899074369257012,
+            "ci_high": 0.208605660629692,
+            "ci_low_pp": 14.899074369257011,
+            "ci_high_pp": 20.8605660629692,
+            "formula_clusters": 1021,
+            "bootstrap_resamples": 10000,
+            "familywise_hypotheses": 24
+          }
+        }
+      }
+    }
+  },
+  "claim_limit": "Frozen GNPS Gold/Silver identity/formula-disjoint transfer benchmark; identical graph and aggregation across methods; not an exact NIST20 replication."
+}
+{
+  "status": "NOISE_MSG_FUSION_SUMMARY_COMPLETE",
+  "massspecgym_formula_oof": {
+    "fused_top1_all_folds": 0.9632141020581447,
+    "references_top1_all_folds": {
+      "v1_cosine": 0.9603319819658211,
+      "weighted_entropy": 0.928975472081704,
+      "p2b_fused": 0.9374663652997525
+    },
+    "fused_minus_reference_pp": {
+      "v1_cosine": 0.2882120092323581,
+      "weighted_entropy": 3.423862997644078,
+      "p2b_fused": 2.574773675839226
+    },
+    "per_fold": [
+      {
+        "fold": 0,
+        "held_queries": 18333,
+        "held_molecules": 88197,
+        "fused_oof_top1": 0.9452899143620793,
+        "references_held_fold_top1": {
+          "v1": 0.9427807778323243,
+          "wse": 0.9334533355151912,
+          "p2b_fused": 0.9390170730376916
+        }
+      },
+      {
+        "fold": 1,
+        "held_queries": 16742,
+        "held_molecules": 78753,
+        "fused_oof_top1": 0.9568749253374746,
+        "references_held_fold_top1": {
+          "v1": 0.9517381435909689,
+          "wse": 0.935909688209294,
+          "p2b_fused": 0.9415840401385737
+        }
+      },
+      {
+        "fold": 2,
+        "held_queries": 17742,
+        "held_molecules": 81658,
+        "fused_oof_top1": 0.9764964491038215,
+        "references_held_fold_top1": {
+          "v1": 0.9752000901814902,
+          "wse": 0.9338293315297035,
+          "p2b_fused": 0.9422274828091535
+        }
+      },
+      {
+        "fold": 3,
+        "held_queries": 16039,
+        "held_molecules": 75173,
+        "fused_oof_top1": 0.9730033044454143,
+        "references_held_fold_top1": {
+          "v1": 0.9700729471912214,
+          "wse": 0.9263046324583827,
+          "p2b_fused": 0.9372778851549348
+        }
+      },
+      {
+        "fold": 4,
+        "held_queries": 14763,
+        "held_molecules": 68448,
+        "fused_oof_top1": 0.9660638081690713,
+        "references_held_fold_top1": {
+          "v1": 0.9634220686852266,
+          "wse": 0.9126193863035968,
+          "p2b_fused": 0.9253539253539254
+        }
+      }
+    ]
+  },
+  "gnps_frozen": {
+    "official_vs_fusion": {
+      "identity_disjoint": {
+        "baseline_recall1": 0.8535698044565712,
+        "fusion_recall1": 0.8505684402000909,
+        "recall1_delta_pp": -0.30013642564802184,
+        "recall1_formula_ci_pp": [
+          -1.3302427752561483,
+          0.684188881948458
+        ],
+        "baseline_mrr": 0.9051639681859982,
+        "fusion_mrr": 0.9055365675928908,
+        "baseline_macro_query_auroc": 0.9373295459624588,
+        "fusion_macro_query_auroc": 0.9388918668260047,
+        "baseline_pooled_pairwise_auroc": 0.9286969754803536,
+        "fusion_pooled_pairwise_auroc": 0.980475369358435,
+        "corrected": 403,
+        "introduced": 436,
+        "risk_net_lambda2": -469,
+        "near_recall1": 0.791754478398314,
+        "near_risk_net_lambda2": -482
+      },
+      "formula_disjoint": {
+        "baseline_recall1": 0.8680859152252424,
+        "fusion_recall1": 0.8604827979471583,
+        "recall1_delta_pp": -0.7603117278084015,
+        "recall1_formula_ci_pp": [
+          -2.278647799988759,
+          0.7026139531392808
+        ],
+        "baseline_mrr": 0.9202418061335217,
+        "fusion_mrr": 0.9173406325114776,
+        "baseline_macro_query_auroc": 0.9318640612819976,
+        "fusion_macro_query_auroc": 0.930496181672914,
+        "baseline_pooled_pairwise_auroc": 0.9032769060642534,
+        "fusion_pooled_pairwise_auroc": 0.9778731155024432,
+        "corrected": 193,
+        "introduced": 233,
+        "risk_net_lambda2": -273,
+        "near_recall1": 0.7629076086956522,
+        "near_risk_net_lambda2": -274
+      }
+    },
+    "noise_v1_vs_fusion": {
+      "identity_disjoint": {
+        "baseline_recall1": 0.8655752614824921,
+        "fusion_recall1": 0.8505684402000909,
+        "recall1_delta_pp": -1.5006821282401093,
+        "recall1_formula_ci_pp": [
+          -2.267263516848402,
+          -0.8097736857204605
+        ],
+        "baseline_mrr": 0.9127409951606013,
+        "fusion_mrr": 0.9055365675928908,
+        "baseline_macro_query_auroc": 0.9412900334099533,
+        "fusion_macro_query_auroc": 0.9388918668260047,
+        "baseline_pooled_pairwise_auroc": 0.941278825418217,
+        "fusion_pooled_pairwise_auroc": 0.980475369358435,
+        "corrected": 137,
+        "introduced": 302,
+        "risk_net_lambda2": -467,
+        "near_recall1": 0.791754478398314,
+        "near_risk_net_lambda2": -472
+      },
+      "formula_disjoint": {
+        "baseline_recall1": 0.880631058734081,
+        "fusion_recall1": 0.8604827979471583,
+        "recall1_delta_pp": -2.014826078692264,
+        "recall1_formula_ci_pp": [
+          -3.155656366789556,
+          -0.9234903610835177
+        ],
+        "baseline_mrr": 0.9283314280757717,
+        "fusion_mrr": 0.9173406325114776,
+        "baseline_macro_query_auroc": 0.938051533182662,
+        "fusion_macro_query_auroc": 0.930496181672914,
+        "baseline_pooled_pairwise_auroc": 0.9299017498040729,
+        "fusion_pooled_pairwise_auroc": 0.9778731155024432,
+        "corrected": 57,
+        "introduced": 163,
+        "risk_net_lambda2": -269,
+        "near_recall1": 0.7629076086956522,
+        "near_risk_net_lambda2": -269
+      }
+    },
+    "wse_vs_fusion": {
+      "identity_disjoint": {
+        "baseline_recall1": 0.8736698499317872,
+        "fusion_recall1": 0.8505684402000909,
+        "recall1_delta_pp": -2.3101409731696223,
+        "recall1_formula_ci_pp": [
+          -3.388762000704383,
+          -1.3033019051631638
+        ],
+        "baseline_mrr": 0.916603672923036,
+        "fusion_mrr": 0.9055365675928908,
+        "baseline_macro_query_auroc": 0.9432826982460426,
+        "fusion_macro_query_auroc": 0.9388918668260047,
+        "baseline_pooled_pairwise_auroc": 0.9402395780799676,
+        "fusion_pooled_pairwise_auroc": 0.980475369358435,
+        "corrected": 322,
+        "introduced": 576,
+        "risk_net_lambda2": -830,
+        "near_recall1": 0.791754478398314,
+        "near_risk_net_lambda2": -812
+      },
+      "formula_disjoint": {
+        "baseline_recall1": 0.882721915985554,
+        "fusion_recall1": 0.8604827979471583,
+        "recall1_delta_pp": -2.223911803839574,
+        "recall1_formula_ci_pp": [
+          -3.821182619461974,
+          -0.7392630347593548
+        ],
+        "baseline_mrr": 0.9279624506603819,
+        "fusion_mrr": 0.9173406325114776,
+        "baseline_macro_query_auroc": 0.938963508907561,
+        "fusion_macro_query_auroc": 0.930496181672914,
+        "baseline_pooled_pairwise_auroc": 0.9265086729730845,
+        "fusion_pooled_pairwise_auroc": 0.9778731155024432,
+        "corrected": 178,
+        "introduced": 295,
+        "risk_net_lambda2": -412,
+        "near_recall1": 0.7629076086956522,
+        "near_risk_net_lambda2": -392
+      }
+    }
+  },
+  "claim_boundary": "Learned candidate reranker over deployment-visible spectrum-pair scores; not a new shared encoder and not an embedding-gain claim."
+}
+=== fusion 5pp shot complete: data/validation/noise_msg_fusion_run_2349961 ===
+verdicts: gnps_official_vs_fusion, gnps_v1_vs_fusion, gnps_wse_vs_fusion (each report.json)

@@ -116,17 +116,12 @@ or B2.
   evaluation and explicitly reports the conditions in which contextual evidence
   is reliable; this motivates our strict balance, fallback and risk reporting.
 
-## Immediate action
+## Immediate action (superseded on 2026-09-04)
 
-The B0 script and server sbatch now treat decoy balance as a pass/fail gate
-(`--maximum-standardised-imbalance 0.10`).  The next permissible server action
-is the B0 formal probe, not an adapter training run:
-
-```bash
-sbatch tasks/run_bioaware_b0_reaction_embedding_signal.sbatch
-```
-
-Interpretation is precommitted: B1 proceeds only if `report.json` has
-`pass_to_b1: true`.  A failure identifies whether to improve control matching
-or to stop the shared-reaction-embedding claim; it must not be bypassed by
-loosening a threshold after observing the result.
+Do **not** submit the old `run_bioaware_b0_reaction_embedding_signal.sbatch`.
+Its non-edge universe and fold-level assignment do not achieve the chemical
+balance needed for a reaction-specific interpretation.  The next experiment is
+the model-free B0-M0 matched identifiability preflight defined in
+`BIOAWARE_SCIENTIFIC_RESET_20260904.md`.  No classifier, relation head, adapter,
+or shared-encoder training is permitted until that preflight produces complete
+1:3 matched groups with all frozen balance gates satisfied.

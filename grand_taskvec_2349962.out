@@ -1,0 +1,190 @@
+{
+  "status": "DREAMS_SLIM_NORMALIZATION_COMPLETE",
+  "source_kind": "official_embedding",
+  "source_sha256": "09c419dcabf2ff424fe38bb33eaefcd25ccab0b6d125daf03b7959c25fff5838",
+  "output_sha256": "83160374c963b8fafbee1552d2e85400ae94ec821cc80112bd2f0e76dd98e201"
+}
+{
+  "global_cosine": 0.036626700394081696,
+  "noise_l2": 7.303863857720812,
+  "chem_l2": 2.3863447385132197,
+  "active_sign_agreement": 0.5116081284638246,
+  "mean_tensor_top1pct_overlap": 0.07556366265005472,
+  "interpretation": "Positive cosine supports a small linear merge scan; near-zero or negative cosine and low sign agreement prioritize TIES or separate expert routing. This diagnostic is label-free and is not a performance claim."
+}
+{
+  "schema": "dreams_task_vector_merge_v1",
+  "mode": "linear",
+  "operation": "base + alpha_noise*(noise-base) + alpha_chem*(chem-base)",
+  "alpha_noise": 0.5,
+  "alpha_chem": 0.5,
+  "ties_density": 0.2,
+  "ties_scale": 1.0,
+  "base": {
+    "path": "data/e1/official_embedding_slim.pt",
+    "sha256": "8928f908606c0bd652c5a4107d3c35102f660622958c225a1f625abe4b1ba245"
+  },
+  "noise": {
+    "path": "data/validation/noise_relation_t1_t3_run_2347055/checkpoint/primary_seed_3407_slim.pt",
+    "sha256": "01ac8c7bfa75d89862e0b1eb2b5ffb297955cffae471fd483ad6c38d13f33beb"
+  },
+  "chem": {
+    "path": "data/validation/grand_fusion_task_vector_scan_2349962/chem_normalized_slim.pt",
+    "sha256": "83160374c963b8fafbee1552d2e85400ae94ec821cc80112bd2f0e76dd98e201"
+  },
+  "output": {
+    "path": "data/validation/grand_fusion_task_vector_scan_2349962/checkpoints/linear_n050_c050.pt",
+    "sha256": "4ebbb8d11ee54ff662ca0989f4360623d863eb5f9f0361ed04a3a32a07db09cb"
+  }
+}
+{
+  "schema": "dreams_task_vector_merge_v1",
+  "mode": "linear",
+  "operation": "base + alpha_noise*(noise-base) + alpha_chem*(chem-base)",
+  "alpha_noise": 0.75,
+  "alpha_chem": 0.25,
+  "ties_density": 0.2,
+  "ties_scale": 1.0,
+  "base": {
+    "path": "data/e1/official_embedding_slim.pt",
+    "sha256": "8928f908606c0bd652c5a4107d3c35102f660622958c225a1f625abe4b1ba245"
+  },
+  "noise": {
+    "path": "data/validation/noise_relation_t1_t3_run_2347055/checkpoint/primary_seed_3407_slim.pt",
+    "sha256": "01ac8c7bfa75d89862e0b1eb2b5ffb297955cffae471fd483ad6c38d13f33beb"
+  },
+  "chem": {
+    "path": "data/validation/grand_fusion_task_vector_scan_2349962/chem_normalized_slim.pt",
+    "sha256": "83160374c963b8fafbee1552d2e85400ae94ec821cc80112bd2f0e76dd98e201"
+  },
+  "output": {
+    "path": "data/validation/grand_fusion_task_vector_scan_2349962/checkpoints/linear_n075_c025.pt",
+    "sha256": "d68333cd06b1025d799dace545735b4b745647169b74336cd1f0863aeb3c0ab7"
+  }
+}
+{
+  "schema": "dreams_task_vector_merge_v1",
+  "mode": "linear",
+  "operation": "base + alpha_noise*(noise-base) + alpha_chem*(chem-base)",
+  "alpha_noise": 0.25,
+  "alpha_chem": 0.75,
+  "ties_density": 0.2,
+  "ties_scale": 1.0,
+  "base": {
+    "path": "data/e1/official_embedding_slim.pt",
+    "sha256": "8928f908606c0bd652c5a4107d3c35102f660622958c225a1f625abe4b1ba245"
+  },
+  "noise": {
+    "path": "data/validation/noise_relation_t1_t3_run_2347055/checkpoint/primary_seed_3407_slim.pt",
+    "sha256": "01ac8c7bfa75d89862e0b1eb2b5ffb297955cffae471fd483ad6c38d13f33beb"
+  },
+  "chem": {
+    "path": "data/validation/grand_fusion_task_vector_scan_2349962/chem_normalized_slim.pt",
+    "sha256": "83160374c963b8fafbee1552d2e85400ae94ec821cc80112bd2f0e76dd98e201"
+  },
+  "output": {
+    "path": "data/validation/grand_fusion_task_vector_scan_2349962/checkpoints/linear_n025_c075.pt",
+    "sha256": "dec08a7adac4edf87203a4d27e4a47fe553ee6819b648061857212233d6b7247"
+  }
+}
+{
+  "schema": "dreams_task_vector_merge_v1",
+  "mode": "ties",
+  "operation": "TIES trim-elect-sign-merge over Noise and Chem task vectors",
+  "alpha_noise": 1.0,
+  "alpha_chem": 1.0,
+  "ties_density": 0.1,
+  "ties_scale": 0.5,
+  "base": {
+    "path": "data/e1/official_embedding_slim.pt",
+    "sha256": "8928f908606c0bd652c5a4107d3c35102f660622958c225a1f625abe4b1ba245"
+  },
+  "noise": {
+    "path": "data/validation/noise_relation_t1_t3_run_2347055/checkpoint/primary_seed_3407_slim.pt",
+    "sha256": "01ac8c7bfa75d89862e0b1eb2b5ffb297955cffae471fd483ad6c38d13f33beb"
+  },
+  "chem": {
+    "path": "data/validation/grand_fusion_task_vector_scan_2349962/chem_normalized_slim.pt",
+    "sha256": "83160374c963b8fafbee1552d2e85400ae94ec821cc80112bd2f0e76dd98e201"
+  },
+  "output": {
+    "path": "data/validation/grand_fusion_task_vector_scan_2349962/checkpoints/ties_d010_s050.pt",
+    "sha256": "294e4d3669776c25a51f27012eae623ae97e79767c39470b166d8432725d55e1"
+  }
+}
+{
+  "schema": "dreams_task_vector_merge_v1",
+  "mode": "ties",
+  "operation": "TIES trim-elect-sign-merge over Noise and Chem task vectors",
+  "alpha_noise": 1.0,
+  "alpha_chem": 1.0,
+  "ties_density": 0.2,
+  "ties_scale": 0.5,
+  "base": {
+    "path": "data/e1/official_embedding_slim.pt",
+    "sha256": "8928f908606c0bd652c5a4107d3c35102f660622958c225a1f625abe4b1ba245"
+  },
+  "noise": {
+    "path": "data/validation/noise_relation_t1_t3_run_2347055/checkpoint/primary_seed_3407_slim.pt",
+    "sha256": "01ac8c7bfa75d89862e0b1eb2b5ffb297955cffae471fd483ad6c38d13f33beb"
+  },
+  "chem": {
+    "path": "data/validation/grand_fusion_task_vector_scan_2349962/chem_normalized_slim.pt",
+    "sha256": "83160374c963b8fafbee1552d2e85400ae94ec821cc80112bd2f0e76dd98e201"
+  },
+  "output": {
+    "path": "data/validation/grand_fusion_task_vector_scan_2349962/checkpoints/ties_d020_s050.pt",
+    "sha256": "f624d8d078dc7bb0a636123dfa35eb3e2ff79c27d5a92b3a646c0e6fb76dab0e"
+  }
+}
+{
+  "schema": "dreams_task_vector_merge_v1",
+  "mode": "ties",
+  "operation": "TIES trim-elect-sign-merge over Noise and Chem task vectors",
+  "alpha_noise": 1.0,
+  "alpha_chem": 1.0,
+  "ties_density": 0.2,
+  "ties_scale": 1.0,
+  "base": {
+    "path": "data/e1/official_embedding_slim.pt",
+    "sha256": "8928f908606c0bd652c5a4107d3c35102f660622958c225a1f625abe4b1ba245"
+  },
+  "noise": {
+    "path": "data/validation/noise_relation_t1_t3_run_2347055/checkpoint/primary_seed_3407_slim.pt",
+    "sha256": "01ac8c7bfa75d89862e0b1eb2b5ffb297955cffae471fd483ad6c38d13f33beb"
+  },
+  "chem": {
+    "path": "data/validation/grand_fusion_task_vector_scan_2349962/chem_normalized_slim.pt",
+    "sha256": "83160374c963b8fafbee1552d2e85400ae94ec821cc80112bd2f0e76dd98e201"
+  },
+  "output": {
+    "path": "data/validation/grand_fusion_task_vector_scan_2349962/checkpoints/ties_d020_s100.pt",
+    "sha256": "eacc8997ca6a20efc8b99c6b610b55cea9be443ab5cdad2946cbe3af866b77c4"
+  }
+}
+{
+  "schema": "dreams_task_vector_merge_v1",
+  "mode": "ties",
+  "operation": "TIES trim-elect-sign-merge over Noise and Chem task vectors",
+  "alpha_noise": 1.0,
+  "alpha_chem": 1.0,
+  "ties_density": 0.5,
+  "ties_scale": 0.5,
+  "base": {
+    "path": "data/e1/official_embedding_slim.pt",
+    "sha256": "8928f908606c0bd652c5a4107d3c35102f660622958c225a1f625abe4b1ba245"
+  },
+  "noise": {
+    "path": "data/validation/noise_relation_t1_t3_run_2347055/checkpoint/primary_seed_3407_slim.pt",
+    "sha256": "01ac8c7bfa75d89862e0b1eb2b5ffb297955cffae471fd483ad6c38d13f33beb"
+  },
+  "chem": {
+    "path": "data/validation/grand_fusion_task_vector_scan_2349962/chem_normalized_slim.pt",
+    "sha256": "83160374c963b8fafbee1552d2e85400ae94ec821cc80112bd2f0e76dd98e201"
+  },
+  "output": {
+    "path": "data/validation/grand_fusion_task_vector_scan_2349962/checkpoints/ties_d050_s050.pt",
+    "sha256": "516530ce87e1802e2d3e0722fa051db40a730e64d5f4650ac51fbcaaee8f3689"
+  }
+}
+Task-vector scan complete: data/validation/grand_fusion_task_vector_scan_2349962

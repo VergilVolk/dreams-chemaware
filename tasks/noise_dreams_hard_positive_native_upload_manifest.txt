@@ -1,0 +1,14 @@
+tasks/build_noise_dreams_native_triplets.py
+tasks/noise_dreams_native_spectrum.py
+tasks/audit_noise_dreams_native_official_replay.py
+tasks/train_noise_dreams_native.py
+tasks/train_e1_identity.py
+tasks/e1_checkpoint_io.py
+tasks/evaluate_noise_dreams_native.py
+tasks/noise_corrected_fullgraph_evaluation.py
+tasks/summarize_noise_dreams_hard_positive_arms.py
+tasks/summarize_noise_dreams_native_replicates.py
+tasks/test_noise_dreams_hard_positive_bridge.py
+tasks/test_noise_dreams_native.py
+tasks/run_noise_dreams_hard_positive_native_2gpu.sbatch
+docs/NOISE_DREAMS_NATIVE_HARD_POSITIVE_BRIDGE_20260925.md

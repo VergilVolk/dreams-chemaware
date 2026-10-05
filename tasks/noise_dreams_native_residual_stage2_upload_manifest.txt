@@ -1,0 +1,7 @@
+tasks/build_noise_dreams_native_residual_stage2.py
+tasks/train_noise_dreams_native_residual_stage2.py
+tasks/evaluate_noise_dreams_native.py
+tasks/summarize_noise_dreams_native_residual_stage2.py
+tasks/test_noise_dreams_native_residual_stage2.py
+tasks/run_noise_dreams_native_residual_stage2_2gpu.sbatch
+docs/NOISE_DREAMS_NATIVE_RESIDUAL_STAGE2_20260926.md

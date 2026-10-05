@@ -23,7 +23,9 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "tasks"))
 
 from audit_chemaware_counterfactual_rule_kernel import sha256  # noqa: E402
-from evaluate_chemaware_v2_direct_triplet import encode_rows, load_model  # noqa: E402
+from evaluate_chemaware_v2_direct_triplet import (  # noqa: E402
+    encode_rows, load_model, required_rows,
+)
 
 
 def arguments() -> argparse.Namespace:
@@ -80,19 +82,6 @@ def evidence_queries(directory: Path) -> tuple[np.ndarray, dict[str, int]]:
     if len(np.unique(queries)) != len(queries):
         raise RuntimeError("formula-role evidence repeats queries across roles")
     return queries, counts
-
-
-def required_rows(manifest: dict[str, np.ndarray], queries: np.ndarray) -> np.ndarray:
-    blocks = [np.asarray(manifest["query_row"], dtype=np.int64)[queries]]
-    for query in queries:
-        mleft, mright = map(int, manifest["query_ptr"][int(query):int(query) + 2])
-        pleft = int(manifest["molecule_ptr"][mleft])
-        pright = int(manifest["molecule_ptr"][mright])
-        blocks.append(np.asarray(manifest["pair_candidate_row"][pleft:pright], dtype=np.int64))
-    rows = np.unique(np.concatenate(blocks))
-    if not len(rows) or np.any(np.diff(rows) <= 0):
-        raise RuntimeError("manifest row registry is empty or not strictly increasing")
-    return rows
 
 
 def main() -> None:
