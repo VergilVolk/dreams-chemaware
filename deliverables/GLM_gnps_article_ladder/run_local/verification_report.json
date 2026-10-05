@@ -1,0 +1,76 @@
+{
+  "status": "GLM_GNPS_LADDER_VERIFIED",
+  "run": "data\\validation\\GLM_gnps_article_benchmark_public_models\\run_local",
+  "methods": [
+    "official_dreams",
+    "noise_v1",
+    "cosine_greedy",
+    "modified_cosine",
+    "weighted_spectral_entropy",
+    "p2b_sqrt_cosine",
+    "p2b_unweighted_entropy",
+    "neutral_loss_sqrt_cosine",
+    "p2b_official_frozen",
+    "p2b_noise_v1_frozen",
+    "ms2deepscore_2x_public",
+    "spec2vec_gnps_public"
+  ],
+  "panels": [
+    "identity_disjoint",
+    "formula_disjoint"
+  ],
+  "cross_checks": "every recall@k, MRR, rank, margin, near metric and corrected/introduced/risk-net recomputed from per-query tables and asserted equal to the frozen report at 1e-9",
+  "mismatches": [],
+  "macro_query_auprc_identity_notes": [
+    "identity_disjoint/official_dreams: report macro_query_auprc equals mrr (0.9051639681859982); ladder uses the recomputed per-query mean 0.9051639681859982",
+    "identity_disjoint/noise_v1: report macro_query_auprc equals mrr (0.9127409951606013); ladder uses the recomputed per-query mean 0.9127409951606013",
+    "identity_disjoint/cosine_greedy: report macro_query_auprc equals mrr (0.901865286450235); ladder uses the recomputed per-query mean 0.901865286450235",
+    "identity_disjoint/modified_cosine: report macro_query_auprc equals mrr (0.9017837715763244); ladder uses the recomputed per-query mean 0.9017837715763244",
+    "identity_disjoint/weighted_spectral_entropy: report macro_query_auprc equals mrr (0.9166036729230361); ladder uses the recomputed per-query mean 0.9166036729230361",
+    "identity_disjoint/p2b_sqrt_cosine: report macro_query_auprc equals mrr (0.9151272295295281); ladder uses the recomputed per-query mean 0.9151272295295281",
+    "identity_disjoint/p2b_unweighted_entropy: report macro_query_auprc equals mrr (0.9148194939669205); ladder uses the recomputed per-query mean 0.9148194939669205",
+    "identity_disjoint/neutral_loss_sqrt_cosine: report macro_query_auprc equals mrr (0.9142698262102854); ladder uses the recomputed per-query mean 0.9142698262102852",
+    "identity_disjoint/p2b_official_frozen: report macro_query_auprc equals mrr (0.9154377008132815); ladder uses the recomputed per-query mean 0.9154377008132815",
+    "identity_disjoint/p2b_noise_v1_frozen: report macro_query_auprc equals mrr (0.9164583717765483); ladder uses the recomputed per-query mean 0.9164583717765481",
+    "identity_disjoint/ms2deepscore_2x_public: report macro_query_auprc equals mrr (0.8636505070873445); ladder uses the recomputed per-query mean 0.8636505070873445",
+    "identity_disjoint/spec2vec_gnps_public: report macro_query_auprc equals mrr (0.910204922829751); ladder uses the recomputed per-query mean 0.910204922829751",
+    "formula_disjoint/official_dreams: report macro_query_auprc equals mrr (0.9202418061335217); ladder uses the recomputed per-query mean 0.9202418061335217",
+    "formula_disjoint/noise_v1: report macro_query_auprc equals mrr (0.9283314280757717); ladder uses the recomputed per-query mean 0.9283314280757717",
+    "formula_disjoint/cosine_greedy: report macro_query_auprc equals mrr (0.9226433627830699); ladder uses the recomputed per-query mean 0.9226433627830699",
+    "formula_disjoint/modified_cosine: report macro_query_auprc equals mrr (0.9225324839894314); ladder uses the recomputed per-query mean 0.9225324839894314",
+    "formula_disjoint/weighted_spectral_entropy: report macro_query_auprc equals mrr (0.9279624506603819); ladder uses the recomputed per-query mean 0.9279624506603819",
+    "formula_disjoint/p2b_sqrt_cosine: report macro_query_auprc equals mrr (0.9277067321239181); ladder uses the recomputed per-query mean 0.9277067321239181",
+    "formula_disjoint/p2b_unweighted_entropy: report macro_query_auprc equals mrr (0.9280322590437238); ladder uses the recomputed per-query mean 0.9280322590437238",
+    "formula_disjoint/neutral_loss_sqrt_cosine: report macro_query_auprc equals mrr (0.9267030437913); ladder uses the recomputed per-query mean 0.9267030437913",
+    "formula_disjoint/p2b_official_frozen: report macro_query_auprc equals mrr (0.9276635606272374); ladder uses the recomputed per-query mean 0.9276635606272374",
+    "formula_disjoint/p2b_noise_v1_frozen: report macro_query_auprc equals mrr (0.9290015517945218); ladder uses the recomputed per-query mean 0.9290015517945218",
+    "formula_disjoint/ms2deepscore_2x_public: report macro_query_auprc equals mrr (0.8873661692492265); ladder uses the recomputed per-query mean 0.8873661692492265",
+    "formula_disjoint/spec2vec_gnps_public: report macro_query_auprc equals mrr (0.9236716313121758); ladder uses the recomputed per-query mean 0.9236716313121758"
+  ],
+  "claim_limits": [
+    "Noise/P2b GNPS article benchmark. Methods at different information levels are reported in separate strata; this is not an exact NIST20 replication.",
+    "Extended bundle for the frozen evaluator; no fitting or method selection on GNPS."
+  ],
+  "information_levels": {
+    "spectrum_only": [
+      "official_dreams",
+      "noise_v1",
+      "cosine_greedy",
+      "modified_cosine",
+      "weighted_spectral_entropy",
+      "p2b_sqrt_cosine",
+      "p2b_unweighted_entropy",
+      "neutral_loss_sqrt_cosine",
+      "ms2deepscore_2x_public",
+      "spec2vec_gnps_public"
+    ],
+    "frozen_candidate_reranker": [
+      "p2b_official_frozen",
+      "p2b_noise_v1_frozen"
+    ]
+  },
+  "missing_baselines": [
+    "MS2DeepScore 2.0 and Spec2Vec weights not yet placed under third_party/ (verdict doc item S4); the ladder gains these rows without any change to frozen methods",
+    "structure-library tools (SIRIUS/CSI:FingerID, MetFrag, CFM-ID) are out of scope by design: this ladder compares spectral-similarity information extraction on one sealed candidate graph"
+  ]
+}

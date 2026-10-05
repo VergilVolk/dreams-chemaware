@@ -80,16 +80,16 @@ def build_panel(pairs: dict, manifest: pd.DataFrame, queries: pd.DataFrame):
         query_ptr[query + 1] = len(molecule_rows)
     return {
         "query_row": query_row,
-        "query_ik14": query_ik14,
-        "query_formula": query_formula,
+        "query_ik14": np.asarray(query_ik14, dtype=np.str_),
+        "query_formula": np.asarray(query_formula, dtype=np.str_),
         "query_precursor_mz": precursor_by_row[query_row],
         "near_query": near_query,
         "independent_positive": independent_positive,
         "query_ptr": query_ptr,
         "molecule_ptr": np.asarray(molecule_ptr, dtype=np.int64),
         "molecule_label": np.asarray(molecule_label, dtype=np.int8),
-        "molecule_ik14": np.asarray(molecule_ik14, dtype=object).astype(str),
-        "molecule_formula": np.asarray(molecule_formula, dtype=object).astype(str),
+        "molecule_ik14": np.asarray(molecule_ik14, dtype=np.str_),
+        "molecule_formula": np.asarray(molecule_formula, dtype=np.str_),
         "molecule_same_formula": np.asarray(molecule_same_formula, dtype=bool),
         "candidate_row": np.asarray(candidate_row, dtype=np.int64),
     }

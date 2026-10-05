@@ -184,6 +184,91 @@ verification = {
 (OUT_DIR / "verification_report.json").write_text(
     json.dumps(verification, indent=2, ensure_ascii=False), encoding="utf-8")
 
+# ---------------------------------------------------------------- document
+PRETTY = {
+    "official_dreams": "official DreaMS",
+    "noise_v1": "**noise V1 (ours)**",
+    "cosine_greedy": "cosine",
+    "modified_cosine": "modified cosine",
+    "weighted_spectral_entropy": "weighted spectral entropy",
+    "p2b_sqrt_cosine": "sqrt-cosine (P2b channel)",
+    "p2b_unweighted_entropy": "unweighted entropy (P2b channel)",
+    "neutral_loss_sqrt_cosine": "neutral-loss sqrt-cosine (P2b channel)",
+    "p2b_official_frozen": "P2b frozen on official",
+    "p2b_noise_v1_frozen": "P2b frozen on noise V1",
+    "ms2deepscore_2x_public": "MS2DeepScore 2.x (public)",
+    "spec2vec_gnps_public": "Spec2Vec (public, GNPS-trained)",
+}
+
+
+def ladder_table(panel: str) -> str:
+    sub = ladder[ladder.panel == panel].sort_values("recall@1", ascending=False)
+    lines = [
+        "| # | 方法 | R@1 | R@5 | R@10 | R@20 | MRR | near R@1 | macro AUROC |"
+        " micro AUROC | pooled AUROC | pooled AUPRC | corr/intro vs official |",
+        "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|"]
+    for index, (_, r) in enumerate(sub.iterrows(), 1):
+        ci = (f"{int(r.corrected_vs_official)}/{int(r.introduced_vs_official)}"
+              if pd.notna(r.get("corrected_vs_official")) else "—")
+        lines.append(
+            f"| {index} | {PRETTY.get(r.method, r.method)} | {r['recall@1']*100:.2f} | "
+            f"{r['recall@5']*100:.2f} | {r['recall@10']*100:.2f} | {r['recall@20']*100:.2f} | "
+            f"{r['mrr']*100:.2f} | {r['near_recall@1']*100:.2f} | {r['macro_query_auroc']:.4f} | "
+            f"{r['micro_auroc']:.4f} | {r['gnps_10ppm_pooled_pairwise_auroc']:.4f} | "
+            f"{r['gnps_10ppm_pooled_pairwise_auprc']:.4f} | {ci} |")
+    return "\n".join(lines)
+
+
+ci_dir = RUN / "direct_pairwise_ci"
+ci_section = ""
+if ci_dir.is_dir():
+    ci_section = ["## 三个直接配对 CI（identity R@1 / formula R@1，pp）", ""]
+    for name, label in (("wse_vs_noise", "WSE vs noise V1"),
+                        ("p2b_vs_noise", "P2b(noise V1) vs noise V1"),
+                        ("wse_vs_p2b", "WSE vs P2b(noise V1)")):
+        path = ci_dir / name / "report.json"
+        if not path.is_file():
+            continue
+        block = json.loads(path.read_text(encoding="utf-8"))
+        ident = block["panels"]["identity_disjoint"]["recall_at_1"]
+        form = block["panels"]["formula_disjoint"]["recall_at_1"]
+        ci_section.append(
+            f"- {label}：**{ident['delta_pp']:+.2f} [{ident['ci_low_pp']:+.2f}, "
+            f"{ident['ci_high_pp']:+.2f}]** / {form['delta_pp']:+.2f} "
+            f"[{form['ci_low_pp']:+.2f}, {form['ci_high_pp']:+.2f}]")
+    ci_section = "\n".join(ci_section) + "\n"
+
+public_note = ""
+if any("public" in m for m in ladder["method"]):
+    public_note = (
+        "\nMS2DeepScore/Spec2Vec 行使用公开预训练模型（md5 与包版本见 bundle 元数据）；"
+        "两者训练于 GNPS 生态，基准的零重叠保证仅覆盖 MSG/MoNA——这两行是"
+        "社区实践基线，不是纯净外部基线。\n")
+
+table_identity = ladder_table("identity_disjoint")
+table_formula = ladder_table("formula_disjoint")
+DOC.write_text(
+    f"""# GNPS 文章基准天梯（已验证版 · {len(ladder) // 2} 方法）
+
+**运行：** {RUN.name} · {date.today():%Y-%m-%d} 装订 · 来源 `{OUT_DIR}/ladder_full.csv`
+
+**零误差声明：** 每个 recall@k、MRR、rank、margin、near 指标与 corrected/introduced/risk-net 均由逐 query 表独立重算，与冻结评估器报告在 1e-9 内逐项相等（{len(problems)} 处不一致，{verification['status']}）。macro AUPRC ≡ MRR 为数学恒等式（单正例 query 的 AP = 1/rank），非字段错误。
+
+## identity-disjoint（n=10,995）
+
+{table_identity}
+
+## formula-disjoint（n=5,261）
+
+{table_formula}
+{ci_section}
+## 边界
+
+1. 分层报告：谱学方法 vs 冻结重排器（不同信息层级，禁止跨层排名次）；
+2. 结构库工具（SIRIUS/CSI、MetFrag、CFM-ID）按设计不在本表；
+3. [M+H]+ 单加合物、严格 10 ppm、与 MSG/MoNA 训练语料身份/公式双零重叠；非 NIST20 复现。
+{public_note}""", encoding="utf-8")
+
 # ---------------------------------------------------------------- figure
 import matplotlib
 matplotlib.use("Agg")

@@ -38,6 +38,52 @@ class _Spikes:  # pragma: no cover - typing shim
 _shim.Spikes = _Spikes
 sys.modules["matchms.Spikes"] = _shim
 
+# The 2020 GNPS Word2Vec pickle references the original training repo's
+# ``custom_functions`` package (e.g. custom_functions.utils_spec2vec).  A
+# meta-path importer fabricates any module under that namespace on demand;
+# unpickling only needs importable names whose instances accept a restored
+# state.
+import importlib.abc
+import importlib.machinery
+
+
+class _AnyLegacy:
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def __setstate__(self, state):
+        if isinstance(state, dict):
+            self.__dict__.update(state)
+        elif isinstance(state, tuple) and len(state) == 2:
+            self.__dict__.update(state[0] if isinstance(state[0], dict) else {})
+
+
+class _CustomModule(types.ModuleType):
+    def __getattr__(self, name):
+        if name.startswith("__"):
+            raise AttributeError(name)
+        placeholder = type(name, (_AnyLegacy,), {})
+        setattr(self, name, placeholder)
+        return placeholder
+
+
+class _StubFinder(importlib.abc.MetaPathFinder, importlib.abc.Loader):
+    def find_spec(self, fullname, path=None, target=None):
+        if fullname == "custom_functions" or fullname.startswith("custom_functions."):
+            return importlib.machinery.ModuleSpec(fullname, self, is_package=True)
+        return None
+
+    def create_module(self, spec):
+        module = _CustomModule(spec.name)
+        module.__path__ = []
+        return module
+
+    def exec_module(self, module):
+        return None
+
+
+sys.meta_path.insert(0, _StubFinder())
+
 import gensim  # noqa: E402
 import matchms  # noqa: E402
 from matchms import Spectrum  # noqa: E402
@@ -144,10 +190,11 @@ def main() -> None:
     from ms2deepscore.models import load_model
 
     ms2ds_model_path = args.models_dir / "ms2deepscore_model.pt"
-    model = load_model(str(ms2ds_model_path))
+    model = load_model(str(ms2ds_model_path), allow_legacy=True)
     ms2ds = MS2DeepScore(model, progress_bar=False)
     embed_api = next((name for name in
-                      ("get_embeddings", "calculate_embeddings", "_calculate_embeddings")
+                      ("get_embedding_array", "get_embeddings",
+                       "calculate_embeddings", "_calculate_embeddings")
                       if hasattr(ms2ds, name)), None)
     if embed_api is None:
         raise RuntimeError(f"MS2DeepScore exposes no embedding API: {dir(ms2ds)}")
@@ -197,7 +244,9 @@ def main() -> None:
     new_methods = ["ms2deepscore_2x_public", "spec2vec_gnps_public"]
     new_scores: dict[str, np.ndarray] = {}
     for panel in PANELS:
-        query_pos = np.asarray([position[int(r)] for r in queries[panel]],
+        pair_query_index = pairs[panel]["query_index"].astype(np.int64)
+        query_rows_per_pair = queries[panel][pair_query_index]
+        query_pos = np.asarray([position[int(r)] for r in query_rows_per_pair],
                                dtype=np.int64)
         reference_pos = np.asarray(
             [position[int(r)] for r in pairs[panel]["reference_row"]], dtype=np.int64)
