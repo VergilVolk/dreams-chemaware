@@ -1,5 +1,7 @@
 # URSEA 对抗性审稿审计与方法学重构
 
+> **2026-10-05 再审计结论：本稿提出的 latent-correspondence e-value 路线降级为下游统计备选，不再作为核心方法创新。** record linkage、replicability inference、e-value/FDR 各自已有成熟理论，组合后仍不足以支撑本项目主创新。当前主方法转为[候选差分证据重排](./CORE_METHOD_REDESIGN_CANDIDATE_DIFFERENTIAL_EVIDENCE_20261005.md)：只允许能够同时超过同分子实验漂移和匹配伪化学解释的候选排他性谱学证据改变排序。
+
 日期：2026-10-05  
 状态：方法设计冻结前的拒稿级审计；不得把本文中的 proposed 方法写成已经验证的结果
 
