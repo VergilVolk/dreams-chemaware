@@ -1,7 +1,7 @@
 # GLM supervisor chain: public-model downloads -> md5 -> scoring -> frozen
 # evaluation -> verified 12-method ladder -> git commit + push.
 # Runs unattended; every step fails closed and logs to chain.log.
-$ErrorActionPreference = "Stop"
+$ErrorActionPreference = "Continue"
 Set-Location D:\DreaMS
 $models = "third_party\public_models"
 $bench = "data/validation/gnps_gold_silver_10ppm_benchmark_v1"
@@ -41,26 +41,21 @@ foreach ($path in $md5s.Keys) {
 }
 Step "md5 gate passed for all model files"
 
-# ---- 3. score public models ----
+# ---- 3. score public models (cmd /c wraps python so PowerShell never
+# turns native stderr warnings into terminating errors) ----
 $env:PYTHONPATH = "D:\DreaMS;D:\DreaMS\tasks"
-python -X utf8 tasks/GLM_score_public_models_on_gnps.py `
-  --benchmark $bench --frozen-run $frozen --models-dir $models `
-  --output "$run\bundle" *>> $log
-if ($LASTEXITCODE -ne 0) { Die "public-model scoring failed" }
+cmd /c "python -X utf8 tasks/GLM_score_public_models_on_gnps.py --benchmark $bench --frozen-run $frozen --models-dir $models --output `"$run\bundle`" >> `"$log`" 2>&1"
+if ($LASTEXITCODE -ne 0) { Die "public-model scoring failed ($LASTEXITCODE)" }
 Step "public-model scoring complete"
 
 # ---- 4. frozen evaluator on certified panels ----
-python -X utf8 tasks/evaluate_noise_gnps_article_benchmark.py `
-  --score-bundle "$run\bundle\method_scores.npz" `
-  --benchmark $panels --output "$run\evaluation" `
-  --baseline-method official_dreams --bootstrap-resamples 10000 `
-  --bootstrap-seed 20261003 *>> $log
-if ($LASTEXITCODE -ne 0) { Die "frozen evaluator failed" }
+cmd /c "python -X utf8 tasks/evaluate_noise_gnps_article_benchmark.py --score-bundle `"$run\bundle\method_scores.npz`" --benchmark $panels --output `"$run\evaluation`" --baseline-method official_dreams --bootstrap-resamples 10000 --bootstrap-seed 20261003 >> `"$log`" 2>&1"
+if ($LASTEXITCODE -ne 0) { Die "frozen evaluator failed ($LASTEXITCODE)" }
 Step "frozen evaluation complete (12 methods x 2 panels)"
 
 # ---- 5. verified ladder assembly (dual-source cross-checks) ----
-python -X utf8 tasks/GLM_assemble_gnps_article_ladder.py --run $run *>> $log
-if ($LASTEXITCODE -ne 0) { Die "ladder assembly/verification failed" }
+cmd /c "python -X utf8 tasks/GLM_assemble_gnps_article_ladder.py --run $run >> `"$log`" 2>&1"
+if ($LASTEXITCODE -ne 0) { Die "ladder assembly/verification failed ($LASTEXITCODE)" }
 Step "12-method ladder verified and written"
 
 # ---- 6. commit and push ----
