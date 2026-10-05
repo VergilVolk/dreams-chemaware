@@ -1,0 +1,231 @@
+{
+  "status": "GLM_MIGRATION_RELIABILITY_UPPER_BOUND_CARD",
+  "scope": "library-spectrum cross-file matching; upper bound only, cohort-DDA features will be worse (Gate 1 proper)",
+  "run": "noise_gnps_article_benchmark_run_2349091",
+  "panels": {
+    "identity_disjoint": {
+      "weighted_spectral_entropy": {
+        "recall@1": 0.8737,
+        "recall@3": 0.9533,
+        "recall@5": 0.9701,
+        "recall@10": 0.987,
+        "recall@20": 0.9967,
+        "mrr": 0.9166,
+        "macro_query_auc": 0.9433,
+        "near_recall@5": 0.9588,
+        "queries": 10995
+      },
+      "p2b_noise_v1_frozen": {
+        "recall@1": 0.8713,
+        "recall@3": 0.9552,
+        "recall@5": 0.9744,
+        "recall@10": 0.988,
+        "recall@20": 0.9975,
+        "mrr": 0.9165,
+        "macro_query_auc": 0.9444,
+        "near_recall@5": 0.964,
+        "queries": 10995
+      },
+      "p2b_sqrt_cosine": {
+        "recall@1": 0.8704,
+        "recall@3": 0.9524,
+        "recall@5": 0.9719,
+        "recall@10": 0.9872,
+        "recall@20": 0.9973,
+        "mrr": 0.9151,
+        "macro_query_auc": 0.9411,
+        "near_recall@5": 0.9613,
+        "queries": 10995
+      },
+      "p2b_official_frozen": {
+        "recall@1": 0.8698,
+        "recall@3": 0.9545,
+        "recall@5": 0.9744,
+        "recall@10": 0.9879,
+        "recall@20": 0.9975,
+        "mrr": 0.9154,
+        "macro_query_auc": 0.9433,
+        "near_recall@5": 0.964,
+        "queries": 10995
+      },
+      "p2b_unweighted_entropy": {
+        "recall@1": 0.8698,
+        "recall@3": 0.9526,
+        "recall@5": 0.9713,
+        "recall@10": 0.9872,
+        "recall@20": 0.9972,
+        "mrr": 0.9148,
+        "macro_query_auc": 0.9408,
+        "near_recall@5": 0.9604,
+        "queries": 10995
+      },
+      "neutral_loss_sqrt_cosine": {
+        "recall@1": 0.8681,
+        "recall@3": 0.9543,
+        "recall@5": 0.9731,
+        "recall@10": 0.9884,
+        "recall@20": 0.9976,
+        "mrr": 0.9143,
+        "macro_query_auc": 0.9432,
+        "near_recall@5": 0.9625,
+        "queries": 10995
+      },
+      "noise_v1": {
+        "recall@1": 0.8656,
+        "recall@3": 0.9513,
+        "recall@5": 0.9717,
+        "recall@10": 0.9874,
+        "recall@20": 0.9983,
+        "mrr": 0.9127,
+        "macro_query_auc": 0.9413,
+        "near_recall@5": 0.9601,
+        "queries": 10995
+      },
+      "official_dreams": {
+        "recall@1": 0.8536,
+        "recall@3": 0.9502,
+        "recall@5": 0.9702,
+        "recall@10": 0.9876,
+        "recall@20": 0.9976,
+        "mrr": 0.9052,
+        "macro_query_auc": 0.9373,
+        "near_recall@5": 0.9577,
+        "queries": 10995
+      },
+      "cosine_greedy": {
+        "recall@1": 0.8504,
+        "recall@3": 0.9442,
+        "recall@5": 0.9671,
+        "recall@10": 0.9858,
+        "recall@20": 0.9973,
+        "mrr": 0.9019,
+        "macro_query_auc": 0.9337,
+        "near_recall@5": 0.9544,
+        "queries": 10995
+      },
+      "modified_cosine": {
+        "recall@1": 0.8503,
+        "recall@3": 0.944,
+        "recall@5": 0.9671,
+        "recall@10": 0.9858,
+        "recall@20": 0.9973,
+        "mrr": 0.9018,
+        "macro_query_auc": 0.9336,
+        "near_recall@5": 0.9544,
+        "queries": 10995
+      }
+    },
+    "formula_disjoint": {
+      "weighted_spectral_entropy": {
+        "recall@1": 0.8827,
+        "recall@3": 0.9715,
+        "recall@5": 0.9869,
+        "recall@10": 0.9966,
+        "recall@20": 0.9996,
+        "mrr": 0.928,
+        "macro_query_auc": 0.939,
+        "near_recall@5": 0.9766,
+        "queries": 5261
+      },
+      "p2b_noise_v1_frozen": {
+        "recall@1": 0.8825,
+        "recall@3": 0.9726,
+        "recall@5": 0.9901,
+        "recall@10": 0.9966,
+        "recall@20": 0.9996,
+        "mrr": 0.929,
+        "macro_query_auc": 0.9401,
+        "near_recall@5": 0.9823,
+        "queries": 5261
+      },
+      "p2b_sqrt_cosine": {
+        "recall@1": 0.8816,
+        "recall@3": 0.9709,
+        "recall@5": 0.9876,
+        "recall@10": 0.9964,
+        "recall@20": 0.9996,
+        "mrr": 0.9277,
+        "macro_query_auc": 0.937,
+        "near_recall@5": 0.9779,
+        "queries": 5261
+      },
+      "p2b_unweighted_entropy": {
+        "recall@1": 0.8816,
+        "recall@3": 0.9721,
+        "recall@5": 0.988,
+        "recall@10": 0.9962,
+        "recall@20": 0.9996,
+        "mrr": 0.928,
+        "macro_query_auc": 0.9377,
+        "near_recall@5": 0.9786,
+        "queries": 5261
+      },
+      "noise_v1": {
+        "recall@1": 0.8806,
+        "recall@3": 0.9721,
+        "recall@5": 0.9882,
+        "recall@10": 0.9971,
+        "recall@20": 1.0,
+        "mrr": 0.9283,
+        "macro_query_auc": 0.9381,
+        "near_recall@5": 0.9796,
+        "queries": 5261
+      },
+      "p2b_official_frozen": {
+        "recall@1": 0.8803,
+        "recall@3": 0.973,
+        "recall@5": 0.9895,
+        "recall@10": 0.9964,
+        "recall@20": 0.9996,
+        "mrr": 0.9277,
+        "macro_query_auc": 0.9386,
+        "near_recall@5": 0.9813,
+        "queries": 5261
+      },
+      "neutral_loss_sqrt_cosine": {
+        "recall@1": 0.8787,
+        "recall@3": 0.9726,
+        "recall@5": 0.9892,
+        "recall@10": 0.9968,
+        "recall@20": 0.9996,
+        "mrr": 0.9267,
+        "macro_query_auc": 0.9384,
+        "near_recall@5": 0.9806,
+        "queries": 5261
+      },
+      "cosine_greedy": {
+        "recall@1": 0.8717,
+        "recall@3": 0.9698,
+        "recall@5": 0.9875,
+        "recall@10": 0.996,
+        "recall@20": 0.9996,
+        "mrr": 0.9226,
+        "macro_query_auc": 0.9337,
+        "near_recall@5": 0.9776,
+        "queries": 5261
+      },
+      "modified_cosine": {
+        "recall@1": 0.8715,
+        "recall@3": 0.9696,
+        "recall@5": 0.9875,
+        "recall@10": 0.996,
+        "recall@20": 0.9996,
+        "mrr": 0.9225,
+        "macro_query_auc": 0.9336,
+        "near_recall@5": 0.9776,
+        "queries": 5261
+      },
+      "official_dreams": {
+        "recall@1": 0.8681,
+        "recall@3": 0.9707,
+        "recall@5": 0.9867,
+        "recall@10": 0.9958,
+        "recall@20": 0.9998,
+        "mrr": 0.9202,
+        "macro_query_auc": 0.9319,
+        "near_recall@5": 0.9766,
+        "queries": 5261
+      }
+    }
+  }
+}

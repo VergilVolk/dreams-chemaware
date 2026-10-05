@@ -1,0 +1,941 @@
+{
+  "status": "GLM_LCNEC_DARK_REVERSE_SEARCH_PILOT",
+  "library": "gnps_gold_silver_10ppm_benchmark_v1/spectra.mgf",
+  "gate": 0.007,
+  "modules": [
+    {
+      "precursor": 342.08806471,
+      "title": "",
+      "n_candidates_in_gate": 7656,
+      "neighbors": [
+        {
+          "score": 0.9852,
+          "precursor": 344.233,
+          "title": ""
+        },
+        {
+          "score": 0.9183,
+          "precursor": 340.107,
+          "title": ""
+        },
+        {
+          "score": 0.8343,
+          "precursor": 340.118,
+          "title": ""
+        },
+        {
+          "score": 0.6558,
+          "precursor": 342.166,
+          "title": ""
+        },
+        {
+          "score": 0.6558,
+          "precursor": 342.166,
+          "title": ""
+        }
+      ]
+    },
+    {
+      "precursor": 190.07231097,
+      "title": "",
+      "n_candidates_in_gate": 1717,
+      "neighbors": [
+        {
+          "score": 0.8754,
+          "precursor": 190.061,
+          "title": ""
+        },
+        {
+          "score": 0.854,
+          "precursor": 190.084,
+          "title": ""
+        },
+        {
+          "score": 0.8524,
+          "precursor": 190.084,
+          "title": ""
+        },
+        {
+          "score": 0.8516,
+          "precursor": 190.084,
+          "title": ""
+        },
+        {
+          "score": 0.8373,
+          "precursor": 190.084,
+          "title": ""
+        }
+      ]
+    },
+    {
+      "precursor": 251.0788234,
+      "title": "",
+      "n_candidates_in_gate": 2585,
+      "neighbors": [
+        {
+          "score": 0.7288,
+          "precursor": 250.099,
+          "title": ""
+        },
+        {
+          "score": 0.7285,
+          "precursor": 250.099,
+          "title": ""
+        },
+        {
+          "score": 0.609,
+          "precursor": 250.09,
+          "title": ""
+        },
+        {
+          "score": 0.5004,
+          "precursor": 252.123,
+          "title": ""
+        },
+        {
+          "score": 0.5004,
+          "precursor": 252.123,
+          "title": ""
+        }
+      ]
+    },
+    {
+      "precursor": 533.10602466,
+      "title": "",
+      "n_candidates_in_gate": 2298,
+      "neighbors": [
+        {
+          "score": 0.1946,
+          "precursor": 532.342,
+          "title": ""
+        },
+        {
+          "score": 0.1946,
+          "precursor": 532.342,
+          "title": ""
+        },
+        {
+          "score": 0.1946,
+          "precursor": 532.342,
+          "title": ""
+        },
+        {
+          "score": 0.1946,
+          "precursor": 532.342,
+          "title": ""
+        },
+        {
+          "score": 0.1646,
+          "precursor": 536.357,
+          "title": ""
+        }
+      ]
+    },
+    {
+      "precursor": 218.06719234,
+      "title": "",
+      "n_candidates_in_gate": 2097,
+      "neighbors": [
+        {
+          "score": 0.6987,
+          "precursor": 218.081,
+          "title": ""
+        },
+        {
+          "score": 0.6732,
+          "precursor": 217.097,
+          "title": ""
+        },
+        {
+          "score": 0.6704,
+          "precursor": 218.081,
+          "title": ""
+        },
+        {
+          "score": 0.6557,
+          "precursor": 219.076,
+          "title": ""
+        },
+        {
+          "score": 0.5365,
+          "precursor": 218.081,
+          "title": ""
+        }
+      ]
+    },
+    {
+      "precursor": 606.07515199,
+      "title": "",
+      "n_candidates_in_gate": 1354,
+      "neighbors": [
+        {
+          "score": 0.2996,
+          "precursor": 607.432,
+          "title": ""
+        },
+        {
+          "score": 0.2995,
+          "precursor": 609.582,
+          "title": ""
+        },
+        {
+          "score": 0.2957,
+          "precursor": 605.44,
+          "title": ""
+        },
+        {
+          "score": 0.2957,
+          "precursor": 605.44,
+          "title": ""
+        },
+        {
+          "score": 0.2759,
+          "precursor": 607.566,
+          "title": ""
+        }
+      ]
+    },
+    {
+      "precursor": 207.01485208,
+      "title": "",
+      "n_candidates_in_gate": 1990,
+      "neighbors": [
+        {
+          "score": 0.9744,
+          "precursor": 206.027,
+          "title": ""
+        },
+        {
+          "score": 0.9139,
+          "precursor": 208.097,
+          "title": ""
+        },
+        {
+          "score": 0.9129,
+          "precursor": 206.118,
+          "title": ""
+        },
+        {
+          "score": 0.9012,
+          "precursor": 206.118,
+          "title": ""
+        },
+        {
+          "score": 0.6632,
+          "precursor": 208.133,
+          "title": ""
+        }
+      ]
+    },
+    {
+      "precursor": 207.1028424,
+      "title": "",
+      "n_candidates_in_gate": 1990,
+      "neighbors": [
+        {
+          "score": 0.9031,
+          "precursor": 207.113,
+          "title": ""
+        },
+        {
+          "score": 0.5983,
+          "precursor": 206.081,
+          "title": ""
+        },
+        {
+          "score": 0.4301,
+          "precursor": 206.081,
+          "title": ""
+        },
+        {
+          "score": 0.214,
+          "precursor": 206.129,
+          "title": ""
+        },
+        {
+          "score": 0.1455,
+          "precursor": 206.129,
+          "title": ""
+        }
+      ]
+    },
+    {
+      "precursor": 138.0561676,
+      "title": "",
+      "n_candidates_in_gate": 21,
+      "neighbors": [
+        {
+          "score": 0.0311,
+          "precursor": 137.107,
+          "title": ""
+        },
+        {
+          "score": 0.0285,
+          "precursor": 138.08,
+          "title": ""
+        },
+        {
+          "score": 0.0062,
+          "precursor": 137.107,
+          "title": ""
+        },
+        {
+          "score": 0.0053,
+          "precursor": 137.107,
+          "title": ""
+        },
+        {
+          "score": 0.0041,
+          "precursor": 137.107,
+          "title": ""
+        }
+      ]
+    },
+    {
+      "precursor": 215.03295898,
+      "title": "",
+      "n_candidates_in_gate": 2254,
+      "neighbors": [
+        {
+          "score": 0.5876,
+          "precursor": 216.159,
+          "title": ""
+        },
+        {
+          "score": 0.5876,
+          "precursor": 216.159,
+          "title": ""
+        },
+        {
+          "score": 0.5876,
+          "precursor": 216.159,
+          "title": ""
+        },
+        {
+          "score": 0.5876,
+          "precursor": 216.159,
+          "title": ""
+        },
+        {
+          "score": 0.5684,
+          "precursor": 216.16,
+          "title": ""
+        }
+      ]
+    },
+    {
+      "precursor": 146.02819736,
+      "title": "",
+      "n_candidates_in_gate": 70,
+      "neighbors": [
+        {
+          "score": 0.2892,
+          "precursor": 145.17,
+          "title": ""
+        },
+        {
+          "score": 0.0974,
+          "precursor": 146.081,
+          "title": ""
+        },
+        {
+          "score": 0.0585,
+          "precursor": 145.016,
+          "title": ""
+        },
+        {
+          "score": 0.042,
+          "precursor": 146.0,
+          "title": ""
+        },
+        {
+          "score": 0.0403,
+          "precursor": 146.0,
+          "title": ""
+        }
+      ]
+    },
+    {
+      "precursor": 230.99705505,
+      "title": "",
+      "n_candidates_in_gate": 2891,
+      "neighbors": [
+        {
+          "score": 0.5937,
+          "precursor": 231.077,
+          "title": ""
+        },
+        {
+          "score": 0.494,
+          "precursor": 232.154,
+          "title": ""
+        },
+        {
+          "score": 0.4849,
+          "precursor": 230.091,
+          "title": ""
+        },
+        {
+          "score": 0.4738,
+          "precursor": 231.113,
+          "title": ""
+        },
+        {
+          "score": 0.4645,
+          "precursor": 231.113,
+          "title": ""
+        }
+      ]
+    },
+    {
+      "precursor": 406.02178266,
+      "title": "",
+      "n_candidates_in_gate": 3569,
+      "neighbors": [
+        {
+          "score": 0.449,
+          "precursor": 404.172,
+          "title": ""
+        },
+        {
+          "score": 0.3936,
+          "precursor": 404.022,
+          "title": ""
+        },
+        {
+          "score": 0.3866,
+          "precursor": 407.071,
+          "title": ""
+        },
+        {
+          "score": 0.3477,
+          "precursor": 408.152,
+          "title": ""
+        },
+        {
+          "score": 0.3477,
+          "precursor": 408.152,
+          "title": ""
+        }
+      ]
+    },
+    {
+      "precursor": 421.14851577,
+      "title": "",
+      "n_candidates_in_gate": 3125,
+      "neighbors": [
+        {
+          "score": 0.4697,
+          "precursor": 420.323,
+          "title": ""
+        },
+        {
+          "score": 0.419,
+          "precursor": 420.175,
+          "title": ""
+        },
+        {
+          "score": 0.419,
+          "precursor": 420.175,
+          "title": ""
+        },
+        {
+          "score": 0.3908,
+          "precursor": 420.228,
+          "title": ""
+        },
+        {
+          "score": 0.3879,
+          "precursor": 421.245,
+          "title": ""
+        }
+      ]
+    },
+    {
+      "precursor": 273.08055416,
+      "title": "",
+      "n_candidates_in_gate": 3898,
+      "neighbors": [
+        {
+          "score": 0.1331,
+          "precursor": 274.084,
+          "title": ""
+        },
+        {
+          "score": 0.1202,
+          "precursor": 274.155,
+          "title": ""
+        },
+        {
+          "score": 0.12,
+          "precursor": 273.193,
+          "title": ""
+        },
+        {
+          "score": 0.12,
+          "precursor": 273.193,
+          "title": ""
+        },
+        {
+          "score": 0.12,
+          "precursor": 273.193,
+          "title": ""
+        }
+      ]
+    },
+    {
+      "precursor": 346.05616339,
+      "title": "",
+      "n_candidates_in_gate": 7518,
+      "neighbors": [
+        {
+          "score": 0.649,
+          "precursor": 347.139,
+          "title": ""
+        },
+        {
+          "score": 0.6249,
+          "precursor": 347.139,
+          "title": ""
+        },
+        {
+          "score": 0.564,
+          "precursor": 345.215,
+          "title": ""
+        },
+        {
+          "score": 0.5599,
+          "precursor": 348.009,
+          "title": ""
+        },
+        {
+          "score": 0.5599,
+          "precursor": 348.009,
+          "title": ""
+        }
+      ]
+    },
+    {
+      "precursor": 144.10314178,
+      "title": "",
+      "n_candidates_in_gate": 153,
+      "neighbors": [
+        {
+          "score": 0.3777,
+          "precursor": 144.102,
+          "title": ""
+        },
+        {
+          "score": 0.2218,
+          "precursor": 144.102,
+          "title": ""
+        },
+        {
+          "score": 0.1819,
+          "precursor": 144.139,
+          "title": ""
+        },
+        {
+          "score": 0.1665,
+          "precursor": 144.102,
+          "title": ""
+        },
+        {
+          "score": 0.1432,
+          "precursor": 144.102,
+          "title": ""
+        }
+      ]
+    },
+    {
+      "precursor": 426.02278137,
+      "title": "",
+      "n_candidates_in_gate": 2067,
+      "neighbors": [
+        {
+          "score": 0.4988,
+          "precursor": 424.153,
+          "title": ""
+        },
+        {
+          "score": 0.4363,
+          "precursor": 428.137,
+          "title": ""
+        },
+        {
+          "score": 0.3751,
+          "precursor": 428.187,
+          "title": ""
+        },
+        {
+          "score": 0.3619,
+          "precursor": 427.238,
+          "title": ""
+        },
+        {
+          "score": 0.3586,
+          "precursor": 423.172,
+          "title": ""
+        }
+      ]
+    },
+    {
+      "precursor": 221.98455811,
+      "title": "",
+      "n_candidates_in_gate": 1838,
+      "neighbors": [
+        {
+          "score": 0.9888,
+          "precursor": 223.054,
+          "title": ""
+        },
+        {
+          "score": 0.6135,
+          "precursor": 222.056,
+          "title": ""
+        },
+        {
+          "score": 0.604,
+          "precursor": 222.149,
+          "title": ""
+        },
+        {
+          "score": 0.598,
+          "precursor": 221.038,
+          "title": ""
+        },
+        {
+          "score": 0.5775,
+          "precursor": 222.185,
+          "title": ""
+        }
+      ]
+    },
+    {
+      "precursor": 444.03234863,
+      "title": "",
+      "n_candidates_in_gate": 3321,
+      "neighbors": [
+        {
+          "score": 0.4934,
+          "precursor": 444.138,
+          "title": ""
+        },
+        {
+          "score": 0.4934,
+          "precursor": 444.138,
+          "title": ""
+        },
+        {
+          "score": 0.4295,
+          "precursor": 441.225,
+          "title": ""
+        },
+        {
+          "score": 0.3841,
+          "precursor": 444.138,
+          "title": ""
+        },
+        {
+          "score": 0.3841,
+          "precursor": 444.138,
+          "title": ""
+        }
+      ]
+    },
+    {
+      "precursor": 162.02322388,
+      "title": "",
+      "n_candidates_in_gate": 774,
+      "neighbors": [
+        {
+          "score": 0.5857,
+          "precursor": 161.128,
+          "title": ""
+        },
+        {
+          "score": 0.4044,
+          "precursor": 163.05,
+          "title": ""
+        },
+        {
+          "score": 0.395,
+          "precursor": 163.05,
+          "title": ""
+        },
+        {
+          "score": 0.3417,
+          "precursor": 163.075,
+          "title": ""
+        },
+        {
+          "score": 0.338,
+          "precursor": 161.154,
+          "title": ""
+        }
+      ]
+    },
+    {
+      "precursor": 169.99194609,
+      "title": "",
+      "n_candidates_in_gate": 1510,
+      "neighbors": [
+        {
+          "score": 0.3391,
+          "precursor": 169.049,
+          "title": ""
+        },
+        {
+          "score": 0.2776,
+          "precursor": 170.061,
+          "title": ""
+        },
+        {
+          "score": 0.2347,
+          "precursor": 169.062,
+          "title": ""
+        },
+        {
+          "score": 0.2254,
+          "precursor": 171.138,
+          "title": ""
+        },
+        {
+          "score": 0.2026,
+          "precursor": 170.027,
+          "title": ""
+        }
+      ]
+    },
+    {
+      "precursor": 168.04331855,
+      "title": "",
+      "n_candidates_in_gate": 1432,
+      "neighbors": [
+        {
+          "score": 0.6437,
+          "precursor": 168.077,
+          "title": ""
+        },
+        {
+          "score": 0.5746,
+          "precursor": 169.061,
+          "title": ""
+        },
+        {
+          "score": 0.5242,
+          "precursor": 167.081,
+          "title": ""
+        },
+        {
+          "score": 0.513,
+          "precursor": 169.072,
+          "title": ""
+        },
+        {
+          "score": 0.4378,
+          "precursor": 168.066,
+          "title": ""
+        }
+      ]
+    },
+    {
+      "precursor": 359.12527466,
+      "title": "",
+      "n_candidates_in_gate": 4941,
+      "neighbors": [
+        {
+          "score": 0.3779,
+          "precursor": 359.124,
+          "title": ""
+        },
+        {
+          "score": 0.3779,
+          "precursor": 359.124,
+          "title": ""
+        },
+        {
+          "score": 0.3779,
+          "precursor": 359.124,
+          "title": ""
+        },
+        {
+          "score": 0.3647,
+          "precursor": 359.219,
+          "title": ""
+        },
+        {
+          "score": 0.175,
+          "precursor": 360.239,
+          "title": ""
+        }
+      ]
+    },
+    {
+      "precursor": 244.02293396,
+      "title": "",
+      "n_candidates_in_gate": 2532,
+      "neighbors": [
+        {
+          "score": 0.656,
+          "precursor": 243.076,
+          "title": ""
+        },
+        {
+          "score": 0.6539,
+          "precursor": 243.11,
+          "title": ""
+        },
+        {
+          "score": 0.6351,
+          "precursor": 245.036,
+          "title": ""
+        },
+        {
+          "score": 0.6298,
+          "precursor": 245.129,
+          "title": ""
+        },
+        {
+          "score": 0.5519,
+          "precursor": 245.092,
+          "title": ""
+        }
+      ]
+    },
+    {
+      "precursor": 313.11963202,
+      "title": "",
+      "n_candidates_in_gate": 5808,
+      "neighbors": [
+        {
+          "score": 0.2462,
+          "precursor": 313.155,
+          "title": ""
+        },
+        {
+          "score": 0.2076,
+          "precursor": 315.193,
+          "title": ""
+        },
+        {
+          "score": 0.194,
+          "precursor": 311.29,
+          "title": ""
+        },
+        {
+          "score": 0.188,
+          "precursor": 315.087,
+          "title": ""
+        },
+        {
+          "score": 0.1832,
+          "precursor": 315.18,
+          "title": ""
+        }
+      ]
+    },
+    {
+      "precursor": 91.02874374,
+      "title": "",
+      "n_candidates_in_gate": 0,
+      "neighbors": []
+    },
+    {
+      "precursor": 280.90861578,
+      "title": "",
+      "n_candidates_in_gate": 3249,
+      "neighbors": [
+        {
+          "score": 0.6146,
+          "precursor": 282.182,
+          "title": ""
+        },
+        {
+          "score": 0.6037,
+          "precursor": 279.17,
+          "title": ""
+        },
+        {
+          "score": 0.6037,
+          "precursor": 279.17,
+          "title": ""
+        },
+        {
+          "score": 0.5999,
+          "precursor": 282.182,
+          "title": ""
+        },
+        {
+          "score": 0.5754,
+          "precursor": 282.089,
+          "title": ""
+        }
+      ]
+    },
+    {
+      "precursor": 190.01815796,
+      "title": "",
+      "n_candidates_in_gate": 1717,
+      "neighbors": [
+        {
+          "score": 0.6359,
+          "precursor": 190.05,
+          "title": ""
+        },
+        {
+          "score": 0.6237,
+          "precursor": 189.112,
+          "title": ""
+        },
+        {
+          "score": 0.6237,
+          "precursor": 189.112,
+          "title": ""
+        },
+        {
+          "score": 0.5222,
+          "precursor": 189.16,
+          "title": ""
+        },
+        {
+          "score": 0.5222,
+          "precursor": 189.16,
+          "title": ""
+        }
+      ]
+    },
+    {
+      "precursor": 181.96627045,
+      "title": "",
+      "n_candidates_in_gate": 1169,
+      "neighbors": [
+        {
+          "score": 0.5608,
+          "precursor": 181.041,
+          "title": ""
+        },
+        {
+          "score": 0.4046,
+          "precursor": 182.104,
+          "title": ""
+        },
+        {
+          "score": 0.3142,
+          "precursor": 183.066,
+          "title": ""
+        },
+        {
+          "score": 0.3142,
+          "precursor": 183.066,
+          "title": ""
+        },
+        {
+          "score": 0.2913,
+          "precursor": 183.102,
+          "title": ""
+        }
+      ]
+    }
+  ]
+}
