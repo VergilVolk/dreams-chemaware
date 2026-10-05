@@ -23,7 +23,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-RUN = Path("data/validation/noise_gnps_article_benchmark_run_2349091")
+RUN = Path(sys.argv[sys.argv.index("--run") + 1]) if "--run" in sys.argv else \
+    Path("data/validation/noise_gnps_article_benchmark_run_2349091")
 OUT_DIR = Path("deliverables/GLM_gnps_article_ladder") / RUN.name
 FIG_DIR = Path("deliverables/figures")
 DOC = Path(f"docs/GLM_GNPS_ARTICLE_LADDER_{date.today():%Y%m%d}.md")
