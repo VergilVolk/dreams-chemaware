@@ -1,0 +1,69 @@
+{
+  "status": "GLM_GNPS_METHOD_COMPLEMENTARITY_COMPLETE",
+  "panels": {
+    "identity_disjoint": {
+      "queries": 10995,
+      "per_method_correct": {
+        "cosine_greedy": 9350,
+        "modified_cosine": 9349,
+        "ms2deepscore_2x_public": 8699,
+        "neutral_loss_sqrt_cosine": 9545,
+        "noise_v1": 9517,
+        "official_dreams": 9385,
+        "p2b_noise_v1_frozen": 9580,
+        "p2b_official_frozen": 9563,
+        "p2b_sqrt_cosine": 9570,
+        "p2b_unweighted_entropy": 9563,
+        "spec2vec_gnps_public": 9488,
+        "weighted_spectral_entropy": 9606
+      },
+      "best_pair": {
+        "method_a": "noise_v1",
+        "method_b": "weighted_spectral_entropy",
+        "oracle_union_pp": 89.97726239199636,
+        "gain_vs_best_single_pp": 2.6102773988176438
+      },
+      "oracle_unions_pp": {
+        "weighted+noise+p2b": 90.59,
+        "weighted+noise": 89.98,
+        "weighted+spec2vec+noise": 90.98,
+        "all_12": 92.9
+      },
+      "best_single_pp": 87.37,
+      "near_family_oracle_pp": 86.91,
+      "near_best_single_pp": 82.51
+    },
+    "formula_disjoint": {
+      "queries": 5261,
+      "per_method_correct": {
+        "cosine_greedy": 4586,
+        "modified_cosine": 4585,
+        "ms2deepscore_2x_public": 4286,
+        "neutral_loss_sqrt_cosine": 4623,
+        "noise_v1": 4633,
+        "official_dreams": 4567,
+        "p2b_noise_v1_frozen": 4643,
+        "p2b_official_frozen": 4631,
+        "p2b_sqrt_cosine": 4638,
+        "p2b_unweighted_entropy": 4638,
+        "spec2vec_gnps_public": 4600,
+        "weighted_spectral_entropy": 4644
+      },
+      "best_pair": {
+        "method_a": "cosine_greedy",
+        "method_b": "noise_v1",
+        "oracle_union_pp": 91.52252423493633,
+        "gain_vs_best_single_pp": 3.250332636380918
+      },
+      "oracle_unions_pp": {
+        "weighted+noise+p2b": 91.94,
+        "weighted+noise": 91.33,
+        "weighted+spec2vec+noise": 92.45,
+        "all_12": 94.28
+      },
+      "best_single_pp": 88.27,
+      "near_family_oracle_pp": 86.28,
+      "near_best_single_pp": 80.1
+    }
+  }
+}

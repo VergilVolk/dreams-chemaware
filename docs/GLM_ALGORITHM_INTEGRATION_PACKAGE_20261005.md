@@ -55,6 +55,14 @@
 3. **near-core 墓地**：所有全局重排在极近异构体上回退；
 4. **公开基线披露**：MS2DeepScore/SpecVec 训练于 GNPS 生态，零重叠保证仅覆盖 MSG/MoNA。
 
+## 5.5 方法互补性（12 方法 oracle 分析，本地已验证计算）
+
+- **最佳二元组**：noise V1 + WSE → identity **89.98%**（比最佳单方法 +2.61pp）；formula 面板最佳对是 **cosine + noise V1 → 91.52%**（+3.25pp）——互补性来自**分歧**而非强度（谦逊的 cosine 在 formula 面板是最有价值的搭档）；
+- **三元组** WSE+Spec2Vec+noise V1：90.98 / 92.45pp；
+- **全体 12 方法 oracle**：92.90 / 94.28pp（+5.53 / +6.01pp）；
+- **最难子集上互补性最大**：near 子集 family oracle vs 最佳单方法 = identity **+4.40pp**（86.91 vs 82.51）、formula **+6.18pp**（86.28 vs 80.10）——**方法们在不同的分子上失败**，这是候选层路由的立项实证（此前 grand fusion 文档引用的 +3.22/+3.67pp 三专家 oracle 现在有 12 方法版验证数据支撑）；
+- 工件：`method_complementarity.json` + `method_complementarity_pairs.csv`（66 对全组合）。
+
 ## 6. 整合不封存：已排队的前向路径
 
 | 层 | 状态 | 入口工件 |
