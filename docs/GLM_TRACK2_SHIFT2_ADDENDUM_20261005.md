@@ -30,6 +30,14 @@
 3. 五命中扩展：换 WSE 复核 + 查 MoNA/本地库第二来源 + MSV 公共库（MASST 式）外查；
 4. 天梯图渲染版（补 R@5/10/20 列）。
 
+## 增补 4（熵复核无效声明——重要）
+- `lcnec_dark_wse_crosscheck.csv` **作废**：熵相似度为凭记忆手写实现，分母错误
+  （同谱对只得 ~0.03–0.11，恒近零）。**余弦试点与身份表不受影响**（其数值与
+  manifest 连接自洽）。
+- 正确路径：改用 `tasks/noise_gnps_article_spectral_scores.py` 的
+  `weighted_entropy_similarity`（钉死 `_ms_entropy` 官方后端，基准 WSE 同源）
+  重新复核——下一动作。
+
 ## 增补 3（晨间核查结果）
 - OMIX 三候选**全部排除**为 Quartet 室间数据：OMIX013254=神经元共培养峰表；
   OMIX008286=ChiHOPE 队列（2,148 血浆 LC-MS/MS，398MB，**受控访问**）；
