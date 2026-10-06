@@ -1,5 +1,6 @@
 {
-  "status": "GLM_S1_VALIDATION",
+  "status": "RETRACTED_20261007_TRUTH_LEAK",
+  "retraction": "S1 used positive_vs_best_negative_margin, which is computed from the true positive's score and therefore leaks the answer key. S1_recall1 equals the oracle bound because of this leak, not because margin selection is deployable. Truth-blind gap selection achieves only +0.25/+0.65pp (CI crossing zero). See docs/GLM_ENSEMBLE_COMPLEMENTARITY_RETRACTION_AND_TRUTHBLIND_RESULT_20261007.md and deliverables/GLM_gnps_article_ladder/run_local/truthblind_ensemble.json.",
   "panels": {
     "identity_disjoint": {
       "S1_recall1": 92.3,

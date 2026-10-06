@@ -1,0 +1,347 @@
+{
+  "status": "GLM_ROUTER_V2",
+  "panels": {
+    "identity_disjoint": {
+      "_best_single": {
+        "method": "weighted_spectral_entropy",
+        "recall1": 87.37
+      },
+      "R2_router_logreg": {
+        "trained_on": "formula_disjoint",
+        "recall1": 87.75,
+        "near_recall1": 82.92,
+        "delta_vs_best_single_pp": 0.38,
+        "ci95_vs_best_single": [
+          0.09,
+          0.66
+        ],
+        "supervised": true,
+        "selection_distribution": {
+          "official_dreams": {
+            "selected": 610,
+            "accuracy": 73.93
+          },
+          "noise_v1": {
+            "selected": 1023,
+            "accuracy": 75.17
+          },
+          "cosine_greedy": {
+            "selected": 773,
+            "accuracy": 87.45
+          },
+          "modified_cosine": {
+            "selected": 300,
+            "accuracy": 66.33
+          },
+          "weighted_spectral_entropy": {
+            "selected": 506,
+            "accuracy": 90.12
+          },
+          "p2b_sqrt_cosine": {
+            "selected": 197,
+            "accuracy": 86.8
+          },
+          "p2b_unweighted_entropy": {
+            "selected": 270,
+            "accuracy": 85.93
+          },
+          "neutral_loss_sqrt_cosine": {
+            "selected": 198,
+            "accuracy": 88.89
+          },
+          "p2b_official_frozen": {
+            "selected": 62,
+            "accuracy": 62.9
+          },
+          "p2b_noise_v1_frozen": {
+            "selected": 124,
+            "accuracy": 60.48
+          },
+          "ms2deepscore_2x_public": {
+            "selected": 936,
+            "accuracy": 74.68
+          },
+          "spec2vec_gnps_public": {
+            "selected": 1629,
+            "accuracy": 88.09
+          },
+          "entropy_raw_public": {
+            "selected": 1716,
+            "accuracy": 97.49
+          },
+          "denoising_search_public": {
+            "selected": 2651,
+            "accuracy": 97.96
+          }
+        }
+      },
+      "R2_router_hgb": {
+        "trained_on": "formula_disjoint",
+        "recall1": 90.3,
+        "near_recall1": 86.59,
+        "delta_vs_best_single_pp": 2.93,
+        "ci95_vs_best_single": [
+          2.55,
+          3.33
+        ],
+        "supervised": true,
+        "selection_distribution": {
+          "official_dreams": {
+            "selected": 777,
+            "accuracy": 88.8
+          },
+          "noise_v1": {
+            "selected": 1049,
+            "accuracy": 83.89
+          },
+          "cosine_greedy": {
+            "selected": 603,
+            "accuracy": 85.9
+          },
+          "modified_cosine": {
+            "selected": 802,
+            "accuracy": 90.02
+          },
+          "weighted_spectral_entropy": {
+            "selected": 1294,
+            "accuracy": 93.74
+          },
+          "p2b_sqrt_cosine": {
+            "selected": 455,
+            "accuracy": 91.65
+          },
+          "p2b_unweighted_entropy": {
+            "selected": 871,
+            "accuracy": 94.6
+          },
+          "neutral_loss_sqrt_cosine": {
+            "selected": 350,
+            "accuracy": 86.0
+          },
+          "p2b_official_frozen": {
+            "selected": 546,
+            "accuracy": 91.03
+          },
+          "p2b_noise_v1_frozen": {
+            "selected": 560,
+            "accuracy": 92.14
+          },
+          "ms2deepscore_2x_public": {
+            "selected": 787,
+            "accuracy": 87.67
+          },
+          "spec2vec_gnps_public": {
+            "selected": 959,
+            "accuracy": 88.95
+          },
+          "entropy_raw_public": {
+            "selected": 873,
+            "accuracy": 93.01
+          },
+          "denoising_search_public": {
+            "selected": 1069,
+            "accuracy": 93.17
+          }
+        }
+      },
+      "R2_learned_fusion": {
+        "trained_on": "formula_disjoint",
+        "recall1": 87.84,
+        "near_recall1": 83.09,
+        "delta_vs_best_single_pp": 0.47,
+        "ci95_vs_best_single": [
+          0.14,
+          0.81
+        ],
+        "supervised": true,
+        "fusion_weights": {
+          "official_dreams": 0.005,
+          "noise_v1": 0.7207,
+          "cosine_greedy": 0.4028,
+          "modified_cosine": 0.3416,
+          "weighted_spectral_entropy": 0.5841,
+          "p2b_sqrt_cosine": -1.9085,
+          "p2b_unweighted_entropy": 0.6659,
+          "neutral_loss_sqrt_cosine": 0.7191,
+          "p2b_official_frozen": -0.8776,
+          "p2b_noise_v1_frozen": 0.5059,
+          "ms2deepscore_2x_public": 0.1429,
+          "spec2vec_gnps_public": 0.3974,
+          "entropy_raw_public": 0.3842,
+          "denoising_search_public": 0.7921
+        }
+      }
+    },
+    "formula_disjoint": {
+      "_best_single": {
+        "method": "weighted_spectral_entropy",
+        "recall1": 88.27
+      },
+      "R2_router_logreg": {
+        "trained_on": "identity_disjoint",
+        "recall1": 88.96,
+        "near_recall1": 81.18,
+        "delta_vs_best_single_pp": 0.69,
+        "ci95_vs_best_single": [
+          0.25,
+          1.12
+        ],
+        "supervised": true,
+        "selection_distribution": {
+          "official_dreams": {
+            "selected": 220,
+            "accuracy": 72.27
+          },
+          "noise_v1": {
+            "selected": 568,
+            "accuracy": 83.8
+          },
+          "cosine_greedy": {
+            "selected": 154,
+            "accuracy": 72.08
+          },
+          "modified_cosine": {
+            "selected": 532,
+            "accuracy": 85.34
+          },
+          "weighted_spectral_entropy": {
+            "selected": 679,
+            "accuracy": 94.7
+          },
+          "p2b_sqrt_cosine": {
+            "selected": 406,
+            "accuracy": 97.54
+          },
+          "p2b_unweighted_entropy": {
+            "selected": 118,
+            "accuracy": 98.31
+          },
+          "neutral_loss_sqrt_cosine": {
+            "selected": 88,
+            "accuracy": 86.36
+          },
+          "p2b_official_frozen": {
+            "selected": 50,
+            "accuracy": 80.0
+          },
+          "p2b_noise_v1_frozen": {
+            "selected": 89,
+            "accuracy": 89.89
+          },
+          "ms2deepscore_2x_public": {
+            "selected": 503,
+            "accuracy": 70.38
+          },
+          "spec2vec_gnps_public": {
+            "selected": 432,
+            "accuracy": 93.98
+          },
+          "entropy_raw_public": {
+            "selected": 720,
+            "accuracy": 96.11
+          },
+          "denoising_search_public": {
+            "selected": 702,
+            "accuracy": 96.44
+          }
+        }
+      },
+      "R2_router_hgb": {
+        "trained_on": "identity_disjoint",
+        "recall1": 92.3,
+        "near_recall1": 86.92,
+        "delta_vs_best_single_pp": 4.03,
+        "ci95_vs_best_single": [
+          3.48,
+          4.58
+        ],
+        "supervised": true,
+        "selection_distribution": {
+          "official_dreams": {
+            "selected": 96,
+            "accuracy": 64.58
+          },
+          "noise_v1": {
+            "selected": 250,
+            "accuracy": 82.4
+          },
+          "cosine_greedy": {
+            "selected": 827,
+            "accuracy": 98.67
+          },
+          "modified_cosine": {
+            "selected": 561,
+            "accuracy": 97.15
+          },
+          "weighted_spectral_entropy": {
+            "selected": 354,
+            "accuracy": 91.81
+          },
+          "p2b_sqrt_cosine": {
+            "selected": 224,
+            "accuracy": 91.96
+          },
+          "p2b_unweighted_entropy": {
+            "selected": 45,
+            "accuracy": 33.33
+          },
+          "neutral_loss_sqrt_cosine": {
+            "selected": 139,
+            "accuracy": 75.54
+          },
+          "p2b_official_frozen": {
+            "selected": 2027,
+            "accuracy": 98.91
+          },
+          "p2b_noise_v1_frozen": {
+            "selected": 82,
+            "accuracy": 47.56
+          },
+          "ms2deepscore_2x_public": {
+            "selected": 92,
+            "accuracy": 64.13
+          },
+          "spec2vec_gnps_public": {
+            "selected": 133,
+            "accuracy": 72.18
+          },
+          "entropy_raw_public": {
+            "selected": 277,
+            "accuracy": 92.06
+          },
+          "denoising_search_public": {
+            "selected": 154,
+            "accuracy": 79.22
+          }
+        }
+      },
+      "R2_learned_fusion": {
+        "trained_on": "identity_disjoint",
+        "recall1": 88.84,
+        "near_recall1": 81.01,
+        "delta_vs_best_single_pp": 0.57,
+        "ci95_vs_best_single": [
+          0.04,
+          1.08
+        ],
+        "supervised": true,
+        "fusion_weights": {
+          "official_dreams": 0.1395,
+          "noise_v1": 0.5971,
+          "cosine_greedy": 0.335,
+          "modified_cosine": 0.4093,
+          "weighted_spectral_entropy": 0.4717,
+          "p2b_sqrt_cosine": -2.5143,
+          "p2b_unweighted_entropy": 0.9662,
+          "neutral_loss_sqrt_cosine": 0.6158,
+          "p2b_official_frozen": -0.5746,
+          "p2b_noise_v1_frozen": 0.5137,
+          "ms2deepscore_2x_public": 0.1959,
+          "spec2vec_gnps_public": 0.334,
+          "entropy_raw_public": 1.0352,
+          "denoising_search_public": 0.2418
+        }
+      }
+    }
+  }
+}

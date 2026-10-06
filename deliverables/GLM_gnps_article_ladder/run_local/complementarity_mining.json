@@ -1,5 +1,6 @@
 {
-  "status": "GLM_COMPLEMENTARITY_MINING_COMPLETE",
+  "status": "PARTIALLY_RETRACTED_20261007",
+  "retraction": "S1_margin_selection and S6_disagreement_arbiter used positive_vs_best_negative_margin, an oracle-flavored signal (computed from the true positive's score). Their rows are upper-bound references, NOT deployable strategies. S2/S3/S5 are rank-based (truth-blind) and remain valid. S4 is oracle by construction. See docs/GLM_ENSEMBLE_COMPLEMENTARITY_RETRACTION_AND_TRUTHBLIND_RESULT_20261007.md.",
   "panels": {
     "identity_disjoint": {
       "S1_margin_selection": {

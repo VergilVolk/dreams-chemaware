@@ -1,0 +1,311 @@
+{
+  "status": "GLM_RISK_COVERAGE",
+  "panels": {
+    "identity_disjoint": {
+      "risk_coverage": {
+        "official_dreams": {
+          "cov50": 99.38,
+          "cov60": 98.94,
+          "cov70": 97.62,
+          "cov80": 94.9,
+          "cov90": 90.56,
+          "cov95": 88.02,
+          "cov100": 85.36
+        },
+        "noise_v1": {
+          "cov50": 99.42,
+          "cov60": 99.03,
+          "cov70": 98.17,
+          "cov80": 95.59,
+          "cov90": 91.52,
+          "cov95": 89.18,
+          "cov100": 86.56
+        },
+        "cosine_greedy": {
+          "cov50": 99.2,
+          "cov60": 98.58,
+          "cov70": 96.97,
+          "cov80": 93.45,
+          "cov90": 89.23,
+          "cov95": 87.23,
+          "cov100": 85.04
+        },
+        "modified_cosine": {
+          "cov50": 99.2,
+          "cov60": 98.58,
+          "cov70": 96.95,
+          "cov80": 93.43,
+          "cov90": 89.21,
+          "cov95": 87.22,
+          "cov100": 85.03
+        },
+        "weighted_spectral_entropy": {
+          "cov50": 99.6,
+          "cov60": 99.41,
+          "cov70": 98.86,
+          "cov80": 96.46,
+          "cov90": 92.43,
+          "cov95": 90.2,
+          "cov100": 87.37
+        },
+        "p2b_sqrt_cosine": {
+          "cov50": 99.47,
+          "cov60": 99.36,
+          "cov70": 98.66,
+          "cov80": 96.09,
+          "cov90": 91.91,
+          "cov95": 89.54,
+          "cov100": 87.04
+        },
+        "p2b_unweighted_entropy": {
+          "cov50": 99.51,
+          "cov60": 99.35,
+          "cov70": 98.6,
+          "cov80": 96.26,
+          "cov90": 92.01,
+          "cov95": 89.64,
+          "cov100": 86.98
+        },
+        "neutral_loss_sqrt_cosine": {
+          "cov50": 99.55,
+          "cov60": 99.44,
+          "cov70": 98.65,
+          "cov80": 95.85,
+          "cov90": 91.6,
+          "cov95": 89.32,
+          "cov100": 86.81
+        },
+        "p2b_official_frozen": {
+          "cov50": 99.53,
+          "cov60": 99.48,
+          "cov70": 98.69,
+          "cov80": 95.96,
+          "cov90": 91.77,
+          "cov95": 89.4,
+          "cov100": 86.98
+        },
+        "p2b_noise_v1_frozen": {
+          "cov50": 99.56,
+          "cov60": 99.47,
+          "cov70": 98.67,
+          "cov80": 96.04,
+          "cov90": 91.85,
+          "cov95": 89.57,
+          "cov100": 87.13
+        },
+        "ms2deepscore_2x_public": {
+          "cov50": 97.2,
+          "cov60": 95.73,
+          "cov70": 92.92,
+          "cov80": 88.51,
+          "cov90": 83.84,
+          "cov95": 81.47,
+          "cov100": 79.12
+        },
+        "spec2vec_gnps_public": {
+          "cov50": 99.44,
+          "cov60": 99.33,
+          "cov70": 98.87,
+          "cov80": 95.65,
+          "cov90": 91.28,
+          "cov95": 88.95,
+          "cov100": 86.29
+        },
+        "entropy_raw_public": {
+          "cov50": 99.84,
+          "cov60": 99.62,
+          "cov70": 99.03,
+          "cov80": 96.76,
+          "cov90": 92.56,
+          "cov95": 90.01,
+          "cov100": 87.31
+        },
+        "denoising_search_public": {
+          "cov50": 99.78,
+          "cov60": 99.59,
+          "cov70": 99.05,
+          "cov80": 96.6,
+          "cov90": 92.33,
+          "cov95": 89.81,
+          "cov100": 87.13
+        }
+      },
+      "failure_band": {
+        "wse_wrong_total": 1389,
+        "recoverable_by_oracle": 639,
+        "winning_method_gap_percentile_mean": 0.115,
+        "winning_method_gap_percentile_below_60pct": 99.6,
+        "wse_correct_gap_percentile_mean": 0.553,
+        "mean_pairwise_correctness_phi": 0.763,
+        "winner_counts": {
+          "cosine_greedy": 177,
+          "denoising_search_public": 190,
+          "entropy_raw_public": 166,
+          "modified_cosine": 177,
+          "ms2deepscore_2x_public": 253,
+          "neutral_loss_sqrt_cosine": 163,
+          "noise_v1": 287,
+          "official_dreams": 249,
+          "p2b_noise_v1_frozen": 171,
+          "p2b_official_frozen": 161,
+          "p2b_sqrt_cosine": 110,
+          "p2b_unweighted_entropy": 109,
+          "spec2vec_gnps_public": 230
+        }
+      }
+    },
+    "formula_disjoint": {
+      "risk_coverage": {
+        "official_dreams": {
+          "cov50": 99.62,
+          "cov60": 99.37,
+          "cov70": 97.88,
+          "cov80": 95.56,
+          "cov90": 91.53,
+          "cov95": 89.33,
+          "cov100": 86.81
+        },
+        "noise_v1": {
+          "cov50": 99.54,
+          "cov60": 99.37,
+          "cov70": 98.59,
+          "cov80": 96.34,
+          "cov90": 92.5,
+          "cov95": 90.41,
+          "cov100": 88.06
+        },
+        "cosine_greedy": {
+          "cov50": 99.54,
+          "cov60": 99.05,
+          "cov70": 98.32,
+          "cov80": 95.18,
+          "cov90": 91.06,
+          "cov95": 89.25,
+          "cov100": 87.17
+        },
+        "modified_cosine": {
+          "cov50": 99.54,
+          "cov60": 99.05,
+          "cov70": 98.26,
+          "cov80": 95.1,
+          "cov90": 91.04,
+          "cov95": 89.23,
+          "cov100": 87.15
+        },
+        "weighted_spectral_entropy": {
+          "cov50": 99.73,
+          "cov60": 99.52,
+          "cov70": 99.27,
+          "cov80": 96.74,
+          "cov90": 93.24,
+          "cov95": 91.07,
+          "cov100": 88.27
+        },
+        "p2b_sqrt_cosine": {
+          "cov50": 99.66,
+          "cov60": 99.49,
+          "cov70": 99.24,
+          "cov80": 96.55,
+          "cov90": 92.65,
+          "cov95": 90.47,
+          "cov100": 88.16
+        },
+        "p2b_unweighted_entropy": {
+          "cov50": 99.62,
+          "cov60": 99.49,
+          "cov70": 99.05,
+          "cov80": 96.72,
+          "cov90": 92.75,
+          "cov95": 90.57,
+          "cov100": 88.16
+        },
+        "neutral_loss_sqrt_cosine": {
+          "cov50": 99.66,
+          "cov60": 99.59,
+          "cov70": 99.24,
+          "cov80": 96.53,
+          "cov90": 92.5,
+          "cov95": 90.45,
+          "cov100": 87.87
+        },
+        "p2b_official_frozen": {
+          "cov50": 99.66,
+          "cov60": 99.56,
+          "cov70": 99.32,
+          "cov80": 96.65,
+          "cov90": 92.65,
+          "cov95": 90.45,
+          "cov100": 88.03
+        },
+        "p2b_noise_v1_frozen": {
+          "cov50": 99.66,
+          "cov60": 99.56,
+          "cov70": 99.38,
+          "cov80": 96.72,
+          "cov90": 92.86,
+          "cov95": 90.81,
+          "cov100": 88.25
+        },
+        "ms2deepscore_2x_public": {
+          "cov50": 97.64,
+          "cov60": 96.42,
+          "cov70": 94.43,
+          "cov80": 90.28,
+          "cov90": 85.7,
+          "cov95": 83.67,
+          "cov100": 81.47
+        },
+        "spec2vec_gnps_public": {
+          "cov50": 99.58,
+          "cov60": 99.56,
+          "cov70": 99.13,
+          "cov80": 96.34,
+          "cov90": 92.14,
+          "cov95": 90.05,
+          "cov100": 87.44
+        },
+        "entropy_raw_public": {
+          "cov50": 99.96,
+          "cov60": 99.71,
+          "cov70": 99.29,
+          "cov80": 97.15,
+          "cov90": 93.2,
+          "cov95": 90.67,
+          "cov100": 88.14
+        },
+        "denoising_search_public": {
+          "cov50": 99.85,
+          "cov60": 99.71,
+          "cov70": 99.38,
+          "cov80": 97.15,
+          "cov90": 92.99,
+          "cov95": 90.57,
+          "cov100": 88.03
+        }
+      },
+      "failure_band": {
+        "wse_wrong_total": 617,
+        "recoverable_by_oracle": 326,
+        "winning_method_gap_percentile_mean": 0.107,
+        "winning_method_gap_percentile_below_60pct": 99.5,
+        "wse_correct_gap_percentile_mean": 0.55,
+        "mean_pairwise_correctness_phi": 0.751,
+        "winner_counts": {
+          "cosine_greedy": 102,
+          "denoising_search_public": 84,
+          "entropy_raw_public": 76,
+          "modified_cosine": 102,
+          "ms2deepscore_2x_public": 133,
+          "neutral_loss_sqrt_cosine": 81,
+          "noise_v1": 161,
+          "official_dreams": 133,
+          "p2b_noise_v1_frozen": 89,
+          "p2b_official_frozen": 79,
+          "p2b_sqrt_cosine": 59,
+          "p2b_unweighted_entropy": 59,
+          "spec2vec_gnps_public": 127
+        }
+      }
+    }
+  }
+}
