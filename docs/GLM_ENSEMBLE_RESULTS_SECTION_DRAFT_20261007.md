@@ -31,6 +31,7 @@ We benchmarked fifteen spectral-similarity methods on two sealed, model-blind GN
 | Fig 1 — metric split scatter (R@1 × pooled AUROC, 15 methods, both panels) | `deliverables/figures/GLM_gnps_metric_split.{svg,pdf,png}` |
 | Fig 2 — gating story: (A) risk-coverage; (B) winner-gap-percentile histogram | `deliverables/figures/GLM_gating_story.{svg,pdf,png}` |
 | Table 2 — truth-blind strategies (6 unsupervised + router splits + learned fusion, Δ vs best single with CI) | `deliverables/GLM_gnps_article_ladder/run15/truthblind_ensemble.json`, `router_v3.json` |
+| Table 2b — U1 vs EACH of the 15 methods (paired CI; significantly better than 11-12/15, never significantly worse) | `run15/u1_vs_each_method.json` |
 | Table 3 — gap calibration (quintile accuracy + AUC per method) | `run15/gap_calibration.json` |
 | Suppl — failure-band structure (winners' percentiles, φ, winner counts) | `run15/risk_coverage.json` |
 

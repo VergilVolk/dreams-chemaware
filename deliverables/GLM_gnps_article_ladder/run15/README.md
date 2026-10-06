@@ -12,6 +12,7 @@
 | spec2vec_2026 低于 2020 版 | `ladder_full.csv` 行 `spec2vec_2026_retrained` | 86.08/87.25 vs 86.29/87.44 |
 | oracle 互补性存在 | `truthblind_ensemble.json` `_oracle_any` | 93.25/94.58 = +5.88/+6.31pp |
 | 无监督 truth-blind 全灭 | `truthblind_ensemble.json` U1–U6 | 全部 CI 跨零，≤±0.25pp |
+| U1 vs 每个单方法（配对CI） | `u1_vs_each_method.json` | 显著胜 11-12/15，对顶部集群 n.s.，从不显著落败 |
 | 泄露清除 router ≈10% 空间 | `router_v3.json` | B +0.61 [+0.15,+1.06]、C +0.51 [+0.09,+0.95]、A +0.23 n.s. |
 | router 信号为真（非伪影） | `router_permutation.json` | 置换 −0.91/−0.54 vs 真实 +0.23/+0.61 |
 | gap 校准好（方法内） | `gap_calibration.json` | AUC 0.86–0.93；Q5 ≈99.3–100% |

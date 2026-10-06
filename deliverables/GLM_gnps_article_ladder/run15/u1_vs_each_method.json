@@ -1,0 +1,315 @@
+{
+  "status": "GLM_U1_VS_EACH_METHOD_CI",
+  "panels": {
+    "identity_disjoint": {
+      "U1_recall1": 87.33,
+      "vs_each": {
+        "official_dreams": {
+          "method_recall1": 85.36,
+          "u1_minus_method_pp": 1.97,
+          "ci95": [
+            1.53,
+            2.42
+          ],
+          "u1_significantly_better": true,
+          "method_significantly_better": false
+        },
+        "noise_v1": {
+          "method_recall1": 86.56,
+          "u1_minus_method_pp": 0.77,
+          "ci95": [
+            0.36,
+            1.18
+          ],
+          "u1_significantly_better": true,
+          "method_significantly_better": false
+        },
+        "cosine_greedy": {
+          "method_recall1": 85.04,
+          "u1_minus_method_pp": 2.29,
+          "ci95": [
+            1.83,
+            2.75
+          ],
+          "u1_significantly_better": true,
+          "method_significantly_better": false
+        },
+        "modified_cosine": {
+          "method_recall1": 85.03,
+          "u1_minus_method_pp": 2.3,
+          "ci95": [
+            1.84,
+            2.76
+          ],
+          "u1_significantly_better": true,
+          "method_significantly_better": false
+        },
+        "weighted_spectral_entropy": {
+          "method_recall1": 87.37,
+          "u1_minus_method_pp": -0.04,
+          "ci95": [
+            -0.4,
+            0.33
+          ],
+          "u1_significantly_better": false,
+          "method_significantly_better": false
+        },
+        "p2b_sqrt_cosine": {
+          "method_recall1": 87.04,
+          "u1_minus_method_pp": 0.29,
+          "ci95": [
+            -0.05,
+            0.63
+          ],
+          "u1_significantly_better": false,
+          "method_significantly_better": false
+        },
+        "p2b_unweighted_entropy": {
+          "method_recall1": 86.98,
+          "u1_minus_method_pp": 0.35,
+          "ci95": [
+            0.01,
+            0.69
+          ],
+          "u1_significantly_better": true,
+          "method_significantly_better": false
+        },
+        "neutral_loss_sqrt_cosine": {
+          "method_recall1": 86.81,
+          "u1_minus_method_pp": 0.52,
+          "ci95": [
+            0.15,
+            0.89
+          ],
+          "u1_significantly_better": true,
+          "method_significantly_better": false
+        },
+        "p2b_official_frozen": {
+          "method_recall1": 86.98,
+          "u1_minus_method_pp": 0.35,
+          "ci95": [
+            0.01,
+            0.71
+          ],
+          "u1_significantly_better": true,
+          "method_significantly_better": false
+        },
+        "p2b_noise_v1_frozen": {
+          "method_recall1": 87.13,
+          "u1_minus_method_pp": 0.2,
+          "ci95": [
+            -0.15,
+            0.55
+          ],
+          "u1_significantly_better": false,
+          "method_significantly_better": false
+        },
+        "ms2deepscore_2x_public": {
+          "method_recall1": 79.12,
+          "u1_minus_method_pp": 8.21,
+          "ci95": [
+            7.58,
+            8.87
+          ],
+          "u1_significantly_better": true,
+          "method_significantly_better": false
+        },
+        "spec2vec_gnps_public": {
+          "method_recall1": 86.29,
+          "u1_minus_method_pp": 1.04,
+          "ci95": [
+            0.63,
+            1.45
+          ],
+          "u1_significantly_better": true,
+          "method_significantly_better": false
+        },
+        "entropy_raw_public": {
+          "method_recall1": 87.31,
+          "u1_minus_method_pp": 0.02,
+          "ci95": [
+            -0.36,
+            0.39
+          ],
+          "u1_significantly_better": false,
+          "method_significantly_better": false
+        },
+        "denoising_search_public": {
+          "method_recall1": 87.13,
+          "u1_minus_method_pp": 0.2,
+          "ci95": [
+            -0.2,
+            0.59
+          ],
+          "u1_significantly_better": false,
+          "method_significantly_better": false
+        },
+        "spec2vec_2026_retrained": {
+          "method_recall1": 86.08,
+          "u1_minus_method_pp": 1.25,
+          "ci95": [
+            0.84,
+            1.66
+          ],
+          "u1_significantly_better": true,
+          "method_significantly_better": false
+        }
+      }
+    },
+    "formula_disjoint": {
+      "U1_recall1": 88.46,
+      "vs_each": {
+        "official_dreams": {
+          "method_recall1": 86.81,
+          "u1_minus_method_pp": 1.65,
+          "ci95": [
+            1.01,
+            2.26
+          ],
+          "u1_significantly_better": true,
+          "method_significantly_better": false
+        },
+        "noise_v1": {
+          "method_recall1": 88.06,
+          "u1_minus_method_pp": 0.4,
+          "ci95": [
+            -0.21,
+            0.99
+          ],
+          "u1_significantly_better": false,
+          "method_significantly_better": false
+        },
+        "cosine_greedy": {
+          "method_recall1": 87.17,
+          "u1_minus_method_pp": 1.29,
+          "ci95": [
+            0.65,
+            1.96
+          ],
+          "u1_significantly_better": true,
+          "method_significantly_better": false
+        },
+        "modified_cosine": {
+          "method_recall1": 87.15,
+          "u1_minus_method_pp": 1.31,
+          "ci95": [
+            0.67,
+            1.98
+          ],
+          "u1_significantly_better": true,
+          "method_significantly_better": false
+        },
+        "weighted_spectral_entropy": {
+          "method_recall1": 88.27,
+          "u1_minus_method_pp": 0.19,
+          "ci95": [
+            -0.32,
+            0.72
+          ],
+          "u1_significantly_better": false,
+          "method_significantly_better": false
+        },
+        "p2b_sqrt_cosine": {
+          "method_recall1": 88.16,
+          "u1_minus_method_pp": 0.3,
+          "ci95": [
+            -0.17,
+            0.8
+          ],
+          "u1_significantly_better": false,
+          "method_significantly_better": false
+        },
+        "p2b_unweighted_entropy": {
+          "method_recall1": 88.16,
+          "u1_minus_method_pp": 0.3,
+          "ci95": [
+            -0.19,
+            0.8
+          ],
+          "u1_significantly_better": false,
+          "method_significantly_better": false
+        },
+        "neutral_loss_sqrt_cosine": {
+          "method_recall1": 87.87,
+          "u1_minus_method_pp": 0.59,
+          "ci95": [
+            0.04,
+            1.14
+          ],
+          "u1_significantly_better": true,
+          "method_significantly_better": false
+        },
+        "p2b_official_frozen": {
+          "method_recall1": 88.03,
+          "u1_minus_method_pp": 0.43,
+          "ci95": [
+            -0.08,
+            0.95
+          ],
+          "u1_significantly_better": false,
+          "method_significantly_better": false
+        },
+        "p2b_noise_v1_frozen": {
+          "method_recall1": 88.25,
+          "u1_minus_method_pp": 0.21,
+          "ci95": [
+            -0.3,
+            0.72
+          ],
+          "u1_significantly_better": false,
+          "method_significantly_better": false
+        },
+        "ms2deepscore_2x_public": {
+          "method_recall1": 81.47,
+          "u1_minus_method_pp": 6.99,
+          "ci95": [
+            6.1,
+            7.87
+          ],
+          "u1_significantly_better": true,
+          "method_significantly_better": false
+        },
+        "spec2vec_gnps_public": {
+          "method_recall1": 87.44,
+          "u1_minus_method_pp": 1.02,
+          "ci95": [
+            0.42,
+            1.65
+          ],
+          "u1_significantly_better": true,
+          "method_significantly_better": false
+        },
+        "entropy_raw_public": {
+          "method_recall1": 88.14,
+          "u1_minus_method_pp": 0.32,
+          "ci95": [
+            -0.25,
+            0.86
+          ],
+          "u1_significantly_better": false,
+          "method_significantly_better": false
+        },
+        "denoising_search_public": {
+          "method_recall1": 88.03,
+          "u1_minus_method_pp": 0.43,
+          "ci95": [
+            -0.15,
+            1.01
+          ],
+          "u1_significantly_better": false,
+          "method_significantly_better": false
+        },
+        "spec2vec_2026_retrained": {
+          "method_recall1": 87.25,
+          "u1_minus_method_pp": 1.21,
+          "ci95": [
+            0.61,
+            1.84
+          ],
+          "u1_significantly_better": true,
+          "method_significantly_better": false
+        }
+      }
+    }
+  }
+}
