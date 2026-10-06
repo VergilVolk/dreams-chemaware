@@ -1,0 +1,369 @@
+{
+  "status": "GLM_GAP_CALIBRATION",
+  "panels": {
+    "identity_disjoint": [
+      {
+        "method": "official_dreams",
+        "recall1": 85.36,
+        "p_correct_by_gap_quintile": [
+          47.2,
+          82.8,
+          97.6,
+          99.5,
+          99.7
+        ],
+        "auc_gap_to_correct": 0.9064
+      },
+      {
+        "method": "noise_v1",
+        "recall1": 86.56,
+        "p_correct_by_gap_quintile": [
+          50.4,
+          85.3,
+          97.9,
+          99.5,
+          99.7
+        ],
+        "auc_gap_to_correct": 0.9083
+      },
+      {
+        "method": "cosine_greedy",
+        "recall1": 85.04,
+        "p_correct_by_gap_quintile": [
+          51.4,
+          78.1,
+          96.7,
+          99.3,
+          99.7
+        ],
+        "auc_gap_to_correct": 0.8861
+      },
+      {
+        "method": "modified_cosine",
+        "recall1": 85.03,
+        "p_correct_by_gap_quintile": [
+          51.4,
+          78.0,
+          96.7,
+          99.3,
+          99.7
+        ],
+        "auc_gap_to_correct": 0.8858
+      },
+      {
+        "method": "weighted_spectral_entropy",
+        "recall1": 87.37,
+        "p_correct_by_gap_quintile": [
+          51.0,
+          87.6,
+          98.6,
+          99.7,
+          99.9
+        ],
+        "auc_gap_to_correct": 0.9206
+      },
+      {
+        "method": "p2b_sqrt_cosine",
+        "recall1": 87.04,
+        "p_correct_by_gap_quintile": [
+          50.8,
+          86.3,
+          98.8,
+          99.4,
+          99.9
+        ],
+        "auc_gap_to_correct": 0.9145
+      },
+      {
+        "method": "p2b_unweighted_entropy",
+        "recall1": 86.98,
+        "p_correct_by_gap_quintile": [
+          49.8,
+          87.0,
+          98.7,
+          99.5,
+          99.9
+        ],
+        "auc_gap_to_correct": 0.915
+      },
+      {
+        "method": "neutral_loss_sqrt_cosine",
+        "recall1": 86.81,
+        "p_correct_by_gap_quintile": [
+          50.7,
+          85.1,
+          99.0,
+          99.5,
+          99.8
+        ],
+        "auc_gap_to_correct": 0.9138
+      },
+      {
+        "method": "p2b_official_frozen",
+        "recall1": 86.98,
+        "p_correct_by_gap_quintile": [
+          51.0,
+          85.4,
+          99.1,
+          99.5,
+          99.8
+        ],
+        "auc_gap_to_correct": 0.9131
+      },
+      {
+        "method": "p2b_noise_v1_frozen",
+        "recall1": 87.13,
+        "p_correct_by_gap_quintile": [
+          51.5,
+          85.8,
+          99.1,
+          99.5,
+          99.8
+        ],
+        "auc_gap_to_correct": 0.9123
+      },
+      {
+        "method": "ms2deepscore_2x_public",
+        "recall1": 79.12,
+        "p_correct_by_gap_quintile": [
+          41.6,
+          66.8,
+          90.9,
+          97.0,
+          99.3
+        ],
+        "auc_gap_to_correct": 0.8659
+      },
+      {
+        "method": "spec2vec_gnps_public",
+        "recall1": 86.29,
+        "p_correct_by_gap_quintile": [
+          48.9,
+          84.6,
+          99.0,
+          99.4,
+          99.7
+        ],
+        "auc_gap_to_correct": 0.9139
+      },
+      {
+        "method": "entropy_raw_public",
+        "recall1": 87.31,
+        "p_correct_by_gap_quintile": [
+          49.5,
+          88.2,
+          99.0,
+          99.8,
+          100.0
+        ],
+        "auc_gap_to_correct": 0.9261
+      },
+      {
+        "method": "denoising_search_public",
+        "recall1": 87.13,
+        "p_correct_by_gap_quintile": [
+          49.2,
+          87.6,
+          99.0,
+          99.8,
+          100.0
+        ],
+        "auc_gap_to_correct": 0.9257
+      },
+      {
+        "method": "spec2vec_2026_retrained",
+        "recall1": 86.08,
+        "p_correct_by_gap_quintile": [
+          48.3,
+          84.2,
+          98.8,
+          99.5,
+          99.6
+        ],
+        "auc_gap_to_correct": 0.9147
+      }
+    ],
+    "formula_disjoint": [
+      {
+        "method": "official_dreams",
+        "recall1": 86.81,
+        "p_correct_by_gap_quintile": [
+          51.8,
+          84.1,
+          99.0,
+          99.4,
+          99.7
+        ],
+        "auc_gap_to_correct": 0.9052
+      },
+      {
+        "method": "noise_v1",
+        "recall1": 88.06,
+        "p_correct_by_gap_quintile": [
+          54.9,
+          87.3,
+          98.7,
+          99.6,
+          99.8
+        ],
+        "auc_gap_to_correct": 0.9054
+      },
+      {
+        "method": "cosine_greedy",
+        "recall1": 87.17,
+        "p_correct_by_gap_quintile": [
+          55.2,
+          83.5,
+          97.9,
+          99.3,
+          99.9
+        ],
+        "auc_gap_to_correct": 0.893
+      },
+      {
+        "method": "modified_cosine",
+        "recall1": 87.15,
+        "p_correct_by_gap_quintile": [
+          55.3,
+          83.3,
+          97.9,
+          99.3,
+          99.9
+        ],
+        "auc_gap_to_correct": 0.8924
+      },
+      {
+        "method": "weighted_spectral_entropy",
+        "recall1": 88.27,
+        "p_correct_by_gap_quintile": [
+          54.4,
+          88.4,
+          98.8,
+          99.9,
+          99.9
+        ],
+        "auc_gap_to_correct": 0.9228
+      },
+      {
+        "method": "p2b_sqrt_cosine",
+        "recall1": 88.16,
+        "p_correct_by_gap_quintile": [
+          54.6,
+          87.7,
+          99.1,
+          99.4,
+          99.9
+        ],
+        "auc_gap_to_correct": 0.9146
+      },
+      {
+        "method": "p2b_unweighted_entropy",
+        "recall1": 88.16,
+        "p_correct_by_gap_quintile": [
+          53.9,
+          88.4,
+          99.1,
+          99.4,
+          99.9
+        ],
+        "auc_gap_to_correct": 0.9151
+      },
+      {
+        "method": "neutral_loss_sqrt_cosine",
+        "recall1": 87.87,
+        "p_correct_by_gap_quintile": [
+          53.3,
+          87.3,
+          99.2,
+          99.9,
+          99.6
+        ],
+        "auc_gap_to_correct": 0.9186
+      },
+      {
+        "method": "p2b_official_frozen",
+        "recall1": 88.03,
+        "p_correct_by_gap_quintile": [
+          53.5,
+          87.9,
+          99.1,
+          99.8,
+          99.7
+        ],
+        "auc_gap_to_correct": 0.9172
+      },
+      {
+        "method": "p2b_noise_v1_frozen",
+        "recall1": 88.25,
+        "p_correct_by_gap_quintile": [
+          54.4,
+          88.2,
+          99.1,
+          99.9,
+          99.6
+        ],
+        "auc_gap_to_correct": 0.9168
+      },
+      {
+        "method": "ms2deepscore_2x_public",
+        "recall1": 81.47,
+        "p_correct_by_gap_quintile": [
+          46.3,
+          71.8,
+          92.1,
+          97.5,
+          99.6
+        ],
+        "auc_gap_to_correct": 0.8644
+      },
+      {
+        "method": "spec2vec_gnps_public",
+        "recall1": 87.44,
+        "p_correct_by_gap_quintile": [
+          51.9,
+          86.6,
+          99.4,
+          99.6,
+          99.6
+        ],
+        "auc_gap_to_correct": 0.9157
+      },
+      {
+        "method": "entropy_raw_public",
+        "recall1": 88.14,
+        "p_correct_by_gap_quintile": [
+          52.1,
+          89.4,
+          99.2,
+          99.9,
+          100.0
+        ],
+        "auc_gap_to_correct": 0.9269
+      },
+      {
+        "method": "denoising_search_public",
+        "recall1": 88.03,
+        "p_correct_by_gap_quintile": [
+          51.5,
+          89.4,
+          99.2,
+          99.9,
+          100.0
+        ],
+        "auc_gap_to_correct": 0.9275
+      },
+      {
+        "method": "spec2vec_2026_retrained",
+        "recall1": 87.25,
+        "p_correct_by_gap_quintile": [
+          52.3,
+          85.5,
+          99.2,
+          99.6,
+          99.6
+        ],
+        "auc_gap_to_correct": 0.915
+      }
+    ]
+  }
+}

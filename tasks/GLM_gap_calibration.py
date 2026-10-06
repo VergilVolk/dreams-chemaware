@@ -7,6 +7,7 @@ uninformative about correctness, which explains why every selection and
 fusion strategy collapses to ~0 gain despite +4.6/+5.8pp oracle headroom.
 """
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -17,7 +18,8 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tasks"))
 from GLM_truthblind_fusion_analysis import load_panel, per_query_stats  # noqa: E402
 
-OUT = ROOT / "deliverables/GLM_gnps_article_ladder/run_local"
+OUT = Path(os.environ.get(
+    "GLM_OUT_DIR", "deliverables/GLM_gnps_article_ladder/run_local"))
 report = {"status": "GLM_GAP_CALIBRATION", "panels": {}}
 for panel in ("identity_disjoint", "formula_disjoint"):
     g, methods, mol = load_panel(panel)

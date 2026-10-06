@@ -87,3 +87,14 @@
 | `tasks/GLM_mine_complementarity.py`、`GLM_validate_s1_margin_selection.py`、`GLM_router_v2.py` | 泄露实现 | 归档为反面教材 |
 
 > 一句话总结：**集成路由的 5pp 蛋糕在地图上（oracle），但钥匙不在置信度里——赢家不知道自己赢；置信度真正可靠的用途是把 60% 的 query 圈进 99.5% 精度自动带，把剩下的硬币抛给正交证据范式。**
+
+## 8. 15 方法复检（spec2vec_2026 入场后，同日）
+
+第 15 方法（MS2LDA 2.0 重训 Spec2Vec 2026）加入后全套真值盲分析重跑（`deliverables/GLM_gnps_article_ladder/run15/`）：
+
+- Oracle-any：93.25 / 94.58（+5.88 / +6.31pp）——结论不变。
+- 无监督 U1–U6：全部 CI 跨零（U1 −0.04 / +0.19）——结论不变。
+- 泄露清除 router：Split B HGB **+0.61pp [+0.15, +1.06]**、Split C HGB **+0.51pp [+0.09, +0.95]**（3 分割之 2 显著）、Split A +0.23 n.s.；learned fusion B +0.50 [0.00, +1.01] 边缘。监督路由的可开采份额修正为 ≈ +0.5pp（oracle 空间的 ~10%）。
+- 校准/失败带结构：winners' gap 百分位 0.115 / 0.106、φ = 0.762 / 0.748——机制不变。
+- noise_v1 仍是可恢复集最大贡献者（287/647、161/332，15 方法第一）。
+- spec2vec_2026 本身：R@1 86.08 / 87.25（低于 2020 版），判别/检索分离的又一实例。

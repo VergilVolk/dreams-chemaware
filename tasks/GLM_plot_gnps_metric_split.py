@@ -8,9 +8,10 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import pandas as pd
 
-LADDER = Path("deliverables/GLM_gnps_article_ladder/run_local/ladder_full.csv")
+LADDER = Path("deliverables/GLM_gnps_article_ladder/run15/ladder_full.csv")
 OUT = Path("deliverables/figures")
-INK, GRAY, GREEN, BLUE, RED = "#1a1a1a", "#9a9a9a", "#1e8449", "#1f618d", "#c0392b"
+INK, GRAY, GREEN, BLUE, RED, ORANGE = ("#1a1a1a", "#9a9a9a", "#1e8449",
+                                       "#1f618d", "#c0392b", "#b9770e")
 
 ladder = pd.read_csv(LADDER)
 GROUPS = {
@@ -25,7 +26,10 @@ GROUPS = {
     "p2b_official_frozen": (BLUE, "D", "P2b frozen on official"),
     "p2b_noise_v1_frozen": (BLUE, "D", "P2b frozen on noise V1"),
     "ms2deepscore_2x_public": (GRAY, "^", "MS2DeepScore 2.x (public)"),
-    "spec2vec_gnps_public": (GRAY, "^", "Spec2Vec (public)"),
+    "spec2vec_gnps_public": (GRAY, "^", "Spec2Vec 2020 (public)"),
+    "entropy_raw_public": (GREEN, "v", "raw entropy (public)"),
+    "denoising_search_public": (GREEN, "P", "denoising search (public)"),
+    "spec2vec_2026_retrained": (ORANGE, "^", "Spec2Vec 2026 (public)"),
 }
 LABEL_DX = {"noise_v1": (6, 4), "weighted_spectral_entropy": (-8, 6),
             "official_dreams": (6, -10), "spec2vec_gnps_public": (6, 3),
@@ -67,7 +71,7 @@ for ax, panel, title in zip(
                             best_auc["gnps_10ppm_pooled_pairwise_auroc"]),
                     arrowprops=dict(arrowstyle="->", color=GRAY, lw=1.0, ls="--"))
 fig.suptitle("Metric split on the sealed GNPS benchmark: the best discriminator "
-             "is not the best identifier (12 methods, verified numbers)",
+             "is not the best identifier (15 methods, verified numbers)",
              fontsize=11.5, y=0.99)
 fig.tight_layout(rect=(0, 0, 1, 0.95))
 for ext in ("svg", "pdf", "png"):

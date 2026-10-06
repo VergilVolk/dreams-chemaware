@@ -31,6 +31,7 @@ Verification: per-method R@1 must reproduce the frozen per-query tables.
 from __future__ import annotations
 
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -45,8 +46,11 @@ sys.path.insert(0, str(ROOT / "tasks"))
 from evaluate_gnps_gold_silver_10ppm_embeddings import graph_from_panel  # noqa: E402
 
 BENCH = ROOT / "data/validation/GLM_gnps_identity_panel_reconstruction"
-RUN = ROOT / "data/validation/GLM_gnps_article_benchmark_challengers/run_local"
-OUT = ROOT / "deliverables/GLM_gnps_article_ladder/run_local"
+RUN = Path(os.environ.get("GLM_RUN_DIR",
+                          "data/validation/GLM_gnps_article_benchmark_"
+                          "challengers/run_local"))
+OUT = Path(os.environ.get(
+    "GLM_OUT_DIR", "deliverables/GLM_gnps_article_ladder/run_local"))
 PANELS = ("identity_disjoint", "formula_disjoint")
 BOOT_N = 10000
 RNG = np.random.default_rng(20261007)

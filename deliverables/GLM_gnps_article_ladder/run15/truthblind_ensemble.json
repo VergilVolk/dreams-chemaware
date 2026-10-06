@@ -1,0 +1,310 @@
+{
+  "status": "GLM_TRUTHBLIND_ENSEMBLE_ANALYSIS",
+  "retraction": "Earlier S1 margin-selection used positive_vs_best_negative_margin which leaks the answer key; it is an oracle reference, not a deployable algorithm.",
+  "panels": {
+    "identity_disjoint": {
+      "_best_single": {
+        "method": "weighted_spectral_entropy",
+        "recall1": 87.37
+      },
+      "_oracle_any": {
+        "recall1": 93.25
+      },
+      "U1_select_raw_gap": {
+        "recall1": 87.33,
+        "near_recall1": 82.42,
+        "delta_vs_best_single_pp": -0.04,
+        "ci95_vs_best_single": [
+          -0.4,
+          0.33
+        ],
+        "supervised": false
+      },
+      "U2_select_batch_z_gap": {
+        "recall1": 85.58,
+        "near_recall1": 80.08,
+        "delta_vs_best_single_pp": -1.79,
+        "ci95_vs_best_single": [
+          -2.26,
+          -1.33
+        ],
+        "supervised": false
+      },
+      "U2x_select_transfer_z_gap": {
+        "recall1": 85.58,
+        "near_recall1": 80.06,
+        "delta_vs_best_single_pp": -1.79,
+        "ci95_vs_best_single": [
+          -2.25,
+          -1.32
+        ],
+        "supervised": false
+      },
+      "U3_select_batch_pct_gap": {
+        "recall1": 86.58,
+        "near_recall1": 81.49,
+        "delta_vs_best_single_pp": -0.79,
+        "ci95_vs_best_single": [
+          -1.2,
+          -0.38
+        ],
+        "supervised": false
+      },
+      "U4_query_z_fusion": {
+        "recall1": 87.31,
+        "near_recall1": 82.42,
+        "delta_vs_best_single_pp": -0.06,
+        "ci95_vs_best_single": [
+          -0.36,
+          0.24
+        ],
+        "supervised": false
+      },
+      "U5_borda_fusion": {
+        "recall1": 87.22,
+        "near_recall1": 82.26,
+        "delta_vs_best_single_pp": -0.15,
+        "ci95_vs_best_single": [
+          -0.44,
+          0.15
+        ],
+        "supervised": false
+      },
+      "U6_rrf_fusion": {
+        "recall1": 87.3,
+        "near_recall1": 82.38,
+        "delta_vs_best_single_pp": -0.07,
+        "ci95_vs_best_single": [
+          -0.35,
+          0.23
+        ],
+        "supervised": false
+      },
+      "R_cross_panel_router": {
+        "trained_on": "formula_disjoint",
+        "recall1": 87.2,
+        "near_recall1": 82.23,
+        "delta_vs_best_single_pp": -0.17,
+        "ci95_vs_best_single": [
+          -0.54,
+          0.22
+        ],
+        "supervised": true,
+        "selection_distribution": {
+          "official_dreams": {
+            "selected": 955,
+            "accuracy": 86.6
+          },
+          "noise_v1": {
+            "selected": 523,
+            "accuracy": 72.47
+          },
+          "cosine_greedy": {
+            "selected": 791,
+            "accuracy": 90.64
+          },
+          "modified_cosine": {
+            "selected": 679,
+            "accuracy": 80.27
+          },
+          "weighted_spectral_entropy": {
+            "selected": 763,
+            "accuracy": 90.3
+          },
+          "p2b_sqrt_cosine": {
+            "selected": 209,
+            "accuracy": 85.17
+          },
+          "p2b_unweighted_entropy": {
+            "selected": 82,
+            "accuracy": 78.05
+          },
+          "neutral_loss_sqrt_cosine": {
+            "selected": 282,
+            "accuracy": 91.13
+          },
+          "p2b_official_frozen": {
+            "selected": 23,
+            "accuracy": 52.17
+          },
+          "p2b_noise_v1_frozen": {
+            "selected": 44,
+            "accuracy": 45.45
+          },
+          "ms2deepscore_2x_public": {
+            "selected": 1120,
+            "accuracy": 59.38
+          },
+          "spec2vec_gnps_public": {
+            "selected": 1546,
+            "accuracy": 90.43
+          },
+          "entropy_raw_public": {
+            "selected": 482,
+            "accuracy": 94.19
+          },
+          "denoising_search_public": {
+            "selected": 1918,
+            "accuracy": 96.87
+          },
+          "spec2vec_2026_retrained": {
+            "selected": 1578,
+            "accuracy": 96.64
+          }
+        }
+      }
+    },
+    "formula_disjoint": {
+      "_best_single": {
+        "method": "weighted_spectral_entropy",
+        "recall1": 88.27
+      },
+      "_oracle_any": {
+        "recall1": 94.58
+      },
+      "U1_select_raw_gap": {
+        "recall1": 88.46,
+        "near_recall1": 80.37,
+        "delta_vs_best_single_pp": 0.19,
+        "ci95_vs_best_single": [
+          -0.32,
+          0.72
+        ],
+        "supervised": false
+      },
+      "U2_select_batch_z_gap": {
+        "recall1": 86.64,
+        "near_recall1": 77.41,
+        "delta_vs_best_single_pp": -1.63,
+        "ci95_vs_best_single": [
+          -2.3,
+          -0.99
+        ],
+        "supervised": false
+      },
+      "U2x_select_transfer_z_gap": {
+        "recall1": 86.58,
+        "near_recall1": 77.34,
+        "delta_vs_best_single_pp": -1.69,
+        "ci95_vs_best_single": [
+          -2.38,
+          -1.03
+        ],
+        "supervised": false
+      },
+      "U3_select_batch_pct_gap": {
+        "recall1": 87.7,
+        "near_recall1": 79.28,
+        "delta_vs_best_single_pp": -0.57,
+        "ci95_vs_best_single": [
+          -1.16,
+          0.02
+        ],
+        "supervised": false
+      },
+      "U4_query_z_fusion": {
+        "recall1": 88.35,
+        "near_recall1": 80.23,
+        "delta_vs_best_single_pp": 0.08,
+        "ci95_vs_best_single": [
+          -0.38,
+          0.51
+        ],
+        "supervised": false
+      },
+      "U5_borda_fusion": {
+        "recall1": 88.31,
+        "near_recall1": 80.16,
+        "delta_vs_best_single_pp": 0.04,
+        "ci95_vs_best_single": [
+          -0.4,
+          0.48
+        ],
+        "supervised": false
+      },
+      "U6_rrf_fusion": {
+        "recall1": 88.39,
+        "near_recall1": 80.3,
+        "delta_vs_best_single_pp": 0.12,
+        "ci95_vs_best_single": [
+          -0.32,
+          0.57
+        ],
+        "supervised": false
+      },
+      "R_cross_panel_router": {
+        "trained_on": "identity_disjoint",
+        "recall1": 88.94,
+        "near_recall1": 81.08,
+        "delta_vs_best_single_pp": 0.67,
+        "ci95_vs_best_single": [
+          0.23,
+          1.1
+        ],
+        "supervised": true,
+        "selection_distribution": {
+          "official_dreams": {
+            "selected": 182,
+            "accuracy": 97.25
+          },
+          "noise_v1": {
+            "selected": 250,
+            "accuracy": 87.2
+          },
+          "cosine_greedy": {
+            "selected": 340,
+            "accuracy": 93.53
+          },
+          "modified_cosine": {
+            "selected": 296,
+            "accuracy": 79.39
+          },
+          "weighted_spectral_entropy": {
+            "selected": 226,
+            "accuracy": 85.4
+          },
+          "p2b_sqrt_cosine": {
+            "selected": 97,
+            "accuracy": 93.81
+          },
+          "p2b_unweighted_entropy": {
+            "selected": 29,
+            "accuracy": 86.21
+          },
+          "neutral_loss_sqrt_cosine": {
+            "selected": 103,
+            "accuracy": 90.29
+          },
+          "p2b_official_frozen": {
+            "selected": 165,
+            "accuracy": 66.67
+          },
+          "p2b_noise_v1_frozen": {
+            "selected": 516,
+            "accuracy": 68.99
+          },
+          "ms2deepscore_2x_public": {
+            "selected": 5,
+            "accuracy": 80.0
+          },
+          "spec2vec_gnps_public": {
+            "selected": 255,
+            "accuracy": 99.22
+          },
+          "entropy_raw_public": {
+            "selected": 775,
+            "accuracy": 83.1
+          },
+          "denoising_search_public": {
+            "selected": 1770,
+            "accuracy": 96.95
+          },
+          "spec2vec_2026_retrained": {
+            "selected": 252,
+            "accuracy": 97.62
+          }
+        }
+      }
+    }
+  }
+}

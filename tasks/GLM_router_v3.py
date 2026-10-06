@@ -24,6 +24,7 @@ plus pair-level learned weighted fusion.
 from __future__ import annotations
 
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -205,7 +206,9 @@ def main():
                   f"CI [{r['ci95_vs_best_single'][0]:+.2f}, "
                   f"{r['ci95_vs_best_single'][1]:+.2f}]  near {r['near_recall1']}")
 
-    out = ROOT / "deliverables/GLM_gnps_article_ladder/run_local/router_v3.json"
+    out = Path(os.environ.get(
+        "GLM_OUT_DIR",
+        "deliverables/GLM_gnps_article_ladder/run_local")) / "router_v3.json"
     out.write_text(json.dumps(report, indent=2), encoding="utf-8")
     print(f"\nwritten: {out}")
 

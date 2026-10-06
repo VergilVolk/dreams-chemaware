@@ -8,6 +8,7 @@ Question 2: in the band where the best single method (WSE) fails but the
   headroom -- which is exactly what the leak-free router experiments show.
 """
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -17,7 +18,8 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tasks"))
 from GLM_truthblind_fusion_analysis import load_panel, per_query_stats  # noqa: E402
 
-OUT = ROOT / "deliverables/GLM_gnps_article_ladder/run_local"
+OUT = Path(os.environ.get(
+    "GLM_OUT_DIR", "deliverables/GLM_gnps_article_ladder/run_local"))
 COVERAGES = (0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 1.0)
 
 report = {"status": "GLM_RISK_COVERAGE", "panels": {}}
