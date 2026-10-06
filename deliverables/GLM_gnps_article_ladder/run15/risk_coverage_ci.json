@@ -1,0 +1,241 @@
+{
+  "status": "GLM_RISK_COVERAGE_CI",
+  "panels": {
+    "identity_disjoint": {
+      "weighted_spectral_entropy": {
+        "cov50": {
+          "accuracy": 99.6,
+          "ci95": [
+            99.44,
+            99.76
+          ]
+        },
+        "cov60": {
+          "accuracy": 99.41,
+          "ci95": [
+            99.23,
+            99.59
+          ]
+        },
+        "cov80": {
+          "accuracy": 96.46,
+          "ci95": [
+            96.08,
+            96.84
+          ]
+        }
+      },
+      "noise_v1": {
+        "cov50": {
+          "accuracy": 99.42,
+          "ci95": [
+            99.2,
+            99.62
+          ]
+        },
+        "cov60": {
+          "accuracy": 99.03,
+          "ci95": [
+            98.79,
+            99.26
+          ]
+        },
+        "cov80": {
+          "accuracy": 95.59,
+          "ci95": [
+            95.16,
+            96.01
+          ]
+        }
+      },
+      "entropy_raw_public": {
+        "cov50": {
+          "accuracy": 99.84,
+          "ci95": [
+            99.73,
+            99.93
+          ]
+        },
+        "cov60": {
+          "accuracy": 99.62,
+          "ci95": [
+            99.47,
+            99.76
+          ]
+        },
+        "cov80": {
+          "accuracy": 96.76,
+          "ci95": [
+            96.38,
+            97.12
+          ]
+        }
+      },
+      "denoising_search_public": {
+        "cov50": {
+          "accuracy": 99.78,
+          "ci95": [
+            99.65,
+            99.89
+          ]
+        },
+        "cov60": {
+          "accuracy": 99.59,
+          "ci95": [
+            99.44,
+            99.74
+          ]
+        },
+        "cov80": {
+          "accuracy": 96.6,
+          "ci95": [
+            96.2,
+            96.98
+          ]
+        }
+      },
+      "wse_vs_noise_v1_cov50": {
+        "delta_pp": 0.18,
+        "ci95": [
+          -0.07,
+          0.45
+        ],
+        "note": "independent top-k sets; CI over shared query resamples"
+      },
+      "wse_vs_noise_v1_cov60": {
+        "delta_pp": 0.38,
+        "ci95": [
+          0.08,
+          0.68
+        ],
+        "note": "independent top-k sets; CI over shared query resamples"
+      },
+      "wse_vs_noise_v1_cov80": {
+        "delta_pp": 0.88,
+        "ci95": [
+          0.35,
+          1.41
+        ],
+        "note": "independent top-k sets; CI over shared query resamples"
+      }
+    },
+    "formula_disjoint": {
+      "weighted_spectral_entropy": {
+        "cov50": {
+          "accuracy": 99.73,
+          "ci95": [
+            99.51,
+            99.92
+          ]
+        },
+        "cov60": {
+          "accuracy": 99.52,
+          "ci95": [
+            99.27,
+            99.75
+          ]
+        },
+        "cov80": {
+          "accuracy": 96.74,
+          "ci95": [
+            96.22,
+            97.29
+          ]
+        }
+      },
+      "noise_v1": {
+        "cov50": {
+          "accuracy": 99.54,
+          "ci95": [
+            99.28,
+            99.77
+          ]
+        },
+        "cov60": {
+          "accuracy": 99.37,
+          "ci95": [
+            99.08,
+            99.62
+          ]
+        },
+        "cov80": {
+          "accuracy": 96.34,
+          "ci95": [
+            95.77,
+            96.91
+          ]
+        }
+      },
+      "entropy_raw_public": {
+        "cov50": {
+          "accuracy": 99.96,
+          "ci95": [
+            99.89,
+            100.0
+          ]
+        },
+        "cov60": {
+          "accuracy": 99.71,
+          "ci95": [
+            99.52,
+            99.87
+          ]
+        },
+        "cov80": {
+          "accuracy": 97.15,
+          "ci95": [
+            96.63,
+            97.65
+          ]
+        }
+      },
+      "denoising_search_public": {
+        "cov50": {
+          "accuracy": 99.85,
+          "ci95": [
+            99.7,
+            99.96
+          ]
+        },
+        "cov60": {
+          "accuracy": 99.71,
+          "ci95": [
+            99.52,
+            99.87
+          ]
+        },
+        "cov80": {
+          "accuracy": 97.15,
+          "ci95": [
+            96.65,
+            97.65
+          ]
+        }
+      },
+      "wse_vs_noise_v1_cov50": {
+        "delta_pp": 0.19,
+        "ci95": [
+          -0.11,
+          0.53
+        ],
+        "note": "independent top-k sets; CI over shared query resamples"
+      },
+      "wse_vs_noise_v1_cov60": {
+        "delta_pp": 0.16,
+        "ci95": [
+          -0.19,
+          0.54
+        ],
+        "note": "independent top-k sets; CI over shared query resamples"
+      },
+      "wse_vs_noise_v1_cov80": {
+        "delta_pp": 0.4,
+        "ci95": [
+          -0.31,
+          1.12
+        ],
+        "note": "independent top-k sets; CI over shared query resamples"
+      }
+    }
+  }
+}
