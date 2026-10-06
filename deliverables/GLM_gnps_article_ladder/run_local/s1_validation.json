@@ -1,0 +1,189 @@
+{
+  "status": "GLM_S1_VALIDATION",
+  "panels": {
+    "identity_disjoint": {
+      "S1_recall1": 92.3,
+      "WSE_recall1": 87.37,
+      "delta_pp": 4.93,
+      "bootstrap_ci95": [
+        4.55,
+        5.3
+      ],
+      "near_S1": 89.24,
+      "near_WSE": 82.51,
+      "selection_distribution": {
+        "cosine_greedy": {
+          "selected": 5068,
+          "accuracy": 94.95
+        },
+        "denoising_search_public": {
+          "selected": 1566,
+          "accuracy": 95.02
+        },
+        "entropy_raw_public": {
+          "selected": 403,
+          "accuracy": 81.89
+        },
+        "neutral_loss_sqrt_cosine": {
+          "selected": 618,
+          "accuracy": 94.82
+        },
+        "noise_v1": {
+          "selected": 1178,
+          "accuracy": 86.25
+        },
+        "p2b_noise_v1_frozen": {
+          "selected": 52,
+          "accuracy": 30.77
+        },
+        "p2b_sqrt_cosine": {
+          "selected": 121,
+          "accuracy": 85.12
+        },
+        "spec2vec_gnps_public": {
+          "selected": 1264,
+          "accuracy": 89.48
+        },
+        "weighted_spectral_entropy": {
+          "selected": 725,
+          "accuracy": 91.86
+        }
+      },
+      "s1_wrong_total": 847,
+      "s1_wrong_but_oracle_right": 0,
+      "s1_wrong_and_oracle_wrong": 847,
+      "best_minimal_subsets": {
+        "size_2": {
+          "methods": [
+            "noise_v1",
+            "weighted_spectral_entropy"
+          ],
+          "recall1": 89.98,
+          "gain_vs_wse": 2.61
+        },
+        "size_3": {
+          "methods": [
+            "cosine_greedy",
+            "denoising_search_public",
+            "noise_v1"
+          ],
+          "recall1": 91.22,
+          "gain_vs_wse": 3.86
+        },
+        "size_4": {
+          "methods": [
+            "cosine_greedy",
+            "denoising_search_public",
+            "noise_v1",
+            "spec2vec_gnps_public"
+          ],
+          "recall1": 91.86,
+          "gain_vs_wse": 4.49
+        },
+        "size_5": {
+          "methods": [
+            "cosine_greedy",
+            "denoising_search_public",
+            "neutral_loss_sqrt_cosine",
+            "noise_v1",
+            "spec2vec_gnps_public"
+          ],
+          "recall1": 92.11,
+          "gain_vs_wse": 4.74
+        }
+      }
+    },
+    "formula_disjoint": {
+      "S1_recall1": 93.71,
+      "WSE_recall1": 88.27,
+      "delta_pp": 5.44,
+      "bootstrap_ci95": [
+        4.83,
+        6.0
+      ],
+      "near_S1": 89.23,
+      "near_WSE": 80.1,
+      "selection_distribution": {
+        "cosine_greedy": {
+          "selected": 2531,
+          "accuracy": 95.69
+        },
+        "denoising_search_public": {
+          "selected": 657,
+          "accuracy": 95.74
+        },
+        "entropy_raw_public": {
+          "selected": 163,
+          "accuracy": 86.5
+        },
+        "neutral_loss_sqrt_cosine": {
+          "selected": 296,
+          "accuracy": 95.61
+        },
+        "noise_v1": {
+          "selected": 621,
+          "accuracy": 90.82
+        },
+        "p2b_noise_v1_frozen": {
+          "selected": 21,
+          "accuracy": 33.33
+        },
+        "p2b_sqrt_cosine": {
+          "selected": 50,
+          "accuracy": 88.0
+        },
+        "spec2vec_gnps_public": {
+          "selected": 610,
+          "accuracy": 89.51
+        },
+        "weighted_spectral_entropy": {
+          "selected": 312,
+          "accuracy": 94.23
+        }
+      },
+      "s1_wrong_total": 331,
+      "s1_wrong_but_oracle_right": 0,
+      "s1_wrong_and_oracle_wrong": 331,
+      "best_minimal_subsets": {
+        "size_2": {
+          "methods": [
+            "cosine_greedy",
+            "noise_v1"
+          ],
+          "recall1": 91.52,
+          "gain_vs_wse": 3.25
+        },
+        "size_3": {
+          "methods": [
+            "cosine_greedy",
+            "noise_v1",
+            "spec2vec_gnps_public"
+          ],
+          "recall1": 92.97,
+          "gain_vs_wse": 4.69
+        },
+        "size_4": {
+          "methods": [
+            "cosine_greedy",
+            "denoising_search_public",
+            "noise_v1",
+            "spec2vec_gnps_public"
+          ],
+          "recall1": 93.37,
+          "gain_vs_wse": 5.09
+        },
+        "size_5": {
+          "methods": [
+            "cosine_greedy",
+            "denoising_search_public",
+            "noise_v1",
+            "spec2vec_gnps_public",
+            "weighted_spectral_entropy"
+          ],
+          "recall1": 93.56,
+          "gain_vs_wse": 5.28
+        }
+      }
+    }
+  }
+}
