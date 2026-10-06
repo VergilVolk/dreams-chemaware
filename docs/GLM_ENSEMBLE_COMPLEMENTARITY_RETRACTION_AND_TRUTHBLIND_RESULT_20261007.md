@@ -79,6 +79,8 @@
 | `tasks/GLM_router_v3.py` | 三分割泄露清除协议 | 当前有效 |
 | `tasks/GLM_gap_calibration.py` | gap→正确性校准 | 当前有效 |
 | `tasks/GLM_risk_coverage.py` | risk–coverage + 失败带结构 | 当前有效 |
+| `tasks/GLM_router_permutation.py` | router 标签置换对照（真实 +0.23/+0.61 vs 置换 −0.91/−0.54pp） | 当前有效 |
+| `tasks/GLM_confidence_gate.py` | 部署级弃权门控工具 | 当前有效 |
 | `tasks/GLM_zenodo_resume.py` | 通用续传下载器 | 工具 |
 | `deliverables/.../truthblind_ensemble.json` | §3.1 表 | 当前有效 |
 | `deliverables/.../router_v3.json` | §2/§3.2 表 | 当前有效 |
@@ -98,3 +100,9 @@
 - 校准/失败带结构：winners' gap 百分位 0.115 / 0.106、φ = 0.762 / 0.748——机制不变。
 - noise_v1 仍是可恢复集最大贡献者（287/647、161/332，15 方法第一）。
 - spec2vec_2026 本身：R@1 86.08 / 87.25（低于 2020 版），判别/检索分离的又一实例。
+
+## 9. MoNA 极性迁移外部验证：本地受阻审计（同日）
+
+- 封存面板在本地：`chemaware_mona_polarity_transfer_local_preflight`（正 921 q / 负 1,766 q，score-blind 构建，与开发语料身份隔离，gates 全过）——但面板以谱 hash 引用服务器端 `mona_pos_full.mgf` / `mona_neg_full.mgf`，谱本体不在本地。
+- 公开替代源尝试：Zenodo MetFrag MoNA 快照（2024-10-14，196 MB，142,699 条记录）按内容 hash 匹配仅 **23/3,563（0.65%）**——跨快照的峰强度数值精度差异使归一化内容 hash 无法对齐（`data/validation/GLM_mona_metfrag_hash_match/hash_match_report.json`）。
+- 我方 encoder checkpoint 亦仅在服务器。**结论：15 方法外部验证需服务器 sbatch + 公开模型资产同步，本地诚实记为受阻，不伪造覆盖。**

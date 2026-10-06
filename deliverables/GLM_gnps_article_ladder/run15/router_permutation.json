@@ -1,0 +1,28 @@
+{
+  "status": "GLM_ROUTER_PERMUTATION_CONTROL",
+  "n_permutations": 5,
+  "splits": {
+    "A_train_formula_test_unseen_identity": {
+      "true_gain_pp": 0.23,
+      "permutation_gains_pp": [
+        -1.01,
+        -0.75,
+        -0.75,
+        -1.31,
+        -0.73
+      ],
+      "permutation_mean": -0.91
+    },
+    "B_train_unseen_identity_test_formula": {
+      "true_gain_pp": 0.61,
+      "permutation_gains_pp": [
+        -0.68,
+        -0.47,
+        -0.45,
+        -0.55,
+        -0.55
+      ],
+      "permutation_mean": -0.54
+    }
+  }
+}

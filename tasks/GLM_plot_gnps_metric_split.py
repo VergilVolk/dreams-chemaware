@@ -33,7 +33,10 @@ GROUPS = {
 }
 LABEL_DX = {"noise_v1": (6, 4), "weighted_spectral_entropy": (-8, 6),
             "official_dreams": (6, -10), "spec2vec_gnps_public": (6, 3),
-            "ms2deepscore_2x_public": (6, -3), "cosine_greedy": (6, 2)}
+            "ms2deepscore_2x_public": (6, -3), "cosine_greedy": (6, 2),
+            "spec2vec_2026_retrained": (-4, -12),
+            "entropy_raw_public": (6, -4),
+            "denoising_search_public": (-10, -12)}
 
 fig, axes = plt.subplots(1, 2, figsize=(12.6, 4.9))
 for ax, panel, title in zip(
