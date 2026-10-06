@@ -34,6 +34,19 @@ We benchmarked fifteen spectral-similarity methods on two sealed, model-blind GN
 | Table 3 — gap calibration (quintile accuracy + AUC per method) | `run15/gap_calibration.json` |
 | Suppl — failure-band structure (winners' percentiles, φ, winner counts) | `run15/risk_coverage.json` |
 
+## Methods addendum (for the same section)
+
+**Benchmark.** GNPS Gold/Silver ([M+H]+, strict 10 ppm) candidate graphs were sealed before any model scoring; the identity-disjoint and formula-disjoint panels share no query identity or formula with the MassSpecGym/MoNA training corpora of the learned methods. Per-method molecule-level rankings follow the frozen evaluator semantics: candidate-pair scores are max-pooled per molecule and the unique positive molecule (always block-first) must strictly exceed every negative (ties count against the positive, float64). All per-method R@1 values were dual-source verified against the frozen per-query tables (exact match), and one full number chain (U1 selection, WSE baseline, oracle) was re-derived through an independent path (spot audit, PASS).
+
+**Truth-blind protocol.** Selection and fusion signals use only deployment-computable quantities: per-method top1−top2 gaps, batch percentiles thereof, top-1 scores, cross-method top-1 agreement, modal-candidate consensus, candidate counts, and precursor m/z. The supervised router is a per-method gradient-boosted classifier (fixed a-priori hyperparameters: 300 iterations, learning rate 0.06, min 40 samples/leaf, L2 1.0) over these features, deployed as argmax predicted correctness. Leak-free splits remove all test-panel query spectra and structures from training (the two panels share 5,237/5,261 query spectra, so naive cross-panel training is memorization). Uncertainties are paired-by-query percentile bootstrap CIs (10,000 resamples); the router additionally carries a 5-permutation label-shuffle control.
+
+**Gating.** Coverage-accuracy operating points sort queries by within-method gap (descending) and report cumulative top-1 accuracy among the top-c fraction; thresholds and CIs are emitted by the released tool (`GLM_confidence_gate.py`, resampling the selected population).
+
+## Server queue notes (not in the paper)
+
+- MoNA polarity external validation: stage-1 sbatch + scorer ready (`GLM_mona_15method_stage1.sbatch`), blocked on asset sync (public models up, MoNA MGFs already server-side, sealed panels upload).
+- Task-vector 7-arm internal gate sbatch ready; grand router 2349964 log pull pending; B47 remediation pending — all server-side.
+
 ## Claim discipline
 
 - May claim: metric split; oracle headroom existence + structure; negative result for truth-blind routing (with mechanism); risk-coverage gating; our encoders' discrimination crowns + parity on identification; noise_v1 as top unique contributor.

@@ -1,0 +1,177 @@
+{
+  "status": "GLM_FAILURE_PROFILE",
+  "panels": {
+    "identity_disjoint": {
+      "weighted_spectral_entropy": {
+        "fail_by_precursor_decile_pct": [
+          22.5,
+          13.7,
+          9.6,
+          7.0,
+          5.0,
+          6.4,
+          6.4,
+          14.5,
+          19.3,
+          22.0
+        ],
+        "fail_by_candidate_count": [
+          {
+            "range": "2-2",
+            "n": 1917,
+            "fail_pct": 4.3
+          },
+          {
+            "range": "3-3",
+            "n": 1570,
+            "fail_pct": 8.3
+          },
+          {
+            "range": "4-5",
+            "n": 1994,
+            "fail_pct": 10.3
+          },
+          {
+            "range": "6-8",
+            "n": 1974,
+            "fail_pct": 15.0
+          },
+          {
+            "range": "9-+",
+            "n": 3540,
+            "fail_pct": 19.0
+          }
+        ],
+        "overall_fail_pct": 12.63
+      },
+      "noise_v1": {
+        "fail_by_precursor_decile_pct": [
+          24.9,
+          16.7,
+          11.0,
+          7.7,
+          6.4,
+          6.8,
+          6.4,
+          13.0,
+          18.7,
+          22.9
+        ],
+        "fail_by_candidate_count": [
+          {
+            "range": "2-2",
+            "n": 1917,
+            "fail_pct": 4.2
+          },
+          {
+            "range": "3-3",
+            "n": 1570,
+            "fail_pct": 8.9
+          },
+          {
+            "range": "4-5",
+            "n": 1994,
+            "fail_pct": 10.8
+          },
+          {
+            "range": "6-8",
+            "n": 1974,
+            "fail_pct": 16.6
+          },
+          {
+            "range": "9-+",
+            "n": 3540,
+            "fail_pct": 20.3
+          }
+        ],
+        "overall_fail_pct": 13.44
+      }
+    },
+    "formula_disjoint": {
+      "weighted_spectral_entropy": {
+        "fail_by_precursor_decile_pct": [
+          12.0,
+          7.6,
+          5.9,
+          5.5,
+          6.3,
+          3.4,
+          13.9,
+          18.3,
+          20.0,
+          24.4
+        ],
+        "fail_by_candidate_count": [
+          {
+            "range": "2-2",
+            "n": 1699,
+            "fail_pct": 4.8
+          },
+          {
+            "range": "3-3",
+            "n": 1068,
+            "fail_pct": 8.5
+          },
+          {
+            "range": "4-5",
+            "n": 1150,
+            "fail_pct": 14.1
+          },
+          {
+            "range": "6-8",
+            "n": 757,
+            "fail_pct": 16.4
+          },
+          {
+            "range": "9-+",
+            "n": 587,
+            "fail_pct": 27.1
+          }
+        ],
+        "overall_fail_pct": 11.73
+      },
+      "noise_v1": {
+        "fail_by_precursor_decile_pct": [
+          14.9,
+          8.7,
+          5.1,
+          6.3,
+          5.9,
+          2.7,
+          12.9,
+          16.3,
+          21.9,
+          24.6
+        ],
+        "fail_by_candidate_count": [
+          {
+            "range": "2-2",
+            "n": 1699,
+            "fail_pct": 4.6
+          },
+          {
+            "range": "3-3",
+            "n": 1068,
+            "fail_pct": 9.4
+          },
+          {
+            "range": "4-5",
+            "n": 1150,
+            "fail_pct": 14.3
+          },
+          {
+            "range": "6-8",
+            "n": 757,
+            "fail_pct": 17.4
+          },
+          {
+            "range": "9-+",
+            "n": 587,
+            "fail_pct": 25.9
+          }
+        ],
+        "overall_fail_pct": 11.94
+      }
+    }
+  }
+}
