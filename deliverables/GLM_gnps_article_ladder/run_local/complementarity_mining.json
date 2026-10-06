@@ -1,0 +1,105 @@
+{
+  "status": "GLM_COMPLEMENTARITY_MINING_COMPLETE",
+  "panels": {
+    "identity_disjoint": {
+      "S1_margin_selection": {
+        "recall1": 92.3,
+        "near_recall1": 89.24,
+        "gain_vs_best_single": 4.93
+      },
+      "S2_avg_rank": {
+        "recall1": 78.44,
+        "near_recall1": 70.94,
+        "gain_vs_best_single": -8.92
+      },
+      "S3_majority_vote": {
+        "recall1": 87.31,
+        "near_recall1": 82.44,
+        "gain_vs_best_single": -0.05
+      },
+      "S4_oracle_noise+weighted": {
+        "recall1": 89.98,
+        "near_recall1": 86.08,
+        "gain_vs_best_single": 2.61
+      },
+      "S4_oracle_noise+entropy": {
+        "recall1": 89.8,
+        "near_recall1": 85.81,
+        "gain_vs_best_single": 2.43
+      },
+      "S4_oracle_noise+weighted+entropy": {
+        "recall1": 90.64,
+        "near_recall1": 86.96,
+        "gain_vs_best_single": 3.27
+      },
+      "S5_weighted_rank_fusion": {
+        "recall1": 86.36,
+        "near_recall1": 81.15,
+        "gain_vs_best_single": -1.01
+      },
+      "S6_disagreement_arbiter": {
+        "recall1": 90.96,
+        "near_recall1": 87.46,
+        "gain_vs_best_single": 3.59
+      },
+      "_oracle_any_method": {
+        "recall1": 92.3,
+        "near_recall1": 89.24
+      },
+      "_best_single": {
+        "method": "weighted_spectral_entropy",
+        "recall1": 87.37
+      }
+    },
+    "formula_disjoint": {
+      "S1_margin_selection": {
+        "recall1": 93.71,
+        "near_recall1": 89.23,
+        "gain_vs_best_single": 5.44
+      },
+      "S2_avg_rank": {
+        "recall1": 80.35,
+        "near_recall1": 67.76,
+        "gain_vs_best_single": -7.93
+      },
+      "S3_majority_vote": {
+        "recall1": 88.37,
+        "near_recall1": 80.3,
+        "gain_vs_best_single": 0.1
+      },
+      "S4_oracle_noise+weighted": {
+        "recall1": 91.33,
+        "near_recall1": 85.22,
+        "gain_vs_best_single": 3.06
+      },
+      "S4_oracle_noise+entropy": {
+        "recall1": 90.99,
+        "near_recall1": 84.68,
+        "gain_vs_best_single": 2.72
+      },
+      "S4_oracle_noise+weighted+entropy": {
+        "recall1": 91.9,
+        "near_recall1": 86.18,
+        "gain_vs_best_single": 3.63
+      },
+      "S5_weighted_rank_fusion": {
+        "recall1": 87.72,
+        "near_recall1": 79.28,
+        "gain_vs_best_single": -0.55
+      },
+      "S6_disagreement_arbiter": {
+        "recall1": 92.64,
+        "near_recall1": 87.47,
+        "gain_vs_best_single": 4.37
+      },
+      "_oracle_any_method": {
+        "recall1": 93.71,
+        "near_recall1": 89.23
+      },
+      "_best_single": {
+        "method": "weighted_spectral_entropy",
+        "recall1": 88.27
+      }
+    }
+  }
+}
