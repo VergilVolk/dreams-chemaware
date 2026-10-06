@@ -44,7 +44,7 @@
 
 完整表见 `GLM_GNPS_ARTICLE_LADDER_20261005.md`（12 方法 × 双面板 × 全指标，双源核验）。三个 headline 读数：
 
-- **读数 1（外推性）**：Noise V1 86.56% vs official DreaMS 85.36%（+1.20pp，双面板 CI 下界>0）——深度微调对外部检索的净增益成立；
+- **读数 1（外推性）**：Noise V1 86.56% vs official DreaMS 85.36%（+1.20pp，双面板 CI 下界>0）；对公开神经基线：**vs MS2DeepScore 2.x +7.44/+6.60pp（双面板 CI 全正，显著）**；vs Spec2Vec +0.26/+0.63pp（点估占优，CI 跨零，统计打平；判别类指标差距更大：pooled AUROC 0.9413 vs 0.9336）；
 - **读数 2（指标劈裂）**：Top-1 第一 = WSE（87.37，零训练）；pooled pairwise AUROC 第一 = Noise V1（0.9413 vs WSE 0.9402 vs official 0.9287）——判别最强的表示与 Top-1 最强的分数不是同一家；
 - **读数 3（神经基线对照）**：SpecVec 86.29（第 8，胜 official 但低于 Noise V1）；**MS2DeepScore 2.x 79.12（第 12）**——其公开 dual-mode 模型以化学相似度（Tanimoto 类）为训练目标，会把结构类似物排在真结构之前：**相似度目标 ≠ 鉴定目标**，与读数 2 互为印证，且打分经官方 `.pair()` 审计（worst 6.09e-08），是模型真实行为而非实现偏差。
 
