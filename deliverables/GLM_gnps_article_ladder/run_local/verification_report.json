@@ -1,6 +1,6 @@
 {
   "status": "GLM_GNPS_LADDER_VERIFIED",
-  "run": "data\\validation\\GLM_gnps_article_benchmark_public_models\\run_local",
+  "run": "data\\validation\\GLM_gnps_article_benchmark_challengers\\run_local",
   "methods": [
     "official_dreams",
     "noise_v1",
@@ -13,7 +13,9 @@
     "p2b_official_frozen",
     "p2b_noise_v1_frozen",
     "ms2deepscore_2x_public",
-    "spec2vec_gnps_public"
+    "spec2vec_gnps_public",
+    "entropy_raw_public",
+    "denoising_search_public"
   ],
   "panels": [
     "identity_disjoint",
@@ -34,6 +36,8 @@
     "identity_disjoint/p2b_noise_v1_frozen: report macro_query_auprc equals mrr (0.9164583717765483); ladder uses the recomputed per-query mean 0.9164583717765481",
     "identity_disjoint/ms2deepscore_2x_public: report macro_query_auprc equals mrr (0.8636505070873445); ladder uses the recomputed per-query mean 0.8636505070873445",
     "identity_disjoint/spec2vec_gnps_public: report macro_query_auprc equals mrr (0.910204922829751); ladder uses the recomputed per-query mean 0.910204922829751",
+    "identity_disjoint/entropy_raw_public: report macro_query_auprc equals mrr (0.9179457589187309); ladder uses the recomputed per-query mean 0.9179457589187309",
+    "identity_disjoint/denoising_search_public: report macro_query_auprc equals mrr (0.916762593716583); ladder uses the recomputed per-query mean 0.916762593716583",
     "formula_disjoint/official_dreams: report macro_query_auprc equals mrr (0.9202418061335217); ladder uses the recomputed per-query mean 0.9202418061335217",
     "formula_disjoint/noise_v1: report macro_query_auprc equals mrr (0.9283314280757717); ladder uses the recomputed per-query mean 0.9283314280757717",
     "formula_disjoint/cosine_greedy: report macro_query_auprc equals mrr (0.9226433627830699); ladder uses the recomputed per-query mean 0.9226433627830699",
@@ -45,7 +49,9 @@
     "formula_disjoint/p2b_official_frozen: report macro_query_auprc equals mrr (0.9276635606272374); ladder uses the recomputed per-query mean 0.9276635606272374",
     "formula_disjoint/p2b_noise_v1_frozen: report macro_query_auprc equals mrr (0.9290015517945218); ladder uses the recomputed per-query mean 0.9290015517945218",
     "formula_disjoint/ms2deepscore_2x_public: report macro_query_auprc equals mrr (0.8873661692492265); ladder uses the recomputed per-query mean 0.8873661692492265",
-    "formula_disjoint/spec2vec_gnps_public: report macro_query_auprc equals mrr (0.9236716313121758); ladder uses the recomputed per-query mean 0.9236716313121758"
+    "formula_disjoint/spec2vec_gnps_public: report macro_query_auprc equals mrr (0.9236716313121758); ladder uses the recomputed per-query mean 0.9236716313121758",
+    "formula_disjoint/entropy_raw_public: report macro_query_auprc equals mrr (0.9282224238411275); ladder uses the recomputed per-query mean 0.9282224238411275",
+    "formula_disjoint/denoising_search_public: report macro_query_auprc equals mrr (0.9272332389990631); ladder uses the recomputed per-query mean 0.9272332389990631"
   ],
   "claim_limits": [
     "Noise/P2b GNPS article benchmark. Methods at different information levels are reported in separate strata; this is not an exact NIST20 replication.",
@@ -62,7 +68,9 @@
       "p2b_unweighted_entropy",
       "neutral_loss_sqrt_cosine",
       "ms2deepscore_2x_public",
-      "spec2vec_gnps_public"
+      "spec2vec_gnps_public",
+      "entropy_raw_public",
+      "denoising_search_public"
     ],
     "frozen_candidate_reranker": [
       "p2b_official_frozen",
