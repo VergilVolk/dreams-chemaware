@@ -23,8 +23,8 @@ export PYTHONUNBUFFERED=1
 export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK:-8}"
 
 RUN_DIR="data/validation/lcnec_global_remodeling_stage1/run_${SLURM_JOB_ID}"
-RAW_ZIP="data/validation/lcnec_zenodo19005638_preflight/MTB22_P073_HSST3n_mzML_public.zip"
-OVERVIEW="data/validation/lcnec_zenodo19005638_preflight/06_MTB22_P073_HSST3n_mzML_overview_v1.txt"
+RAW_ZIP="${LCNEC_RAW_ZIP:-data/validation/lcnec_zenodo19005638_preflight/MTB22_P073_HSST3n_mzML_public.zip}"
+OVERVIEW="${LCNEC_OVERVIEW:-data/validation/lcnec_zenodo19005638_preflight/06_MTB22_P073_HSST3n_mzML_overview_v1.txt}"
 
 required=(
   "$RAW_ZIP"
