@@ -30,6 +30,17 @@
 3. 五命中扩展：换 WSE 复核 + 查 MoNA/本地库第二来源 + MSV 公共库（MASST 式）外查；
 4. 天梯图渲染版（补 R@5/10/20 列）。
 
+## 增补 5（PI 提供两份 PDF 后的裁决——B 轨关键格闭合）
+- **Schuhknecht 2025（药物扰动图）：FAIL。** 数据声明只有 "Metabolome data and
+  results from data analysis" → BioStudies S-BSST1724 + 补充材料；**无 MassIVE/
+  MetaboLights，无原始谱图，仅处理矩阵**。按冻结杀死规则：**不得作为谱图实体
+  扰动库**。扰动库候选只剩 CRISPRi（Nat Chem Biol 2022）与 2026 药筛待查，
+  "≥3 个原始 DDA 研究"的存活概率显著下降。
+- **Quartet（室间真值）：落点找到。** 全文 URL 扫描：原始数据托管在
+  **Synapse：10.7303/syn53184679 与 10.7303/syn53190805**（项目门户
+  chinesequartet.org；github/zenodo 10427770 为代码）。下一步：核验两个
+  Synapse 实体是否含原始 LC-MS/MS 与室间设计元数据。
+
 ## 增补 4（熵复核无效声明——重要）
 - `lcnec_dark_wse_crosscheck.csv` **作废**：熵相似度为凭记忆手写实现，分母错误
   （同谱对只得 ~0.03–0.11，恒近零）。**余弦试点与身份表不受影响**（其数值与
