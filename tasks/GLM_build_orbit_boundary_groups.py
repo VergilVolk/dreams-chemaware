@@ -84,8 +84,8 @@ def main() -> None:
     for gid, cidx, mg in zip(m["group_id"], m["candidate_local"], m["margin"]):
         margin_map[(int(gid), int(cidx))] = float(mg)
 
-    orbit_row = np.full(n_groups, -1, dtype=np.int64)
-    orbit_kind = np.array(["none"] * n_groups, dtype=object)
+    orbit_row_real = np.full(n_groups, -1, dtype=np.int64)
+    orbit_row_null = np.full(n_groups, -1, dtype=np.int64)
     delta_real = np.zeros((n_groups, cmax), dtype=np.float32)
     delta_null = np.zeros((n_groups, cmax), dtype=np.float32)
 
@@ -120,37 +120,42 @@ def main() -> None:
             same_cond = (v["instrument"][vi] == q_inst
                          and v["quality"][vi] == q_qual)
             (null_cands if same_cond else real_cands).append(vi)
-        pool = real_cands if real_cands else null_cands
-        if not pool:
-            continue
-        pick = pool[int(rng.integers(len(pool)))]
-        orbit_row[q] = int(v["rows"][pick])
-        orbit_kind[q] = "real" if real_cands else "null"
+        pick_real = real_cands[int(rng.integers(len(real_cands)))] \
+            if real_cands else -1
+        pick_null = null_cands[int(rng.integers(len(null_cands)))] \
+            if null_cands else -1
+        if pick_real >= 0:
+            orbit_row_real[q] = int(v["rows"][pick_real])
+        if pick_null >= 0:
+            orbit_row_null[q] = int(v["rows"][pick_null])
 
     # I1/I2 verification
     ok_i1, ok_i2, n_real, n_null, n_none = True, True, 0, 0, 0
     for q in range(n_groups):
-        if orbit_row[q] < 0:
+        if orbit_row_real[q] < 0 and orbit_row_null[q] < 0:
             n_none += 1
             continue
         lo, hi = int(cand_ptr[q]), int(cand_ptr[q + 1])
         label = int(np.flatnonzero(g["molecule_label"][lo:hi] == 1)[0])
         mol_ids = g["mol_ik14"][lo:hi].astype(str)
         true_mol = mol_ids[label]
-        vi = row2view[int(orbit_row[q])]
-        if str(v["molecule"][vi]) != true_mol:
-            ok_i1 = False
         q_view = row2view[int(g["query_row"][q])]
-        same = (v["instrument"][vi] == v["instrument"][q_view]
-                and v["quality"][vi] == v["quality"][q_view])
-        if orbit_kind[q] == "real" and same:
-            ok_i2 = False
-        if orbit_kind[q] == "null" and not same:
-            ok_i2 = False
-        if orbit_kind[q] == "real":
-            n_real += 1
-        else:
-            n_null += 1
+        for arr, is_real in ((orbit_row_real, True), (orbit_row_null, False)):
+            if arr[q] < 0:
+                continue
+            vi = row2view[int(arr[q])]
+            if str(v["molecule"][vi]) != true_mol:
+                ok_i1 = False
+            same = (v["instrument"][vi] == v["instrument"][q_view]
+                    and v["quality"][vi] == v["quality"][q_view])
+            if is_real and same:
+                ok_i2 = False
+            if (not is_real) and not same:
+                ok_i2 = False
+            if is_real:
+                n_real += 1
+            else:
+                n_null += 1
     # I4 formula-disjoint train/val
     val_mask = g["val_query_mask"].astype(bool)
     tr_clusters = set(g["formula_cluster"][~val_mask].tolist())
@@ -174,8 +179,8 @@ def main() -> None:
     np.savez_compressed(
         tmp,
         **{k: g[k] for k in g},
-        orbit_query_row=orbit_row,
-        orbit_kind=np.asarray(orbit_kind, dtype=str),
+        orbit_row_real=orbit_row_real,
+        orbit_row_null=orbit_row_null,
         delta_chem_real=delta_real,
         delta_chem_null=delta_null,
     )

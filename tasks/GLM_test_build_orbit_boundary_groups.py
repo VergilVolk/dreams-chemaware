@@ -74,25 +74,26 @@ assert proc.returncode == 0, "builder failed"
 
 report = json.loads((tmp / "orbit_pools.json").read_text(encoding="utf-8"))
 with np.load(out) as z:
-    orbit_row = z["orbit_query_row"]
-    kind = z["orbit_kind"]
+    orbit_real = z["orbit_row_real"]
+    orbit_null = z["orbit_row_null"]
     dr = z["delta_chem_real"]
     dn = z["delta_chem_null"]
 
 assert report["checks"]["I1_true_molecule"]
 assert report["checks"]["I2_condition_semantics"]
 assert report["checks"]["I4_formula_disjoint_val"]
-# all groups resolved an orbit view (both real and replicate exist)
-assert (orbit_row >= 0).all()
-# every group found a REAL cross-instrument view first (instrument 2 exists)
-assert (kind == "real").all(), "real cross-condition views must be preferred"
+# every group has BOTH view kinds available (synthetic ledger provides both)
+assert (orbit_real >= 0).all() and (orbit_null >= 0).all()
+# real views cross instrument (rows 100+), null views are same-condition
+# replicates (rows 200+)
+assert (orbit_real >= 100).all() and (orbit_real < 200).all()
+assert (orbit_null >= 200).all()
 # margins: real margin on candidate 2; null rotated among false candidates
 assert np.allclose(dr[:, 2], 0.3)
-false_cols = [0, 1, 2]
 for q in range(N):
-    vals_real = sorted(dr[q, [c for c in false_cols if c != 0]])
-    vals_null = sorted(dn[q, [c for c in false_cols if c != 0]])
+    vals_real = sorted(dr[q, [1, 2]])
+    vals_null = sorted(dn[q, [1, 2]])
     assert vals_real == vals_null, "I3: null must be a rotation (multiset)"
     assert dr[q, 0] == 0.0 and dn[q, 0] == 0.0, "true candidate margin 0"
-print("SMOKE PASS: pools built, integrity I1-I4 verified, rotation matches, "
-      "real views preferred")
+print("SMOKE PASS: pools built with BOTH orbit rows (real+null), integrity "
+      "I1-I4 verified, rotation matches")
