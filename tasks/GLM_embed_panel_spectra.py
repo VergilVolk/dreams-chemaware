@@ -39,9 +39,13 @@ def needed_rows() -> np.ndarray:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--checkpoint", type=Path, required=True)
+    ap.add_argument("--checkpoint", type=Path, required=True,
+                    help="weights checkpoint overriding the backbone")
     ap.add_argument("--encoder", choices=("synthetic", "dreams"),
                     default="synthetic")
+    ap.add_argument("--official-checkpoint", type=Path)
+    ap.add_argument("--architecture-checkpoint", type=Path)
+    ap.add_argument("--n-highest-peaks", type=int, default=100)
     ap.add_argument("--output", type=Path, required=True)
     ap.add_argument("--batch-size", type=int, default=4096)
     args = ap.parse_args()
@@ -67,30 +71,37 @@ def main() -> None:
                                              args.batch_size)])
     else:
         from GLM_train_orbit_boundary_encoder import load_dreams_encoder
-        from types import SimpleNamespace
         from GLM_score_challenger_models_on_gnps import parse_mgf_used
-        ns = SimpleNamespace(official_checkpoint=None,
-                             architecture_checkpoint=None,
-                             noise_v1_checkpoint=None,
-                             n_highest_peaks=100, lr=0.0, data=None)
-        # server path: the real arguments are provided by the sbatch
-        head = load_dreams_encoder(ns)
+        if args.architecture_checkpoint is None:
+            raise RuntimeError("dreams mode requires --official-checkpoint "
+                               "and --architecture-checkpoint (DreaMS "
+                               "release); --checkpoint = weights override")
+        head = load_dreams_encoder(args)
         state = torch.load(args.checkpoint, map_location="cpu",
-                           weights_only=False)["encoder"]
-        head.load_state_dict(state, strict=True)
+                           weights_only=False)
+        sd = state["encoder"] if "encoder" in state else state
+        sd = sd.get("backbone", sd) if isinstance(sd, dict) else sd
+        head.backbone.load_state_dict(sd, strict=True)
         head.eval()
         spectra = parse_mgf_used(BENCH / "spectra.mgf", set(map(int, rows)))
-        embs = np.zeros((int(rows.max()) + 1, head.head.in_features
-                         if hasattr(head.head, "in_features") else 256),
-                        dtype=np.float32)
+        from train_e1_identity import preprocess_spectrum  # noqa: PLC0415
+        embs = []
         with torch.no_grad():
             for i in range(0, n, args.batch_size):
                 chunk = rows[i:i + args.batch_size]
                 batch = torch.stack([
-                    torch.as_tensor(np.asarray(spectra[int(r)][0]),
-                                    dtype=torch.float32) for r in chunk])
+                    preprocess_spectrum(
+                        np.vstack([np.asarray(spectra[int(r)][0]),
+                                   np.asarray(spectra[int(r)][1])]),
+                        float(spectra[int(r)][2]), args.n_highest_peaks)
+                    for r in chunk])
                 out = head(batch, charge=None).cpu().numpy()
-                embs[chunk] = out
+                embs.append(out)
+        embs = np.concatenate(embs)
+        full = np.zeros((int(rows.max()) + 1, embs.shape[1]),
+                        dtype=np.float32)
+        full[rows] = embs
+        embs_np = full
 
     embs_np = embs.numpy() if isinstance(embs, torch.Tensor) else embs
     norms = np.linalg.norm(embs_np[rows], axis=1, keepdims=True)

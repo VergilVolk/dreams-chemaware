@@ -51,5 +51,6 @@ python -u tasks/GLM_p0_spectral_coordinate_mapping.py \
   --bootstrap-seed 20261007 \
   --output "$OUT"
 
-find "$OUT" -type f -print0 | sort -z | xargs -0 sha256sum > "$OUT/SHA256SUMS"
+find "$OUT" -type f ! -name SHA256SUMS -print0 \
+  | sort -z | xargs -0 sha256sum > "$OUT/SHA256SUMS"
 echo "COMPLETE: P0-L spectral-coordinate identifiability -> $OUT"

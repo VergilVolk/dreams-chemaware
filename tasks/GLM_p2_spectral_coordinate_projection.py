@@ -1,4 +1,9 @@
-"""P2: LCNEC cross-platform spectral-coordinate projection and effect consistency.
+"""RETIRED pilot: LCNEC spectral-coordinate projection.
+
+Run 2353437 showed that this implementation is not a valid P2 experiment. It
+is retained only to reproduce that pilot and now fails closed unless the
+explicit legacy flag is supplied. See
+docs/LCNEC_P2_SPECTRAL_COORDINATE_RUN_2353437_AUDIT.md.
 
 Paradigm shift from family-graph decomposition to fixed-coordinate mapping:
   1. Build a frozen coordinate dictionary from GNPS gold spectra.
@@ -333,7 +338,18 @@ def main():
     parser.add_argument("--max-coordinates", type=int, default=2000)
     parser.add_argument("--score-threshold", type=float, default=0.3)
     parser.add_argument("--overwrite", action="store_true")
+    parser.add_argument(
+        "--allow-invalid-legacy-pilot",
+        action="store_true",
+        help="Reproduce the invalid 2353437 pilot only; never use for a formal P2 claim.",
+    )
     args = parser.parse_args()
+
+    if not args.allow_invalid_legacy_pilot:
+        raise RuntimeError(
+            "LCNEC_P2_RETIRED_INVALID_PILOT: P0-G no-match calibration and real "
+            "LIPn MS/MS/effects are required before a formal P2 run"
+        )
 
     if args.output_dir.exists() and not args.overwrite:
         raise RuntimeError(f"refusing to overwrite {args.output_dir}")

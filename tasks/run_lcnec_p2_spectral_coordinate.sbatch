@@ -14,6 +14,15 @@ conda activate dreams
 export PYTHONPATH="$PWD:$PWD/tasks:${PYTHONPATH:-}"
 export PYTHONUNBUFFERED=1
 
+# Run 2353437 is an invalid single-platform pilot, not a formal P2 result.
+# Preserve the old body only for exact forensic reproduction.  A formal P2
+# must wait for P0-G no-match calibration and genuine LIPn MS/MS/effect inputs.
+if [[ "${ALLOW_INVALID_LCNEC_P2_PILOT:-0}" != "1" ]]; then
+  echo "LCNEC_P2_BLOCKED: invalid legacy pilot; do not resubmit" >&2
+  echo "See docs/LCNEC_P2_SPECTRAL_COORDINATE_RUN_2353437_AUDIT.md" >&2
+  exit 64
+fi
+
 STAGE1_RUN="data/validation/lcnec_global_remodeling_stage1/run_2352292"
 LIPN_ZIP="data/validation/lcnec_zenodo19005638_preflight/MTB22_P073_LIPn_mzML_public.zip"
 LIPN_OVERVIEW="data/validation/lcnec_zenodo19005638_preflight/04_MTB22_P073_LIPn_mzML_overview_v1.txt"
@@ -69,6 +78,7 @@ python -u tasks/GLM_p2_spectral_coordinate_projection.py \
   --method both \
   --max-coordinates 2000 \
   --score-threshold 0.3 \
+  --allow-invalid-legacy-pilot \
   --overwrite
 
 echo "P2_COMPLETE: $OUT"
