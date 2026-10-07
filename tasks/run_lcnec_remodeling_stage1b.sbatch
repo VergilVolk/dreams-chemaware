@@ -29,6 +29,7 @@ python -u tasks/analyze_lcnec_remodeling_stage1b.py \
   --output-dir "$OUT" \
   --target-coverage 0.80 \
   --theta-sensitivity 0.01 \
-  --sign-flips 10000
+  --sign-flips 10000 \
+  --overwrite
 
 echo "STAGE1B_COMPLETE: $OUT"
