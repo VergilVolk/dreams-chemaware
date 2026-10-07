@@ -1,7 +1,7 @@
 # 核心方法再设计：从“模块融合”改为候选差分证据
 
-日期：2026-10-05  
-状态：**方法学立项稿；尚无新性能结果，不得写成已验证方法。**
+日期：2026-10-05；2026-10-07 深挖修订  
+状态：**Phase 1 已实现并得到关键负结果；完整方法仍未验证，不得写成已完成算法。**
 
 ## 0. 最终裁决
 
@@ -70,15 +70,17 @@ PeakDecoder、Percolator/MS2Rescore、COSMIC 和最新的多源注释工作都�
 
 设查询谱为 `q`，候选集合为 `C(q)`。基础模型给出每个候选的全谱得分。只对前 `M` 个候选构造有序候选对 `(a,b)`，其中 `b` 是 `a` 的强竞争者。
 
-### 2.1 基础身份边界
+### 2.1 基础身份边界：双表征，不做逐查询路由
 
 ```text
-G_ab = S_Noise(q,a) - S_Noise(q,b)
+G_ab = alpha_N * z[Delta S_Noise(a,b)]
+     + alpha_C * z[Delta S_Chem(a,b)]
+     + alpha_W * z[Delta S_WSE(a,b)]
 ```
 
-`S_Noise` 使用当前已外部确认的 Noise V1/T1-T3 encoder。它解决跨仪器、碰撞能和谱图条件变化下的身份稳定性，是底座，不再与后续证据重复计票。
+`S_Noise` 使用当前已外部确认的 Noise V1/T1-T3 encoder；`S_Chem` 使用 ChemAware 共享权重；WSE 是非学习谱学锚。三个分数先在训练折内按候选规模、参考谱数量和来源分层校准，再形成候选对差分。`alpha` 必须满足非负与和为 1 的约束，并通过 formula/source 外折的 group-DRO 目标冻结：优化最差来源或仪器组的候选对损失，而不是平均准确率。
 
-WSE、官方 DreaMS、P2b 和 MSG 不直接全部相加到 `G_ab`。它们用于定义专家分歧、局部证据和必要基线。
+这一步承认 Noise 与 ChemAware 权重都可能有价值，但不再训练逐查询“信哪个专家”的路由器。若 ChemAware 在统一候选图上对 Noise 错误没有外折残余 headroom，`alpha_C` 必须允许精确收缩到零；“开发期涨过”不是强制保留它的理由。官方 DreaMS、P2b 和 MSG 不直接重复加入 `G_ab`，它们用于必要基线和后续局部证据。
 
 ### 2.2 候选排他性的局部谱学证据
 
@@ -91,13 +93,22 @@ WSE、官方 DreaMS、P2b 和 MSG 不直接全部相加到 `G_ab`。它们用于
 
 共享碎片不给 A 或 B 加分。P2b 的全局 neutral-loss 相似度不能直接使用，因为它在 near-core 上有害；它应被拆成候选对层面的差分通道。WSE 和 MSG 提供附加谱学视图，但也只能贡献 A-vs-B 的差异。
 
-记局部差分为：
+Phase 1 已证明“排他峰个数”不能作为局部差分：参考谱更多的候选会积累更多排他峰。必须把每个候选的参考谱视作对实验条件分布的抽样，而不是可无限累加的票数。对每个方向采用等机会构造：
+
+1. 两个候选各抽取相同数量的参考谱；不足时不重复采样；
+2. 每张参考谱分别计算峰、neutral loss 和峰间质量差支持，再在候选内取稳健均值或中位数；
+3. 每个方向只保留固定 `K` 个由参考谱稳定性预先选出的排他事件；
+4. 分数除以可观测事件数，缺失证据记为零贡献，不记为反证；
+5. 对抽样重复取中位数，并报告参考谱抽样方差。
+
+记参考机会平衡后的局部差分为：
 
 ```text
-L_ab = local_evidence(q,a) - local_evidence(q,b)
+L_ab_bal = balanced_local_evidence(q,a | b)
+         - balanced_local_evidence(q,b | a)
 ```
 
-这一步解决 P2b 失败的根因：近异构体的大量共享碎片不再被重复奖励，排序只看真正能分开当前两名候选的部分。
+它同时满足共享证据归零、候选交换反对称和参考谱机会平衡。只有这三个性质同时成立，才可能解决 P2b 在 near-core 失败及 Phase 1 的参考谱数量混杂。
 
 ### 2.3 化学解释的双重对照
 
@@ -115,37 +126,60 @@ ChemAware 对 A/B 的结构差异生成候选特异解释 `H_ab`。对同一个 
 
 从 Noise 的多条件实测谱中，取同一分子的两张谱形成 `L_nuis`。这里真实化学差异为零，但仪器、碰撞能和峰缺失可以变化。它回答：某个化学规则是否只是碰巧解释了常见实验漂移。
 
-### 2.5 唯一核心统计量：二重差分
+### 2.5 唯一核心统计量：三重空对照的交集门
 
-对真实局部差分和实验漂移分别比较真实化学解释与伪解释：
+令 `T_real=F(L_ab_bal,H_real)`。分别在匹配空分布中将它标准化：
 
 ```text
-D_ab = [F(L_ab, H_real) - mean_null F(L_ab, H_null)]
-     - [F(L_nuis, H_real) - mean_null F(L_nuis, H_null)]
+Z_chem = robust_z[T_real ; F(L_ab_bal, H_chemical_null)]
+Z_ref  = robust_z[T_real ; F(L_refnull, H_real)]
+Z_nuis = robust_z[T_real ; F(L_nuis, H_real)]
+
+D_ab = min(Z_chem, Z_ref, Z_nuis)
 ```
 
-其中 `H_null` 是 rotated、reversed、peak-permuted 和 zero；`F` 可以先从受限的单调双线性函数开始，不使用大模型。
+其中：
+
+- `H_chemical_null` 是 rotated、reversed、peak-permuted 和 zero；
+- `L_refnull` 在相同 formula、参考谱数量、峰数、仪器和来源条件下交换候选参考谱，专门估计“参考谱机会”伪增益；
+- `L_nuis` 是同分子跨实验条件差分；
+- `robust_z` 首选匹配空分布的中位数与 MAD，MAD 退化时用条件经验分位数，不使用容易被长尾牵引的简单均值；
+- `F` 从受限单调双线性函数开始，不使用大模型。
 
 直观解释只有一句：
 
-> 真实候选之间的谱学差异，是否比同分子实验漂移更特异地支持真实化学差异。
+> 参考机会平衡后的真实候选差异，是否同时超过匹配参考谱空对照、伪化学解释和同分子实验漂移。
 
-这不是因果效应；`D_ab` 是经过两套匹配空对照校正的**候选特异相容性**。论文中禁止使用“发现碎裂因果机制”。
+这里使用 `min` 而不是把三个残差相加：只有三个门都为正，`D_ab` 才为正；某一类反证失败不能被另一类很大的分数补偿。这是 intersection-union 纪律，不是把三个相关检验伪装成独立证据。
 
-### 2.6 最终排序
+这不是因果效应；`D_ab` 是通过三类匹配空对照的**候选特异相容性下界**。论文中禁止使用“发现碎裂因果机制”。
+
+### 2.6 最终排序：先形成候选对边流，再投影为全局排序
 
 最终只包含两个可解释部分：
 
 ```text
-M_ab = calibrated(G_ab) + beta * positive_part(calibrated(D_ab))
+M_ab = calibrated(G_ab)
+     + sum_k gamma_k * calibrated(R_k,ab)
+     + beta * positive_part(calibrated(D_ab))
 ```
 
+- `R_k,ab` 是 P2b 的峰、neutral loss、熵和 MSG-OOF 等重排通道的候选对差分；所有 `gamma_k` 非负并可收缩到零；
 - `beta` 只在内层公式隔离折冻结；
 - `D_ab` 的外折条件风险下界不大于零时，精确设为零；
-- 所有候选对的 `M_ab` 通过固定的 Bradley-Terry/listwise 映射得到一个候选排序；
+- 强制 `M_ba=-M_ab`，缺失通道贡献为零；
 - 若没有候选获得足够的两两优势，保留基础排序或输出候选集合，不强行唯一注释。
 
-这里不是让模型学习“信哪个专家”，而是要求化学模块提交一份能够经受实验漂移和伪规则反证的候选对证据。
+不同通道可能形成循环矛盾，例如 A 胜 B、B 胜 C、C 又胜 A。不能假装任意 pairwise 头天然对应一个全局分数。对 top-M 完全候选图求加权最小二乘投影：
+
+```text
+s* = argmin_{sum_c s_c = 0} sum_(a,b) w_ab [M_ab - (s_a - s_b)]^2
+rho_cycle = ||M - grad(s*)||_w / ||M||_w
+```
+
+`s*` 给出唯一全局排序；`rho_cycle` 是证据冲突比例。高循环残差时回退基础排序或扩大候选集合。该 Hodge/least-squares 投影不是本文的新数学，只是防止多个重排器被生硬投票后产生不可见矛盾的必要实现纪律。
+
+这里不是让模型学习“信哪个专家”，而是把每个组件转换为同一个反对称候选对证据单位，再把其中可全局一致的部分用于排序，把循环冲突显式留作不确定性。
 
 ---
 
@@ -371,13 +405,170 @@ RRF 只作已知失败负对照。BioAware 不参加这张主表。
 
 过不了，就没有 1+1+1 的方法学成果；只能诚实发表 Noise 的稳健谱图学习和若干独立重排结果。过了，才有资格声称本项目不是在堆模块，而是在改变近结构候选判别所使用的证据单位。
 
+---
+
+## 11. 2026-10-07 Phase 1 实证：原始排他证据为什么不能用
+
+已实现 `tasks/GLM_candidate_differential_ledger.py`，在冻结 GNPS identity-disjoint 本地开发底物上构造 Noise top-5 的 77,195 个候选对。数值性质检查通过：
+
+- `L_ba=-L_ab` 精确成立；
+- 给 A/B 同时加入共享峰后所有通道不变；
+- 查询支持的排他碎片覆盖 93.73%，排他 neutral loss 覆盖 93.72%，质量差覆盖 83.49%。
+
+但真正决定方法生死的是错误救援集：在 1,913 个 Noise 排错且正确候选位于候选对中的比较上，碎片、neutral loss 和质量差的方向正确率分别只有 33.93%、33.87% 和 36.54%，明显低于 50%。错误候选平均有 2.06 张参考谱，正确候选平均只有 1.62 张；原始排他计数会系统性奖励有更多参考谱的候选。
+
+因此：
+
+1. 93% 覆盖率不是成功，可能只是参考库机会更多；
+2. 总体 85% 左右的方向准确率主要反映基础模型本来就排对的容易样本，不能证明可纠错；
+3. 原始 `L_ab` 若直接送入学习器，模型极可能学到参考谱数量和库覆盖捷径；
+4. 下一步必须先实现 `L_ab_bal` 与 `L_refnull`，不得先训练融合头；
+5. 这一负结果强化而不是削弱核心方法动机：真正需要估计的是超出“库里看得更多”的候选特异证据。
+
+冻结证据：`data/validation/GLM_candidate_differential_ledger/ledger_p1_identity.json`。
+
+## 12. 统一算法的两层架构
+
+必须把“尽可能强的成品算法”和“论文中的核心方法增量”分开，否则会再次用性能包装创新。
+
+### 12.1 全证据底座：最大化现有资产价值
+
+该层负责性能，不声称原创：
+
+1. 在全候选集合上同时计算 Noise、ChemAware 和 WSE 分数；
+2. 用固定总预算的 top-M Pareto 候选池保留任一表征强烈支持的候选，报告 pool recall@M 和计算成本；
+3. 用 formula/source 外折 group-DRO 冻结全局 `alpha_N/alpha_C/alpha_W`，禁止逐查询路由；
+4. 把 P2b、MSG、谱熵、neutral loss 和 ChemAware V2 全部变成反对称候选对边流；
+5. 用 Hodge 投影得到统一候选分数和循环冲突诊断。
+
+这层回答“怎样把已有好组件最大化利用”。ChemAware 与 Noise 的好权重都获得正式入口，但必须通过统一候选图上的条件增量决定权重，不能把不同评价面板的百分点相加。
+
+### 12.2 方法核心：三重反证后的候选排他证据
+
+该层只回答一个问题：在全证据底座之上，`D_ab` 是否增加了普通 stack 学不到的、安全的纠错能力。它由四个不可替代的域知识约束组成：
+
+- 共享谱学证据归零；
+- 参考谱观察机会平衡；
+- 真实化学解释必须优于匹配伪规则；
+- 候选差异必须超过同分子跨条件漂移。
+
+若全证据底座有效而 `D_ab` 无增益，项目得到强工程算法，但没有新的方法核心。若 `D_ab` 在新外部面板上仍超过同容量 stack，才有资格写“候选差分证据”。
+
+## 13. Noise 与 ChemAware 权重怎样真正融合
+
+### 13.1 先问是否互补，再决定是否合权重
+
+在完全相同的 query、候选池和 molecule pooling 规则上，冻结报告：
+
+- `Noise correct, Chem wrong`；
+- `Noise wrong, Chem correct`；
+- 两者都错但 WSE/P2b/ChemAware V2 可纠正；
+- 错误重叠的 formula/source/instrument 分层区间；
+- 在控制候选参考谱数与谱图质量后，Chem 对 Noise 错误的条件 oracle headroom。
+
+若最后一项的 formula-cluster CI 下界不大于零，停止 task-vector、串训和蒸馏；ChemAware 共享权重只作对照，ChemAware 的局部化学空对照功能仍保留。只有存在稳定的条件互补，才值得比较三种表征整合臂：
+
+1. 冻结双编码器 + 受限分数融合；
+2. 预注册七臂 task-vector/TIES 合并；
+3. Noise→Chem 与 Chem→Noise 的等步数、等数据、等优化器串训。
+
+这些都是性能臂，不是主创新。赢家必须同时保住 Noise 的条件不变性和 ChemAware 的化学困难集，不能只看总体 Top-1。
+
+### 13.2 最终才考虑蒸馏为单 checkpoint
+
+只有全证据 teacher 经外部确认后，才训练单一 student：
+
+```text
+L_student = L_retrieval
+          + lambda_N * L_preserve_Noise_pair_margins
+          + lambda_C * L_preserve_Chem_pair_margins
+          + lambda_T * L_match_teacher_ranking
+```
+
+蒸馏目标是部署简化，不承担发现互补性的任务。直接串训会发生灾难性遗忘，也无法判断性能来自何处，因此不能作为第一步。
+
+## 14. 最新文献后的真实创新边界
+
+2025-2026 年工作已经占据以下位置：
+
+- JESTR、MSAlign：谱图与结构/分子基础模型的候选感知对齐；
+- FLARE：峰与分子子结构的细粒度局部对齐；
+- MVP：多谱图、共识谱和分子多视图联合表示；
+- STEP/MT-GEM：从谱图对预测离散结构变换；
+- conformal retrieval 与 selective prediction：候选集合覆盖保证和风险-覆盖；
+- MCheM：用正交化学信息重排候选；
+- MSFragger-DDA+：在其他质谱领域移除共享碎片后重打分。
+
+所以不能把“双编码器”“局部峰解释”“结构变化”“不确定性”“正交证据”或“共享峰删除”中的任何一个单独写成创新。尚可争取的组合边界非常窄：
+
+> 在小分子同分子式候选检索中，以完整候选图上的反对称边流为统一单位；对局部排他谱学证据做参考机会平衡，并同时用候选匹配化学空对照和同分子跨条件漂移空对照否证；最后只把全局一致的边流分量用于排序，把循环矛盾显式转成拒判信号。
+
+这仍是待验证的优先权边界，不是已证明首创。
+
+## 15. 下一轮代码与实验的严格顺序
+
+### Gate 0：组件互补性账本
+
+- 统一 molecule pooling 与候选图；
+- 生成 Noise/Chem/WSE/P2b/MSG/V2 的 query×candidate 冻结分数；
+- 输出错误交集、条件 oracle headroom 和候选池 recall@M；
+- 若 Chem 权重无稳定残余 headroom，表征合并止步。
+
+### Gate 1：修复 Phase 1 的观察机会偏差
+
+- 实现等参考谱抽样、固定 K 排他事件和方向归一化；
+- 构造 matched `L_refnull`；
+- 在不训练任何头的前提下，要求 rescue-set 符号率超过 50%，且 corrected/introduced 风险净值为正；
+- 若失败，停止候选差分主方法。
+
+### Gate 2：加入 ChemAware 与 Noise 双反证
+
+- 导出 real/rotated/reversed/peakperm/zero 化学解释；
+- 构造按 instrument/CE/adduct/quality 匹配的同分子 `L_nuis`；
+- 检查 real>null 与 real>nuisance 的分层区间；
+- 只有无参数 `D_ab` 通过，才允许训练小头。
+
+### Gate 3：受限统一排序器
+
+- 非负、单调、反对称、缺失归零；
+- 与相同参数量的线性 stack、HGB/MLP、router、无 null 消融同台；
+- 用 Hodge 投影输出候选分数及 cycle residual；
+- 预注册 cycle residual 的回退阈值。
+
+### Gate 4：一次性新外部确认
+
+- GNPS 已是开发/确认底物，不能继续承担唯一终测；
+- 在新来源或新实验室面板上冻结运行；
+- 主成功条件仍是胜最佳单组件、胜同容量 stack、near-core 不退化、formula/source CI 下界大于零、corrected>2×introduced。
+
+BioAware B44-B46 的负结果必须作为“为何不把所有模块强行进分数”的证据；B47 未过外部门前不进入 Gate 0-4。
+
 ## 参考边界（2026-10-05 检索）
 
 - STEP / MT-GEM: https://pubmed.ncbi.nlm.nih.gov/42182457/
 - FLARE: https://pmc.ncbi.nlm.nih.gov/articles/PMC12873900/
 - MSAlign: https://arxiv.org/abs/2605.19752
+- JESTR: https://pmc.ncbi.nlm.nih.gov/articles/PMC12233093/
+- MVP: https://pmc.ncbi.nlm.nih.gov/articles/PMC12642559/
+- MCheM: https://www.nature.com/articles/s41467-025-61240-z
+- MSFragger-DDA+ shared-fragment removal: https://pmc.ncbi.nlm.nih.gov/articles/PMC11507693/
+- HodgeRank: https://arxiv.org/abs/0811.1067
 - Reliable Molecular Retrieval from Mass Spectra using Conformal Prediction: https://www.biorxiv.org/content/10.64898/2026.03.12.711424v1
 - Quantifying per-match Reliability in Library Matching: https://www.biorxiv.org/content/10.64898/2026.07.30.741704v1
 - PeakDecoder: https://www.nature.com/articles/s41467-023-37031-9
 - COSMIC: https://www.nature.com/articles/s41587-021-01045-9
 - Data Processing of Product Ion Spectra / FDR control: https://doi.org/10.5702/massspectrometry.A0155
+
+## 16. Gate 1 裁决（2026-10-07，预注册停止规则执行）
+
+实现与结果：`tasks/GLM_gate1_fast.py` → `data/validation/GLM_candidate_differential_ledger/gate1_balanced.json`。
+
+- 等参考抽样（n_eq=min(两侧)，4次抽样平均）+ matched reference null（同分子半分裂）后，营救集方向正确率 **28.53% [24.08, 32.98]**——不仅未过 50% 门，反而低于未平衡版的 33.9%；
+- 翻转规则风险净值 corrected−2×introduced = 660−2×1120 = **−1580**；
+- 可评对覆盖 36.2%（双侧 ≥2 参考谱；单参考谱分子无法构造 refnull）。
+
+两项门全部失败。方向一致性揭示机制：在 Noise 排错的候选对上，查询谱整体上就更像错误候选（这正是排错的原因），排他证据计数无论怎样平衡观察机会都系统性指向错误方。**计数层的候选差分证据不可用；这不是加权或校准能修复的问题。**
+
+按第 15 节预注册规则：**候选差分核心创新线就此停止。** 化学解释层（D_chem）与同分子漂移对照（L_nuis）不再实现——它们的前提（排他证据在计数层有正确方向）已被否证。
+
+存活的部分（第 12.1 节全证据底座）：统一候选图上的多视图分数融合 + HodgeRank 一致性聚合，作为性能层（v0 实测：本地视图下与 WSE 持平，ChemAware encoder 槽位待服务器分数）。该层不承担方法学创新主张。
