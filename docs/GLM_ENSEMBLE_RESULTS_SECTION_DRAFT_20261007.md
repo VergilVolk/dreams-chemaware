@@ -23,6 +23,8 @@ We benchmarked fifteen spectral-similarity methods on two sealed, model-blind GN
 
 *Two evaluation traps.* During this analysis we identified and retracted two misleading intermediate results, which we report as methodological warnings: (i) any confidence signal derived from the true positive's score (e.g., positive-vs-best-negative margin) leaks the answer key and reproduces the oracle bound; (ii) panels overlapping in query spectra silently convert cross-panel training into memorization — our identity- and formula-disjoint GNPS panels share 5,237 of the formula panel's 5,261 queries, so all cross-panel supervised numbers must deduplicate by query spectrum and structure.
 
+*Application: the gate on real dark features.* We transferred the calibrated cosine gate (conservative identity-panel thresholds: gap ≥ 0.584 at 99% / 0.741 at 99.5%) to reverse-search annotation of 30 LCNEC priority dark modules against 52,871 GNPS library spectra, with molecule-level (InChIKey-collapsed) score gaps. One module passed the spectral gate (m/z 221.985, C8H7FN6O, cosine 0.949, gap 0.826) and carries a fluorine plausibility flag — exogenous-until-proven in tissue; four high-scoring modules were blocked by contested gaps (including m/z 273.081: the highest cosine 0.981 with gap 0.012, the confident-error pattern the benchmark predicts); 22 remained dark, whose low-scoring top hits are predominantly halogenated drug-like formulas, i.e., library-coverage absence rather than candidates. The claim for each module therefore requires two axes — spectral gate and chemical plausibility — which is the operating shape of the identifiability-gated workflow.
+
 ## Table/figure plan
 
 | Element | Source artifact |
@@ -34,6 +36,7 @@ We benchmarked fifteen spectral-similarity methods on two sealed, model-blind GN
 | Table 2b — U1 vs EACH of the 15 methods (paired CI; significantly better than 11-12/15, never significantly worse) | `run15/u1_vs_each_method.json` |
 | Table 3 — gap calibration (quintile accuracy + AUC per method) | `run15/gap_calibration.json` |
 | Suppl — failure-band structure (winners' percentiles, φ, winner counts) | `run15/risk_coverage.json` |
+| Fig 3 — three-tier claims on LCNEC dark modules (gate transfer application) | `deliverables/figures/GLM_lcnec_three_tier.{svg,pdf,png}` + `deliverables/GLM_track2_census/lcnec_dark_three_tier.csv` |
 
 ## Methods addendum (for the same section)
 

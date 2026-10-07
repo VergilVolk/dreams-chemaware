@@ -209,3 +209,9 @@ tasks/ 2,339 文件：audit 395 / test 402 / sbatch 416（全部 sbatch-only，�
 - **幸存部署物**：弃权门控（`GLM_confidence_gate.py`）：WSE/noise_v1 在 60% 覆盖下达 99.0–99.5% 精度（带 CI），弃权带 ≈ 抛硬币 → identifiability-gated 范式的直接实证接口。
 - **SOTA 审计**（`GLM_SOTA_AUDIT_20261007.md`）：判别力双面板第一；检索平手；集成不可部署 = 可引用否定性结果；MoNA 极性外部验证本地受阻（谱本体+checkpoint 在服务器，快照 hash 匹配 0.65%），已队列化。
 - 论文材料：英文结果章节草稿 + 门控故事图 + 15 方法 metric-split 图。
+### 11.1 追加（同日晚）：门控范式落地 LCNEC（任务二三級主张架构）
+
+- 分子级暗特征重扫（v1 只存 top-3 谱邻居无法算 gap，v2 按 ik14 折叠精确化）+ GNPS 校准阈值迁移（cosine gap ≥0.584@99%）。
+- 30 模块：**1 过门控但含氟（外源待证，双轴主张）**；4 高分争议送正交证据（含 273.081：全场最高 cos 0.981/gap 0.012 = 自信错误陷阱实证）；22 暗特征（top 命中多为含卤药物样式 = 库覆盖缺失）。
+- 审计修正：v1 三级表的名字联接自 pilot 时代带 bug 的 identities 表（分子过期/分数虚高/USI 冒名），v2 从 manifest 直连并加卤素合理性旗标；旧表明令弃用。
+- 工件：`docs/GLM_LCNEC_DARK_THREE_TIER_CLAIMS_20261007.md`、`deliverables/GLM_track2_census/`、图 `GLM_lcnec_three_tier`。
