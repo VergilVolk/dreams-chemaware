@@ -15,6 +15,7 @@
 | U1 vs 每个单方法（配对CI） | `u1_vs_each_method.json` | 显著胜 11-12/15，对顶部集群 n.s.，从不显著落败 |
 | 贡献结构（口径修正） | `audit_unique_wins.json` | 胜者成员数第一：noise_v1（287/161）；唯一命中第一：ms2deepscore（65/24，net为负） |
 | 泄露清除 router ≈10% 空间 | `router_v3.json` | B +0.61 [+0.15,+1.06]、C +0.51 [+0.09,+0.95]、A +0.23 n.s. |
+| 谱特征通道关闭 | `spectrum_router.json` | 谱特征S≈0；S+C vs C：+0.09/0/−0.03pp=无增益 |
 | router 信号为真（非伪影） | `router_permutation.json` | 置换 −0.91/−0.54 vs 真实 +0.23/+0.61 |
 | gap 校准好（方法内） | `gap_calibration.json` | AUC 0.86–0.93；Q5 ≈99.3–100% |
 | 赢家不自知（诊断，含对照审核） | `audit_winner_confidence.json` + `risk_coverage.json` | R集内赢家vs输家 gap AUC 0.449/0.437（vs 全集校准0.905）；φ 0.762/0.748 |

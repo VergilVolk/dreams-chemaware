@@ -1,0 +1,95 @@
+{
+  "status": "GLM_SPECTRUM_ROUTER",
+  "splits": {
+    "A": {
+      "_best_single": {
+        "method": "weighted_spectral_entropy",
+        "recall1": 86.63
+      },
+      "router_S": {
+        "recall1": 86.18,
+        "delta_vs_best_single_pp": -0.45,
+        "ci95_vs_best_single": [
+          -0.94,
+          0.05
+        ]
+      },
+      "router_C": {
+        "recall1": 86.86,
+        "delta_vs_best_single_pp": 0.23,
+        "ci95_vs_best_single": [
+          -0.24,
+          0.68
+        ]
+      },
+      "router_SC": {
+        "recall1": 86.95,
+        "delta_vs_best_single_pp": 0.32,
+        "ci95_vs_best_single": [
+          -0.16,
+          0.79
+        ]
+      }
+    },
+    "B": {
+      "_best_single": {
+        "method": "weighted_spectral_entropy",
+        "recall1": 88.27
+      },
+      "router_S": {
+        "recall1": 88.14,
+        "delta_vs_best_single_pp": -0.13,
+        "ci95_vs_best_single": [
+          -0.68,
+          0.42
+        ]
+      },
+      "router_C": {
+        "recall1": 88.88,
+        "delta_vs_best_single_pp": 0.61,
+        "ci95_vs_best_single": [
+          0.15,
+          1.06
+        ]
+      },
+      "router_SC": {
+        "recall1": 88.88,
+        "delta_vs_best_single_pp": 0.61,
+        "ci95_vs_best_single": [
+          0.13,
+          1.08
+        ]
+      }
+    },
+    "C": {
+      "_best_single": {
+        "method": "weighted_spectral_entropy",
+        "recall1": 87.57
+      },
+      "router_S": {
+        "recall1": 87.55,
+        "delta_vs_best_single_pp": -0.02,
+        "ci95_vs_best_single": [
+          -0.51,
+          0.45
+        ]
+      },
+      "router_C": {
+        "recall1": 88.08,
+        "delta_vs_best_single_pp": 0.51,
+        "ci95_vs_best_single": [
+          0.09,
+          0.95
+        ]
+      },
+      "router_SC": {
+        "recall1": 88.05,
+        "delta_vs_best_single_pp": 0.48,
+        "ci95_vs_best_single": [
+          0.05,
+          0.89
+        ]
+      }
+    }
+  }
+}
