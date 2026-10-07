@@ -65,6 +65,15 @@ def load_dreams_encoder(args):
     architecture checkpoints (same contract as GLM_train_chemaware_listwise).
     Noise V1 start = official architecture checkpoint replaced by the
     Noise V1 weights file; the hash is pinned by the caller's sbatch."""
+    # matchms>=0.30 compat shim (dreams imports the legacy ModifiedCosine
+    # location; our path never calls it - stub keeps the import chain alive,
+    # same practice as the matchms.Spikes shim in the scoring scripts)
+    import matchms.similarity as _ms  # noqa: PLC0415
+    if not hasattr(_ms, "ModifiedCosine"):
+        class _ModifiedCosine:  # pragma: no cover - unused stub
+            def __init__(self, *a, **k):
+                pass
+        _ms.ModifiedCosine = _ModifiedCosine
     from dreams.models.heads.heads import ContrastiveHead  # noqa: PLC0415
     from train_e1_identity import load_base_model  # noqa: PLC0415
     initialized, _ = load_base_model(
