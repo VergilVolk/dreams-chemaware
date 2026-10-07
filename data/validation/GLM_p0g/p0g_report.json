@@ -1,0 +1,61 @@
+{
+  "status": "P0_G_STOP",
+  "dict_fraction": 0.7,
+  "dict_identities": 3873,
+  "heldout_identities": 1661,
+  "results": {
+    "official_dreams": {
+      "match_queries": 7691,
+      "no_match_queries": 3304,
+      "match_top1": 0.8539,
+      "match_top5": 0.9691,
+      "match_median_max_score": 0.8944,
+      "no_match_median_max_score": 0.8963,
+      "no_match_q95_max_score": 0.9818,
+      "score_separation_auc": 0.5014,
+      "coverage_at_5pct_error": 0.0413,
+      "threshold_at_5pct_error": 0.985,
+      "coverage_at_2pct_error": 0.0088,
+      "threshold_at_2pct_error": 0.995
+    },
+    "noise_v1": {
+      "match_queries": 7691,
+      "no_match_queries": 3304,
+      "match_top1": 0.8644,
+      "match_top5": 0.9705,
+      "match_median_max_score": 0.8558,
+      "no_match_median_max_score": 0.8574,
+      "no_match_q95_max_score": 0.9691,
+      "score_separation_auc": 0.507,
+      "coverage_at_5pct_error": 0.0625,
+      "threshold_at_5pct_error": 0.97,
+      "coverage_at_2pct_error": 0.0179,
+      "threshold_at_2pct_error": 0.985
+    },
+    "weighted_spectral_entropy": {
+      "match_queries": 7691,
+      "no_match_queries": 3304,
+      "match_top1": 0.8745,
+      "match_top5": 0.9683,
+      "match_median_max_score": 0.906,
+      "no_match_median_max_score": 0.9119,
+      "no_match_q95_max_score": 0.9996,
+      "score_separation_auc": 0.5003,
+      "coverage_at_5pct_error": null,
+      "threshold_at_5pct_error": null,
+      "coverage_at_2pct_error": null,
+      "threshold_at_2pct_error": null
+    }
+  },
+  "gates": {
+    "official_dreams_top1_gt_50": true,
+    "official_dreams_separation_gt_65": false,
+    "official_dreams_cov_at_2pct_gt_30": "False",
+    "noise_v1_top1_gt_50": true,
+    "noise_v1_separation_gt_65": false,
+    "noise_v1_cov_at_2pct_gt_30": "False",
+    "weighted_spectral_entropy_top1_gt_50": true,
+    "weighted_spectral_entropy_separation_gt_65": false
+  },
+  "claim_limit": "P0-G: open-set coordinate mapping. Tests find-correct AND abstain-on-unknown."
+}
