@@ -73,6 +73,11 @@ def main() -> None:
             els = formula_elements(mol.get("formula"))
             halogens = {e: els.get(e, 0) for e in ("F", "Cl", "Br", "I")
                         if els.get(e, 0)}
+            # mass-delta axis: dark precursor vs candidate [M+H]+
+            ppm = None
+            if row is not None and pd.notna(row["exact_mass"]):
+                mh = float(row["exact_mass"]) + 1.007276
+                ppm = (m["precursor"] - mh) / mh * 1e6
             return {
                 "ik14": mol["ik14"], "cosine": mol["cosine"],
                 "formula": mol["formula"],
@@ -81,6 +86,9 @@ def main() -> None:
                 "instrument": (str(row["instrument"]) if row is not None
                                and pd.notna(row["instrument"]) else None),
                 "halogens": halogens or None,
+                "delta_ppm_vs_mh": (round(float(ppm), 1)
+                                    if ppm is not None else None),
+                "analog_mass_match": bool(ppm is None or abs(ppm) > 10.0),
             }
 
         t1, t2 = enrich(top), enrich(second)
@@ -105,6 +113,8 @@ def main() -> None:
         "top1_usi": r["top1"].get("usi"),
         "top1_halogens": r["top1"].get("halogens"),
         "top1_halogen_flag": r["top1_halogen_flag"],
+        "top1_delta_ppm_vs_mh": r["top1"].get("delta_ppm_vs_mh"),
+        "top1_analog_mass_match": r["top1"].get("analog_mass_match"),
         "top2_ik14": r["top2"].get("ik14"),
         "top2_formula": r["top2"].get("formula"),
         "top2_cosine": r["top2"].get("cosine"),
@@ -140,7 +150,8 @@ def main() -> None:
     OUT_JSON.write_text(json.dumps(report, indent=2), encoding="utf-8")
     print(json.dumps(counts, indent=1))
     cols = ["precursor", "tier", "best_cosine", "molecule_gap",
-            "entropy_best", "top1_ik14", "top1_formula", "top1_halogens",
+            "entropy_best", "top1_ik14", "top1_formula",
+            "top1_delta_ppm_vs_mh", "top1_analog_mass_match",
             "top1_halogen_flag"]
     print(df[cols].to_string(index=False))
     print(f"written: {OUT_CSV}")

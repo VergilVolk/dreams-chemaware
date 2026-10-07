@@ -9,29 +9,34 @@
 - 暗特征：30 个 LCNEC priority dark 模块；分子级（ik14 折叠）重扫（`GLM_lcnec_dark_molecule_rescan.py`），0.7% 类似物容差门，52,871 张 GNPS gold/silver 库谱。
 - 门控阈值（GNPS cosine_greedy，保守取 identity 面板）：@99% 精度 gap ≥ **0.584**；@99.5% gap ≥ **0.741**。
 
-## 2. 三级结果（30 模块；双轴 = 谱学门控 × 合理性旗标）
+## 2. 三级结果（30 模块；三轴 = 谱学门控 × 合理性旗标 × 质量一致性）
 
-| 级 | 定义 | 数量 | 模块（m/z → top 命中） | 卤素旗标 |
-|---|---|---|---|---|
-| **A 门控通过** | cos ≥0.85 且 gap ≥0.584 | **1** | 221.985 → C8H7FN6O（cos 0.949，gap 0.826，entropy 0.421） | ⚠ **含 F（外源待证）** |
-| **B1 高分争议** | cos ≥0.85，gap 不过 | 4 | 273.081 → C14H10F2N4（0.981/gap **0.012**）⚠F₂；342.088 → C20H29N3O2（0.967/0.205）；207.015 → C12H15NO2（0.934/0.011）；313.120 → C14H15F3N4O（0.924/0.006）⚠F₃ | 3/4 含氟 |
-| **B2 次命中** | 0.70–0.85 | 3 | 190.072（C8H18N2OS）、251.079（C13H17NO4）、244.023（C15H17NO2） | 无 |
-| **C 暗** | <0.70 | 22 | 无谱学主张；12/29 个 top 命中含卤素（含 F₆、BrCl 等）→ 库覆盖缺失信号，不报告为候选 | — |
+**质量轴（本轮审计新增）：dark 前体 vs 候选 [M+H]+ 的偏差全部 >10 ppm（−23.8 至 −6963 ppm）——30 个模块没有任何同质量候选，全部 top 命中都是 0.7% 类似物容差门扫进来的类似物匹配。**
 
-## 3. 读数
+| 级 | 定义 | 数量 | 模块（m/z → top 命中） | Δppm | 卤素 |
+|---|---|---|---|---|---|
+| **A 门控通过** | cos ≥0.85 且 gap ≥0.584 | **1** | 221.985 → C8H7FN6O（cos 0.949，gap 0.826） | **−4883** ⚠类似物 | ⚠ F |
+| **B1 高分争议** | cos ≥0.85，gap 不过 | 4 | 273.081（0.981/gap 0.012） | −52 | ⚠ F₂ |
+| | | | 342.088（0.967/0.205） | −6232 | — |
+| | | | 207.015（0.934/0.011） | +4353 | — |
+| | | | 313.120（0.924/0.006） | −24 | ⚠ F₃ |
+| **B2 次命中** | 0.70–0.85 | 3 | 190.072 / 251.079 / 244.023 | −5488 / −4142 / −450 | — |
+| **C 暗** | <0.70 | 22 | 无谱学主张 | — | 12/29 top 命中含卤 |
 
-1. **唯一过门控的命中带合理性旗标**：221.985 的谱学证据充分（gap 0.826），但 C8H7FN6O 含氟——组织代谢组学中含氟结构默认外源（LCNEC 患者化疗/环境暴露可能）。**门控通过 ≠ 可报告；主张需要双轴（谱学×合理性）都过。** 该模块的正确下一步：查用药记录/进样序列污染排查/标准品。
-2. **最高分仍是最争议**：273.081 cosine 0.981、gap 0.012——传统 top-hit 工作流的"自信错误"，门控拦截送升级；且其候选 F₂，同样待合理性审查。
-3. 22 个暗特征的低分"top 命中"多为含卤药物样化学式（F₆、BrCl）——反向搜索在此分数段没有信息量，暗特征的正确表述是"库覆盖缺失"。
-4. B1/B2 共 7 个模块是正交证据工单（标准品清单含 SMILES/USI/仪器，`lcnec_dark_three_tier.csv`）。
+## 3. 读数（最终版）
+
+1. **零分子级命中**：质量轴加入后，30 个暗特征没有一个具备同质量候选——谱学 gap 门控通过的 221.985 也是 −1.09 Da 的类似物（谱极相似但质量不符）。**任何 top-hit 工作流都会在这里产生 8 个假"高置信鉴定"；三轴架构把它们全部拦在正确层级。**
+2. 候选化学空间本身可疑：top 命中多为 GNPS 合成库（组合化学板）含氟/含卤结构——对内源组织代谢物而言是谱巧合类似物，B1/B2 不构成购买工单，只构成"药物暴露/污染排查 + MSn"的排查线索。
+3. 221.985 的正确处置：**污染/用药暴露排查优先于任何标准品采购**（QC/blank 序列相关性、进样序位置）。
+4. 22 个暗特征 = 库覆盖缺失，无候选主张。
 
 ## 4. 边界（随表携带）
 
 - 阈值校准域（库-库谱）与迁移域（真实样本 DDA）存在域移位；@99% 保证近似成立。
-- 类似物容差门使竞争分子含类似物，gap 语义 = 证据受争议。
-- Tier A 为 Level 2 文献匹配主张；Level 1 需标准品。卤素旗标为启发式（F/Cl/Br/I→外源待证），不替代用药史与 QC 排查。
+- 质量轴判据：|Δ| ≤10 ppm 视为同质量候选；>10 ppm 一律类似物（本表全部如此）。
+- Tier A 为 Level 2 文献匹配主张（且本表 Tier A 实为类似物线索，非分子鉴定）；Level 1 需标准品。卤素旗标为启发式，不替代用药史与 QC 排查。
 - n=30，无统计主张。
-- 摘要句（可进稿件）：*Confidence thresholds calibrated on a model-blind benchmark were transferred to dark-feature reverse search: of 30 modules, one passed the spectral gate (and carries a fluorine plausibility flag), four high-scoring modules were blocked by contested molecule-level gaps, and 22 remained dark.*
+- 摘要句（可进稿件）：*Transferring benchmark-calibrated confidence gates to reverse-search annotation of 30 LCNEC dark modules yielded no molecule-level identification: every top hit is an analog-mass match (23-7000 ppm off the candidate [M+H]+), mostly fluorinated synthetic-library structures; one module passed the spectral gap gate and is flagged exogenous-until-proven. The three-axis architecture (spectral gate, chemical plausibility, mass consistency) is what prevents these from being reported as identifications.*
 
 ## 5. 工件
 
