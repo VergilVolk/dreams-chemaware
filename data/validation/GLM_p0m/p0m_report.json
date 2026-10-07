@@ -1,0 +1,85 @@
+{
+  "status": "P0_M_STOP",
+  "dict_fraction": 0.7,
+  "results": {
+    "official_dreams": {
+      "match_queries": 7691,
+      "no_match_queries": 3304,
+      "near_match_queries": 5322,
+      "match_median_margin": 0.3351,
+      "nomatch_median_margin": 0.0479,
+      "near_match_median_margin": 0.2304,
+      "separation_auc": 0.8277,
+      "operating_point_5pct_fdr": {
+        "threshold": 0.3,
+        "coverage": 0.5484,
+        "precision_on_match": 0.9919,
+        "no_match_false_assign_rate": 0.049
+      },
+      "operating_point_2pct_fdr": {
+        "threshold": 0.43,
+        "coverage": 0.3665,
+        "precision_on_match": 0.9961,
+        "no_match_false_assign_rate": 0.0197
+      },
+      "selective_risk_60pct": 0.146145,
+      "selective_risk_80pct": 0.146145
+    },
+    "noise_v1": {
+      "match_queries": 7691,
+      "no_match_queries": 3304,
+      "near_match_queries": 5322,
+      "match_median_margin": 0.456,
+      "nomatch_median_margin": 0.0553,
+      "near_match_median_margin": 0.3319,
+      "separation_auc": 0.8482,
+      "operating_point_5pct_fdr": {
+        "threshold": 0.375,
+        "coverage": 0.5847,
+        "precision_on_match": 0.9902,
+        "no_match_false_assign_rate": 0.0472
+      },
+      "operating_point_2pct_fdr": {
+        "threshold": 0.535,
+        "coverage": 0.391,
+        "precision_on_match": 0.996,
+        "no_match_false_assign_rate": 0.02
+      },
+      "selective_risk_60pct": 0.135613,
+      "selective_risk_80pct": 0.135613
+    },
+    "weighted_spectral_entropy": {
+      "match_queries": 7691,
+      "no_match_queries": 3304,
+      "near_match_queries": 5322,
+      "match_median_margin": 0.5927,
+      "nomatch_median_margin": 0.0354,
+      "near_match_median_margin": 0.4354,
+      "separation_auc": 0.8718,
+      "operating_point_5pct_fdr": {
+        "threshold": 0.415,
+        "coverage": 0.6437,
+        "precision_on_match": 0.9921,
+        "no_match_false_assign_rate": 0.049
+      },
+      "operating_point_2pct_fdr": {
+        "threshold": 0.625,
+        "coverage": 0.4646,
+        "precision_on_match": 0.9964,
+        "no_match_false_assign_rate": 0.02
+      },
+      "selective_risk_60pct": 0.123191,
+      "selective_risk_80pct": 0.123191
+    }
+  },
+  "gates": {
+    "official_dreams_separation_gt_60": true,
+    "official_dreams_risk_at_60pct_lt_5pct": false,
+    "noise_v1_separation_gt_60": true,
+    "noise_v1_risk_at_60pct_lt_5pct": false,
+    "weighted_spectral_entropy_separation_gt_60": true,
+    "weighted_spectral_entropy_risk_at_60pct_lt_5pct": false
+  },
+  "key_finding": "Margin (top1-top2 gap) separation AUC: 0.8482. Absolute score AUC was 0.507 (chance). Margin selective risk at 60% coverage: 0.135613.",
+  "claim_limit": "P0-M: margin-based abstention. Tests if top1-top2 gap can replace absolute score."
+}
