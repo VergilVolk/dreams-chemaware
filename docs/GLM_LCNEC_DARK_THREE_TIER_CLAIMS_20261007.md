@@ -30,6 +30,15 @@
 3. 221.985 的正确处置：**污染/用药暴露排查优先于任何标准品采购**（QC/blank 序列相关性、进样序位置）。
 4. 22 个暗特征 = 库覆盖缺失，无候选主张。
 
+## 3.5 法证层（EIC矩阵对照，冻结资产）
+
+对 A/B1/B2 全部 8 个模块用冻结 EIC 矩阵（85 进样 = 68 study + 9 QC + 2 blank + 6 dilution）做样本类型分解 + 表型效应联查（`GLM_lcnec_dark_forensics.py` → `lcnec_dark_forensics.json`）：
+
+- **8/8：blank 0/2 检出（零污染）、QC 9/9 稳健、study 68/68 全检出**；
+- **8/8 带强表型效应**：|log2FC| = 1.06–3.12，q ≤ 4.6×10⁻¹¹（其中 342.088 达 +2.92/q=1.4e-19、190.072 达 +3.12/q=2.1e-17）；
+- 处置更新：Tier-A 221.985 的污染假说被 blank 屏除——它是真实、重现、与表型强关联的成分；含氟类似物邻居使**药物暴露假说**成为首选检验（用药记录联查 → MSn），其余 B1/B2 走 MSn/标准品路线；
+- 组合结论：**这 8 个是"库覆盖缺失但信号真实"的暗物质核心**——三级架构把它们与假鉴定区分开，法证层证明它们值得正交证据投入。
+
 ## 4. 边界（随表携带）
 
 - 阈值校准域（库-库谱）与迁移域（真实样本 DDA）存在域移位；@99% 保证近似成立。
@@ -44,4 +53,5 @@
 |---|---|
 | `tasks/GLM_lcnec_dark_molecule_rescan.py` + `lcnec_dark_molecule_rescan.{json,csv}` | 分子级重扫（gap 精确） |
 | `tasks/GLM_lcnec_dark_three_tier.py`（v2） + `lcnec_dark_three_tier.{json,csv}` | 双轴三级主张表（SMILES/USI/卤素旗标） |
+| `tasks/GLM_lcnec_dark_forensics.py` + `lcnec_dark_forensics.json` | 法证层：blank/QC/study 分解 + 表型效应 + 处置 |
 | `deliverables/GLM_gnps_article_ladder/run15/gate_cosine_{identity,formula}.json` | 阈值校准来源 |
