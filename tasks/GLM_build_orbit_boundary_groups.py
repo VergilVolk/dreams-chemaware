@@ -47,15 +47,22 @@ import numpy as np
 
 def rotate_margins(real: np.ndarray, label: int,
                    rng: np.random.Generator) -> np.ndarray:
-    """Rotate the false-candidate margins among themselves."""
+    """Rotate the false-candidate margins among their nonzero positions.
+
+    Guarantees a different assignment when at least two distinct nonzero
+    margins exist (retries the shuffle); with fewer, returns the only
+    permutation available and the trainer must be interpreted accordingly.
+    """
     false_idx = [i for i in range(len(real)) if i != label]
     vals = [real[i] for i in false_idx if real[i] != 0.0]
-    rng.shuffle(vals)
-    out = np.zeros_like(real)
-    it = iter(vals)
-    for i in false_idx:
-        if real[i] != 0.0:
-            out[i] = next(it)
+    nonzero = [i for i in false_idx if real[i] != 0.0]
+    for _ in range(20):
+        rng.shuffle(vals)
+        out = np.zeros_like(real)
+        for pos, v in zip(nonzero, vals):
+            out[pos] = v
+        if len(nonzero) < 2 or not np.allclose(out, real):
+            return out
     return out
 
 

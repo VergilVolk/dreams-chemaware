@@ -49,10 +49,12 @@ for i in range(N):
 v = {"rows": np.asarray(rows), "molecule": np.asarray(mols),
      "instrument": np.asarray(inst), "quality": np.asarray(qual, float)}
 
-# chemical margins: every group has one false candidate (local idx 2) with
-# margin 0.3
-m = {"group_id": np.arange(N), "candidate_local": np.full(N, 2),
-     "margin": np.full(N, 0.3, dtype=np.float32)}
+# chemical margins: false candidates carry two distinct margins (1 -> 0.3,
+# 2 -> 0.5) so the candidate-rotated null can actually permute
+m = {"group_id": np.concatenate([np.arange(N), np.arange(N)]),
+     "candidate_local": np.concatenate([np.full(N, 1), np.full(N, 2)]),
+     "margin": np.concatenate([np.full(N, 0.3, dtype=np.float32),
+                               np.full(N, 0.5, dtype=np.float32)])}
 
 cand = tmp / "candidate_groups.npz"
 views = tmp / "condition_views.npz"
@@ -88,12 +90,15 @@ assert (orbit_real >= 0).all() and (orbit_null >= 0).all()
 # replicates (rows 200+)
 assert (orbit_real >= 100).all() and (orbit_real < 200).all()
 assert (orbit_null >= 200).all()
-# margins: real margin on candidate 2; null rotated among false candidates
-assert np.allclose(dr[:, 2], 0.3)
+# margins: real margins 0.3/0.5 on candidates 1/2; null permutes them
+assert np.allclose(dr[:, 1], 0.3) and np.allclose(dr[:, 2], 0.5)
+swapped = int(((dn[:, 1] == 0.5) & (dn[:, 2] == 0.3)).sum())
+kept = int(((dn[:, 1] == 0.3) & (dn[:, 2] == 0.5)).sum())
+assert swapped + kept == N
 for q in range(N):
     vals_real = sorted(dr[q, [1, 2]])
     vals_null = sorted(dn[q, [1, 2]])
     assert vals_real == vals_null, "I3: null must be a rotation (multiset)"
     assert dr[q, 0] == 0.0 and dn[q, 0] == 0.0, "true candidate margin 0"
-print("SMOKE PASS: pools built with BOTH orbit rows (real+null), integrity "
-      "I1-I4 verified, rotation matches")
+print(f"SMOKE PASS: pools built with BOTH orbit rows (real+null), integrity "
+      f"I1-I4 verified, rotation permutes ({swapped} swapped / {kept} kept)")
