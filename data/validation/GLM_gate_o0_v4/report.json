@@ -1,0 +1,42 @@
+{
+  "status": "GLM_GATE_O0_V4_STOP",
+  "true_pairs": 5000,
+  "d1_hard_decoys": 619,
+  "results": {
+    "specificity": {
+      "auroc": 0.5428,
+      "p": 0.000245
+    },
+    "e1_shift": {
+      "auroc": 0.5274,
+      "p": 0.0127
+    },
+    "e2_diagnostic": {
+      "auroc": 0.5336,
+      "p": 1.5e-11
+    },
+    "e3_new_loss": {
+      "auroc": 0.5469,
+      "p": 9.44e-16
+    },
+    "fraction_new": {
+      "auroc": 0.8174,
+      "p": 3.65e-147
+    },
+    "specificity_x_fraction": {
+      "auroc": 0.5717,
+      "p": 2.71e-09
+    }
+  },
+  "gates": {
+    "any_component_beats_0_70": true,
+    "specificity_beats_0_60": false,
+    "e1_shift_beats_0_60": false
+  },
+  "vs_v3": {
+    "v3_fragment_change_auroc": 0.8175,
+    "v4_best": 0.8174,
+    "improvement": -0.0001
+  },
+  "claim_limit": "Gate O0 v4: transformation-SPECIFIC fragment evidence vs hard decoys."
+}
