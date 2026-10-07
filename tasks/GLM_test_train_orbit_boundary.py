@@ -151,4 +151,17 @@ expected_elig = int((~p2["val_query_mask"].astype(bool)
 assert rep_o["eligible_train_groups"] == expected_elig
 print(f"A7 PASS: poisoned group excluded (O-real eligible "
       f"{rep_o['eligible_train_groups']} = expected {expected_elig})")
+# A8 role-2 curve emission: every arm writes a selector-consumable npz
+import numpy as np
+for arm in ("R", "OC"):
+    curve = tmp / arm / f"{arm}_role2_curve.npz"
+    assert curve.exists(), f"{arm}: role2 curve missing"
+    with np.load(curve) as z:
+        mps = z["metrics_per_step"]
+        cids = z["cluster_ids"]
+    assert mps.ndim == 2 and mps.shape[0] == 4 and mps.shape[1] == len(cids)
+    assert set(np.unique(mps)) <= {0, 1}
+print("A8 PASS: role-2 validation curves emitted (selector-consumable "
+      "metrics_per_step + cluster_ids, 4 steps x val queries)")
+
 print("SIX-ARM SMOKE v2: ALL PASS")

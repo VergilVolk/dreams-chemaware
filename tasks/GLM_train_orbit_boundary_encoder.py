@@ -275,6 +275,37 @@ def main() -> None:
             torch.save({"encoder": encoder.state_dict(), "step": step},
                        args.output_dir / f"{args.arm}_step{step:06d}.ckpt")
 
+    # ---- role-2 validation curve (the shared-step selector's input) -----
+    # For each checkpoint fraction, per-val-query correctness (0/1) of the
+    # molecule ranking, plus formula clusters. Saved as the npz the
+    # selector consumes; ONLY the R arm's curve may be used for selection.
+    val_ids = np.flatnonzero(val)
+    val_curve = {}
+    for step, frac in sorted(ckpt_steps.items()):
+        enc_ckpt = torch.load(args.output_dir
+                              / f"{args.arm}_step{step:06d}.ckpt",
+                              map_location="cpu", weights_only=False)
+        encoder.load_state_dict(enc_ckpt["encoder"])
+        with torch.no_grad():
+            z_all_v = encoder(spectra_feats)
+        per_q = np.zeros(len(val_ids), dtype=np.int8)
+        for k, q in enumerate(val_ids):
+            lo, hi = int(pool["cand_ptr"][q]), int(pool["cand_ptr"][q + 1])
+            scores_v = molecule_score(
+                z_all_v[pool["query_row"][q]],
+                z_all_v[torch.as_tensor(pool["ref_rows"])],
+                torch.as_tensor(pool["ref_ptr"]), cfg.tau)
+            # molecule_score returns one score per candidate block
+            mol_scores = scores_v[lo:hi].numpy()
+            per_q[k] = int(np.argmax(mol_scores)
+                           == int(np.flatnonzero(
+                               pool["molecule_label"][lo:hi])[0]))
+        val_curve[frac] = per_q
+    np.savez(args.output_dir / f"{args.arm}_role2_curve.npz",
+             metrics_per_step=np.stack([val_curve[f]
+                                        for f in sorted(val_curve)]),
+             cluster_ids=pool["formula_cluster"][val])
+
     report = {
         "status": "GLM_ORBIT_BOUNDARY_TRAIN_COMPLETE_V2",
         "arm": args.arm, "arm_spec": spec,
