@@ -62,8 +62,9 @@ python -u tasks/audit_lcnec_hsst3n_qc_headroom.py \
   --overview "$OVERVIEW" \
   --output-dir "$RUN_DIR/qc_headroom"
 
-LEDGER_FAMILIES="$(awk -F',' 'NR>1 && $0 ~ /[0-9]/ {n++} END {print n+0}' \
-  "$RUN_DIR/qc_headroom/precursor_family_ledger.csv")"
+LEDGER_FAMILIES="$(python -c \
+  'import json,sys; r=json.load(open(sys.argv[1])); print(r["all_three_qualified_families"])' \
+  "$RUN_DIR/qc_headroom/report.json")"
 if [[ "$LEDGER_FAMILIES" != "263" ]]; then
   echo "LCNEC_REMODELING_LEDGER_COUNT_MISMATCH: $LEDGER_FAMILIES of 263 QC-qualified families" >&2
   exit 6
