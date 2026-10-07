@@ -1,0 +1,139 @@
+{
+  "status": "GLM_GATE_O0_V3_COMPLETE",
+  "true_pairs": 5000,
+  "decoys": {
+    "D1_hard": 619,
+    "D2_reversed": 2000,
+    "D3_random": 1994,
+    "total": 4613
+  },
+  "results": {
+    "per_decoy": {
+      "D1_hard": {
+        "cosine": {
+          "auroc": 0.041,
+          "p": 1.0
+        },
+        "entropy": {
+          "auroc": 0.4711,
+          "p": 1.0
+        },
+        "fragment_change": {
+          "auroc": 0.8175,
+          "p": 3.5e-147
+        },
+        "pmd_ppm": {
+          "auroc": 0.0042,
+          "p": 0.0
+        },
+        "fused_all4": {
+          "auroc": 0.1967,
+          "p": 1.0
+        }
+      },
+      "D2_reversed": {
+        "cosine": {
+          "auroc": 0.4763,
+          "p": 0.999
+        },
+        "entropy": {
+          "auroc": 0.5047,
+          "p": 0.0591
+        },
+        "fragment_change": {
+          "auroc": 0.4904,
+          "p": 0.897
+        },
+        "pmd_ppm": {
+          "auroc": 0.3678,
+          "p": 4.12e-68
+        },
+        "fused_all4": {
+          "auroc": 0.4155,
+          "p": 1.0
+        }
+      },
+      "D3_random": {
+        "cosine": {
+          "auroc": 0.573,
+          "p": 6.75e-22
+        },
+        "entropy": {
+          "auroc": 0.4756,
+          "p": 1.0
+        },
+        "fragment_change": {
+          "auroc": 0.3984,
+          "p": 1.0
+        },
+        "pmd_ppm": {
+          "auroc": 0.0888,
+          "p": 0.0
+        },
+        "fused_all4": {
+          "auroc": 0.21,
+          "p": 1.0
+        }
+      }
+    },
+    "ablation": {
+      "full": {
+        "auroc": 0.2893,
+        "p": 1.0,
+        "components": [
+          "cosine",
+          "fragment_change",
+          "entropy",
+          "pmd_ppm"
+        ]
+      },
+      "drop_cosine": {
+        "auroc": 0.3014,
+        "p": 1.0,
+        "components": [
+          "fragment_change",
+          "entropy",
+          "pmd_ppm"
+        ]
+      },
+      "drop_fragment_change": {
+        "auroc": 0.331,
+        "p": 1.0,
+        "components": [
+          "cosine",
+          "entropy",
+          "pmd_ppm"
+        ]
+      },
+      "drop_entropy": {
+        "auroc": 0.2478,
+        "p": 1.0,
+        "components": [
+          "cosine",
+          "fragment_change",
+          "pmd_ppm"
+        ]
+      },
+      "drop_pmd_ppm": {
+        "auroc": 0.5759,
+        "p": 3.24e-38,
+        "components": [
+          "cosine",
+          "fragment_change",
+          "entropy"
+        ]
+      }
+    },
+    "component_auroc": {
+      "cosine_vs_all": 0.4597
+    }
+  },
+  "gates": {
+    "fused_beats_d1_gt_0_65": false,
+    "fused_beats_d2_gt_0_65": false,
+    "no_pmd_still_beats_0_60": false,
+    "no_pmd_beats_cosine_alone": true
+  },
+  "pass_or_stop": "STOP",
+  "claim_limit": "Gate O0 v3: transformation identification with hard decoys and ablation. Not a biological result."
+}
