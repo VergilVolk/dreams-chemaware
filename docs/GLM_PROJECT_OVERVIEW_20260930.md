@@ -205,7 +205,7 @@ tasks/ 2,339 文件：audit 395 / test 402 / sbatch 416（全部 sbatch-only，�
 
 - **15 方法模型盲梯队闭环**（`deliverables/GLM_gnps_article_ladder/run15/`）：spec2vec_2026（MS2LDA 2.0 重训，Zenodo 15688609）入场后 R@1 86.08/87.25，**低于 2020 版**；全部冠军不变（R@1：WSE；pooled/micro AUROC：我方；formula MRR：我方）。我方 R@1 与 WSE 配对 CI 跨零 = 统计平手。
 - **两次撤回（全审计痕迹在 `GLM_ENSEMBLE_COMPLEMENTARITY_RETRACTION_AND_TRUTHBLIND_RESULT_20261007.md`）**：(1) S1 margin-selection 用了真阳性分数导出的 margin（答案键泄露，"=oracle" 是假象）；(2) router v2 跨面板增益源于两面板共享 5,237/5,261 query（记忆泄露）。两次教训写入论文附录。
-- **诚实结论**：oracle 互补性 +5.88/+6.31pp 真实存在，但 (a) 6 种无监督 truth-blind 选择/融合全部 CI 跨零；(b) 泄露清除监督 router ≤ +0.61pp（2/3 分割显著，标签置换对照证实为真信号）≈ oracle 的 10%；机制 = 赢家方法自身 gap 百分位均值 0.11、方法间错误相关 φ≈0.76——互补性埋藏在所有方法共同最不自信的区域。
+- **诚实结论**：oracle 互补性 +5.88/+6.31pp 真实存在，但 (a) 6 种无监督 truth-blind 选择/融合全部 CI 跨零；(b) 泄露清除监督 router ≤ +0.61pp（2/3 分割显著，标签置换对照证实为真信号）≈ oracle 的 10%；诊断（含 within-query 对照审核）= 可恢复集内赢家-vs-输家 gap 判别 AUC 0.449/0.437（全集校准 0.905/0.908 的对照下失效）、方法间错误相关 φ≈0.76——余量集中在置信度失效的区域。
 - **幸存部署物**：弃权门控（`GLM_confidence_gate.py`）：WSE/noise_v1 在 60% 覆盖下达 99.0–99.5% 精度（带 CI），弃权带 ≈ 抛硬币 → identifiability-gated 范式的直接实证接口。
 - **SOTA 审计**（`GLM_SOTA_AUDIT_20261007.md`）：判别力双面板第一；检索平手；集成不可部署 = 可引用否定性结果；MoNA 极性外部验证本地受阻（谱本体+checkpoint 在服务器，快照 hash 匹配 0.65%），已队列化。
 - 论文材料：英文结果章节草稿 + 门控故事图 + 15 方法 metric-split 图。

@@ -1,0 +1,33 @@
+{
+  "status": "GLM_AUDIT_WINNER_CONFIDENCE_CONTROLS",
+  "panels": {
+    "identity_disjoint": {
+      "n_recoverable": 647,
+      "batch_pct_winners_mean": 0.115,
+      "batch_pct_losers_mean": 0.1263,
+      "raw_gap_winners_mean": 0.0499,
+      "raw_gap_losers_mean": 0.0608,
+      "within_query_gap_rank_winners_mean": 7.164,
+      "within_query_gap_rank_losers_mean": 6.938,
+      "C2_auc_gap_winner_vs_loser_on_R": 0.449,
+      "C2_auc_batch_pct_winner_vs_loser_on_R": 0.458,
+      "C2_auc_withinquery_gap_rank_on_R": 0.485,
+      "C3_u1_hit_rate_on_R": 0.3138,
+      "C4_auc_gap_correct_vs_incorrect_all": 0.9055
+    },
+    "formula_disjoint": {
+      "n_recoverable": 332,
+      "batch_pct_winners_mean": 0.1063,
+      "batch_pct_losers_mean": 0.1203,
+      "raw_gap_winners_mean": 0.047,
+      "raw_gap_losers_mean": 0.0584,
+      "within_query_gap_rank_winners_mean": 7.264,
+      "within_query_gap_rank_losers_mean": 6.897,
+      "C2_auc_gap_winner_vs_loser_on_R": 0.4373,
+      "C2_auc_batch_pct_winner_vs_loser_on_R": 0.443,
+      "C2_auc_withinquery_gap_rank_on_R": 0.4755,
+      "C3_u1_hit_rate_on_R": 0.3102,
+      "C4_auc_gap_correct_vs_incorrect_all": 0.9081
+    }
+  }
+}

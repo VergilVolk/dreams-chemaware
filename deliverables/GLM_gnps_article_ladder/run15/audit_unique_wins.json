@@ -1,0 +1,197 @@
+{
+  "status": "GLM_AUDIT_UNIQUE_WINS",
+  "panels": {
+    "identity_disjoint": {
+      "n_queries": 10995,
+      "n_recoverable": 647,
+      "by_method": {
+        "official_dreams": {
+          "recall1": 85.36,
+          "unique_wins": 15,
+          "unique_share_pct": 0.136,
+          "among_wins_on_recoverable": 249
+        },
+        "noise_v1": {
+          "recall1": 86.56,
+          "unique_wins": 31,
+          "unique_share_pct": 0.282,
+          "among_wins_on_recoverable": 287
+        },
+        "cosine_greedy": {
+          "recall1": 85.04,
+          "unique_wins": 0,
+          "unique_share_pct": 0.0,
+          "among_wins_on_recoverable": 177
+        },
+        "modified_cosine": {
+          "recall1": 85.03,
+          "unique_wins": 0,
+          "unique_share_pct": 0.0,
+          "among_wins_on_recoverable": 177
+        },
+        "weighted_spectral_entropy": {
+          "recall1": 87.37,
+          "unique_wins": 8,
+          "unique_share_pct": 0.073,
+          "among_wins_on_recoverable": 0
+        },
+        "p2b_sqrt_cosine": {
+          "recall1": 87.04,
+          "unique_wins": 0,
+          "unique_share_pct": 0.0,
+          "among_wins_on_recoverable": 110
+        },
+        "p2b_unweighted_entropy": {
+          "recall1": 86.98,
+          "unique_wins": 1,
+          "unique_share_pct": 0.009,
+          "among_wins_on_recoverable": 109
+        },
+        "neutral_loss_sqrt_cosine": {
+          "recall1": 86.81,
+          "unique_wins": 4,
+          "unique_share_pct": 0.036,
+          "among_wins_on_recoverable": 163
+        },
+        "p2b_official_frozen": {
+          "recall1": 86.98,
+          "unique_wins": 0,
+          "unique_share_pct": 0.0,
+          "among_wins_on_recoverable": 161
+        },
+        "p2b_noise_v1_frozen": {
+          "recall1": 87.13,
+          "unique_wins": 0,
+          "unique_share_pct": 0.0,
+          "among_wins_on_recoverable": 171
+        },
+        "ms2deepscore_2x_public": {
+          "recall1": 79.12,
+          "unique_wins": 65,
+          "unique_share_pct": 0.591,
+          "among_wins_on_recoverable": 253
+        },
+        "spec2vec_gnps_public": {
+          "recall1": 86.29,
+          "unique_wins": 11,
+          "unique_share_pct": 0.1,
+          "among_wins_on_recoverable": 230
+        },
+        "entropy_raw_public": {
+          "recall1": 87.31,
+          "unique_wins": 1,
+          "unique_share_pct": 0.009,
+          "among_wins_on_recoverable": 166
+        },
+        "denoising_search_public": {
+          "recall1": 87.13,
+          "unique_wins": 9,
+          "unique_share_pct": 0.082,
+          "among_wins_on_recoverable": 190
+        },
+        "spec2vec_2026_retrained": {
+          "recall1": 86.08,
+          "unique_wins": 8,
+          "unique_share_pct": 0.073,
+          "among_wins_on_recoverable": 210
+        }
+      }
+    },
+    "formula_disjoint": {
+      "n_queries": 5261,
+      "n_recoverable": 332,
+      "by_method": {
+        "official_dreams": {
+          "recall1": 86.81,
+          "unique_wins": 7,
+          "unique_share_pct": 0.133,
+          "among_wins_on_recoverable": 133
+        },
+        "noise_v1": {
+          "recall1": 88.06,
+          "unique_wins": 15,
+          "unique_share_pct": 0.285,
+          "among_wins_on_recoverable": 161
+        },
+        "cosine_greedy": {
+          "recall1": 87.17,
+          "unique_wins": 0,
+          "unique_share_pct": 0.0,
+          "among_wins_on_recoverable": 102
+        },
+        "modified_cosine": {
+          "recall1": 87.15,
+          "unique_wins": 0,
+          "unique_share_pct": 0.0,
+          "among_wins_on_recoverable": 102
+        },
+        "weighted_spectral_entropy": {
+          "recall1": 88.27,
+          "unique_wins": 3,
+          "unique_share_pct": 0.057,
+          "among_wins_on_recoverable": 0
+        },
+        "p2b_sqrt_cosine": {
+          "recall1": 88.16,
+          "unique_wins": 0,
+          "unique_share_pct": 0.0,
+          "among_wins_on_recoverable": 59
+        },
+        "p2b_unweighted_entropy": {
+          "recall1": 88.16,
+          "unique_wins": 0,
+          "unique_share_pct": 0.0,
+          "among_wins_on_recoverable": 59
+        },
+        "neutral_loss_sqrt_cosine": {
+          "recall1": 87.87,
+          "unique_wins": 1,
+          "unique_share_pct": 0.019,
+          "among_wins_on_recoverable": 81
+        },
+        "p2b_official_frozen": {
+          "recall1": 88.03,
+          "unique_wins": 0,
+          "unique_share_pct": 0.0,
+          "among_wins_on_recoverable": 79
+        },
+        "p2b_noise_v1_frozen": {
+          "recall1": 88.25,
+          "unique_wins": 0,
+          "unique_share_pct": 0.0,
+          "among_wins_on_recoverable": 89
+        },
+        "ms2deepscore_2x_public": {
+          "recall1": 81.47,
+          "unique_wins": 24,
+          "unique_share_pct": 0.456,
+          "among_wins_on_recoverable": 133
+        },
+        "spec2vec_gnps_public": {
+          "recall1": 87.44,
+          "unique_wins": 6,
+          "unique_share_pct": 0.114,
+          "among_wins_on_recoverable": 127
+        },
+        "entropy_raw_public": {
+          "recall1": 88.14,
+          "unique_wins": 0,
+          "unique_share_pct": 0.0,
+          "among_wins_on_recoverable": 76
+        },
+        "denoising_search_public": {
+          "recall1": 88.03,
+          "unique_wins": 2,
+          "unique_share_pct": 0.038,
+          "among_wins_on_recoverable": 84
+        },
+        "spec2vec_2026_retrained": {
+          "recall1": 87.25,
+          "unique_wins": 6,
+          "unique_share_pct": 0.114,
+          "among_wins_on_recoverable": 116
+        }
+      }
+    }
+  }
+}

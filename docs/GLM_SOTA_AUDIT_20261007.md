@@ -19,7 +19,7 @@
 | micro AUROC | noise_v1 **0.9436** ✅ | 同左 | noise_v1 **0.9314** ✅ | 同左 |
 | macro query AUROC | entropy_raw 0.9464 | p2b_noise_v1_frozen 0.9444 | entropy_raw 0.9411 | p2b_noise_v1_frozen 0.9401 |
 | near Recall@1 | WSE 82.51 | p2b_noise_v1_frozen 82.13 | WSE 80.10 | noise_v1 79.96 |
-| 互补性独特贡献 | — | noise_v1 可恢复集胜出 287/639（14 方法第一） | — | noise_v1 161/326（第一） |
+| 互补性贡献 | — | 可恢复集胜者成员数第一：noise_v1（287/647、161/332）；真实唯一命中最多：ms2deepscore（65/24，总体risk-net为负） | — | 同左 |
 
 （✅ = 我方持有；配对 CI 见正文。）
 
@@ -27,7 +27,7 @@
 
 1. **成对判别力双面板第一**：pooled 10ppm pairwise AUROC identity 0.9416（p2b_noise_v1_frozen）、formula 0.9299（noise_v1）；micro AUROC 双面板第一（noise_v1）。与次名（WSE 0.9402/0.9265）差距小但方向一致；与公开学习模型（ms2deepscore 0.8994/0.8818、spec2vec2020 0.9336/0.9170）差距显著。
 2. **formula 面板 MRR 第一**（p2b_noise_v1_frozen 0.9290）。
-3. **可恢复集最大单一贡献者**（oracle 互补性结构分析，见撤回文档 §4）：方法盲但结构上不可被置信度路由利用。
+3. **可恢复集胜者成员数第一**（oracle 互补性结构分析，见撤回文档 §4 修正版）：方法盲但结构上不可被置信度路由利用（within-query 对照 AUC 0.44–0.49，`audit_winner_confidence.json`）。注意这是成员数口径，不是唯一命中口径（唯一命中最多的是 ms2deepscore，65/24，但其总体引入错误远超纠正）。
 
 ## 3. 非 SOTA 的部分与补充状态
 
