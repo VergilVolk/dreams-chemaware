@@ -1,0 +1,98 @@
+"""Synthetic smoke test for GLM_build_orbit_boundary_groups.
+
+Fabricates minimal candidate groups, a multi-condition ledger, and a
+chemical-margin ledger; runs the builder; verifies the output contract and
+integrity flags (I1 true-molecule orbit, I2 condition semantics, I3
+rotation multiset, I4 formula-disjoint validation).
+"""
+from __future__ import annotations
+
+import json
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+
+import numpy as np
+
+ROOT = Path(__file__).resolve().parents[1]
+tmp = Path(tempfile.mkdtemp(prefix="orbit_pools_smoke_"))
+
+N, C = 12, 3          # 12 groups, up to 3 candidates
+mol_of_group = []
+g = {
+    "query_row": np.arange(N),
+    "cand_ptr": np.arange(N + 1) * C,
+    "molecule_label": np.tile(np.array([1, 0, 0]), N),
+    "mol_ik14": np.array([], dtype="<U14"),
+    "formula_cluster": np.array([i // 4 for i in range(N)]),
+    "val_query_mask": np.array([i >= 8 for i in range(N)]),
+    "ref_ptr": np.arange(N * C + 1),
+    "ref_rows": np.arange(N * C),
+}
+iks = []
+for i in range(N):
+    iks.extend([f"IKTRUE{i:04d}xxxxx", f"IKFALSE{i:04d}a", f"IKFALSE{i:04d}b"])
+g["mol_ik14"] = np.asarray(iks)
+
+# condition ledger: each TRUE molecule has 3 views:
+#   row i   : instrument 1, quality 0.5   (the group's own query row)
+#   row 100+: instrument 2, quality 0.5   (REAL condition view)
+#   row 200+: instrument 1, quality 0.5   (NULL same-condition replicate)
+rows, mols, inst, qual = [], [], [], []
+for i in range(N):
+    for base, k in ((0, 1), (100, 2), (200, 1)):
+        rows.append(base + i)
+        mols.append(f"IKTRUE{i:04d}xxxxx")
+        inst.append(k)
+        qual.append(0.5)
+v = {"rows": np.asarray(rows), "molecule": np.asarray(mols),
+     "instrument": np.asarray(inst), "quality": np.asarray(qual, float)}
+
+# chemical margins: every group has one false candidate (local idx 2) with
+# margin 0.3
+m = {"group_id": np.arange(N), "candidate_local": np.full(N, 2),
+     "margin": np.full(N, 0.3, dtype=np.float32)}
+
+cand = tmp / "candidate_groups.npz"
+views = tmp / "condition_views.npz"
+marg = tmp / "chem_margins.npz"
+out = tmp / "orbit_pools.npz"
+np.savez(cand, **g)
+np.savez(views, **v)
+np.savez(marg, **m)
+
+proc = subprocess.run(
+    [sys.executable, "-X", "utf8",
+     str(ROOT / "tasks/GLM_build_orbit_boundary_groups.py"),
+     "--candidate-groups", str(cand), "--condition-views", str(views),
+     "--chem-margins", str(marg), "--output", str(out)],
+    capture_output=True, text=True)
+print(proc.stdout[-1500:])
+print(proc.stderr[-1500:])
+assert proc.returncode == 0, "builder failed"
+
+report = json.loads((tmp / "orbit_pools.json").read_text(encoding="utf-8"))
+with np.load(out) as z:
+    orbit_row = z["orbit_query_row"]
+    kind = z["orbit_kind"]
+    dr = z["delta_chem_real"]
+    dn = z["delta_chem_null"]
+
+assert report["checks"]["I1_true_molecule"]
+assert report["checks"]["I2_condition_semantics"]
+assert report["checks"]["I4_formula_disjoint_val"]
+# all groups resolved an orbit view (both real and replicate exist)
+assert (orbit_row >= 0).all()
+# every group found a REAL cross-instrument view first (instrument 2 exists)
+assert (kind == "real").all(), "real cross-condition views must be preferred"
+# margins: real margin on candidate 2; null rotated among false candidates
+assert np.allclose(dr[:, 2], 0.3)
+false_cols = [0, 1, 2]
+for q in range(N):
+    vals_real = sorted(dr[q, [c for c in false_cols if c != 0]])
+    vals_null = sorted(dn[q, [c for c in false_cols if c != 0]])
+    assert vals_real == vals_null, "I3: null must be a rotation (multiset)"
+    assert dr[q, 0] == 0.0 and dn[q, 0] == 0.0, "true candidate margin 0"
+print("SMOKE PASS: pools built, integrity I1-I4 verified, rotation matches, "
+      "real views preferred")
