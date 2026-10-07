@@ -201,3 +201,15 @@ tasks/massspecgym_isomers/dataset_manifest.json
 tasks/massspecgym_isomers/pairs.json
 tasks/massspecgym_isomers/ik_to_smiles.json
 tasks/massspecgym_isomers/ik_to_rows.json
+
+# Nested full clone (breaks branch worktree copy; 2.7 GB)
+dreams-chemaware/
+# Local workspaces, caches and oversized artifacts (not source)
+scratch/
+third_party/
+tools/
+.chart-data-*/
+.codex_artifacts/
+.codex-finalizer/
+.codex-ppt-rebuild/
+kgmn_external_dependencies_small_20260831.tar.gz
