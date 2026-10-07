@@ -1,11 +1,12 @@
 {
-  "status": "GLM_LCNEC_DARK_THREE_TIER",
+  "status": "GLM_LCNEC_DARK_THREE_TIER_V2",
+  "fix": "names/identifiers now joined from the GNPS manifest for the corrected molecule rescan; v1 joined the pilot-era neighbor_identities.csv (stale molecules, buggy cosines, USI-as-name) - do not use that table for decisions",
   "thresholds": {
     "gate_99": 0.584,
     "gate_995": 0.7407,
     "hit": 0.85,
     "sub_hit": 0.7,
-    "source": "GNPS model-blind cosine_greedy gate (identity panel, conservative)"
+    "source": "GNPS model-blind cosine_greedy gate, conservative identity-panel values"
   },
   "tier_counts": {
     "C_dark": 22,
@@ -14,461 +15,908 @@
     "A_gate_passed": 1
   },
   "boundaries": [
-    "thresholds calibrated on library-vs-library spectra; LCNEC are real-sample DDA (domain shift, accuracy guarantee approximate)",
+    "thresholds calibrated on library-vs-library spectra; LCNEC are real-sample DDA (domain shift, guarantee approximate)",
     "analog-tolerant 0.7% precursor gate: competitors include analogs",
     "tier A is a Level-2 library-match claim; Level-1 requires a standard",
+    "halogen flag: F/Cl/Br/I structures are exogenous-until-proven in tissue metabolomics (chemotherapy/environmental) - gate passage does not clear the plausibility axis",
     "n = 30 modules"
   ],
   "modules": [
     {
-      "precursor": 221.98455811,
-      "tier": "A_gate_passed",
-      "best_cosine": 0.9494,
-      "molecule_gap": 0.8255,
-      "passes_995": true,
-      "entropy_best": 0.421,
-      "n_molecules": 603,
-      "top1_ik14": "SJPZAKSXLKKMPP",
-      "top1_formula": "C8H7FN6O",
-      "top1_name": null,
-      "top2_ik14": "IQZNJFBQFZVJFU",
-      "top2_formula": "C12H12FNO2",
-      "top2_cosine": 0.1239
-    },
-    {
-      "precursor": 273.08055416,
-      "tier": "B1_high_score_contested",
-      "best_cosine": 0.9808,
-      "molecule_gap": 0.0117,
-      "passes_995": false,
-      "entropy_best": 0.4066,
-      "n_molecules": 1145,
-      "top1_ik14": "SERHVCXTIMCXBT",
-      "top1_formula": "C14H10F2N4",
-      "top1_name": null,
-      "top2_ik14": "LEAKQIXYSHIHCW",
-      "top2_formula": "C14H13ClN4",
-      "top2_cosine": 0.9691
-    },
-    {
       "precursor": 342.08806471,
       "tier": "B1_high_score_contested",
       "best_cosine": 0.9665,
+      "second_cosine": 0.7611,
       "molecule_gap": 0.2054,
-      "passes_995": false,
       "entropy_best": 0.3982,
       "n_molecules": 2144,
-      "top1_ik14": "UUBWNPOOIAGVSU",
-      "top1_formula": "C20H29N3O2",
-      "top1_name": "mzspec:GNPS:MSNLIB-POSITIVE:accession:CCMSLIB00012749088",
-      "top2_ik14": "OFCKPPQPUUMOBI",
-      "top2_formula": "C19H21N3O3",
-      "top2_cosine": 0.7611
-    },
-    {
-      "precursor": 207.01485208,
-      "tier": "B1_high_score_contested",
-      "best_cosine": 0.9342,
-      "molecule_gap": 0.0113,
       "passes_995": false,
-      "entropy_best": 0.4621,
-      "n_molecules": 549,
-      "top1_ik14": "PWICTTOVWSNXRV",
-      "top1_formula": "C12H15NO2",
-      "top1_name": null,
-      "top2_ik14": "DOEIPZUTRVMWAB",
-      "top2_formula": "C12H15NO2",
-      "top2_cosine": 0.9228
-    },
-    {
-      "precursor": 313.11963202,
-      "tier": "B1_high_score_contested",
-      "best_cosine": 0.9237,
-      "molecule_gap": 0.0059,
-      "passes_995": false,
-      "entropy_best": 0.3985,
-      "n_molecules": 1798,
-      "top1_ik14": "AFUFYTAYFCQENI",
-      "top1_formula": "C14H15F3N4O",
-      "top1_name": null,
-      "top2_ik14": "HVEFOAIIKVXXLG",
-      "top2_formula": "C15H18F2N2O3",
-      "top2_cosine": 0.9179
+      "top1": {
+        "ik14": "UUBWNPOOIAGVSU",
+        "cosine": 0.9665,
+        "formula": "C20H29N3O2",
+        "smiles": "Cc1ccc(C(=O)N2CCC(C(=O)N3CCC(C)CC3)CC2)c(C)n1",
+        "usi": "mzspec:GNPS:MSNLIB-POSITIVE:accession:CCMSLIB00012749094",
+        "instrument": "ESI-Orbitrap",
+        "halogens": null
+      },
+      "top1_halogen_flag": false,
+      "top2": {
+        "ik14": "OFCKPPQPUUMOBI",
+        "cosine": 0.7611,
+        "formula": "C19H21N3O3",
+        "smiles": "COc1ccc2c(c1)CCN2C(=O)c1ccnc(N=C(O)C(C)C)c1",
+        "usi": "mzspec:GNPS:MSNLIB-POSITIVE:accession:CCMSLIB00012794070",
+        "instrument": "ESI-Orbitrap",
+        "halogens": null
+      }
     },
     {
       "precursor": 190.07231097,
       "tier": "B2_sub_hit_analog",
       "best_cosine": 0.7403,
+      "second_cosine": 0.4675,
       "molecule_gap": 0.2727,
-      "passes_995": false,
-      "entropy_best": NaN,
+      "entropy_best": null,
       "n_molecules": 303,
-      "top1_ik14": "YRRBXJLFCBCKNW",
-      "top1_formula": "C8H18N2OS",
-      "top1_name": null,
-      "top2_ik14": "YMSMEZAYZIYFGA",
-      "top2_formula": "C9H10F3N",
-      "top2_cosine": 0.4675
+      "passes_995": false,
+      "top1": {
+        "ik14": "YRRBXJLFCBCKNW",
+        "cosine": 0.7403,
+        "formula": "C8H18N2OS",
+        "smiles": "CCSC(=O)NCCCN(C)C",
+        "usi": "mzspec:GNPS:WFSR-LIBRARY:accession:CCMSLIB00013938196",
+        "instrument": "ESI-Orbitrap",
+        "halogens": null
+      },
+      "top1_halogen_flag": false,
+      "top2": {
+        "ik14": "YMSMEZAYZIYFGA",
+        "cosine": 0.4675,
+        "formula": "C9H10F3N",
+        "smiles": "CNCc1ccc(C(F)(F)F)cc1",
+        "usi": "mzspec:GNPS:GNPS-ION-MOBILITY-LIBRARY:accession:CCMSLIB00016212352",
+        "instrument": "LC-ESI-ToF",
+        "halogens": {
+          "F": 3
+        }
+      }
     },
     {
       "precursor": 251.0788234,
       "tier": "B2_sub_hit_analog",
       "best_cosine": 0.7278,
+      "second_cosine": 0.7278,
       "molecule_gap": 0.0,
-      "passes_995": false,
-      "entropy_best": NaN,
+      "entropy_best": null,
       "n_molecules": 834,
-      "top1_ik14": "HEJOXXHRNGYHJF",
-      "top1_formula": "C13H17NO4",
-      "top1_name": null,
-      "top2_ik14": "LBSOBHXUJLTKNH",
-      "top2_formula": "C13H17NO4",
-      "top2_cosine": 0.7278
-    },
-    {
-      "precursor": 244.02293396,
-      "tier": "B2_sub_hit_analog",
-      "best_cosine": 0.7053,
-      "molecule_gap": 0.0,
       "passes_995": false,
-      "entropy_best": NaN,
-      "n_molecules": 685,
-      "top1_ik14": "YPMWBANGSOGRGL",
-      "top1_formula": "C15H17NO2",
-      "top1_name": null,
-      "top2_ik14": "JVHGAPIUBJHOAV",
-      "top2_formula": "C15H17NO2",
-      "top2_cosine": 0.7053
-    },
-    {
-      "precursor": 218.06719234,
-      "tier": "C_dark",
-      "best_cosine": 0.6849,
-      "molecule_gap": 0.2229,
-      "passes_995": false,
-      "entropy_best": NaN,
-      "n_molecules": 484,
-      "top1_ik14": "WVVUGOCPOVLEAI",
-      "top1_formula": "C12H11NO3",
-      "top1_name": null,
-      "top2_ik14": "VAHXOHHQHVUNQS",
-      "top2_formula": "C12H8FNO2",
-      "top2_cosine": 0.462
-    },
-    {
-      "precursor": 138.0561676,
-      "tier": "C_dark",
-      "best_cosine": 0.6687,
-      "molecule_gap": 0.6636,
-      "passes_995": false,
-      "entropy_best": NaN,
-      "n_molecules": 4,
-      "top1_ik14": "LDHMAVIPBRSVRG",
-      "top1_formula": "C7H9N2O+",
-      "top1_name": null,
-      "top2_ik14": "UJWHLERCFNIFNJ",
-      "top2_formula": "C8H11NO",
-      "top2_cosine": 0.0051
-    },
-    {
-      "precursor": 346.05616339,
-      "tier": "C_dark",
-      "best_cosine": 0.3832,
-      "molecule_gap": 0.0129,
-      "passes_995": false,
-      "entropy_best": NaN,
-      "n_molecules": 2109,
-      "top1_ik14": "IFCPABKBYRVXAD",
-      "top1_formula": "C13H13F2N3O4S",
-      "top1_name": null,
-      "top2_ik14": "NSSBLCWNITXZRU",
-      "top2_formula": "C16H15N3O2S2",
-      "top2_cosine": 0.3703
-    },
-    {
-      "precursor": 359.12527466,
-      "tier": "C_dark",
-      "best_cosine": 0.3802,
-      "molecule_gap": 0.1066,
-      "passes_995": false,
-      "entropy_best": NaN,
-      "n_molecules": 1915,
-      "top1_ik14": "QPVWCVAYEPEYHS",
-      "top1_formula": "C14H20N2O9",
-      "top1_name": null,
-      "top2_ik14": "MMLFNDXYPQWLLT",
-      "top2_formula": "C18H24N4O4",
-      "top2_cosine": 0.2736
-    },
-    {
-      "precursor": 207.1028424,
-      "tier": "C_dark",
-      "best_cosine": 0.3164,
-      "molecule_gap": 0.0,
-      "passes_995": false,
-      "entropy_best": NaN,
-      "n_molecules": 549,
-      "top1_ik14": "PEEBXRCYWBOCJM",
-      "top1_formula": "C11H14N2O2",
-      "top1_name": null,
-      "top2_ik14": "PDNWPZJXHJTNMH",
-      "top2_formula": "C11H14N2O2",
-      "top2_cosine": 0.3164
-    },
-    {
-      "precursor": 190.01815796,
-      "tier": "C_dark",
-      "best_cosine": 0.2892,
-      "molecule_gap": 0.0523,
-      "passes_995": false,
-      "entropy_best": NaN,
-      "n_molecules": 303,
-      "top1_ik14": "CLYOMCMDBNNGSM",
-      "top1_formula": "C5H4BrFN2",
-      "top1_name": null,
-      "top2_ik14": "VOVAQGOCBYJSHC",
-      "top2_formula": "C9H7N3O2",
-      "top2_cosine": 0.2369
-    },
-    {
-      "precursor": 406.02178266,
-      "tier": "C_dark",
-      "best_cosine": 0.2722,
-      "molecule_gap": 0.0,
-      "passes_995": false,
-      "entropy_best": NaN,
-      "n_molecules": 1681,
-      "top1_ik14": "SUYLKGWDBBKRNB",
-      "top1_formula": "C19H22N2O4S2",
-      "top1_name": null,
-      "top2_ik14": "YMUCCEWTLRPXIS",
-      "top2_formula": "C19H22N2O4S2",
-      "top2_cosine": 0.2722
-    },
-    {
-      "precursor": 444.03234863,
-      "tier": "C_dark",
-      "best_cosine": 0.2687,
-      "molecule_gap": 0.2485,
-      "passes_995": false,
-      "entropy_best": NaN,
-      "n_molecules": 1433,
-      "top1_ik14": "NJNXCJPSMWKXHO",
-      "top1_formula": "C19H12F6N4O2",
-      "top1_name": null,
-      "top2_ik14": "MIHTTYXBXIRRGV",
-      "top2_formula": "C17H30N8O4S",
-      "top2_cosine": 0.0202
-    },
-    {
-      "precursor": 181.96627045,
-      "tier": "C_dark",
-      "best_cosine": 0.2301,
-      "molecule_gap": 0.2168,
-      "passes_995": false,
-      "entropy_best": NaN,
-      "n_molecules": 200,
-      "top1_ik14": "VPOLBKKAXMBJMI",
-      "top1_formula": "C9H9FN2O",
-      "top1_name": null,
-      "top2_ik14": "CVBAZRKELSYLDE",
-      "top2_formula": "C9H11NO3",
-      "top2_cosine": 0.0133
-    },
-    {
-      "precursor": 606.07515199,
-      "tier": "C_dark",
-      "best_cosine": 0.1984,
-      "molecule_gap": 0.1583,
-      "passes_995": false,
-      "entropy_best": NaN,
-      "n_molecules": 848,
-      "top1_ik14": "QSMRBPGSBKBADN",
-      "top1_formula": "C28H25BrClNO7",
-      "top1_name": null,
-      "top2_ik14": "RFXCTIUBJIXUOH",
-      "top2_formula": "C20H22I2N2O4",
-      "top2_cosine": 0.0401
-    },
-    {
-      "precursor": 215.03295898,
-      "tier": "C_dark",
-      "best_cosine": 0.1863,
-      "molecule_gap": 0.1246,
-      "passes_995": false,
-      "entropy_best": NaN,
-      "n_molecules": 476,
-      "top1_ik14": "ZUNGQBVJRKUYJD",
-      "top1_formula": "C7H4F2N4O2",
-      "top1_name": null,
-      "top2_ik14": "XCULDPCOTWRRAU",
-      "top2_formula": "C10H15NO2S",
-      "top2_cosine": 0.0617
-    },
-    {
-      "precursor": 426.02278137,
-      "tier": "C_dark",
-      "best_cosine": 0.1678,
-      "molecule_gap": 0.0,
-      "passes_995": false,
-      "entropy_best": NaN,
-      "n_molecules": 900,
-      "top1_ik14": "UNLQJLDLLHWHED",
-      "top1_formula": "C23H38N2O5",
-      "top1_name": null,
-      "top2_ik14": "PNTCQQWURIISLR",
-      "top2_formula": "C23H38N2O5",
-      "top2_cosine": 0.1678
-    },
-    {
-      "precursor": 230.99705505,
-      "tier": "C_dark",
-      "best_cosine": 0.1403,
-      "molecule_gap": 0.0383,
-      "passes_995": false,
-      "entropy_best": NaN,
-      "n_molecules": 609,
-      "top1_ik14": "BAJHDUZEIKRKAS",
-      "top1_formula": "C11H10FeO2",
-      "top1_name": null,
-      "top2_ik14": "PBYVJDNJAGCRSR",
-      "top2_formula": "C9H8Cl2N2O",
-      "top2_cosine": 0.102
-    },
-    {
-      "precursor": 280.90861578,
-      "tier": "C_dark",
-      "best_cosine": 0.1388,
-      "molecule_gap": 0.1048,
-      "passes_995": false,
-      "entropy_best": NaN,
-      "n_molecules": 1203,
-      "top1_ik14": "NJYNDGBRTMMXHL",
-      "top1_formula": "C14H19NO3S",
-      "top1_name": null,
-      "top2_ik14": "GTZCKTIZOGTWQO",
-      "top2_formula": "C10H15O5PS",
-      "top2_cosine": 0.0339
-    },
-    {
-      "precursor": 421.14851577,
-      "tier": "C_dark",
-      "best_cosine": 0.1205,
-      "molecule_gap": 0.0365,
-      "passes_995": false,
-      "entropy_best": NaN,
-      "n_molecules": 1266,
-      "top1_ik14": "TYNYTRDUTWFNPF",
-      "top1_formula": "C25H23FN2O3",
-      "top1_name": null,
-      "top2_ik14": "QYPNMENZKVVVGF",
-      "top2_formula": "C27H31NO3",
-      "top2_cosine": 0.084
-    },
-    {
-      "precursor": 169.99194609,
-      "tier": "C_dark",
-      "best_cosine": 0.0701,
-      "molecule_gap": 0.0297,
-      "passes_995": false,
-      "entropy_best": NaN,
-      "n_molecules": 232,
-      "top1_ik14": "YSKWMYLRGKBHQR",
-      "top1_formula": "C7H7NO2S",
-      "top1_name": null,
-      "top2_ik14": "WKJZCJVCVKTKBR",
-      "top2_formula": "C7H7NO2S",
-      "top2_cosine": 0.0405
-    },
-    {
-      "precursor": 168.04331855,
-      "tier": "C_dark",
-      "best_cosine": 0.0627,
-      "molecule_gap": 0.0515,
-      "passes_995": false,
-      "entropy_best": NaN,
-      "n_molecules": 196,
-      "top1_ik14": "MUJWLBCYTZYEQA",
-      "top1_formula": "C9H10ClN",
-      "top1_name": null,
-      "top2_ik14": "DREYJVRZLKQJDG",
-      "top2_formula": "C8H9NOS",
-      "top2_cosine": 0.0112
-    },
-    {
-      "precursor": 146.02819736,
-      "tier": "C_dark",
-      "best_cosine": 0.0409,
-      "molecule_gap": 0.0285,
-      "passes_995": false,
-      "entropy_best": NaN,
-      "n_molecules": 21,
-      "top1_ik14": "BABFRBCLCKFQNF",
-      "top1_formula": "C8H19NO",
-      "top1_name": null,
-      "top2_ik14": "ARPJAIZFQPPBHM",
-      "top2_formula": "C6H11NO3",
-      "top2_cosine": 0.0124
+      "top1": {
+        "ik14": "HEJOXXHRNGYHJF",
+        "cosine": 0.7278,
+        "formula": "C13H17NO4",
+        "smiles": "COc1ccc(C(=O)NCCCC(=O)O)c(C)c1",
+        "usi": "mzspec:GNPS:MULTIPLEX-SYNTHESIS-LIBRARY-ALL-PARTITION-3:accession:CCMSLIB00015133887",
+        "instrument": "LC-ESI-Orbitrap",
+        "halogens": null
+      },
+      "top1_halogen_flag": false,
+      "top2": {
+        "ik14": "LBSOBHXUJLTKNH",
+        "cosine": 0.7278,
+        "formula": "C13H17NO4",
+        "smiles": "COc1cccc(CC(O)=NCCCC(=O)O)c1",
+        "usi": "mzspec:GNPS:MULTIPLEX-SYNTHESIS-LIBRARY-ALL-PARTITION-3:accession:CCMSLIB00015133951",
+        "instrument": "LC-ESI-Orbitrap",
+        "halogens": null
+      }
     },
     {
       "precursor": 533.10602466,
       "tier": "C_dark",
       "best_cosine": 0.0202,
+      "second_cosine": 0.0071,
       "molecule_gap": 0.0132,
-      "passes_995": false,
-      "entropy_best": NaN,
+      "entropy_best": null,
       "n_molecules": 1231,
-      "top1_ik14": "UCPZVMDUQZOOPU",
-      "top1_formula": "C26H32Cl2N6O2",
-      "top1_name": null,
-      "top2_ik14": "RROMPAUEIXTERN",
-      "top2_formula": "C19H24IN5O5",
-      "top2_cosine": 0.0071
+      "passes_995": false,
+      "top1": {
+        "ik14": "UCPZVMDUQZOOPU",
+        "cosine": 0.0202,
+        "formula": "C26H32Cl2N6O2",
+        "smiles": "O=C(NCCCNCCCCNCCCN=C(O)c1cc(Cl)nc(Cl)c1)c1ccc2ccccc2n1",
+        "usi": "mzspec:GNPS:MULTIPLEX-SYNTHESIS-LIBRARY-ALL-PARTITION-3:accession:CCMSLIB00015166580",
+        "instrument": "LC-ESI-Orbitrap",
+        "halogens": {
+          "Cl": 2
+        }
+      },
+      "top1_halogen_flag": true,
+      "top2": {
+        "ik14": "RROMPAUEIXTERN",
+        "cosine": 0.0071,
+        "formula": "C19H24IN5O5",
+        "smiles": "CCCCCCC(=O)OCC1OC(C#N)(c2cc(I)c3c(N)ncnn23)C(O)C1O",
+        "usi": "mzspec:GNPS:REFRAME-POSITIVE-LIBRARY:accession:CCMSLIB00016145467",
+        "instrument": "LC-ESI-Orbitrap",
+        "halogens": {
+          "I": 1
+        }
+      }
     },
     {
-      "precursor": 162.02322388,
+      "precursor": 218.06719234,
       "tier": "C_dark",
-      "best_cosine": 0.0101,
-      "molecule_gap": 0.0071,
+      "best_cosine": 0.6849,
+      "second_cosine": 0.462,
+      "molecule_gap": 0.2229,
+      "entropy_best": null,
+      "n_molecules": 484,
       "passes_995": false,
-      "entropy_best": NaN,
-      "n_molecules": 75,
-      "top1_ik14": "WOCQGWHMXPRWHW",
-      "top1_formula": "C6H11NO4",
-      "top1_name": null,
-      "top2_ik14": "ITQBMXTUIWJKBZ",
-      "top2_formula": "C7H16N2O2",
-      "top2_cosine": 0.003
+      "top1": {
+        "ik14": "WVVUGOCPOVLEAI",
+        "cosine": 0.6849,
+        "formula": "C12H11NO3",
+        "smiles": "CC(C(=O)O)n1ccc2ccccc2c1=O",
+        "usi": "mzspec:GNPS:MSNLIB-POSITIVE:accession:CCMSLIB00012936850",
+        "instrument": "ESI-Orbitrap",
+        "halogens": null
+      },
+      "top1_halogen_flag": false,
+      "top2": {
+        "ik14": "VAHXOHHQHVUNQS",
+        "cosine": 0.462,
+        "formula": "C12H8FNO2",
+        "smiles": "O=C(O)c1ccc(-c2ccncc2)c(F)c1",
+        "usi": "mzspec:GNPS:MSNLIB-POSITIVE:accession:CCMSLIB00012883216",
+        "instrument": "ESI-Orbitrap",
+        "halogens": {
+          "F": 1
+        }
+      }
+    },
+    {
+      "precursor": 606.07515199,
+      "tier": "C_dark",
+      "best_cosine": 0.1984,
+      "second_cosine": 0.0401,
+      "molecule_gap": 0.1583,
+      "entropy_best": null,
+      "n_molecules": 848,
+      "passes_995": false,
+      "top1": {
+        "ik14": "QSMRBPGSBKBADN",
+        "cosine": 0.1984,
+        "formula": "C28H25BrClNO7",
+        "smiles": "COC(=O)C1=C(C)N=C2CC(C)C3(Oc4c(Cl)c(OC)cc(OC)c4C3=O)C(O)=C2C1c1cccc(Br)c1",
+        "usi": "mzspec:GNPS:BMDMS-NP:accession:CCMSLIB00006536187",
+        "instrument": "ESI-Orbitrap",
+        "halogens": {
+          "Cl": 1,
+          "Br": 1
+        }
+      },
+      "top1_halogen_flag": true,
+      "top2": {
+        "ik14": "RFXCTIUBJIXUOH",
+        "cosine": 0.0401,
+        "formula": "C20H22I2N2O4",
+        "smiles": "COc1ccc(I)c(C(O)=NCCCCN=C(O)c2cc(OC)ccc2I)c1",
+        "usi": "mzspec:GNPS:MULTIPLEX-SYNTHESIS-LIBRARY-ALL-PARTITION-4:accession:CCMSLIB00014956677",
+        "instrument": "LC-ESI-Orbitrap",
+        "halogens": {
+          "I": 2
+        }
+      }
+    },
+    {
+      "precursor": 207.01485208,
+      "tier": "B1_high_score_contested",
+      "best_cosine": 0.9342,
+      "second_cosine": 0.9228,
+      "molecule_gap": 0.0113,
+      "entropy_best": 0.4621,
+      "n_molecules": 549,
+      "passes_995": false,
+      "top1": {
+        "ik14": "PWICTTOVWSNXRV",
+        "cosine": 0.9342,
+        "formula": "C12H15NO2",
+        "smiles": "O=C(O)c1cccc(CN2CCCC2)c1",
+        "usi": "mzspec:GNPS:MSNLIB-POSITIVE:accession:CCMSLIB00012872958",
+        "instrument": "ESI-Orbitrap",
+        "halogens": null
+      },
+      "top1_halogen_flag": false,
+      "top2": {
+        "ik14": "DOEIPZUTRVMWAB",
+        "cosine": 0.9228,
+        "formula": "C12H15NO2",
+        "smiles": "O=C(O)c1ccc(CN2CCCC2)cc1",
+        "usi": "mzspec:GNPS:MSNLIB-POSITIVE:accession:CCMSLIB00012874439",
+        "instrument": "ESI-Orbitrap",
+        "halogens": null
+      }
+    },
+    {
+      "precursor": 207.1028424,
+      "tier": "C_dark",
+      "best_cosine": 0.3164,
+      "second_cosine": 0.3164,
+      "molecule_gap": 0.0,
+      "entropy_best": null,
+      "n_molecules": 549,
+      "passes_995": false,
+      "top1": {
+        "ik14": "PEEBXRCYWBOCJM",
+        "cosine": 0.3164,
+        "formula": "C11H14N2O2",
+        "smiles": "CC(=O)CCC(=O)N=c1cc[nH]cc1C",
+        "usi": "mzspec:GNPS:MULTIPLEX-SYNTHESIS-LIBRARY-ALL-PARTITION-3:accession:CCMSLIB00015146970",
+        "instrument": "LC-ESI-Orbitrap",
+        "halogens": null
+      },
+      "top1_halogen_flag": false,
+      "top2": {
+        "ik14": "PDNWPZJXHJTNMH",
+        "cosine": 0.3164,
+        "formula": "C11H14N2O2",
+        "smiles": "CCC/C=C/C(O)=Nc1ncccc1O",
+        "usi": "mzspec:GNPS:MULTIPLEX-SYNTHESIS-LIBRARY-ALL-PARTITION-3:accession:CCMSLIB00015145521",
+        "instrument": "LC-ESI-Orbitrap",
+        "halogens": null
+      }
+    },
+    {
+      "precursor": 138.0561676,
+      "tier": "C_dark",
+      "best_cosine": 0.6687,
+      "second_cosine": 0.0051,
+      "molecule_gap": 0.6636,
+      "entropy_best": null,
+      "n_molecules": 4,
+      "passes_995": false,
+      "top1": {
+        "ik14": "LDHMAVIPBRSVRG",
+        "cosine": 0.6687,
+        "formula": "C7H9N2O+",
+        "smiles": "C[n+]1cccc(C(N)=O)c1",
+        "usi": "mzspec:GNPS:GNPS-EMBL-MCF:accession:CCMSLIB00000577991",
+        "instrument": "LC-ESI-Q-Exactive Plus",
+        "halogens": null
+      },
+      "top1_halogen_flag": false,
+      "top2": {
+        "ik14": "UJWHLERCFNIFNJ",
+        "cosine": 0.0051,
+        "formula": "C8H11NO",
+        "smiles": "CCNc1ccc(O)cc1",
+        "usi": "mzspec:GNPS:GNPS-ALKYLAMINES-LIBRARY:accession:CCMSLIB00016356359",
+        "instrument": "LC-ESI-Orbitrap",
+        "halogens": null
+      }
+    },
+    {
+      "precursor": 215.03295898,
+      "tier": "C_dark",
+      "best_cosine": 0.1863,
+      "second_cosine": 0.0617,
+      "molecule_gap": 0.1246,
+      "entropy_best": null,
+      "n_molecules": 476,
+      "passes_995": false,
+      "top1": {
+        "ik14": "ZUNGQBVJRKUYJD",
+        "cosine": 0.1863,
+        "formula": "C7H4F2N4O2",
+        "smiles": "O=C(O)c1cnc2ncnn2c1C(F)F",
+        "usi": "mzspec:GNPS:MSNLIB-POSITIVE:accession:CCMSLIB00012878675",
+        "instrument": "ESI-Orbitrap",
+        "halogens": {
+          "F": 2
+        }
+      },
+      "top1_halogen_flag": true,
+      "top2": {
+        "ik14": "XCULDPCOTWRRAU",
+        "cosine": 0.0617,
+        "formula": "C10H15NO2S",
+        "smiles": "CCN(CC)Cc1ccc(C(=O)O)s1",
+        "usi": "mzspec:GNPS:MSNLIB-POSITIVE:accession:CCMSLIB00012976363",
+        "instrument": "ESI-Orbitrap",
+        "halogens": null
+      }
+    },
+    {
+      "precursor": 146.02819736,
+      "tier": "C_dark",
+      "best_cosine": 0.0409,
+      "second_cosine": 0.0124,
+      "molecule_gap": 0.0285,
+      "entropy_best": null,
+      "n_molecules": 21,
+      "passes_995": false,
+      "top1": {
+        "ik14": "BABFRBCLCKFQNF",
+        "cosine": 0.0409,
+        "formula": "C8H19NO",
+        "smiles": "CCCC(C)NCCCO",
+        "usi": "mzspec:GNPS:GNPS-ALKYLAMINES-LIBRARY:accession:CCMSLIB00016349769",
+        "instrument": "LC-ESI-Orbitrap",
+        "halogens": null
+      },
+      "top1_halogen_flag": false,
+      "top2": {
+        "ik14": "ARPJAIZFQPPBHM",
+        "cosine": 0.0124,
+        "formula": "C6H11NO3",
+        "smiles": "CC(C=O)NC(C)C(=O)O",
+        "usi": "mzspec:GNPS:GNPS-ALKYLAMINES-LIBRARY:accession:CCMSLIB00016353344",
+        "instrument": "LC-ESI-Orbitrap",
+        "halogens": null
+      }
+    },
+    {
+      "precursor": 230.99705505,
+      "tier": "C_dark",
+      "best_cosine": 0.1403,
+      "second_cosine": 0.102,
+      "molecule_gap": 0.0383,
+      "entropy_best": null,
+      "n_molecules": 609,
+      "passes_995": false,
+      "top1": {
+        "ik14": "BAJHDUZEIKRKAS",
+        "cosine": 0.1403,
+        "formula": "C11H10FeO2",
+        "smiles": "O=C(O)c1ccc[cH-]1.[Fe+2].c1cc[cH-]c1",
+        "usi": "mzspec:GNPS:MULTIPLEX-SYNTHESIS-LIBRARY-ALL-PARTITION-5:accession:CCMSLIB00015256234",
+        "instrument": "LC-ESI-Orbitrap",
+        "halogens": null
+      },
+      "top1_halogen_flag": false,
+      "top2": {
+        "ik14": "PBYVJDNJAGCRSR",
+        "cosine": 0.102,
+        "formula": "C9H8Cl2N2O",
+        "smiles": "OC(=NC1CC1)c1cc(Cl)nc(Cl)c1",
+        "usi": "mzspec:GNPS:MULTIPLEX-SYNTHESIS-LIBRARY-ALL-PARTITION-5:accession:CCMSLIB00015314352",
+        "instrument": "LC-ESI-Orbitrap",
+        "halogens": {
+          "Cl": 2
+        }
+      }
+    },
+    {
+      "precursor": 406.02178266,
+      "tier": "C_dark",
+      "best_cosine": 0.2722,
+      "second_cosine": 0.2722,
+      "molecule_gap": 0.0,
+      "entropy_best": null,
+      "n_molecules": 1681,
+      "passes_995": false,
+      "top1": {
+        "ik14": "SUYLKGWDBBKRNB",
+        "cosine": 0.2722,
+        "formula": "C19H22N2O4S2",
+        "smiles": "CCCCCC(C)OC(=O)c1ccc(SSc2ccc(C(=O)O)cn2)nc1",
+        "usi": "mzspec:GNPS:MULTIPLEX-SYNTHESIS-LIBRARY-ALL-PARTITION-2:accession:CCMSLIB00014919757",
+        "instrument": "LC-ESI-Orbitrap",
+        "halogens": null
+      },
+      "top1_halogen_flag": false,
+      "top2": {
+        "ik14": "YMUCCEWTLRPXIS",
+        "cosine": 0.2722,
+        "formula": "C19H22N2O4S2",
+        "smiles": "CCCCCCCOC(=O)c1ccc(SSc2ccc(C(=O)O)cn2)nc1",
+        "usi": "mzspec:GNPS:MULTIPLEX-SYNTHESIS-LIBRARY-ALL-PARTITION-2:accession:CCMSLIB00014919750",
+        "instrument": "LC-ESI-Orbitrap",
+        "halogens": null
+      }
+    },
+    {
+      "precursor": 421.14851577,
+      "tier": "C_dark",
+      "best_cosine": 0.1205,
+      "second_cosine": 0.084,
+      "molecule_gap": 0.0365,
+      "entropy_best": null,
+      "n_molecules": 1266,
+      "passes_995": false,
+      "top1": {
+        "ik14": "TYNYTRDUTWFNPF",
+        "cosine": 0.1205,
+        "formula": "C25H23FN2O3",
+        "smiles": "O=C(c1ccc(F)cc1)N1CC(O)CC1C(O)=NCc1ccc(-c2ccccc2)cc1",
+        "usi": "mzspec:GNPS:MSNLIB-POSITIVE:accession:CCMSLIB00012805414",
+        "instrument": "ESI-Orbitrap",
+        "halogens": {
+          "F": 1
+        }
+      },
+      "top1_halogen_flag": true,
+      "top2": {
+        "ik14": "QYPNMENZKVVVGF",
+        "cosine": 0.084,
+        "formula": "C27H31NO3",
+        "smiles": "CC(C(O)=NC(c1ccccc1)C(O)c1ccccc1)c1ccc(C(O)C(C)C)cc1",
+        "usi": "mzspec:GNPS:MULTIPLEX-SYNTHESIS-LIBRARY-ALL-PARTITION-6:accession:CCMSLIB00016282584",
+        "instrument": "LC-ESI-Orbitrap",
+        "halogens": null
+      }
+    },
+    {
+      "precursor": 273.08055416,
+      "tier": "B1_high_score_contested",
+      "best_cosine": 0.9808,
+      "second_cosine": 0.9691,
+      "molecule_gap": 0.0117,
+      "entropy_best": 0.4066,
+      "n_molecules": 1145,
+      "passes_995": false,
+      "top1": {
+        "ik14": "SERHVCXTIMCXBT",
+        "cosine": 0.9808,
+        "formula": "C14H10F2N4",
+        "smiles": "Nc1c(-c2ccc(F)cc2)nnn1-c1ccccc1F",
+        "usi": "mzspec:GNPS:MSNLIB-POSITIVE:accession:CCMSLIB00012868980",
+        "instrument": "ESI-Orbitrap",
+        "halogens": {
+          "F": 2
+        }
+      },
+      "top1_halogen_flag": true,
+      "top2": {
+        "ik14": "LEAKQIXYSHIHCW",
+        "cosine": 0.9691,
+        "formula": "C14H13ClN4",
+        "smiles": "CN=C1CN=C(c2ccc[nH]2)c2cc(Cl)ccc2N1",
+        "usi": "mzspec:GNPS:REFRAME-POSITIVE-LIBRARY:accession:CCMSLIB00016150904",
+        "instrument": "LC-ESI-Orbitrap",
+        "halogens": {
+          "Cl": 1
+        }
+      }
+    },
+    {
+      "precursor": 346.05616339,
+      "tier": "C_dark",
+      "best_cosine": 0.3832,
+      "second_cosine": 0.3703,
+      "molecule_gap": 0.0129,
+      "entropy_best": null,
+      "n_molecules": 2109,
+      "passes_995": false,
+      "top1": {
+        "ik14": "IFCPABKBYRVXAD",
+        "cosine": 0.3832,
+        "formula": "C13H13F2N3O4S",
+        "smiles": "O=C(O)C1CN(S(=O)(=O)c2c[nH]c3ncccc23)CCC1(F)F",
+        "usi": "mzspec:GNPS:MSNLIB-POSITIVE:accession:CCMSLIB00012779463",
+        "instrument": "ESI-Orbitrap",
+        "halogens": {
+          "F": 2
+        }
+      },
+      "top1_halogen_flag": true,
+      "top2": {
+        "ik14": "NSSBLCWNITXZRU",
+        "cosine": 0.3703,
+        "formula": "C16H15N3O2S2",
+        "smiles": "O=C(O)Cc1csc(N=C2SCC3Cc4ccccc4CN23)n1",
+        "usi": "mzspec:GNPS:REFRAME-POSITIVE-LIBRARY:accession:CCMSLIB00016146145",
+        "instrument": "LC-ESI-Orbitrap",
+        "halogens": null
+      }
     },
     {
       "precursor": 144.10314178,
       "tier": "C_dark",
       "best_cosine": 0.0,
+      "second_cosine": 0.0,
       "molecule_gap": 0.0,
-      "passes_995": false,
-      "entropy_best": NaN,
+      "entropy_best": null,
       "n_molecules": 26,
-      "top1_ik14": "IPBFYZQJXZJBFQ",
-      "top1_formula": "C8H14O2",
-      "top1_name": null,
-      "top2_ik14": "KFICFRXVWYPCCL",
-      "top2_formula": "C8H18N2",
-      "top2_cosine": 0.0
+      "passes_995": false,
+      "top1": {
+        "ik14": "IPBFYZQJXZJBFQ",
+        "cosine": 0.0,
+        "formula": "C8H14O2",
+        "smiles": "CCCCC1CCC(=O)O1",
+        "usi": "mzspec:GNPS:CMMC-FOOD-BIOMARKERS:accession:CCMSLIB00013576843",
+        "instrument": "LC-ESI-Orbitrap",
+        "halogens": null
+      },
+      "top1_halogen_flag": false,
+      "top2": {
+        "ik14": "KFICFRXVWYPCCL",
+        "cosine": 0.0,
+        "formula": "C8H18N2",
+        "smiles": "NCCCNC1CCCC1",
+        "usi": "mzspec:GNPS:GNPS-ALKYLAMINES-LIBRARY:accession:CCMSLIB00016350885",
+        "instrument": "LC-ESI-Orbitrap",
+        "halogens": null
+      }
+    },
+    {
+      "precursor": 426.02278137,
+      "tier": "C_dark",
+      "best_cosine": 0.1678,
+      "second_cosine": 0.1678,
+      "molecule_gap": 0.0,
+      "entropy_best": null,
+      "n_molecules": 900,
+      "passes_995": false,
+      "top1": {
+        "ik14": "UNLQJLDLLHWHED",
+        "cosine": 0.1678,
+        "formula": "C23H38N2O5",
+        "smiles": "CCCCCCCCCCCC(=O)N(C)CC(=O)OCc1cnc(C)c(O)c1CO",
+        "usi": "mzspec:GNPS:MULTIPLEX-SYNTHESIS-LIBRARY-ALL-PARTITION-5:accession:CCMSLIB00015284781",
+        "instrument": "LC-ESI-Orbitrap",
+        "halogens": null
+      },
+      "top1_halogen_flag": false,
+      "top2": {
+        "ik14": "PNTCQQWURIISLR",
+        "cosine": 0.1678,
+        "formula": "C23H38N2O5",
+        "smiles": "CCCCCCCCCCCC(=O)N(C)CC(=O)OCc1c(CO)cnc(C)c1O",
+        "usi": "mzspec:GNPS:MULTIPLEX-SYNTHESIS-LIBRARY-ALL-PARTITION-5:accession:CCMSLIB00015284768",
+        "instrument": "LC-ESI-Orbitrap",
+        "halogens": null
+      }
+    },
+    {
+      "precursor": 221.98455811,
+      "tier": "A_gate_passed",
+      "best_cosine": 0.9494,
+      "second_cosine": 0.1239,
+      "molecule_gap": 0.8255,
+      "entropy_best": 0.421,
+      "n_molecules": 603,
+      "passes_995": true,
+      "top1": {
+        "ik14": "SJPZAKSXLKKMPP",
+        "cosine": 0.9494,
+        "formula": "C8H7FN6O",
+        "smiles": "N=c1nc(N=C(O)c2ccc(F)nc2)[nH][nH]1",
+        "usi": "mzspec:GNPS:MULTIPLEX-SYNTHESIS-LIBRARY-ALL-PARTITION-4:accession:CCMSLIB00015043861",
+        "instrument": "LC-ESI-Orbitrap",
+        "halogens": {
+          "F": 1
+        }
+      },
+      "top1_halogen_flag": true,
+      "top2": {
+        "ik14": "IQZNJFBQFZVJFU",
+        "cosine": 0.1239,
+        "formula": "C12H12FNO2",
+        "smiles": "C#CCCCCOC(=O)c1cccnc1F",
+        "usi": "mzspec:GNPS:MULTIPLEX-SYNTHESIS-LIBRARY-ALL-PARTITION-2:accession:CCMSLIB00014910169",
+        "instrument": "LC-ESI-Orbitrap",
+        "halogens": {
+          "F": 1
+        }
+      }
+    },
+    {
+      "precursor": 444.03234863,
+      "tier": "C_dark",
+      "best_cosine": 0.2687,
+      "second_cosine": 0.0202,
+      "molecule_gap": 0.2485,
+      "entropy_best": null,
+      "n_molecules": 1433,
+      "passes_995": false,
+      "top1": {
+        "ik14": "NJNXCJPSMWKXHO",
+        "cosine": 0.2687,
+        "formula": "C19H12F6N4O2",
+        "smiles": "CC(Oc1ccc(-c2nc(-c3ccc4nc[nH]c4c3)no2)cc1C(F)(F)F)C(F)(F)F",
+        "usi": "mzspec:GNPS:GNPS-REFRAME-DRUG-CCS-LIBRARY:accession:CCMSLIB00016268107",
+        "instrument": "LC-ESI-ToF",
+        "halogens": {
+          "F": 6
+        }
+      },
+      "top1_halogen_flag": true,
+      "top2": {
+        "ik14": "MIHTTYXBXIRRGV",
+        "cosine": 0.0202,
+        "formula": "C17H30N8O4S",
+        "smiles": "CSCC[C@H](N=C(O)[C@@H](N)Cc1cnc[nH]1)C(O)=N[C@@H](CCCNC(=N)N)C(=O)O",
+        "usi": "mzspec:GNPS:MULTIPLEX-SYNTHESIS-LIBRARY-ALL-PARTITION-5:accession:CCMSLIB00015276999",
+        "instrument": "LC-ESI-Orbitrap",
+        "halogens": null
+      }
+    },
+    {
+      "precursor": 162.02322388,
+      "tier": "C_dark",
+      "best_cosine": 0.0101,
+      "second_cosine": 0.003,
+      "molecule_gap": 0.0071,
+      "entropy_best": null,
+      "n_molecules": 75,
+      "passes_995": false,
+      "top1": {
+        "ik14": "WOCQGWHMXPRWHW",
+        "cosine": 0.0101,
+        "formula": "C6H11NO4",
+        "smiles": "CC(O)C(O)=N[C@@H](C)C(=O)O",
+        "usi": "mzspec:GNPS:MULTIPLEX-SYNTHESIS-LIBRARY-ALL-PARTITION-3:accession:CCMSLIB00014951254",
+        "instrument": "LC-ESI-Orbitrap",
+        "halogens": null
+      },
+      "top1_halogen_flag": false,
+      "top2": {
+        "ik14": "ITQBMXTUIWJKBZ",
+        "cosine": 0.003,
+        "formula": "C7H16N2O2",
+        "smiles": "CC(O)CC(O)=NCCCN",
+        "usi": "mzspec:GNPS:MULTIPLEX-SYNTHESIS-LIBRARY-ALL-PARTITION-1:accession:CCMSLIB00015013656",
+        "instrument": "LC-ESI-Orbitrap",
+        "halogens": null
+      }
+    },
+    {
+      "precursor": 169.99194609,
+      "tier": "C_dark",
+      "best_cosine": 0.0701,
+      "second_cosine": 0.0405,
+      "molecule_gap": 0.0297,
+      "entropy_best": null,
+      "n_molecules": 232,
+      "passes_995": false,
+      "top1": {
+        "ik14": "YSKWMYLRGKBHQR",
+        "cosine": 0.0701,
+        "formula": "C7H7NO2S",
+        "smiles": "O=C(O)c1csc(C2CC2)n1",
+        "usi": "mzspec:GNPS:MSNLIB-POSITIVE:accession:CCMSLIB00012956326",
+        "instrument": "ESI-Orbitrap",
+        "halogens": null
+      },
+      "top1_halogen_flag": false,
+      "top2": {
+        "ik14": "WKJZCJVCVKTKBR",
+        "cosine": 0.0405,
+        "formula": "C7H7NO2S",
+        "smiles": "O=C(O)c1scnc1C1CC1",
+        "usi": "mzspec:GNPS:MSNLIB-POSITIVE:accession:CCMSLIB00012935173",
+        "instrument": "ESI-Orbitrap",
+        "halogens": null
+      }
+    },
+    {
+      "precursor": 168.04331855,
+      "tier": "C_dark",
+      "best_cosine": 0.0627,
+      "second_cosine": 0.0112,
+      "molecule_gap": 0.0515,
+      "entropy_best": null,
+      "n_molecules": 196,
+      "passes_995": false,
+      "top1": {
+        "ik14": "MUJWLBCYTZYEQA",
+        "cosine": 0.0627,
+        "formula": "C9H10ClN",
+        "smiles": "NC1(c2ccc(Cl)cc2)CC1",
+        "usi": "mzspec:GNPS:MULTIPLEX-SYNTHESIS-LIBRARY-ALL-PARTITION-5:accession:CCMSLIB00015262494",
+        "instrument": "LC-ESI-Orbitrap",
+        "halogens": {
+          "Cl": 1
+        }
+      },
+      "top1_halogen_flag": true,
+      "top2": {
+        "ik14": "DREYJVRZLKQJDG",
+        "cosine": 0.0112,
+        "formula": "C8H9NOS",
+        "smiles": "O=C(NC1CC1)c1cccs1",
+        "usi": "mzspec:GNPS:MULTIPLEX-SYNTHESIS-LIBRARY-ALL-PARTITION-3:accession:CCMSLIB00015244432",
+        "instrument": "LC-ESI-Orbitrap",
+        "halogens": null
+      }
+    },
+    {
+      "precursor": 359.12527466,
+      "tier": "C_dark",
+      "best_cosine": 0.3802,
+      "second_cosine": 0.2736,
+      "molecule_gap": 0.1066,
+      "entropy_best": null,
+      "n_molecules": 1915,
+      "passes_995": false,
+      "top1": {
+        "ik14": "QPVWCVAYEPEYHS",
+        "cosine": 0.3802,
+        "formula": "C14H20N2O9",
+        "smiles": "O=C(O)[C@H](Cc1ccc(O)c([N+](=O)[O-])c1)NC[C@H](O)[C@H](O)[C@H](O)CO",
+        "usi": "mzspec:GNPS:GNPS-ALKYLAMINES-LIBRARY:accession:CCMSLIB00016351319",
+        "instrument": "LC-ESI-Orbitrap",
+        "halogens": null
+      },
+      "top1_halogen_flag": false,
+      "top2": {
+        "ik14": "MMLFNDXYPQWLLT",
+        "cosine": 0.2736,
+        "formula": "C18H24N4O4",
+        "smiles": "CCn1cc(C(O)=N[C@@H](CCCCN)C(=O)O)c(=O)c2ccc(C)nc21",
+        "usi": "mzspec:GNPS:MULTIPLEX-SYNTHESIS-LIBRARY-ALL-PARTITION-3:accession:CCMSLIB00015061250",
+        "instrument": "LC-ESI-Orbitrap",
+        "halogens": null
+      }
+    },
+    {
+      "precursor": 244.02293396,
+      "tier": "B2_sub_hit_analog",
+      "best_cosine": 0.7053,
+      "second_cosine": 0.7053,
+      "molecule_gap": 0.0,
+      "entropy_best": null,
+      "n_molecules": 685,
+      "passes_995": false,
+      "top1": {
+        "ik14": "YPMWBANGSOGRGL",
+        "cosine": 0.7053,
+        "formula": "C15H17NO2",
+        "smiles": "CCCCCC(=O)Oc1cnc2ccccc2c1",
+        "usi": "mzspec:GNPS:MULTIPLEX-SYNTHESIS-LIBRARY-ALL-PARTITION-2:accession:CCMSLIB00015171140",
+        "instrument": "LC-ESI-Orbitrap",
+        "halogens": null
+      },
+      "top1_halogen_flag": false,
+      "top2": {
+        "ik14": "JVHGAPIUBJHOAV",
+        "cosine": 0.7053,
+        "formula": "C15H17NO2",
+        "smiles": "CCC(C)CC(=O)Oc1cnc2ccccc2c1",
+        "usi": "mzspec:GNPS:MULTIPLEX-SYNTHESIS-LIBRARY-ALL-PARTITION-2:accession:CCMSLIB00015171156",
+        "instrument": "LC-ESI-Orbitrap",
+        "halogens": null
+      }
+    },
+    {
+      "precursor": 313.11963202,
+      "tier": "B1_high_score_contested",
+      "best_cosine": 0.9237,
+      "second_cosine": 0.9179,
+      "molecule_gap": 0.0059,
+      "entropy_best": 0.3985,
+      "n_molecules": 1798,
+      "passes_995": false,
+      "top1": {
+        "ik14": "AFUFYTAYFCQENI",
+        "cosine": 0.9237,
+        "formula": "C14H15F3N4O",
+        "smiles": "CC(C)(C)C(N=C(O)c1ccnc2nccnc12)C(F)(F)F",
+        "usi": "mzspec:GNPS:MSNLIB-POSITIVE:accession:CCMSLIB00012766531",
+        "instrument": "ESI-Orbitrap",
+        "halogens": {
+          "F": 3
+        }
+      },
+      "top1_halogen_flag": true,
+      "top2": {
+        "ik14": "HVEFOAIIKVXXLG",
+        "cosine": 0.9179,
+        "formula": "C15H18F2N2O3",
+        "smiles": "O=C(c1ccc(OC(F)F)cn1)N1CCC2(CCOCC2)C1",
+        "usi": "mzspec:GNPS:MSNLIB-POSITIVE:accession:CCMSLIB00012832018",
+        "instrument": "ESI-Orbitrap",
+        "halogens": {
+          "F": 2
+        }
+      }
     },
     {
       "precursor": 91.02874374,
       "tier": "C_dark",
       "best_cosine": 0.0,
+      "second_cosine": 0.0,
       "molecule_gap": 0.0,
-      "passes_995": false,
-      "entropy_best": NaN,
+      "entropy_best": null,
       "n_molecules": 0,
-      "top1_ik14": null,
-      "top1_formula": null,
-      "top1_name": null,
-      "top2_ik14": null,
-      "top2_formula": null,
-      "top2_cosine": NaN
+      "passes_995": false,
+      "top1": {},
+      "top1_halogen_flag": false,
+      "top2": {}
+    },
+    {
+      "precursor": 280.90861578,
+      "tier": "C_dark",
+      "best_cosine": 0.1388,
+      "second_cosine": 0.0339,
+      "molecule_gap": 0.1048,
+      "entropy_best": null,
+      "n_molecules": 1203,
+      "passes_995": false,
+      "top1": {
+        "ik14": "NJYNDGBRTMMXHL",
+        "cosine": 0.1388,
+        "formula": "C14H19NO3S",
+        "smiles": "CC(C)S(=O)(=O)c1ccccc1C(O)=NC1CCC1",
+        "usi": "mzspec:GNPS:MSNLIB-POSITIVE:accession:CCMSLIB00012808902",
+        "instrument": "ESI-Orbitrap",
+        "halogens": null
+      },
+      "top1_halogen_flag": false,
+      "top2": {
+        "ik14": "GTZCKTIZOGTWQO",
+        "cosine": 0.0339,
+        "formula": "C10H15O5PS",
+        "smiles": "COP(=O)(OC)Oc1ccc(S(C)=O)c(C)c1",
+        "usi": "mzspec:GNPS:WFSR-LIBRARY:accession:CCMSLIB00013939051",
+        "instrument": "ESI-Orbitrap",
+        "halogens": null
+      }
+    },
+    {
+      "precursor": 190.01815796,
+      "tier": "C_dark",
+      "best_cosine": 0.2892,
+      "second_cosine": 0.2369,
+      "molecule_gap": 0.0523,
+      "entropy_best": null,
+      "n_molecules": 303,
+      "passes_995": false,
+      "top1": {
+        "ik14": "CLYOMCMDBNNGSM",
+        "cosine": 0.2892,
+        "formula": "C5H4BrFN2",
+        "smiles": "Nc1cc(Br)cnc1F",
+        "usi": "mzspec:GNPS:MULTIPLEX-SYNTHESIS-LIBRARY-ALL-PARTITION-4:accession:CCMSLIB00015089269",
+        "instrument": "LC-ESI-Orbitrap",
+        "halogens": {
+          "F": 1,
+          "Br": 1
+        }
+      },
+      "top1_halogen_flag": true,
+      "top2": {
+        "ik14": "VOVAQGOCBYJSHC",
+        "cosine": 0.2369,
+        "formula": "C9H7N3O2",
+        "smiles": "O=C(O)c1cccnc1-n1ccnc1",
+        "usi": "mzspec:GNPS:MSNLIB-POSITIVE:accession:CCMSLIB00012882170",
+        "instrument": "ESI-Orbitrap",
+        "halogens": null
+      }
+    },
+    {
+      "precursor": 181.96627045,
+      "tier": "C_dark",
+      "best_cosine": 0.2301,
+      "second_cosine": 0.0133,
+      "molecule_gap": 0.2168,
+      "entropy_best": null,
+      "n_molecules": 200,
+      "passes_995": false,
+      "top1": {
+        "ik14": "VPOLBKKAXMBJMI",
+        "cosine": 0.2301,
+        "formula": "C9H9FN2O",
+        "smiles": "OC(=NC1CC1)c1ccc(F)nc1",
+        "usi": "mzspec:GNPS:MULTIPLEX-SYNTHESIS-LIBRARY-ALL-PARTITION-4:accession:CCMSLIB00015043993",
+        "instrument": "LC-ESI-Orbitrap",
+        "halogens": {
+          "F": 1
+        }
+      },
+      "top1_halogen_flag": true,
+      "top2": {
+        "ik14": "CVBAZRKELSYLDE",
+        "cosine": 0.0133,
+        "formula": "C9H11NO3",
+        "smiles": "O=C(OCCCO)c1ccccn1",
+        "usi": "mzspec:GNPS:MULTIPLEX-SYNTHESIS-LIBRARY-ALL-PARTITION-1:accession:CCMSLIB00015172523",
+        "instrument": "LC-ESI-Orbitrap",
+        "halogens": null
+      }
     }
   ]
 }
