@@ -65,7 +65,7 @@ def molecule_score(z_q: torch.Tensor, z_refs: torch.Tensor,
     cos = z_refs @ z_q                                   # (R_total,)
     C = ref_ptr.shape[0] - 1
     counts = (ref_ptr[1:] - ref_ptr[:-1]).clamp(min=1)
-    scores = torch.empty(C, dtype=z_q.dtype)
+    scores = torch.empty(C, dtype=z_q.dtype, device=z_q.device)
     for c in range(C):
         block = cos[ref_ptr[c]:ref_ptr[c + 1]] / tau
         scores[c] = tau * (torch.logsumexp(block, dim=0)
@@ -103,10 +103,15 @@ def orbit_consistency(scores_a: torch.Tensor, scores_b: torch.Tensor,
     return kl + hinge
 
 
-def protection_penalty(current: float, reference: float,
+def protection_penalty(current: torch.Tensor, reference: torch.Tensor,
                        eps: float) -> torch.Tensor:
-    """max(0, current - reference - eps) as a tensor penalty."""
-    return F.relu(torch.tensor(float(current - reference - eps)))
+    """DIFFERENTIABLE hinge penalty max(0, current - reference - eps).
+
+    `current` must be a tensor connected to theta (replay loss computed
+    with the live encoder); `reference` is the frozen theta_N replay loss
+    (a detached constant is correct -- the constraint is one-sided).
+    """
+    return F.relu(current - reference - eps)
 
 
 class OrbitBoundaryLoss(torch.nn.Module):
@@ -123,7 +128,10 @@ class OrbitBoundaryLoss(torch.nn.Module):
         cfg = self.cfg
         scores = molecule_score(batch["z_q"], batch["z_refs"],
                                 batch["ref_ptr"], cfg.tau)
-        delta = batch.get("delta_chem") if self.use_boundary else None
+        # boundary margins scale by lambda_boundary (recorded, frozen)
+        delta = None
+        if self.use_boundary and batch.get("delta_chem") is not None:
+            delta = cfg.lambda_boundary * batch["delta_chem"]
         l_rank = listwise_loss(scores, batch["true_idx"], delta,
                                cfg.temperature)
         parts = {"loss_rank": l_rank}
@@ -135,19 +143,14 @@ class OrbitBoundaryLoss(torch.nn.Module):
                                         cfg)
             parts["loss_orbit"] = l_orbit
             total = total + cfg.lambda_orbit * l_orbit
-        if self.use_boundary:
-            l_bound = listwise_loss(scores, batch["true_idx"],
-                                    batch["delta_chem"], cfg.temperature)
-            parts["loss_boundary_dup_check"] = l_bound  # equals l_rank+delta
-        pen = 0.0
+        pen = torch.zeros((), device=scores.device, dtype=scores.dtype)
         for key, eps in (("replay_noise", cfg.eps_noise),
                          ("replay_global", cfg.eps_global),
                          ("replay_near", cfg.eps_near)):
             if key in batch:
-                p = protection_penalty(float(batch[key][0]),
-                                       float(batch[key][1]), eps)
-                pen = pen + p
-        parts["protection"] = torch.as_tensor(pen)
+                cur, ref = batch[key]          # cur: tensor w/ grad; ref: const
+                pen = pen + protection_penalty(cur, ref, eps)
+        parts["protection"] = pen
         total = total + pen
         parts["loss"] = total
         return parts

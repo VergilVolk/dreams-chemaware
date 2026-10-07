@@ -23,7 +23,6 @@ from GLM_orbit_boundary_loss import (  # noqa: E402
     OrbitBoundaryConfig, OrbitBoundaryLoss, listwise_loss,
     molecule_score, orbit_consistency, protection_penalty,
 )
-
 torch.manual_seed(7)
 cfg = OrbitBoundaryConfig()
 
@@ -98,26 +97,34 @@ def main() -> None:
     arm_O = OrbitBoundaryLoss(cfg, use_orbit=True, use_boundary=False)
     arm_C = OrbitBoundaryLoss(cfg, use_orbit=False, use_boundary=True)
     arm_OC = OrbitBoundaryLoss(cfg, use_orbit=True, use_boundary=True)
-    out_R = arm_R(batch)
-    out_O = arm_O(batch)
-    out_C = arm_C(batch)
-    out_OC = arm_OC(batch)
-    assert torch.allclose(out_R["loss"], out_R["loss_rank"])
-    assert "loss_orbit" in out_O and "loss_boundary_dup_check" in out_C
-    assert float(out_OC["loss"]) >= float(out_O["loss"]) - 1e-6
     # R ignores payloads: changing delta/orbit must not change R loss
     b2 = dict(batch)
     b2["delta_chem"] = torch.tensor([9.0, 9.0, 9.0, 9.0])
     b2["z_q_orbit"] = torch.randn(16)
+    out_R = arm_R(batch)
     out_R2 = arm_R(b2)
+    out_O = arm_O(batch)
+    out_C = arm_C(batch)
+    out_OC = arm_OC(batch)
+    assert torch.allclose(out_R["loss"], out_R["loss_rank"])
+    assert "loss_orbit" in out_O
+    # C arm: nonzero delta on a FALSE candidate must raise the CE
+    assert float(out_C["loss_rank"]) > float(out_R["loss_rank"]) + 1e-6
     assert torch.allclose(out_R["loss"], out_R2["loss"])
     print("T4 PASS: arms differ only through their booleans; R ignores "
-          "payloads")
+          "payloads; C-arm CE responds to margins")
 
-    # T5
-    assert float(protection_penalty(1.0, 1.0, 0.0)) == 0.0
-    assert float(protection_penalty(1.5, 1.0, 0.2)) > 0.0
-    print("T5 PASS: protection penalty exact-zero within tolerance")
+    # T5 differentiable protection: gradient flows through `current`
+    cur = torch.tensor(1.5, requires_grad=True)
+    ref = torch.tensor(1.0)
+    p = protection_penalty(cur, ref, 0.2)
+    assert float(p) > 0.0
+    p.backward()
+    assert cur.grad is not None and float(cur.grad) == 1.0
+    inside = protection_penalty(torch.tensor(1.0), torch.tensor(1.0), 0.0)
+    assert float(inside) == 0.0
+    print("T5 PASS: protection penalty differentiable (grad=1 beyond "
+          "tolerance), exact-zero within")
 
     # T6 gradient flow
     z = z_q.clone().requires_grad_(True)

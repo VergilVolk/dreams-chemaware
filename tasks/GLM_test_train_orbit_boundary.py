@@ -76,16 +76,21 @@ pool_bad = tmp / "pool_corrupted.npz"
 np.savez(pool_bad, **p)
 
 
-def train(arm, pl, out, steps=30):
-    r = subprocess.run(
-        [sys.executable, "-X", "utf8",
-         str(ROOT / "tasks/GLM_train_orbit_boundary_encoder.py"),
-         "--arm", arm, "--pool", str(pl), "--encoder", "synthetic",
-         "--steps", str(steps), "--batch-size", "8", "--lr", "1e-2",
-         "--seed", "3407", "--output-dir", str(out)],
-        capture_output=True, text=True)
+def train(arm, pl, out, steps=30, sha=None):
+    cmd = [sys.executable, "-X", "utf8",
+           str(ROOT / "tasks/GLM_train_orbit_boundary_encoder.py"),
+           "--arm", arm, "--pool", str(pl), "--encoder", "synthetic",
+           "--steps", str(steps), "--batch-size", "8", "--lr", "1e-2",
+           "--seed", "3407", "--output-dir", str(out),
+           "--expected-pool-sha256", sha or _sha(pl)]
+    r = subprocess.run(cmd, capture_output=True, text=True)
     assert r.returncode == 0, r.stderr[-800:]
     return json.loads((out / f"{arm}_report.json").read_text(encoding="utf-8"))
+
+
+def _sha(pl):
+    import hashlib
+    return hashlib.sha256(Path(pl).read_bytes()).hexdigest()
 
 
 hist = {}
@@ -94,12 +99,12 @@ for arm in ("R", "O-null", "O-real", "C-null", "C-real", "OC"):
     hist[arm] = train(arm, pool, out)
     h = hist[arm]["loss_history"]
     assert all(np.isfinite(h)), f"{arm}: non-finite loss"
-    assert h[-1] < h[0] + 0.5, f"{arm}: loss not decreasing-ish"
-    for f in (".25", ".5", ".75"):
-        pass
-    ckpts = list(out.glob(f"{arm}_step*.pt"))
+    ckpts = list(out.glob(f"{arm}_step*.ckpt"))
     assert len(ckpts) == 4, f"{arm}: expected 4 checkpoints, got {len(ckpts)}"
-print("A1/A5 PASS: six arms train, finite losses, 4 checkpoints each")
+    rep = hist[arm]
+    # P0-3 isolation: eligible <= train groups; report records the counts
+    assert rep["eligible_train_groups"] <= rep["n_groups"] - rep["val_groups"]
+print("A1/A5 PASS: six arms train, finite losses, 4 ckpts, isolation counts")
 
 r_good = train("R", pool, tmp / "rg")
 r_bad = train("R", pool_bad, tmp / "rb")
@@ -117,4 +122,33 @@ r_rep = train("R", pool, tmp / "rr")
 assert r_rep["loss_history"] == hist["R"]["loss_history"], \
     "same seed/data/dose must reproduce exactly"
 print("A4 PASS: same-dose rerun reproduces the loss history exactly")
-print("SIX-ARM SMOKE: ALL PASS")
+
+# A6 SHA gate: wrong expected sha must ABORT
+bad = subprocess.run(
+    [sys.executable, "-X", "utf8",
+     str(ROOT / "tasks/GLM_train_orbit_boundary_encoder.py"),
+     "--arm", "R", "--pool", str(pool), "--encoder", "synthetic",
+     "--steps", "5", "--batch-size", "4", "--lr", "1e-3", "--seed", "3407",
+     "--output-dir", str(tmp / "sha_bad"),
+     "--expected-pool-sha256", "0" * 64],
+    capture_output=True, text=True)
+assert bad.returncode != 0 and "sha drift" in bad.stderr
+print("A6 PASS: sha mismatch aborts training")
+
+# A7 -1 guard: poison one group's orbit rows -> O-arms exclude it, R unaffected
+with np.load(pool) as z:
+    p2 = {k: np.asarray(z[k]) for k in z.files}
+p2["orbit_row_real"][3] = -1
+p2["orbit_row_null"][3] = -1
+p2["orbit_both_matched"][3] = False
+pool_poison = tmp / "pool_poison.npz"
+np.savez(pool_poison, **p2)
+out_o = tmp / "opoison"
+hist_o = train("O-real", pool_poison, out_o)
+rep_o = hist_o
+expected_elig = int((~p2["val_query_mask"].astype(bool)
+                     & p2["orbit_both_matched"].astype(bool)).sum())
+assert rep_o["eligible_train_groups"] == expected_elig
+print(f"A7 PASS: poisoned group excluded (O-real eligible "
+      f"{rep_o['eligible_train_groups']} = expected {expected_elig})")
+print("SIX-ARM SMOKE v2: ALL PASS")

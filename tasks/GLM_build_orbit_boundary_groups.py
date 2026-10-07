@@ -46,24 +46,25 @@ import numpy as np
 
 
 def rotate_margins(real: np.ndarray, label: int,
-                   rng: np.random.Generator) -> np.ndarray:
-    """Rotate the false-candidate margins among their nonzero positions.
+                   rng: np.random.Generator) -> tuple[np.ndarray, bool]:
+    """Candidate-rotated null: cyclic shift of the FULL false-candidate
+    margin vector (zeros included) by a random offset in [1, n_false).
 
-    Guarantees a different assignment when at least two distinct nonzero
-    margins exist (retries the shuffle); with fewer, returns the only
-    permutation available and the trainer must be interpreted accordingly.
+    Returns (null_vector, nontrivial). A group is TRIVIAL only when it has
+    fewer than 2 false candidates (no non-identity permutation exists);
+    such groups are flagged in the pool and excluded from the C-arms'
+    matched attribution denominator by the trainer.
     """
     false_idx = [i for i in range(len(real)) if i != label]
-    vals = [real[i] for i in false_idx if real[i] != 0.0]
-    nonzero = [i for i in false_idx if real[i] != 0.0]
-    for _ in range(20):
-        rng.shuffle(vals)
-        out = np.zeros_like(real)
-        for pos, v in zip(nonzero, vals):
-            out[pos] = v
-        if len(nonzero) < 2 or not np.allclose(out, real):
-            return out
-    return out
+    vals = np.array([real[i] for i in false_idx])
+    if len(false_idx) < 2:
+        return real.copy(), False
+    shift = int(rng.integers(1, len(false_idx)))
+    rotated = np.roll(vals, shift)
+    out = np.zeros_like(real)
+    for pos, v in zip(false_idx, rotated):
+        out[pos] = v
+    return out, not np.allclose(out, real)
 
 
 def main() -> None:
@@ -95,6 +96,8 @@ def main() -> None:
     orbit_row_null = np.full(n_groups, -1, dtype=np.int64)
     delta_real = np.zeros((n_groups, cmax), dtype=np.float32)
     delta_null = np.zeros((n_groups, cmax), dtype=np.float32)
+    chem_null_trivial = np.zeros(n_groups, dtype=bool)   # matched denominator
+    orbit_both = np.zeros(n_groups, dtype=bool)          # for O-arms' common denominator
 
     view_by_mol: dict[str, list[int]] = {}
     for i, mol in enumerate(v["molecule"]):
@@ -109,7 +112,9 @@ def main() -> None:
         for c in range(hi - lo):
             delta_real[q, c] = margin_map.get((q, c), 0.0)
         if label >= 0:
-            delta_null[q] = rotate_margins(delta_real[q], label, rng)
+            null_vec, nontrivial = rotate_margins(delta_real[q], label, rng)
+            delta_null[q] = null_vec
+            chem_null_trivial[q] = not nontrivial
         # orbit view: second spectrum of the TRUE molecule
         if label < 0:
             continue
@@ -135,6 +140,7 @@ def main() -> None:
             orbit_row_real[q] = int(v["rows"][pick_real])
         if pick_null >= 0:
             orbit_row_null[q] = int(v["rows"][pick_null])
+        orbit_both[q] = (pick_real >= 0 and pick_null >= 0)
 
     # I1/I2 verification
     ok_i1, ok_i2, n_real, n_null, n_none = True, True, 0, 0, 0
@@ -169,19 +175,6 @@ def main() -> None:
     va_clusters = set(g["formula_cluster"][val_mask].tolist())
     ok_i4 = not (tr_clusters & va_clusters)
 
-    report = {
-        "status": "GLM_ORBIT_BOUNDARY_POOLS_BUILT",
-        "n_groups": n_groups, "cmax": cmax,
-        "orbit_real": n_real, "orbit_null": n_null, "orbit_none": n_none,
-        "checks": {"I1_true_molecule": bool(ok_i1),
-                   "I2_condition_semantics": bool(ok_i2),
-                   "I4_formula_disjoint_val": bool(ok_i4),
-                   "I3_rotation_by_construction": True},
-        "seed": args.seed,
-    }
-    if not (ok_i1 and ok_i2 and ok_i4):
-        raise RuntimeError(f"integrity failure: {report['checks']}")
-
     tmp = args.output.with_suffix(".tmp.npz")
     np.savez_compressed(
         tmp,
@@ -190,8 +183,26 @@ def main() -> None:
         orbit_row_null=orbit_row_null,
         delta_chem_real=delta_real,
         delta_chem_null=delta_null,
+        chem_null_trivial=chem_null_trivial,
+        orbit_both_matched=orbit_both,
     )
     tmp.replace(args.output)
+    import hashlib
+    report = {
+        "status": "GLM_ORBIT_BOUNDARY_POOLS_BUILT",
+        "n_groups": n_groups, "cmax": cmax,
+        "orbit_real": n_real, "orbit_null": n_null, "orbit_none": n_none,
+        "orbit_both_matched": int(orbit_both.sum()),
+        "chem_null_trivial": int(chem_null_trivial.sum()),
+        "checks": {"I1_true_molecule": bool(ok_i1),
+                   "I2_condition_semantics": bool(ok_i2),
+                   "I4_formula_disjoint_val": bool(ok_i4),
+                   "I3_full_vector_rotation": True},
+        "pool_sha256": hashlib.sha256(args.output.read_bytes()).hexdigest(),
+        "seed": args.seed,
+    }
+    if not (ok_i1 and ok_i2 and ok_i4):
+        raise RuntimeError(f"integrity failure: {report['checks']}")
     (args.output.with_suffix(".json")).write_text(
         json.dumps(report, indent=2), encoding="utf-8")
     print(json.dumps(report, indent=1))

@@ -4,21 +4,33 @@
 #SBATCH --output=data/validation/GLM_orbit_boundary_factorial_%j.out
 #SBATCH --error=data/validation/GLM_orbit_boundary_factorial_%j.err
 
+# ============================================================================
+# DO NOT SUBMIT (draft, 2026-10-07 post-audit).
+# Blocked until, in order:
+#   1. the real DreaMS loading path passes a 2-group GPU forward/backward
+#      smoke (GLM_train_orbit_boundary_encoder.py --encoder dreams);
+#   2. role-2 curve extraction + role-3 confirmation + GNPS chain wired;
+#   3. the pool is built from the REAL server ledgers and its sha is
+#      preregistered below.
+# This header is removed only when all three hold.
+# ============================================================================
+
 # GLM: six-arm orbit-boundary factorial (audit section 11, file 5).
 # STRICT CONTRACT:
 #   - all six arms: same pool file, same steps/batch/lr/seed (same dose);
-#   - arms differ ONLY through --arm (two boolean factors in the trainer);
+#   - arms differ ONLY through --arm;
+#   - pool sha is PREREGISTERED in GLM_EXPECTED_POOL_SHA and every arm
+#     ABORTS on mismatch (fail-closed);
 #   - one shared checkpoint step chosen afterwards by
-#     GLM_select_shared_factorial_step.py on the R arm ONLY, applied
-#     mechanically to the other five;
-#   - inputs hash-pinned before training starts; any hash change aborts.
-# Prerequisites (server): candidate groups from the frozen Noise-V1
-#   geometry, multi-condition ledger, ChemAware margin ledger -> pool built
-#   by GLM_build_orbit_boundary_groups.py with its integrity gates green.
+#     GLM_select_shared_factorial_step.py on the R arm ONLY.
 set -euo pipefail
 cd "${SLURM_SUBMIT_DIR:-$(pwd)}"
 
+: "${GLM_EXPECTED_POOL_SHA:?preregistered pool sha required}"
 POOL="${GLM_POOL:-data/validation/GLM_orbit_boundary_pools/pool.npz}"
+OFFICIAL="${GLM_OFFICIAL_CKPT:?official checkpoint required}"
+ARCHITECTURE="${GLM_ARCH_CKPT:?architecture checkpoint required}"
+NOISE_V1="${GLM_NOISE_V1_CKPT:?noise V1 checkpoint required}"
 OUT="data/validation/GLM_orbit_boundary_factorial/run_${SLURM_JOB_ID}"
 STEPS="${GLM_STEPS:-2000}"
 BATCH="${GLM_BATCH:-4}"
@@ -26,33 +38,31 @@ LR="${GLM_LR:-5e-6}"
 SEED="3407"
 mkdir -p "$OUT"
 
-# hash pins (abort on drift)
-sha256sum "$POOL" > "$OUT/pool.sha256"
-POOL_SHA="$(cut -d' ' -f1 "$OUT/pool.sha256")"
-echo "pool sha256: $POOL_SHA"
-
 for ARM in "R" "O-null" "O-real" "C-null" "C-real" "OC"; do
   echo "=== training arm $ARM (steps=$STEPS batch=$BATCH lr=$LR seed=$SEED) ==="
   python -X utf8 tasks/GLM_train_orbit_boundary_encoder.py \
     --arm "$ARM" \
     --pool "$POOL" \
+    --expected-pool-sha256 "$GLM_EXPECTED_POOL_SHA" \
     --encoder dreams \
+    --official-checkpoint "$OFFICIAL" \
+    --architecture-checkpoint "$ARCHITECTURE" \
+    --noise-v1-checkpoint "$NOISE_V1" \
     --steps "$STEPS" --batch-size "$BATCH" --lr "$LR" --seed "$SEED" \
     --output-dir "$OUT/$ARM"
-  # verify the arm's report records the SAME dose
-  python - "$OUT/$ARM/${ARM}_report.json" "$STEPS" "$BATCH" "$LR" "$SEED" "$POOL_SHA" <<'PYEOF'
-import json, sys, hashlib
+  python - "$OUT/$ARM/${ARM}_report.json" "$STEPS" "$BATCH" "$LR" "$SEED" "$GLM_EXPECTED_POOL_SHA" <<'PYEOF'
+import json, sys
 rep = json.load(open(sys.argv[1], encoding="utf-8"))
-steps, batch, lr, seed, pool_sha = sys.argv[2:7]
+steps, batch, lr, seed, sha = sys.argv[2:7]
 assert rep["dose"]["steps"] == int(steps), "dose drift: steps"
 assert rep["dose"]["batch_size"] == int(batch), "dose drift: batch"
 assert rep["dose"]["lr"] == float(lr), "dose drift: lr"
 assert rep["dose"]["seed"] == int(seed), "dose drift: seed"
-print(f"dose verified for {rep['arm']}")
+assert rep["pool_sha256"] == sha, "dose drift: pool sha"
+print(f"dose verified for {rep['arm']} (sha pinned)")
 PYEOF
 done
 
-echo "=== all six arms complete; shared-step selection runs on R only ==="
-echo "next: GLM_select_shared_factorial_step.py --r-arm-metrics <R role-2 curve> --output $OUT/shared_step.json"
-echo "then: frozen role-3 confirmation + GNPS external chain with the shared step applied to all arms"
-echo "COMPLETE: six-arm factorial $OUT"
+echo "=== all six arms complete; NEXT (not automatic yet): ==="
+echo "  GLM_select_shared_factorial_step.py --r-arm-metrics <R role-2 curve> --output $OUT/shared_step.json"
+echo "COMPLETE (draft run): six-arm factorial $OUT"
