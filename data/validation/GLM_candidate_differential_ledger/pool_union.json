@@ -1,0 +1,128 @@
+{
+  "status": "GLM_CANDIDATE_POOL_UNION",
+  "chemaware_slot": "ChemAware encoder scores on these panels are server-side; the union numbers below understate the full design pool by that slot",
+  "panels": {
+    "identity_disjoint": {
+      "n_queries": 10995,
+      "views": {
+        "M=5": {
+          "noise_v1": 99.83,
+          "weighted_spectral_entropy": 99.79,
+          "p2b_noise_v1_frozen": 99.75,
+          "entropy_raw_public": 99.8,
+          "denoising_search_public": 99.83,
+          "spec2vec_gnps_public": 99.69,
+          "official_dreams": 99.76
+        },
+        "M=10": {
+          "noise_v1": 99.83,
+          "weighted_spectral_entropy": 99.79,
+          "p2b_noise_v1_frozen": 99.75,
+          "entropy_raw_public": 99.8,
+          "denoising_search_public": 99.83,
+          "spec2vec_gnps_public": 99.69,
+          "official_dreams": 99.76
+        },
+        "M=20": {
+          "noise_v1": 99.83,
+          "weighted_spectral_entropy": 99.79,
+          "p2b_noise_v1_frozen": 99.75,
+          "entropy_raw_public": 99.8,
+          "denoising_search_public": 99.83,
+          "spec2vec_gnps_public": 99.69,
+          "official_dreams": 99.76
+        }
+      },
+      "unions": {
+        "M=5": {
+          "noise+wse": 99.93,
+          "noise+p2bN": 99.9,
+          "wse+p2bN": 99.83,
+          "noise+wse+p2bN": 99.94,
+          "unrecoverable_pct": 8.18
+        },
+        "M=10": {
+          "noise+wse": 99.93,
+          "noise+p2bN": 99.9,
+          "wse+p2bN": 99.83,
+          "noise+wse+p2bN": 99.94,
+          "unrecoverable_pct": 2.73
+        },
+        "M=20": {
+          "noise+wse": 99.93,
+          "noise+p2bN": 99.9,
+          "wse+p2bN": 99.83,
+          "noise+wse+p2bN": 99.94,
+          "unrecoverable_pct": 0.06
+        }
+      },
+      "rescue_pool": {
+        "noise_top1_wrong": 1478,
+        "positive_in_wse_top10_pct": 94.32,
+        "positive_in_p2b_top10_pct": 93.91,
+        "positive_in_either_top10_pct": 94.59
+      }
+    },
+    "formula_disjoint": {
+      "n_queries": 5261,
+      "views": {
+        "M=5": {
+          "noise_v1": 100.0,
+          "weighted_spectral_entropy": 99.98,
+          "p2b_noise_v1_frozen": 99.96,
+          "entropy_raw_public": 99.98,
+          "denoising_search_public": 100.0,
+          "spec2vec_gnps_public": 99.98,
+          "official_dreams": 99.98
+        },
+        "M=10": {
+          "noise_v1": 100.0,
+          "weighted_spectral_entropy": 99.98,
+          "p2b_noise_v1_frozen": 99.96,
+          "entropy_raw_public": 99.98,
+          "denoising_search_public": 100.0,
+          "spec2vec_gnps_public": 99.98,
+          "official_dreams": 99.98
+        },
+        "M=20": {
+          "noise_v1": 100.0,
+          "weighted_spectral_entropy": 99.98,
+          "p2b_noise_v1_frozen": 99.96,
+          "entropy_raw_public": 99.98,
+          "denoising_search_public": 100.0,
+          "spec2vec_gnps_public": 99.98,
+          "official_dreams": 99.98
+        }
+      },
+      "unions": {
+        "M=5": {
+          "noise+wse": 100.0,
+          "noise+p2bN": 100.0,
+          "wse+p2bN": 99.98,
+          "noise+wse+p2bN": 100.0,
+          "unrecoverable_pct": 3.04
+        },
+        "M=10": {
+          "noise+wse": 100.0,
+          "noise+p2bN": 100.0,
+          "wse+p2bN": 99.98,
+          "noise+wse+p2bN": 100.0,
+          "unrecoverable_pct": 0.67
+        },
+        "M=20": {
+          "noise+wse": 100.0,
+          "noise+p2bN": 100.0,
+          "wse+p2bN": 99.98,
+          "noise+wse+p2bN": 100.0,
+          "unrecoverable_pct": 0.0
+        }
+      },
+      "rescue_pool": {
+        "noise_top1_wrong": 628,
+        "positive_in_wse_top10_pct": 98.73,
+        "positive_in_p2b_top10_pct": 98.57,
+        "positive_in_either_top10_pct": 98.73
+      }
+    }
+  }
+}
