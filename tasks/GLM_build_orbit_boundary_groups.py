@@ -173,7 +173,7 @@ def main() -> None:
     tmp = args.output.with_suffix(".tmp.npz")
     np.savez_compressed(
         tmp,
-        **{k: g[k] for k in g.files},
+        **{k: g[k] for k in g},
         orbit_query_row=orbit_row,
         orbit_kind=np.asarray(orbit_kind, dtype=str),
         delta_chem_real=delta_real,
