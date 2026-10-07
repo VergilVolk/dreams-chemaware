@@ -1,0 +1,65 @@
+{
+  "status": "GLM_GATE_O0_V2_PASS",
+  "ground_truth": "formula-level exact transformation matching (elemental composition)",
+  "n_transformations_tested": 26,
+  "true_pairs": 6571,
+  "decoy_pairs": 891,
+  "decoy_types": {
+    "D3_random_pair": "891"
+  },
+  "results": {
+    "cosine": {
+      "auroc": 0.5816,
+      "mannwhitney_p": 1.23e-15
+    },
+    "fragment_change": {
+      "auroc": 0.3973,
+      "mannwhitney_p": 1.0
+    },
+    "entropy": {
+      "auroc": 0.4674,
+      "mannwhitney_p": 1.0
+    },
+    "combined_rank": {
+      "auroc": 0.8845,
+      "mannwhitney_p": 6.6e-305
+    },
+    "pmd_ppm": {
+      "auroc": 0.0276,
+      "mannwhitney_p": 0.0
+    }
+  },
+  "per_decoy_type": {
+    "D3_random_pair": {
+      "cosine": 0.5816,
+      "combined_rank": 0.8845
+    }
+  },
+  "gates": {
+    "combined_auroc_gt_0_65": true,
+    "beats_cosine_alone": true,
+    "beats_pmd_alone": true
+  },
+  "transformation_counts": {
+    "chain_elongation_C2H4": "1627",
+    "decarboxylation": "1296",
+    "demethylation": "953",
+    "hydrogenation": "619",
+    "formylation": "568",
+    "methylation": "546",
+    "glycosylation_hexose": "420",
+    "hydroxylation": "315",
+    "carboxylation": "108",
+    "acetylation": "36",
+    "sulfation": "21",
+    "deamination": "14",
+    "dihydroxylation": "7",
+    "dehydrogenation": "7",
+    "glucuronidation": "7",
+    "taurine_conj": "7",
+    "hydration": "7",
+    "chlorination": "7",
+    "amination": "6"
+  },
+  "claim_limit": "Gate O0 v2: can formula-level + MS/MS evidence separate real biochemical transformation pairs from matched decoys? Not a biological or disease result."
+}
