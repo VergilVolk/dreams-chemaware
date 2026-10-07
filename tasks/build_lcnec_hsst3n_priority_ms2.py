@@ -29,6 +29,18 @@ def parse_args() -> argparse.Namespace:
         default="robust_modules",
         help="robust_modules preserves the original biology screen; all_qc_qualified is phenotype-blind",
     )
+    parser.add_argument(
+        "--qc-ledger", type=Path,
+        default=Path("data/validation/lcnec_hsst3n_qc_headroom_gate/precursor_family_ledger.csv"),
+    )
+    parser.add_argument(
+        "--zip", type=Path,
+        default=Path("data/validation/lcnec_zenodo19005638_preflight/MTB22_P073_HSST3n_mzML_public.zip"),
+    )
+    parser.add_argument(
+        "--overview", type=Path,
+        default=Path("data/validation/lcnec_zenodo19005638_preflight/06_MTB22_P073_HSST3n_mzML_overview_v1.txt"),
+    )
     return parser.parse_args()
 
 
@@ -69,7 +81,7 @@ def main() -> None:
         )
         available_targets = int(merged["module_id"].nunique())
     else:
-        ledger = pd.read_csv(root / "lcnec_hsst3n_qc_headroom_gate/precursor_family_ledger.csv")
+        ledger = pd.read_csv(args.qc_ledger)
         representatives = ledger[ledger["passes_all"].astype(bool)].copy()
         representatives = representatives.rename(columns={"mz_median": "mz", "rt_median_sec": "rt_sec"})
         representatives["module_id"] = -1
@@ -83,9 +95,9 @@ def main() -> None:
         representatives = representatives.head(args.top_n).reset_index(drop=True)
     targets = representatives.to_dict("records")
 
-    overview = pd.read_csv(root / "lcnec_zenodo19005638_preflight/06_MTB22_P073_HSST3n_mzML_overview_v1.txt", sep="\t")
+    overview = pd.read_csv(args.overview, sep="\t")
     qc = overview[overview["NOTE"].eq("QC sample")]
-    zip_path = root / "lcnec_zenodo19005638_preflight/MTB22_P073_HSST3n_mzML_public.zip"
+    zip_path = args.zip
     best: dict[int, dict[str, object]] = {}
     with zipfile.ZipFile(zip_path) as archive:
         members = {Path(info.filename).name: info for info in archive.infolist() if info.filename.lower().endswith(".mzml")}
