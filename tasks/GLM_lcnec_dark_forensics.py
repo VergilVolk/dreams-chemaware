@@ -32,7 +32,7 @@ mods = pd.read_csv(MODULES)
 tiers = pd.read_csv(TIERS)
 
 rows = []
-for _, t in tiers[tiers.tier.str.startswith(("A", "B"))].iterrows():
+for _, t in tiers.iterrows():
     hit = mods[(mods.target_mz.astype(float) - float(t.precursor)).abs() < 0.01]
     if not len(hit):
         rows.append({"precursor": t.precursor, "tier": t.tier,
@@ -75,7 +75,9 @@ for _, t in tiers[tiers.tier.str.startswith(("A", "B"))].iterrows():
 
 OUT.write_text(json.dumps(
     {"status": "GLM_LCNEC_DARK_FORENSICS",
+     "direction": ("per_mg_drift_pqn_log2fc: positive = tumor higher than "
+                   "matched normal (34 TU/NG pairs)"),
      "note": ("frozen EIC matrix breakdown by injection class + module "
-              "differential effect; disposition per tier A/B module"),
+              "differential effect; disposition for every tier"),
      "modules": rows}, indent=2), encoding="utf-8")
 print("written:", OUT)

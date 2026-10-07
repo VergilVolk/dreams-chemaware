@@ -1,6 +1,7 @@
 {
   "status": "GLM_LCNEC_DARK_FORENSICS",
-  "note": "frozen EIC matrix breakdown by injection class + module differential effect; disposition per tier A/B module",
+  "direction": "per_mg_drift_pqn_log2fc: positive = tumor higher than matched normal (34 TU/NG pairs)",
+  "note": "frozen EIC matrix breakdown by injection class + module differential effect; disposition for every tier",
   "modules": [
     {
       "precursor": 221.98455811,
@@ -257,6 +258,710 @@
       "disposition": "real constituent; analog neighbor -> MSn / standard",
       "halogen_flag": false,
       "delta_ppm_vs_mh": -451.7
+    },
+    {
+      "precursor": 218.06719234,
+      "tier": "C_dark",
+      "family_id": 279,
+      "effect_log2fc": 2.56039902464628,
+      "effect_q": 2.181291114878009e-14,
+      "breakdown": {
+        "blank": {
+          "n": 2,
+          "present": 0,
+          "mean_area": 0.0
+        },
+        "pooled_qc": {
+          "n": 9,
+          "present": 9,
+          "mean_area": 3148371.9
+        },
+        "qc_dilution": {
+          "n": 6,
+          "present": 5,
+          "mean_area": 1012708.6
+        },
+        "study": {
+          "n": 68,
+          "present": 68,
+          "mean_area": 3096624.2
+        }
+      },
+      "disposition": "real constituent; analog neighbor -> MSn / standard",
+      "halogen_flag": false,
+      "delta_ppm_vs_mh": -64.1
+    },
+    {
+      "precursor": 138.0561676,
+      "tier": "C_dark",
+      "family_id": 400,
+      "effect_log2fc": -2.484768765819936,
+      "effect_q": 1.5087450293646054e-13,
+      "breakdown": {
+        "blank": {
+          "n": 2,
+          "present": 2,
+          "mean_area": 13503.3
+        },
+        "pooled_qc": {
+          "n": 9,
+          "present": 9,
+          "mean_area": 2738773.4
+        },
+        "qc_dilution": {
+          "n": 6,
+          "present": 5,
+          "mean_area": 888027.1
+        },
+        "study": {
+          "n": 68,
+          "present": 68,
+          "mean_area": 2862017.7
+        }
+      },
+      "disposition": "CONTAMINANT (blank-present) - drop",
+      "halogen_flag": false,
+      "delta_ppm_vs_mh": -159.7
+    },
+    {
+      "precursor": 346.05616339,
+      "tier": "C_dark",
+      "family_id": 127,
+      "effect_log2fc": 3.327279541862925,
+      "effect_q": 1.3364474389892896e-12,
+      "breakdown": {
+        "blank": {
+          "n": 2,
+          "present": 2,
+          "mean_area": 64788.4
+        },
+        "pooled_qc": {
+          "n": 9,
+          "present": 9,
+          "mean_area": 158451074.2
+        },
+        "qc_dilution": {
+          "n": 6,
+          "present": 5,
+          "mean_area": 59109375.9
+        },
+        "study": {
+          "n": 68,
+          "present": 68,
+          "mean_area": 141430264.0
+        }
+      },
+      "disposition": "CONTAMINANT (blank-present) - drop",
+      "halogen_flag": true,
+      "delta_ppm_vs_mh": -30.6
+    },
+    {
+      "precursor": 359.12527466,
+      "tier": "C_dark",
+      "family_id": 443,
+      "effect_log2fc": -1.964394653962575,
+      "effect_q": 2.5421565282456158e-11,
+      "breakdown": {
+        "blank": {
+          "n": 2,
+          "present": 0,
+          "mean_area": 0.0
+        },
+        "pooled_qc": {
+          "n": 9,
+          "present": 9,
+          "mean_area": 1242222.0
+        },
+        "qc_dilution": {
+          "n": 6,
+          "present": 5,
+          "mean_area": 379110.9
+        },
+        "study": {
+          "n": 68,
+          "present": 68,
+          "mean_area": 1361251.7
+        }
+      },
+      "disposition": "real constituent; analog neighbor -> MSn / standard",
+      "halogen_flag": false,
+      "delta_ppm_vs_mh": -5535.2
+    },
+    {
+      "precursor": 207.1028424,
+      "tier": "C_dark",
+      "family_id": 508,
+      "effect_log2fc": -0.9782399321127886,
+      "effect_q": 7.946983122360132e-14,
+      "breakdown": {
+        "blank": {
+          "n": 2,
+          "present": 2,
+          "mean_area": 248753.1
+        },
+        "pooled_qc": {
+          "n": 9,
+          "present": 9,
+          "mean_area": 3489523.3
+        },
+        "qc_dilution": {
+          "n": 6,
+          "present": 6,
+          "mean_area": 1162672.0
+        },
+        "study": {
+          "n": 68,
+          "present": 68,
+          "mean_area": 3659104.5
+        }
+      },
+      "disposition": "CONTAMINANT (blank-present) - drop",
+      "halogen_flag": false,
+      "delta_ppm_vs_mh": -48.1
+    },
+    {
+      "precursor": 190.01815796,
+      "tier": "C_dark",
+      "family_id": 346,
+      "effect_log2fc": -2.728298587412488,
+      "effect_q": 1.3127862965130443e-10,
+      "breakdown": {
+        "blank": {
+          "n": 2,
+          "present": 0,
+          "mean_area": 0.0
+        },
+        "pooled_qc": {
+          "n": 9,
+          "present": 9,
+          "mean_area": 4488469.5
+        },
+        "qc_dilution": {
+          "n": 6,
+          "present": 5,
+          "mean_area": 1271986.1
+        },
+        "study": {
+          "n": 68,
+          "present": 68,
+          "mean_area": 4350201.4
+        }
+      },
+      "disposition": "real constituent; analog neighbor halogenated -> drug-exposure hypothesis (medication records) then MSn",
+      "halogen_flag": true,
+      "delta_ppm_vs_mh": -4939.8
+    },
+    {
+      "precursor": 406.02178266,
+      "tier": "C_dark",
+      "family_id": 436,
+      "effect_log2fc": -2.055906781670517,
+      "effect_q": 7.618114801925148e-13,
+      "breakdown": {
+        "blank": {
+          "n": 2,
+          "present": 0,
+          "mean_area": 0.0
+        },
+        "pooled_qc": {
+          "n": 9,
+          "present": 9,
+          "mean_area": 3456371.1
+        },
+        "qc_dilution": {
+          "n": 6,
+          "present": 4,
+          "mean_area": 767789.9
+        },
+        "study": {
+          "n": 68,
+          "present": 64,
+          "mean_area": 3434895.2
+        }
+      },
+      "disposition": "real constituent; analog neighbor -> MSn / standard",
+      "halogen_flag": false,
+      "delta_ppm_vs_mh": -2671.5
+    },
+    {
+      "precursor": 444.03234863,
+      "tier": "C_dark",
+      "family_id": 136,
+      "effect_log2fc": 4.2233122539220345,
+      "effect_q": 4.6550391973369945e-12,
+      "breakdown": {
+        "blank": {
+          "n": 2,
+          "present": 0,
+          "mean_area": 0.0
+        },
+        "pooled_qc": {
+          "n": 9,
+          "present": 9,
+          "mean_area": 2109517.0
+        },
+        "qc_dilution": {
+          "n": 6,
+          "present": 5,
+          "mean_area": 835013.9
+        },
+        "study": {
+          "n": 68,
+          "present": 67,
+          "mean_area": 1726860.6
+        }
+      },
+      "disposition": "real constituent; analog neighbor halogenated -> drug-exposure hypothesis (medication records) then MSn",
+      "halogen_flag": true,
+      "delta_ppm_vs_mh": 2118.4
+    },
+    {
+      "precursor": 181.96627045,
+      "tier": "C_dark",
+      "family_id": 61,
+      "effect_log2fc": -1.2455155184876463,
+      "effect_q": 1.7627492567842187e-10,
+      "breakdown": {
+        "blank": {
+          "n": 2,
+          "present": 2,
+          "mean_area": 74389.9
+        },
+        "pooled_qc": {
+          "n": 9,
+          "present": 9,
+          "mean_area": 22759816.7
+        },
+        "qc_dilution": {
+          "n": 6,
+          "present": 5,
+          "mean_area": 10617827.9
+        },
+        "study": {
+          "n": 68,
+          "present": 68,
+          "mean_area": 22985459.8
+        }
+      },
+      "disposition": "CONTAMINANT (blank-present) - drop",
+      "halogen_flag": true,
+      "delta_ppm_vs_mh": 4910.1
+    },
+    {
+      "precursor": 606.07515199,
+      "tier": "C_dark",
+      "family_id": 94,
+      "effect_log2fc": 1.970413951668844,
+      "effect_q": 3.4978190912643087e-14,
+      "breakdown": {
+        "blank": {
+          "n": 2,
+          "present": 0,
+          "mean_area": 0.0
+        },
+        "pooled_qc": {
+          "n": 9,
+          "present": 9,
+          "mean_area": 89681735.0
+        },
+        "qc_dilution": {
+          "n": 6,
+          "present": 5,
+          "mean_area": 31390476.4
+        },
+        "study": {
+          "n": 68,
+          "present": 68,
+          "mean_area": 90642135.9
+        }
+      },
+      "disposition": "real constituent; analog neighbor halogenated -> drug-exposure hypothesis (medication records) then MSn",
+      "halogen_flag": true,
+      "delta_ppm_vs_mh": 6673.1
+    },
+    {
+      "precursor": 215.03295898,
+      "tier": "C_dark",
+      "family_id": 59,
+      "effect_log2fc": -1.3140607316469153,
+      "effect_q": 3.2989509591890925e-13,
+      "breakdown": {
+        "blank": {
+          "n": 2,
+          "present": 2,
+          "mean_area": 168097.7
+        },
+        "pooled_qc": {
+          "n": 9,
+          "present": 9,
+          "mean_area": 207765930.5
+        },
+        "qc_dilution": {
+          "n": 6,
+          "present": 5,
+          "mean_area": 88583951.4
+        },
+        "study": {
+          "n": 68,
+          "present": 68,
+          "mean_area": 202923526.5
+        }
+      },
+      "disposition": "CONTAMINANT (blank-present) - drop",
+      "halogen_flag": true,
+      "delta_ppm_vs_mh": -21.2
+    },
+    {
+      "precursor": 426.02278137,
+      "tier": "C_dark",
+      "family_id": 104,
+      "effect_log2fc": 2.225869094997621,
+      "effect_q": 3.0167776959616258e-12,
+      "breakdown": {
+        "blank": {
+          "n": 2,
+          "present": 1,
+          "mean_area": 5757.0
+        },
+        "pooled_qc": {
+          "n": 9,
+          "present": 9,
+          "mean_area": 8371184.7
+        },
+        "qc_dilution": {
+          "n": 6,
+          "present": 5,
+          "mean_area": 2840384.3
+        },
+        "study": {
+          "n": 68,
+          "present": 68,
+          "mean_area": 8469929.0
+        }
+      },
+      "disposition": "CONTAMINANT (blank-present) - drop",
+      "halogen_flag": false,
+      "delta_ppm_vs_mh": 6467.1
+    },
+    {
+      "precursor": 230.99705505,
+      "tier": "C_dark",
+      "family_id": 426,
+      "effect_log2fc": -3.339497786542616,
+      "effect_q": 4.947476606081263e-13,
+      "breakdown": {
+        "blank": {
+          "n": 2,
+          "present": 0,
+          "mean_area": 0.0
+        },
+        "pooled_qc": {
+          "n": 9,
+          "present": 9,
+          "mean_area": 2176760.1
+        },
+        "qc_dilution": {
+          "n": 6,
+          "present": 5,
+          "mean_area": 664813.0
+        },
+        "study": {
+          "n": 68,
+          "present": 62,
+          "mean_area": 2033647.0
+        }
+      },
+      "disposition": "real constituent; analog neighbor -> MSn / standard",
+      "halogen_flag": false,
+      "delta_ppm_vs_mh": -57.3
+    },
+    {
+      "precursor": 280.90861578,
+      "tier": "C_dark",
+      "family_id": 50,
+      "effect_log2fc": 0.8514610482940962,
+      "effect_q": 1.0478927708417752e-10,
+      "breakdown": {
+        "blank": {
+          "n": 2,
+          "present": 1,
+          "mean_area": 5207.0
+        },
+        "pooled_qc": {
+          "n": 9,
+          "present": 9,
+          "mean_area": 10163325.5
+        },
+        "qc_dilution": {
+          "n": 6,
+          "present": 5,
+          "mean_area": 5829750.5
+        },
+        "study": {
+          "n": 68,
+          "present": 68,
+          "mean_area": 10997275.6
+        }
+      },
+      "disposition": "CONTAMINANT (blank-present) - drop",
+      "halogen_flag": false,
+      "delta_ppm_vs_mh": -4279.2
+    },
+    {
+      "precursor": 421.14851577,
+      "tier": "C_dark",
+      "family_id": 507,
+      "effect_log2fc": -1.287125558093008,
+      "effect_q": 7.82426638462458e-13,
+      "breakdown": {
+        "blank": {
+          "n": 2,
+          "present": 0,
+          "mean_area": 0.0
+        },
+        "pooled_qc": {
+          "n": 9,
+          "present": 9,
+          "mean_area": 2713332.4
+        },
+        "qc_dilution": {
+          "n": 6,
+          "present": 5,
+          "mean_area": 1001511.3
+        },
+        "study": {
+          "n": 68,
+          "present": 68,
+          "mean_area": 2609610.0
+        }
+      },
+      "disposition": "real constituent; analog neighbor halogenated -> drug-exposure hypothesis (medication records) then MSn",
+      "halogen_flag": true,
+      "delta_ppm_vs_mh": 4704.4
+    },
+    {
+      "precursor": 169.99194609,
+      "tier": "C_dark",
+      "family_id": 417,
+      "effect_log2fc": -3.7467485969251215,
+      "effect_q": 1.6852892929418916e-11,
+      "breakdown": {
+        "blank": {
+          "n": 2,
+          "present": 0,
+          "mean_area": 0.0
+        },
+        "pooled_qc": {
+          "n": 9,
+          "present": 9,
+          "mean_area": 505516.4
+        },
+        "qc_dilution": {
+          "n": 6,
+          "present": 4,
+          "mean_area": 156027.0
+        },
+        "study": {
+          "n": 68,
+          "present": 64,
+          "mean_area": 514032.7
+        }
+      },
+      "disposition": "real constituent; analog neighbor -> MSn / standard",
+      "halogen_flag": false,
+      "delta_ppm_vs_mh": -206.3
+    },
+    {
+      "precursor": 168.04331855,
+      "tier": "C_dark",
+      "family_id": 918,
+      "effect_log2fc": 1.6867985307187892,
+      "effect_q": 2.04260564661748e-11,
+      "breakdown": {
+        "blank": {
+          "n": 2,
+          "present": 1,
+          "mean_area": 2486.7
+        },
+        "pooled_qc": {
+          "n": 9,
+          "present": 9,
+          "mean_area": 20314276.6
+        },
+        "qc_dilution": {
+          "n": 6,
+          "present": 5,
+          "mean_area": 11278005.8
+        },
+        "study": {
+          "n": 68,
+          "present": 68,
+          "mean_area": 17870525.8
+        }
+      },
+      "disposition": "CONTAMINANT (blank-present) - drop",
+      "halogen_flag": true,
+      "delta_ppm_vs_mh": -84.1
+    },
+    {
+      "precursor": 146.02819736,
+      "tier": "C_dark",
+      "family_id": 156,
+      "effect_log2fc": -1.8829116658025933,
+      "effect_q": 4.947476606081263e-13,
+      "breakdown": {
+        "blank": {
+          "n": 2,
+          "present": 0,
+          "mean_area": 0.0
+        },
+        "pooled_qc": {
+          "n": 9,
+          "present": 9,
+          "mean_area": 4099233.6
+        },
+        "qc_dilution": {
+          "n": 6,
+          "present": 5,
+          "mean_area": 1633969.4
+        },
+        "study": {
+          "n": 68,
+          "present": 68,
+          "mean_area": 4978527.1
+        }
+      },
+      "disposition": "real constituent; analog neighbor -> MSn / standard",
+      "halogen_flag": false,
+      "delta_ppm_vs_mh": -860.3
+    },
+    {
+      "precursor": 533.10602466,
+      "tier": "C_dark",
+      "family_id": 89,
+      "effect_log2fc": 3.966660207035788,
+      "effect_q": 1.6083910566986284e-14,
+      "breakdown": {
+        "blank": {
+          "n": 2,
+          "present": 0,
+          "mean_area": 0.0
+        },
+        "pooled_qc": {
+          "n": 9,
+          "present": 9,
+          "mean_area": 5634326.9
+        },
+        "qc_dilution": {
+          "n": 6,
+          "present": 5,
+          "mean_area": 3000469.4
+        },
+        "study": {
+          "n": 68,
+          "present": 68,
+          "mean_area": 5456144.2
+        }
+      },
+      "disposition": "real constituent; analog neighbor halogenated -> drug-exposure hypothesis (medication records) then MSn",
+      "halogen_flag": true,
+      "delta_ppm_vs_mh": 3581.2
+    },
+    {
+      "precursor": 162.02322388,
+      "tier": "C_dark",
+      "family_id": 296,
+      "effect_log2fc": 3.547614841356835,
+      "effect_q": 1.1390471762429164e-11,
+      "breakdown": {
+        "blank": {
+          "n": 2,
+          "present": 0,
+          "mean_area": 0.0
+        },
+        "pooled_qc": {
+          "n": 9,
+          "present": 9,
+          "mean_area": 2422111.2
+        },
+        "qc_dilution": {
+          "n": 6,
+          "present": 5,
+          "mean_area": 730136.8
+        },
+        "study": {
+          "n": 68,
+          "present": 67,
+          "mean_area": 2479762.3
+        }
+      },
+      "disposition": "real constituent; analog neighbor -> MSn / standard",
+      "halogen_flag": false,
+      "delta_ppm_vs_mh": -326.1
+    },
+    {
+      "precursor": 144.10314178,
+      "tier": "C_dark",
+      "family_id": 129,
+      "effect_log2fc": -1.3509527230334577,
+      "effect_q": 1.906993383398945e-12,
+      "breakdown": {
+        "blank": {
+          "n": 2,
+          "present": 0,
+          "mean_area": 0.0
+        },
+        "pooled_qc": {
+          "n": 9,
+          "present": 9,
+          "mean_area": 2358013.4
+        },
+        "qc_dilution": {
+          "n": 6,
+          "present": 5,
+          "mean_area": 881605.8
+        },
+        "study": {
+          "n": 68,
+          "present": 68,
+          "mean_area": 2312654.0
+        }
+      },
+      "disposition": "real constituent; analog neighbor -> MSn / standard",
+      "halogen_flag": false,
+      "delta_ppm_vs_mh": 6963.2
+    },
+    {
+      "precursor": 91.02874374,
+      "tier": "C_dark",
+      "family_id": 145,
+      "effect_log2fc": 0.5775510098481842,
+      "effect_q": 8.963769614497762e-11,
+      "breakdown": {
+        "blank": {
+          "n": 2,
+          "present": 2,
+          "mean_area": 929180.4
+        },
+        "pooled_qc": {
+          "n": 9,
+          "present": 9,
+          "mean_area": 20035435.8
+        },
+        "qc_dilution": {
+          "n": 6,
+          "present": 6,
+          "mean_area": 8264197.1
+        },
+        "study": {
+          "n": 68,
+          "present": 68,
+          "mean_area": 18954060.5
+        }
+      },
+      "disposition": "CONTAMINANT (blank-present) - drop",
+      "halogen_flag": false,
+      "delta_ppm_vs_mh": NaN
     }
   ]
 }
