@@ -1,0 +1,57 @@
+"""Synthetic tests for the shared factorial step selector.
+
+S1: the selector picks the step with the best formula-cluster lower bound,
+    not the noisiest point-estimate winner (a step that wins by one lucky
+    cluster must lose to a stable step).
+S2: ties resolve to the lowest index (determinism).
+S3: cluster bootstrap bounds are sane (between min/max cluster means).
+"""
+from __future__ import annotations
+
+import sys
+from pathlib import Path
+
+import numpy as np
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "tasks"))
+from GLM_select_shared_factorial_step import (  # noqa: E402
+    cluster_bootstrap_lower_bound, select_step,
+)
+
+
+def main() -> None:
+    rng = np.random.default_rng(11)
+    # 40 clusters x 25 queries
+    cids = np.repeat(np.arange(40), 25)
+    n = len(cids)
+
+    # step A: stable 0.70 correctness, uniform across clusters
+    a = (rng.random(n) < 0.70).astype(float)
+    # step B: point estimate ~0.705 but carried by two lucky clusters
+    b = (rng.random(n) < 0.69).astype(float)
+    b[cids == 7] = 1.0
+    b[cids == 8] = 1.0
+    assert b.mean() > a.mean(), "setup: B must win on point estimate"
+    res = select_step([a, b], cids, n_boot=500)
+    assert res["step_index"] == 0, "stable step must win over lucky cluster"
+    print(f"S1 PASS: chose stable step (lb {res['lower_bounds'][0]:.4f}) "
+          f"over lucky-cluster step (lb {res['lower_bounds'][1]:.4f}) "
+          f"despite point estimates {res['point_estimates']}")
+
+    # S2 ties
+    res2 = select_step([a.copy(), a.copy()], cids, n_boot=200)
+    assert res2["step_index"] == 0
+    print("S2 PASS: tie resolves to lowest index")
+
+    # S3 bound sanity
+    cl_means = np.array([a[cids == c].mean() for c in np.unique(cids)])
+    lb = cluster_bootstrap_lower_bound(a, cids, n_boot=500)
+    assert cl_means.min() - 1e-9 <= lb <= a.mean() + 1e-9
+    print(f"S3 PASS: bound {lb:.4f} within cluster-mean range "
+          f"[{cl_means.min():.4f}, {a.mean():.4f}]")
+    print("ALL TESTS PASS")
+
+
+if __name__ == "__main__":
+    main()
