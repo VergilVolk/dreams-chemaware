@@ -79,6 +79,37 @@ def load_dreams_encoder(args):
     return head
 
 
+def load_real_spectra(args, pool) -> torch.Tensor:
+    """Real spectra input pipeline (P0-1 completion): preprocess every row
+    referenced by the pool exactly like the proven listwise trainer
+    (h5py row -> preprocess_spectrum -> fixed-shape tensor), stacked once.
+    """
+    import h5py  # noqa: PLC0415
+    from train_e1_identity import preprocess_spectrum  # noqa: PLC0415
+    rows_needed = np.unique(np.concatenate((
+        np.asarray(pool["query_row"], dtype=np.int64),
+        np.asarray(pool["ref_rows"], dtype=np.int64),
+        np.asarray(pool["orbit_row_real"], dtype=np.int64),
+        np.asarray(pool["orbit_row_null"], dtype=np.int64))))
+    rows_needed = rows_needed[rows_needed >= 0]
+    feats: dict[int, torch.Tensor] = {}
+    with h5py.File(args.data, "r") as handle:
+        total = int(len(handle["spectrum"]))
+        if np.any((rows_needed < 0) | (rows_needed >= total)):
+            raise RuntimeError("pool references an out-of-range HDF5 row")
+        for row in rows_needed:
+            feats[int(row)] = preprocess_spectrum(
+                np.asarray(handle["spectrum"][int(row)]),
+                float(handle["precursor_mz"][int(row)]),
+                args.n_highest_peaks)
+    n_rows = int(rows_needed.max()) + 1
+    first = next(iter(feats.values()))
+    out = torch.zeros(n_rows, *first.shape, dtype=first.dtype)
+    for row, t in feats.items():
+        out[row] = t
+    return out
+
+
 def sha256_of(path: Path) -> str:
     h = hashlib.sha256()
     with path.open("rb") as f:
@@ -108,6 +139,8 @@ def main() -> None:
     ap.add_argument("--official-checkpoint", type=Path)
     ap.add_argument("--architecture-checkpoint", type=Path)
     ap.add_argument("--noise-v1-checkpoint", type=Path)
+    ap.add_argument("--data", type=Path,
+                    help="real spectra HDF5 (required for --encoder dreams)")
     ap.add_argument("--n-highest-peaks", type=int, default=100)
     ap.add_argument("--steps", type=int, default=50)
     ap.add_argument("--batch-size", type=int, default=8)
@@ -146,23 +179,24 @@ def main() -> None:
     if args.encoder == "synthetic":
         print("*** LOGIC-TEST MODE (synthetic MLP): not a training result ***")
         encoder = SyntheticEncoder(seed=args.seed).to(device)
+        n_rows = int(max(pool["ref_rows"].max(), pool["query_row"].max(),
+                         pool["orbit_row_real"].max(),
+                         pool["orbit_row_null"].max()) + 1)
+        spectra_feats = torch.randn(
+            n_rows, 32, generator=torch.Generator().manual_seed(args.seed))
     else:
         for req in (args.official_checkpoint, args.architecture_checkpoint,
-                    args.noise_v1_checkpoint):
+                    args.noise_v1_checkpoint, args.data):
             if req is None:
-                raise RuntimeError("dreams path requires all checkpoints")
+                raise RuntimeError("dreams path requires all checkpoints "
+                                   "and --data (real spectra hdf5)")
         encoder = load_dreams_encoder(args).to(device)
+        spectra_feats = load_real_spectra(args, pool).to(device)
 
     eligible = eligible_indices(pool, args.arm)
     if len(eligible) < args.batch_size:
         raise RuntimeError(f"arm {args.arm}: only {len(eligible)} eligible "
                            f"train groups < batch {args.batch_size}")
-
-    n_rows = int(max(pool["ref_rows"].max(), pool["query_row"].max(),
-                     pool["orbit_row_real"].max(),
-                     pool["orbit_row_null"].max()) + 1)
-    spectra_feats = torch.randn(
-        n_rows, 32, generator=torch.Generator().manual_seed(args.seed))
 
     # replay reference: frozen theta (init) CE on a fixed replay panel
     replay_ids = eligible[: args.replay_groups]
@@ -177,8 +211,7 @@ def main() -> None:
     ckpt_steps = {min(int(f * args.steps), args.steps - 1): f
                   for f in (0.25, 0.5, 0.75, 1.0)}
 
-    def group_batch(i):
-        z_all = encoder(spectra_feats)
+    def group_batch(i, z_all):
         z_q = z_all[pool["query_row"][i]]
         lo, hi = int(pool["cand_ptr"][i]), int(pool["cand_ptr"][i + 1])
         rlo, rhi = int(pool["ref_ptr"][lo]), int(pool["ref_ptr"][hi])
@@ -201,24 +234,25 @@ def main() -> None:
                 pool[key][i][: hi - lo], dtype=torch.float32)
         return batch
 
-    def replay_ce():
+    def replay_ce(z_all):
         vals = []
         for i in replay_ids:
-            b = group_batch(i)
+            b = group_batch(i, z_all)
             vals.append(listwise_loss(molecule_score(
                 b["z_q"], b["z_refs"], b["ref_ptr"], cfg.tau),
                 b["true_idx"], None, cfg.temperature))
         return torch.stack(vals).mean()
 
     with torch.no_grad():
-        ref_replay = float(replay_ce())
+        ref_replay = float(replay_ce(encoder(spectra_feats)))
 
     for step in range(args.steps):
         idx = rng.choice(eligible, size=args.batch_size, replace=False)
+        z_all = encoder(spectra_feats)          # ONE encode per step
+        cur_replay = replay_ce(z_all)
         losses = []
-        cur_replay = replay_ce()
         for i in idx:
-            batch = group_batch(int(i))
+            batch = group_batch(int(i), z_all)
             batch["replay_noise"] = (cur_replay,
                                      torch.tensor(ref_replay))
             parts = loss_fn(batch)
