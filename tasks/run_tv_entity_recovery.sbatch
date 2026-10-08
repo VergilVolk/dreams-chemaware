@@ -61,10 +61,9 @@ for ckpt in "${CHECKPOINTS[@]}"; do
   if [[ -f tasks/GLM_embed_panel_spectra.py ]]; then
     python -u tasks/GLM_embed_panel_spectra.py \
       --checkpoint "$ckpt" \
+      --encoder dreams \
       --architecture-checkpoint "$ARCH" \
-      --benchmark "$BENCHMARK" \
       --output "$CKPT_OUT/embeddings" \
-      --device cuda \
       --batch-size 64
   else
     echo "GLM_embed_panel_spectra.py not found, trying direct encoding" >&2
