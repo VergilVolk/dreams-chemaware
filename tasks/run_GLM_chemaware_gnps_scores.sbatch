@@ -22,8 +22,14 @@ conda activate dreams
 export PYTHONPATH="$PWD:$PWD/tasks:${PYTHONPATH:-}"
 export PYTHONUNBUFFERED=1
 
-: "${GLM_CHEM_CKPT:?ChemAware checkpoint path required}"
-CHEM_SHA="$(sha256sum "$GLM_CHEM_CKPT" | cut -d' ' -f1)"
+CHEM_CKPT="${GLM_CHEM_CKPT:-data/validation/chemaware_online_role_budget_native/run_2345481/phasea_reproduction_gate/chemaware_phasea_max_boundary_step2000.ckpt}"
+if [[ ! -e "$CHEM_CKPT" ]]; then
+  echo "ERROR: ChemAware checkpoint not found: $CHEM_CKPT" >&2
+  find data/validation -name '*phasea*step2000*' -o -name '*phasea*max*boundary*' 2>/dev/null | head -5
+  exit 3
+fi
+CHEM_SHA="$(sha256sum "$CHEM_CKPT" | cut -d' ' -f1)"
+echo "ChemAware checkpoint: $CHEM_CKPT"
 echo "ChemAware checkpoint sha256: $CHEM_SHA"
 
 OUT="data/validation/GLM_chemaware_gnps_scores/run_${SLURM_JOB_ID}"
@@ -31,7 +37,7 @@ mkdir -p "$OUT"
 
 # 1. embed all panel spectra with the ChemAware encoder
 python -X utf8 tasks/GLM_embed_panel_spectra.py \
-  --checkpoint "$GLM_CHEM_CKPT" \
+  --checkpoint "$CHEM_CKPT" \
   --encoder dreams \
   --official-checkpoint data/e1/official_embedding_slim.pt \
   --architecture-checkpoint dreams/models/pretrained/ssl_model_server.pt \
