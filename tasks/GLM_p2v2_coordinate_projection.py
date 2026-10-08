@@ -85,22 +85,16 @@ def greedy_cos(a_mz, a_int, b_mz, b_int):
 
 
 def entropy_sim(a_mz, a_int, b_mz, b_int):
-    merged = {}
-    for mz, val in zip(a_mz, a_int):
-        merged[round(mz, 2)] = merged.get(round(mz, 2), 0.0) + val
-    for mz, val in zip(b_mz, b_int):
-        merged[round(mz, 2)] = merged.get(round(mz, 2), 0.0) + val
-    w = np.array(list(merged.values()))
-    if w.sum() <= 0:
-        return 0.0
-    w = w / w.sum()
-    h_mix = -float(np.sum(w[w > 0] * np.log(w[w > 0])))
-    ha = a_int / a_int.sum() if a_int.sum() > 0 else a_int
-    hb = b_int / b_int.sum() if b_int.sum() > 0 else b_int
-    hna = -float(np.sum(ha[ha > 0] * np.log(ha[ha > 0])))
-    hnb = -float(np.sum(hb[hb > 0] * np.log(hb[hb > 0])))
-    d = max(hna, hnb)
-    return max(0.0, 1.0 - h_mix / d) if d > 0 else 0.0
+    """Pinned weighted spectral entropy similarity (Li et al. 2021).
+
+    BUG FIX (audit 2026-10-08): the previous ad-hoc formula returned 0 for
+    identical spectra (Hmix=Ha=Hb -> 1-1=0). Replaced with the repository's
+    verified backend from noise_gnps_article_spectral_scores.
+    """
+    sys.path.insert(0, str(ROOT / "tasks"))
+    from noise_gnps_article_spectral_scores import weighted_entropy_similarity
+    return float(weighted_entropy_similarity(
+        np.vstack([a_mz, a_int]), np.vstack([b_mz, b_int]), 0.02))
 
 
 def main():
