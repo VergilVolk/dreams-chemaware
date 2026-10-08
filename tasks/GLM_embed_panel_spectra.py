@@ -70,19 +70,45 @@ def main() -> None:
                               for i in range(0, feats.shape[0],
                                              args.batch_size)])
     else:
-        from GLM_train_orbit_boundary_encoder import load_dreams_encoder
-        from GLM_score_challenger_models_on_gnps import parse_mgf_used
+        from train_e1_identity import load_base_model, preprocess_spectrum
+        from dreams.models.heads.heads import ContrastiveHead
+        import types
+        # matchms shim (same as trainer)
+        _shim = types.ModuleType("matchms.Spikes")
+        class _Spikes:
+            def __init__(self, mz=None, intensities=None):
+                self.mz, self.intensities = mz, intensities
+        _shim.Spikes = _Spikes
+        sys.modules.setdefault("matchms.Spikes", _shim)
+        import matchms.similarity as _ms
+        if not hasattr(_ms, "ModifiedCosine"):
+            _ms.ModifiedCosine = type("ModifiedCosine", (), {})
+
         if args.architecture_checkpoint is None:
             raise RuntimeError("dreams mode requires --official-checkpoint "
-                               "and --architecture-checkpoint (DreaMS "
-                               "release); --checkpoint = weights override")
-        head = load_dreams_encoder(args)
+                               "and --architecture-checkpoint")
+        initialized, _ = load_base_model(
+            args.architecture_checkpoint, args.architecture_checkpoint,
+            torch.device("cpu"), args.n_highest_peaks)
         state = torch.load(args.checkpoint, map_location="cpu",
                            weights_only=False)
-        sd = state["encoder"] if "encoder" in state else state
+        sd = state.get("encoder", state) if isinstance(state, dict) else state
         sd = sd.get("backbone", sd) if isinstance(sd, dict) else sd
-        head.backbone.load_state_dict(sd, strict=True)
-        head.eval()
+        sd = sd.get("state_dict", sd) if isinstance(sd, dict) else sd
+        if isinstance(sd, dict) and sd:
+            initialized.backbone.load_state_dict(sd, strict=False)
+            print(f"  weights override loaded from {args.checkpoint}")
+        model = ContrastiveHead(initialized.backbone, 1e-6, 0.0,
+                                triplet_loss_margin=0.1)
+        if hasattr(initialized, 'head'):
+            try:
+                model.head.load_state_dict(initialized.head.state_dict(),
+                                           strict=True)
+            except Exception:
+                pass
+        model.eval()
+        head = model
+        from GLM_score_challenger_models_on_gnps import parse_mgf_used
         spectra = parse_mgf_used(BENCH / "spectra.mgf", set(map(int, rows)))
         from train_e1_identity import preprocess_spectrum  # noqa: PLC0415
         embs = []
