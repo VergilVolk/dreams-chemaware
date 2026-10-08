@@ -111,7 +111,13 @@ def main():
                     match_data["max_scores"].append(float(np.max(mol_scores)))
                     match_data["positive_scores"].append(float(true_score))
             else:
-                nomatch_data["max_scores"].append(float(np.max(mol_scores)))
+                # BUG FIX (audit 2026-10-08): exclude the positive molecule
+                # from no-match max — the positive is in the candidate graph
+                # even when its identity is not in the dictionary, and will
+                # get a high score that masks the true no-match behavior.
+                neg_scores = mol_scores[~mol_labels]
+                nomatch_data["max_scores"].append(
+                    float(np.max(neg_scores)) if len(neg_scores) else 0.0)
 
         ranks = np.array(match_data["ranks"])
         match_max = np.array(match_data["max_scores"])
