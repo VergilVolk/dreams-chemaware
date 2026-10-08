@@ -42,7 +42,7 @@ python -X utf8 tasks/GLM_embed_panel_spectra.py \
   --official-checkpoint data/e1/official_embedding_slim.pt \
   --architecture-checkpoint dreams/models/pretrained/ssl_model_server.pt \
   --output "$OUT/chemaware_panel_embeddings.npz" \
-  --batch-size 2048
+  --batch-size 64
 
 # 2. merge as a new method row -> frozen evaluation -> ladder row
 python -X utf8 tasks/GLM_arm_scores_to_ladder.py \
