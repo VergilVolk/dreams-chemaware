@@ -1,0 +1,151 @@
+{
+  "status": "ENTITY_RECOVERY_EVALUATION",
+  "design": "70/30 identity split; no-match positives removed; margin-based coverage at FDR targets [0.02, 0.05, 0.1]; mixed population (match + no-match)",
+  "results": {
+    "official_dreams": {
+      "n_match": 7695,
+      "n_nomatch": 3300,
+      "top1_accuracy": 0.8551,
+      "near_top1": 0.8008,
+      "margin_separation_auc": 0.8257,
+      "coverage_at_fdr": {
+        "0.02": {
+          "coverage": 0.1667,
+          "threshold": 0.57,
+          "n_correct": 1283,
+          "fdr": 0.0199
+        },
+        "0.05": {
+          "coverage": 0.5536,
+          "threshold": 0.295,
+          "n_correct": 4260,
+          "fdr": 0.0491
+        },
+        "0.1": {
+          "coverage": 0.6642,
+          "threshold": 0.19,
+          "n_correct": 5111,
+          "fdr": 0.0987
+        }
+      }
+    },
+    "noise_v1": {
+      "n_match": 7695,
+      "n_nomatch": 3300,
+      "top1_accuracy": 0.8669,
+      "near_top1": 0.8169,
+      "margin_separation_auc": 0.8496,
+      "coverage_at_fdr": {
+        "0.02": {
+          "coverage": 0.2446,
+          "threshold": 0.635,
+          "n_correct": 1882,
+          "fdr": 0.0193
+        },
+        "0.05": {
+          "coverage": 0.5836,
+          "threshold": 0.375,
+          "n_correct": 4491,
+          "fdr": 0.0495
+        },
+        "0.1": {
+          "coverage": 0.7105,
+          "threshold": 0.215,
+          "n_correct": 5467,
+          "fdr": 0.098
+        }
+      }
+    },
+    "weighted_spectral_entropy": {
+      "n_match": 7695,
+      "n_nomatch": 3300,
+      "top1_accuracy": 0.8755,
+      "near_top1": 0.8277,
+      "margin_separation_auc": 0.8729,
+      "coverage_at_fdr": {
+        "0.02": {
+          "coverage": 0.3975,
+          "threshold": 0.685,
+          "n_correct": 3059,
+          "fdr": 0.0199
+        },
+        "0.05": {
+          "coverage": 0.6711,
+          "threshold": 0.36,
+          "n_correct": 5164,
+          "fdr": 0.0497
+        },
+        "0.1": {
+          "coverage": 0.7448,
+          "threshold": 0.18,
+          "n_correct": 5731,
+          "fdr": 0.0971
+        }
+      }
+    },
+    "p2b_noise_v1_frozen": {
+      "n_match": 7695,
+      "n_nomatch": 3300,
+      "top1_accuracy": 0.871,
+      "near_top1": 0.8211,
+      "margin_separation_auc": 0.8673,
+      "coverage_at_fdr": {
+        "0.02": {
+          "coverage": 0.1526,
+          "threshold": 0.825,
+          "n_correct": 1174,
+          "fdr": 0.0192
+        },
+        "0.05": {
+          "coverage": 0.6565,
+          "threshold": 0.365,
+          "n_correct": 5052,
+          "fdr": 0.0498
+        },
+        "0.1": {
+          "coverage": 0.7306,
+          "threshold": 0.185,
+          "n_correct": 5622,
+          "fdr": 0.0969
+        }
+      }
+    },
+    "spec2vec_gnps_public": {
+      "n_match": 7695,
+      "n_nomatch": 3300,
+      "top1_accuracy": 0.8629,
+      "near_top1": 0.8108,
+      "margin_separation_auc": 0.8497,
+      "coverage_at_fdr": {
+        "0.02": {
+          "coverage": 0.2325,
+          "threshold": 0.79,
+          "n_correct": 1789,
+          "fdr": 0.0192
+        },
+        "0.05": {
+          "coverage": 0.6408,
+          "threshold": 0.395,
+          "n_correct": 4931,
+          "fdr": 0.0497
+        },
+        "0.1": {
+          "coverage": 0.7233,
+          "threshold": 0.19,
+          "n_correct": 5566,
+          "fdr": 0.0994
+        }
+      }
+    }
+  },
+  "best_method_at_5pct_fdr": "weighted_spectral_entropy",
+  "coverage_comparison_at_5pct": {
+    "official_dreams": 0.5536,
+    "noise_v1": 0.5836,
+    "weighted_spectral_entropy": 0.6711,
+    "p2b_noise_v1_frozen": 0.6565,
+    "spec2vec_gnps_public": 0.6408
+  },
+  "increment_over_official": 0.1175,
+  "claim_limit": "Entity recovery evaluation. Coverage = fraction of match queries correctly assigned at calibrated FDR. Not a biological result."
+}
