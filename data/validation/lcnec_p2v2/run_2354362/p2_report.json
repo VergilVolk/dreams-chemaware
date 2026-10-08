@@ -1,0 +1,23 @@
+{
+  "status": "P2_V2_SPECTRAL_COORDINATE_PROJECTION",
+  "coordinate_dictionary_size": 124090,
+  "queries_total": 263,
+  "queries_linked_to_effects": 263,
+  "queries_assigned": 257,
+  "assignment_rate": 0.9772,
+  "confidence_tiers": {
+    "high": 1,
+    "medium": 22,
+    "low": 234,
+    "unassigned": 6
+  },
+  "median_top1_score": 0.0725,
+  "median_margin": 0.0064,
+  "coordinates_with_effects": 248,
+  "ppm_gate": 1000.0,
+  "provenance": {
+    "query_mgf_sha256": "6f9c2e4b97c2e4d45909ac99a09f26f183612e99b22c53bc9831d3bc4b09fd31",
+    "gnps_manifest_sha256": "ab1d04418c89a5fc163d706c8fd79023c8f0e8c6957db99a302e98e9eac6de80",
+    "effects_npz_sha256": "28d9130ea2a4a6f788ca891cf72215126ba8a9db15104a3863c2af5019b34f0b"
+  }
+}
