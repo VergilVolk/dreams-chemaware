@@ -16,7 +16,11 @@
 # Usage:
 #   GLM_CHEM_CKPT=<path> sbatch tasks/run_GLM_chemaware_gnps_scores.sbatch
 set -euo pipefail
-cd "${SLURM_SUBMIT_DIR:-$(pwd)}"
+cd /data02/run01/scv7tsl/DreaMS
+source /data02/home/scv7tsl/run/miniconda3/etc/profile.d/conda.sh
+conda activate dreams
+export PYTHONPATH="$PWD:$PWD/tasks:${PYTHONPATH:-}"
+export PYTHONUNBUFFERED=1
 
 : "${GLM_CHEM_CKPT:?ChemAware checkpoint path required}"
 CHEM_SHA="$(sha256sum "$GLM_CHEM_CKPT" | cut -d' ' -f1)"
@@ -29,8 +33,8 @@ mkdir -p "$OUT"
 python -X utf8 tasks/GLM_embed_panel_spectra.py \
   --checkpoint "$GLM_CHEM_CKPT" \
   --encoder dreams \
-  --official-checkpoint "${GLM_OFFICIAL_CKPT:?DreaMS release required}" \
-  --architecture-checkpoint "${GLM_ARCH_CKPT:?DreaMS release required}" \
+  --official-checkpoint data/e1/official_embedding_slim.pt \
+  --architecture-checkpoint dreams/models/pretrained/ssl_model_server.pt \
   --output "$OUT/chemaware_panel_embeddings.npz" \
   --batch-size 2048
 
