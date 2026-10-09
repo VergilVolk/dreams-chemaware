@@ -1,4 +1,4 @@
-# 项目文档总索引（2026-10-08 更新）
+# 项目文档总索引（2026-10-09 更新）
 
 **用途：** 一页找到所有文档。按时间倒序、按研究线分组。
 
@@ -6,27 +6,32 @@
 
 | 文档 | 内容 | 状态 |
 |---|---|---|
-| **GLM_SPECTRAL_COORDINATE_COMPLETE_DISCOVERY_CHAIN_20261008.md** | **P0→P2 完整发现链（最重要）** | ✅ 最新 |
+| **ALGORITHM_INTEGRATION_AND_BIOLOGY_CURRENT_STATE_20261009.md** | **算法整合、生物学边界、撤回项与下一步的权威状态页** | ✅ 当前入口 |
+| GLM_SPECTRAL_COORDINATE_COMPLETE_DISCOVERY_CHAIN_20261008.md | P0→P2 历史发现链；P0-G 与 P2 数字已被后续实现修复部分推翻 | ⚠️ 不可单独引用 |
 | SPECTRAL_COORDINATE_METABOLOMICS_P0_RESULT_20261007.md | P0-L 坐标映射结果（6 门全过） | ✅ |
 | SPECTRAL_COORDINATE_METABOLOMICS_P0_CONTRACT_20261007.md | P0 预注册合同 | 冻结 |
 | LCNEC_P2_SPECTRAL_COORDINATE_RUN_2353437_AUDIT.md | P2 v1 审计（实现失败记录） | 已处置 |
 
-**核心发现：**
-- P0-L：坐标映射可行（跨仪器 R@1 84%+）
-- P0-G：绝对分数 ≠ 置信度（AUC 0.507）→ **方法论发现**
-- P0-M：边际 = 置信度（AUC 0.848）→ **部署级发现**
-- P2：LCNEC 91% 暗物质（margin < 0.1）→ **精确量化**
+**当前裁决：**
+- P0-L：GNPS consumed-development 上支持跨仪器坐标可行；不是独立外测
+- P0-G：旧 no-match 未移除阳性，旧 AUC 失效；以修复后的 entity-recovery FDR-coverage 为准
+- P0-M：margin AUC 约 0.848 是开发线索，但 selective risk 尚不足以称部署级
+- P2：旧 entropy 实现有关键错误，23 medium/high 与 91% dark 均待重算
 
 ## 二、算法整合（15 方法天梯 + 统一算法）
 
 | 文档 | 内容 |
 |---|---|
+| **ALGORITHM_INTEGRATION_AND_BIOLOGY_CURRENT_STATE_20261009.md** | **所有模块的当前准入、数据角色、泄漏状态和生物学边界** |
+| **NOISE_CHEMAWARE_SINGLE_ENCODER_MERGING_RESEARCH_20261009.md** | **Noise→ChemAware 负结果、MassSpecGym 停用、Fisher/TIES 单编码器合并调研与 GNPS→Enveda 执行方案** |
+| UNIFIED_RECENT_BENCHMARK_POSITIVE_LEDGER_20261009.md | 近期 benchmark 正/零/负证据账本 |
 | GLM_GNPS_ARTICLE_LADDER_20261007.md | 15 方法天梯（最新版） |
 | GLM_SOTA_AUDIT_20261007.md | SOTA 审计 |
 | GLM_ALGORITHM_INTEGRATION_PACKAGE_20261005.md | 算法整合包 |
 | GLM_ENSEMBLE_COMPLEMENTARITY_RETRACTION_AND_TRUTHBLIND_RESULT_20261007.md | 融合撤回 + 真值盲重审 |
 | GLM_ENSEMBLE_RESULTS_SECTION_DRAFT_20261007.md | 融合结果论文草稿 |
 | UNIFIED_ALGORITHM_POST_GATE1_ADVERSARIAL_AUDIT_20261007.md | 统一算法对抗审计 |
+| UNIFIED_ALGORITHM_DATA_LEAKAGE_LEDGER_20261009.md | 统一算法泄漏总账、Enveda fail-closed 构建与一次性开启边界 |
 | GLM_UNIFIED_ALGORITHM_PHASE1_HANDOFF_20261007.md | Phase-1 交接文档 |
 
 ## 三、LCNEC 生物学应用

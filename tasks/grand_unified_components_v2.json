@@ -1,0 +1,25 @@
+{
+  "schema": "dreams_grand_unified_component_registry_v3",
+  "frozen_on": "2026-10-09",
+  "principle": "Retain every developed component in the evidence ledger, but score only evidence-qualified modules. Missing or inapplicable candidate evidence is neutral and learned reliability may be exactly zero.",
+  "modules": [
+    {"name": "official_dreams", "family": "shared_spectral", "status": "enabled"},
+    {"name": "noise_v1", "family": "condition_robust", "status": "enabled"},
+    {"name": "chemaware_stage1_encoder", "family": "chemical_representation", "status": "enabled", "qualification": "role3_confirmed"},
+    {"name": "chemaware_phase_a_encoder", "family": "chemical_representation", "status": "provisional", "qualification": "role2_development_only"},
+    {"name": "weighted_spectral_entropy", "family": "full_spectrum", "status": "enabled"},
+    {"name": "p2b_sqrt_cosine", "family": "local_fragment", "status": "audit_only_derivative", "qualification": "constituent_of_frozen_p2b_noise_v1"},
+    {"name": "p2b_unweighted_entropy", "family": "local_fragment", "status": "audit_only_derivative", "qualification": "constituent_of_frozen_p2b_noise_v1"},
+    {"name": "neutral_loss_sqrt_cosine", "family": "local_fragment", "status": "audit_only_derivative", "qualification": "constituent_of_frozen_p2b_noise_v1"},
+    {"name": "p2b_noise_v1_frozen", "family": "local_fragment", "status": "enabled", "qualification": "sole_deployment_representative_of_p2b_evidence_family"},
+    {"name": "noise_rrf_1_7", "family": "noise_reranker", "status": "retired_audit_only", "qualification": "stage1_gnps_confirmation_failed"},
+    {"name": "noise_msg_fusion_stack_v1", "family": "noise_reranker", "status": "provisional"},
+    {"name": "chemaware_v2_reranker", "family": "chemical_candidate", "status": "development_only", "applicability": "candidate_sparse"},
+    {"name": "bioaware_b47_exact_event", "family": "sample_context", "status": "conditional_unqualified", "applicability": "requires_real_event_context"}
+  ],
+  "integration_policy": "The three raw P2b channels and their frozen P2b-on-Noise composite are mutually exclusive in any one joint model. The frozen composite is the only enabled representative; raw channels remain audit-only for a separately preregistered replacement experiment.",
+  "joint_output": "candidate ranking plus candidate-level module contribution and applicability ledger",
+  "hard_module_routing": false,
+  "strictly_positive_available_module_weight": false,
+  "default_statuses": ["enabled"]
+}
