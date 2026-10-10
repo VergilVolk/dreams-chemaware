@@ -40,23 +40,32 @@ done
 python -m py_compile tasks/build_unified_entity_evidence_ledger.py
 python -u tasks/test_unified_entity_evidence_ledger.py
 
-optional=()
 if [[ -n "${ENTITY_MANIFEST:-}" ]]; then
   [[ -f "$ENTITY_MANIFEST" ]] || { echo "Missing ENTITY_MANIFEST: $ENTITY_MANIFEST" >&2; exit 6; }
-  optional+=(--entity-manifest "$ENTITY_MANIFEST")
 fi
 if [[ -n "${BIOAWARE_EVENTS:-}" ]]; then
   [[ -f "$BIOAWARE_EVENTS" ]] || { echo "Missing BIOAWARE_EVENTS: $BIOAWARE_EVENTS" >&2; exit 7; }
-  optional+=(--bioaware-events "$BIOAWARE_EVENTS")
 fi
 
-python -u tasks/build_unified_entity_evidence_ledger.py \
-  --benchmark "$BENCHMARK" \
-  --score-bundle "$SCORE_BUNDLE" \
-  --chemaware-action-cache "$CHEMAWARE_CACHE" \
-  --dataset-id gnps_gold_silver_10ppm \
-  --dataset-role development_consumed \
-  --output "$OUT" \
-  "${optional[@]}"
+run_builder() {
+  python -u tasks/build_unified_entity_evidence_ledger.py \
+    --benchmark "$BENCHMARK" \
+    --score-bundle "$SCORE_BUNDLE" \
+    --chemaware-action-cache "$CHEMAWARE_CACHE" \
+    --dataset-id gnps_gold_silver_10ppm \
+    --dataset-role development_consumed \
+    --output "$OUT" \
+    "$@"
+}
+
+if [[ -n "${ENTITY_MANIFEST:-}" && -n "${BIOAWARE_EVENTS:-}" ]]; then
+  run_builder --entity-manifest "$ENTITY_MANIFEST" --bioaware-events "$BIOAWARE_EVENTS"
+elif [[ -n "${ENTITY_MANIFEST:-}" ]]; then
+  run_builder --entity-manifest "$ENTITY_MANIFEST"
+elif [[ -n "${BIOAWARE_EVENTS:-}" ]]; then
+  run_builder --bioaware-events "$BIOAWARE_EVENTS"
+else
+  run_builder
+fi
 
 echo "Unified entity evidence ledger complete: $OUT"
