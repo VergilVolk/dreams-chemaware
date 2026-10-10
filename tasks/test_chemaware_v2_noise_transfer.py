@@ -83,6 +83,9 @@ def test_sbatch_is_gnps_only_and_fail_closed() -> None:
     lowered = text.lower()
     assert "massspecgym" not in lowered
     assert "audit_chemaware_orthogonal_rule_residual_policy.py" not in text
+    directives = [line.strip() for line in text.splitlines() if line.startswith("#SBATCH")]
+    assert directives.count("#SBATCH --partition=gpu") == 1
+    assert directives.count("#SBATCH --gpus=1") == 1
     assert "--deployment-base-score-cache \"$OUT/noise_v1_cache\"" in text
     assert '"$POLICY_DIR/truthblind_policy.joblib"' in text
     assert '"$POLICY_DIR/report.json"' in text

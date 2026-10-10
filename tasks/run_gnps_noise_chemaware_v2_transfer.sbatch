@@ -3,6 +3,8 @@
 # GNPS is development/consumed. Enveda-180 is not accessed by this job.
 # The exact historical V2 bundle must already exist; this job never rebuilds it.
 #SBATCH --job-name=noise_chem_v2
+#SBATCH --partition=gpu
+#SBATCH --gpus=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=16
 #SBATCH --time=36:00:00
