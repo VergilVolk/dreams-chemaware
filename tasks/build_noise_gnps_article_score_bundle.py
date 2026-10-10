@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 
 from encode_unified_library_for_p2b import iter_mgf
-from evaluate_gnps_gold_silver_10ppm_embeddings import graph_from_panel, load_embeddings
+from evaluate_gnps_gold_silver_10ppm_embeddings import load_embeddings
 from noise_corrected_fullgraph_evaluation import expanded_indices, score_embeddings
 from noise_gnps_article_spectral_scores import (
     apply_frozen_p2b,
@@ -24,6 +24,7 @@ from noise_gnps_article_spectral_scores import (
     weighted_entropy_similarity,
     weighted_entropy_backend,
 )
+from scoreblind_retrieval_graph import scoreblind_graph_from_panel
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -123,7 +124,8 @@ def main() -> None:
         raise RuntimeError("official and Noise V1 embedding registries differ")
 
     graphs = {
-        name: graph_from_panel(args.benchmark / f"panel_{name}.npz") for name in PANELS
+        name: scoreblind_graph_from_panel(args.benchmark / f"panel_{name}.npz")
+        for name in PANELS
     }
     used_rows: set[int] = set()
     unique_pairs: set[tuple[int, int]] = set()
@@ -198,6 +200,8 @@ def main() -> None:
         np.savez_compressed(handle, **arrays)
     metadata = {
         "status": "noise_gnps_article_score_bundle_complete",
+        "labels_opened": False,
+        "benchmark": str(args.benchmark),
         "methods": list(METHODS),
         "score_rows": {name: int(arrays[f"scores_{name}"].shape[1]) for name in PANELS},
         "fragment_tolerance_da": args.fragment_tolerance,
@@ -208,14 +212,14 @@ def main() -> None:
             "normalization": "absolute",
             "minimum_support": 1,
             "minimum_advantage": 0.0,
-            "configuration_selection_on_gnps": False,
+            "configuration_selection_on_benchmark": False,
         },
         "information_levels": {
             "spectrum_only": list(METHODS[:8]),
             "frozen_candidate_reranker": list(METHODS[8:]),
         },
         "claim_limit": (
-            "One sealed GNPS graph, no fitting or method selection. Weighted entropy uses the "
+            "One frozen retrieval graph, labels unopened, no fitting or method selection. Weighted entropy uses the "
             "pinned official MSEntropy implementation; P2b entropy remains its frozen historical feature."
         ),
     }

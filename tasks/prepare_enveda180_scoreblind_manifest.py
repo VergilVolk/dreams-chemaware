@@ -294,6 +294,8 @@ def main() -> None:
     parser.add_argument("--progress-every", type=int, default=100_000)
     args = parser.parse_args()
 
+    if args.out.exists():
+        raise FileExistsError(f"refusing to overwrite score-blind audit: {args.out}")
     args.out.mkdir(parents=True, exist_ok=True)
     identities: set[str] = set()
     formulas: set[str] = set()

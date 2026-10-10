@@ -86,6 +86,7 @@ def build_panel(
     query_row = []
     query_ik14 = []
     query_formula = []
+    query_adduct = []
     query_precursor_mz = []
     query_ptr = [0]
     molecule_ptr = [0]
@@ -139,6 +140,7 @@ def build_panel(
         query_row.append(q_index)
         query_ik14.append(truth)
         query_formula.append(q_formula)
+        query_adduct.append(adduct)
         query_precursor_mz.append(source["query_mz"])
         near_query.append(local_near)
         independent_positive.append(True)  # distinct collision-energy record
@@ -163,6 +165,7 @@ def build_panel(
         "query_row": np.asarray(query_row, np.int64),
         "query_ik14": np.asarray(query_ik14, dtype=np.str_),
         "query_formula": np.asarray(query_formula, dtype=np.str_),
+        "query_adduct": np.asarray(query_adduct, dtype=np.str_),
         "query_precursor_mz": np.asarray(query_precursor_mz, float),
         "near_query": np.asarray(near_query, bool),
         "independent_positive": np.asarray(independent_positive, bool),
@@ -198,7 +201,7 @@ def build_open_set_panel(
     if not 0.0 < match_fraction < 1.0:
         raise ValueError("open-set match fraction must be in (0, 1)")
     query_fields = (
-        "query_row", "query_ik14", "query_formula", "query_precursor_mz",
+        "query_row", "query_ik14", "query_formula", "query_adduct", "query_precursor_mz",
         "near_query", "independent_positive",
     )
     molecule_fields = (
@@ -247,6 +250,7 @@ def build_open_set_panel(
         "query_row": np.int64,
         "query_ik14": np.str_,
         "query_formula": np.str_,
+        "query_adduct": np.str_,
         "query_precursor_mz": float,
         "near_query": bool,
         "independent_positive": bool,
@@ -303,6 +307,10 @@ def panel_summary(panel: dict) -> dict:
         "candidate_molecules": int(len(panel["molecule_label"])),
         "candidate_spectra": int(len(panel["candidate_row"])),
         "near_queries": int(panel["near_query"].sum()),
+        "query_adducts": {
+            str(value): int(count)
+            for value, count in zip(*np.unique(panel["query_adduct"].astype(str), return_counts=True))
+        },
     }
     if "query_has_match" in panel:
         summary.update({
@@ -326,6 +334,9 @@ def main() -> None:
     parser.add_argument("--minimum-formula-queries", type=int, default=100)
     parser.add_argument("--open-set-match-fraction", type=float, default=0.70)
     args = parser.parse_args()
+
+    if args.out.exists():
+        raise FileExistsError(f"refusing to overwrite frozen benchmark: {args.out}")
 
     audit_report = json.loads((args.audit / "report.json").read_text(encoding="utf-8"))
     if audit_report.get("status") != "ENVEDA180_SCOREBLIND_MANIFEST_COMPLETE":

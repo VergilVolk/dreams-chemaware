@@ -83,12 +83,14 @@ def test_scoreblind_enveda_builder_end_to_end(tmp_path):
     assert report["identity_disjoint"]["queries"] == 3
     assert report["formula_disjoint"]["queries"] == 3
     assert report["identity_open_set"]["queries"] == 3
+    assert report["identity_disjoint"]["query_adducts"] == {"[M+H]+": 3}
     assert (
         report["identity_open_set"]["match_queries"]
         + report["identity_open_set"]["no_match_queries"]
         == 3
     )
     with np.load(benchmark / "panel_identity_disjoint.npz", allow_pickle=False) as body:
+        assert body["query_adduct"].tolist() == ["[M+H]+"] * 3
         ptr = body["query_ptr"]
         labels = body["molecule_label"]
         for q in range(len(ptr) - 1):

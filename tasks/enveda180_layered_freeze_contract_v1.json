@@ -1,0 +1,55 @@
+{
+  "schema": "enveda180_layered_algorithm_freeze_v1",
+  "freeze_status": "FROZEN_BEFORE_ENVEDA_SCORING",
+  "frozen_on": "2026-10-10",
+  "benchmark_directory": "data/validation/enveda180_cross_condition_benchmark_v2_20261010",
+  "audit_directory": "data/validation/enveda180_scoreblind_manifest_v2_20261010",
+  "dataset_role": "sealed_external_test",
+  "automatic_ranking_methods": [
+    "official_dreams",
+    "noise_v1",
+    "weighted_spectral_entropy",
+    "p2b_noise_v1_frozen"
+  ],
+  "layered_algorithm": {
+    "shared_spectral_coordinate": "noise_v1",
+    "primary_top1_output": "weighted_spectral_entropy",
+    "local_competition_output": "p2b_noise_v1_frozen",
+    "chemical_evidence": "chemaware_v2_evidence_only_not_an_automatic_reranker",
+    "sample_context": "unavailable_on_spectral_library_benchmark"
+  },
+  "checkpoints": {
+    "official_dreams": {
+      "path": "data/e1/official_embedding_slim.pt",
+      "sha256": "8928f908606c0bd652c5a4107d3c35102f660622958c225a1f625abe4b1ba245"
+    },
+    "noise_v1": {
+      "path": "data/validation/noise_relation_t1_t3_run_2347055/checkpoint/primary_seed_3407_slim.pt",
+      "sha256": "01ac8c7bfa75d89862e0b1eb2b5ffb297955cffae471fd483ad6c38d13f33beb"
+    }
+  },
+  "closed_set_primary_endpoint": "weighted_spectral_entropy_recall_at_1",
+  "secondary_endpoints": [
+    "recall_at_2_3_5_10_20",
+    "mrr",
+    "mean_median_rank",
+    "macro_micro_pooled_auroc_auprc",
+    "near_subset",
+    "formula_cluster_paired_ci",
+    "corrected_introduced_risk_net"
+  ],
+  "gnps_frozen_open_set_margin_thresholds_at_5pct_fdr": {
+    "official_dreams": 0.295,
+    "noise_v1": 0.375,
+    "weighted_spectral_entropy": 0.36,
+    "p2b_noise_v1_frozen": 0.365
+  },
+  "prohibited_after_opening": [
+    "changing_method_or_checkpoint",
+    "changing_p2b_weights_or_gate",
+    "selecting_a_new_primary_method",
+    "recalibrating_thresholds_on_enveda",
+    "adding_chemaware_hard_promotion",
+    "fabricating_bioaware_context"
+  ]
+}

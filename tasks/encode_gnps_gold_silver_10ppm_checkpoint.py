@@ -37,6 +37,14 @@ def arguments() -> argparse.Namespace:
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--batch-size", type=int, default=64)
     parser.add_argument("--label", default="checkpoint")
+    parser.add_argument(
+        "--expected-selected-rows", type=int, default=52871,
+        help="Set to 0 for another frozen benchmark whose selected-row count is report-defined.",
+    )
+    parser.add_argument(
+        "--expected-records", type=int, default=329607,
+        help="Set to 0 to accept the complete record count of another curated benchmark.",
+    )
     return parser.parse_args()
 
 
@@ -48,7 +56,7 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
-def required_rows(benchmark: Path) -> np.ndarray:
+def required_rows(benchmark: Path, expected_selected_rows: int = 52871) -> np.ndarray:
     rows: list[np.ndarray] = []
     for panel_name in ("identity_disjoint", "formula_disjoint"):
         with np.load(benchmark / f"panel_{panel_name}.npz", allow_pickle=False) as body:
@@ -59,8 +67,11 @@ def required_rows(benchmark: Path) -> np.ndarray:
     selected = np.unique(np.concatenate(rows))
     # The identity panel uses 52,854 spectra.  The formula-disjoint panel adds
     # 17 rows that are not present there, so the two-panel union is 52,871.
-    if len(selected) != 52871:
-        raise RuntimeError(f"sealed GNPS used-row count drifted: {len(selected)} != 52871")
+    if expected_selected_rows and len(selected) != expected_selected_rows:
+        raise RuntimeError(
+            f"frozen benchmark used-row count drifted: "
+            f"{len(selected)} != {expected_selected_rows}"
+        )
     return selected
 
 
@@ -85,9 +96,9 @@ def load_selected_spectra(
         if peak_array.ndim != 2 or peak_array.shape[1] != 2 or len(peak_array) == 0:
             raise RuntimeError(f"selected MGF row {row} has malformed peaks")
         spectra[row] = (peak_array.T, float(precursor_text[0]))
-    if records != expected_records:
+    if expected_records and records != expected_records:
         raise RuntimeError(
-            f"sealed GNPS MGF row count drifted: {records} != {expected_records}"
+            f"frozen benchmark MGF row count drifted: {records} != {expected_records}"
         )
     missing = selected_set.difference(spectra)
     if missing:
@@ -160,8 +171,11 @@ def main() -> None:
     from dreams.utils.dformats import DataFormatA
     from train_e1_identity import load_base_model
 
-    selected = required_rows(args.benchmark)
-    spectra = load_selected_spectra(args.benchmark / "spectra.mgf", selected)
+    selected = required_rows(args.benchmark, args.expected_selected_rows)
+    spectra = load_selected_spectra(
+        args.benchmark / "spectra.mgf", selected,
+        expected_records=args.expected_records,
+    )
     model, checkpoint_kind = load_base_model(
         args.checkpoint,
         args.architecture_checkpoint,
