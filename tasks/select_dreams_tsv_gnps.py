@@ -9,10 +9,54 @@ from pathlib import Path
 
 
 PANELS = ("identity_disjoint", "formula_disjoint")
+METRIC_PATHS = {
+    "recall@1": ("retrieval", "recall@1"),
+    "recall@3": ("retrieval", "recall@3"),
+    "recall@5": ("retrieval", "recall@5"),
+    "recall@10": ("retrieval", "recall@10"),
+    "recall@20": ("retrieval", "recall@20"),
+    "mrr": ("retrieval", "mrr"),
+    "macro_query_auroc": ("retrieval", "macro_query_auroc"),
+    "macro_query_auprc": ("retrieval", "macro_query_auprc"),
+    "near_recall@1": ("near_subset", "recall@1"),
+    "near_mrr": ("near_subset", "mrr"),
+    "near_macro_query_auroc": ("near_subset", "macro_query_auroc"),
+    "near_macro_query_auprc": ("near_subset", "macro_query_auprc"),
+    "micro_candidate_auroc": ("micro_candidate", "auroc"),
+    "micro_candidate_auprc": ("micro_candidate", "auprc"),
+    "pooled_pairwise_auroc": ("gnps_10ppm_pooled_pairwise", "auroc"),
+    "pooled_pairwise_auprc": ("gnps_10ppm_pooled_pairwise", "auprc"),
+}
 
 
 def recall1(report: dict, panel: str, side: str) -> float:
     return float(report["panels"][panel][side]["retrieval"]["recall@1"])
+
+
+def nested_float(body: dict, path: tuple[str, str]) -> float:
+    return float(body[path[0]][path[1]])
+
+
+def panel_summary(panel_report: dict) -> dict:
+    metrics = {}
+    for name, path in METRIC_PATHS.items():
+        baseline = nested_float(panel_report["baseline"], path)
+        candidate = nested_float(panel_report["candidate"], path)
+        metrics[name] = {
+            "official": baseline,
+            "candidate": candidate,
+            "delta": candidate - baseline,
+            "delta_pp": 100 * (candidate - baseline),
+        }
+    paired = panel_report["paired"]
+    return {
+        "metrics": metrics,
+        "corrected_at_1": int(paired["corrected"]),
+        "introduced_at_1": int(paired["introduced"]),
+        "risk_net_lambda2": int(paired["risk_net_lambda2"]),
+        "formula_cluster_paired_ci": paired["formula_cluster_paired_ci"],
+        "near_formula_cluster_paired_ci": paired["near_formula_cluster_paired_ci"],
+    }
 
 
 def main() -> None:
@@ -32,14 +76,10 @@ def main() -> None:
         values = {}
         deltas = []
         for panel in PANELS:
+            summary = panel_summary(report["panels"][panel])
+            values[panel] = summary
             baseline = recall1(report, panel, "baseline")
             candidate = recall1(report, panel, "candidate")
-            values[panel] = {
-                "official_recall1": baseline,
-                "candidate_recall1": candidate,
-                "delta_recall1": candidate - baseline,
-                "delta_recall1_pp": 100 * (candidate - baseline),
-            }
             deltas.append(candidate - baseline)
         values["minimum_two_panel_delta_recall1"] = min(deltas)
         values["mean_two_panel_delta_recall1"] = sum(deltas) / len(deltas)
