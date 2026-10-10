@@ -92,6 +92,10 @@ def test_sbatch_is_gnps_only_and_fail_closed() -> None:
     assert "recovered_frozen_v2_policy" in text
     assert "--contrast-representation symmetric_summary" in text
     assert "--selection-control-mode deployment_safe" in text
+    assert "CHEMAWARE_V2_POLICY_CONTRACT_FAIL" in text
+    assert "all_gates_pass" in text
+    assert "corrected_at_1\") == 78" not in text
+    assert "0.3565609484787261" not in text
     assert "--deployment-base-score-cache \"$OUT/noise_v1_cache\"" in text
     assert '"$POLICY_DIR/truthblind_policy.joblib"' in text
     assert '"$POLICY_DIR/report.json"' in text

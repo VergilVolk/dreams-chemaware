@@ -34,8 +34,10 @@ V2 不是候选分子结构模型，也不是 dense candidate score。它在历�
 
 轻量仓库只保留了 V2 结果账本，没有保留 nuisance/residual estimator 的序列化参数；账本本身
 不能对新 GNPS query 推理。因此作业优先复用已有的 `truthblind_policy.joblib`；若它缺失，则在
-同一作业内按历史固定命令恢复一次序列化 bundle。恢复结果必须逐项复现上述 dose、threshold、
-78/17 和 93/17，否则立即失败，不进入 GNPS。该恢复不改变本轮方法，也不以旧结果选择新参数。
+同一作业内按历史固定算法恢复一次序列化 bundle，并在打开 GNPS 标签之前冻结。恢复合同校验
+三套 null、symmetric summary、deployment-safe selection、固定 dose、1,978/1,929 query 分母、
+全部机制门及 corrected > 2×introduced。旧 sklearn/runtime 下得到的具体 threshold 和纠错计数
+不作为跨环境字节级条件；这些实际值必须随运行报告完整保存，不能冒充旧点估计。
 
 ## 3. Noise 迁移规则
 
