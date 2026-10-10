@@ -18,6 +18,7 @@ import argparse
 import hashlib
 import json
 import os
+import shutil
 import tempfile
 from pathlib import Path
 from types import SimpleNamespace
@@ -27,7 +28,13 @@ import numpy as np
 
 from audit_chemaware_mass_kernel_embedding import KernelCache, score_queries_truthblind
 from chemaware_truthblind_candidate_core import predict_truthblind_policy
-from gnps_pair_score_cache import PANELS, benchmark_fingerprint, sha256_file, write_pair_score_cache
+from gnps_pair_score_cache import (
+    PANELS,
+    benchmark_fingerprint,
+    load_pair_score_cache,
+    sha256_file,
+    write_pair_score_cache,
+)
 from noise_final_core import sha256_file as noise_sha256_file
 
 
@@ -44,6 +51,13 @@ def arguments() -> argparse.Namespace:
     mode.add_argument("--evidence", type=Path)
     mode.add_argument("--benchmark", type=Path)
     parser.add_argument("--manifest", type=Path)
+    parser.add_argument(
+        "--deployment-base-score-cache", type=Path,
+        help=(
+            "GNPS-only pair-score cache on which frozen V2 actions are applied. "
+            "The V2 selector itself always remains in its frozen official-DreaMS geometry."
+        ),
+    )
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--batch-queries", type=int, default=256)
     parser.add_argument(
@@ -126,12 +140,27 @@ def _promote_frozen_actions(
     body: dict[str, np.ndarray], policy: dict, cache: KernelCache,
     official: np.ndarray, row_position: dict[int, int], variants: tuple[str, ...],
     batch_queries: int, expected_official: np.ndarray | None = None,
-) -> tuple[np.ndarray, dict[str, int]]:
+    deployment_base: np.ndarray | None = None,
+) -> tuple[np.ndarray, dict[str, int], dict[str, np.ndarray]]:
     query_count = len(body["query_row"])
     edge_count = len(body["pair_candidate_row"])
     output = np.empty(edge_count, dtype=np.float32)
     selected_total = 0
     abstained_total = 0
+    changed_total = 0
+    already_top_total = 0
+    selected_candidate = np.full(query_count, -1, dtype=np.int32)
+    official_top = np.empty(query_count, dtype=np.int32)
+    deployment_top = np.empty(query_count, dtype=np.int32)
+    output_top = np.empty(query_count, dtype=np.int32)
+    abstained = np.empty(query_count, dtype=bool)
+    changed_top1 = np.zeros(query_count, dtype=bool)
+    if deployment_base is not None:
+        deployment_base = np.asarray(deployment_base, dtype=np.float32)
+        if deployment_base.ndim != 1 or len(deployment_base) != edge_count:
+            raise RuntimeError("deployment-base scores do not align to the frozen panel")
+        if not np.all(np.isfinite(deployment_base)):
+            raise RuntimeError("deployment-base scores are non-finite")
     for start in range(0, query_count, batch_queries):
         stop = min(query_count, start + batch_queries)
         queries = np.arange(start, stop, dtype=np.int64)
@@ -146,27 +175,70 @@ def _promote_frozen_actions(
             molecule_right = int(body["query_ptr"][query + 1])
             edge_left = int(body["molecule_ptr"][molecule_left])
             edge_right = int(body["molecule_ptr"][molecule_right])
-            values = np.asarray(scored["global"][local], dtype=np.float32).copy()
+            selector_values = np.asarray(scored["global"][local], dtype=np.float32)
             if expected_official is not None and not np.allclose(
-                values, expected_official[edge_left:edge_right], rtol=2e-5, atol=2e-6,
+                selector_values, expected_official[edge_left:edge_right], rtol=2e-5, atol=2e-6,
             ):
                 raise RuntimeError(f"official score alignment drifted at query {query}")
-            if not bool(predictions["abstained"][local]):
+            values = (
+                selector_values.copy() if deployment_base is None
+                else deployment_base[edge_left:edge_right].copy()
+            )
+            pointer = np.asarray(scored["reference_ptr"][local], dtype=np.int64)
+            selector_molecule = np.maximum.reduceat(selector_values, pointer[:-1])
+            deployment_molecule = np.maximum.reduceat(values, pointer[:-1])
+            official_top[query] = int(np.argmax(selector_molecule))
+            deployment_top[query] = int(np.argmax(deployment_molecule))
+            abstained[query] = bool(predictions["abstained"][local])
+            if not abstained[query]:
                 selected = int(predictions["selected_candidate"][local])
                 if not (0 <= selected < molecule_right - molecule_left):
                     raise RuntimeError(f"selected candidate is out of range at query {query}")
-                pointer = np.asarray(scored["reference_ptr"][local], dtype=np.int64)
-                left, right = int(pointer[selected]), int(pointer[selected + 1])
-                best = left + int(np.argmax(values[left:right]))
-                values[best] = np.nextafter(np.max(values), np.float32(np.inf))
+                selected_candidate[query] = selected
                 selected_total += 1
+                changed_top1[query] = selected != deployment_top[query]
+                if changed_top1[query]:
+                    changed_total += 1
+                else:
+                    already_top_total += 1
+                # Historical official+V2 export always performs the promotion.
+                # During cross-base transfer, an action that already agrees with
+                # the deployment scorer must leave its pair scores bit-for-bit
+                # unchanged; only a genuine top-1 change needs promotion.
+                if deployment_base is None or changed_top1[query]:
+                    left, right = int(pointer[selected]), int(pointer[selected + 1])
+                    best = left + int(np.argmax(values[left:right]))
+                    values[best] = np.nextafter(np.max(values), np.float32(np.inf))
             else:
                 abstained_total += 1
+            output_molecule = np.maximum.reduceat(values, pointer[:-1])
+            output_top[query] = int(np.argmax(output_molecule))
+            if (
+                not abstained[query]
+                and output_top[query] != selected_candidate[query]
+            ):
+                raise RuntimeError(f"frozen action did not promote its candidate at query {query}")
             output[edge_left:edge_right] = values
         print(f"[ChemAware V2] {stop:,}/{query_count:,} queries", flush=True)
     if not np.all(np.isfinite(output)):
         raise RuntimeError("ChemAware exported scores are non-finite")
-    return output, {"selected": selected_total, "abstained": abstained_total}
+    counts = {
+        "queries": query_count,
+        "selected": selected_total,
+        "abstained": abstained_total,
+        "changed_deployment_top1": changed_total,
+        "already_deployment_top1": already_top_total,
+    }
+    ledger = {
+        "query_index": np.arange(query_count, dtype=np.int32),
+        "abstained": abstained,
+        "selected_candidate": selected_candidate,
+        "official_top_candidate": official_top,
+        "deployment_top_candidate": deployment_top,
+        "output_top_candidate": output_top,
+        "changed_deployment_top1": changed_top1,
+    }
+    return output, counts, ledger
 
 
 def _massspecgym(args: argparse.Namespace, policy: dict, replay: dict, policy_hash: str) -> None:
@@ -201,7 +273,7 @@ def _massspecgym(args: argparse.Namespace, policy: dict, replay: dict, policy_ha
         "mass", str(policy["rule_key"]), *map(str, policy["control_rule_keys"]),
     )))
     cache = KernelCache(_kernel_args(args.token_dir, args.rule_library, replay), row_position, variants)
-    scores, counts = _promote_frozen_actions(
+    scores, counts, _ = _promote_frozen_actions(
         body, policy, cache, official, row_position, variants,
         args.batch_queries, expected_official,
     )
@@ -243,34 +315,69 @@ def _gnps(args: argparse.Namespace, policy: dict, replay: dict, policy_hash: str
         "mass", str(policy["rule_key"]), *map(str, policy["control_rule_keys"]),
     )))
     cache = KernelCache(_kernel_args(args.token_dir, args.rule_library, replay), row_position, variants)
+    deployment_report = None
+    deployment_scores = None
+    if args.deployment_base_score_cache is not None:
+        deployment_report, deployment_scores = load_pair_score_cache(
+            args.deployment_base_score_cache, args.benchmark,
+        )
     scores: dict[str, np.ndarray] = {}
     counts: dict[str, dict[str, int]] = {}
+    ledgers: dict[str, dict[str, np.ndarray]] = {}
     for panel in PANELS:
         body = _body_from_panel(args.benchmark / f"panel_{panel}.npz")
-        scores[panel], counts[panel] = _promote_frozen_actions(
+        scores[panel], counts[panel], ledgers[panel] = _promote_frozen_actions(
             body, policy, cache, official, row_position, variants, args.batch_queries,
+            deployment_base=None if deployment_scores is None else deployment_scores[panel],
         )
+    base_method = (
+        {"name": "official_dreams", "kind": "frozen_selector_base"}
+        if deployment_report is None else deployment_report["method"]
+    )
     method = {
-        "name": "chemaware_v2_reranker",
+        "name": (
+            "chemaware_v2_reranker" if deployment_report is None
+            else f"{base_method.get('name', 'deployment_base')}__chemaware_v2_transfer"
+        ),
         "kind": "frozen_candidate_action_policy",
         "policy_sha256": policy_hash,
         "policy_schema": policy["schema"],
         "truth_fields_used": [],
         "selection_counts": counts,
-        "score_semantics": "official pair scores with selected candidate promoted above baseline maximum",
+        "selector_geometry": "official_dreams_frozen",
+        "deployment_base_method": base_method,
+        "score_semantics": (
+            "deployment-base pair scores unchanged on abstention; frozen official-geometry "
+            "V2 selected candidate promoted above the deployment-base maximum on action"
+        ),
     }
     report = write_pair_score_cache(args.output, args.benchmark, method, scores)
-    summary = {
-        "status": "CHEMAWARE_V2_GNPS_SCORE_EXPORT_COMPLETE",
-        "labels_opened": False,
-        "benchmark": benchmark_fingerprint(args.benchmark),
-        "policy_sha256": policy_hash,
-        "selection_counts": counts,
-        "cache_report_sha256": sha256_file(args.output / "report.json"),
-    }
-    (args.output / "selection_report.json").write_text(
-        json.dumps(summary, indent=2), encoding="utf-8",
-    )
+    try:
+        ledger_hashes = {}
+        for panel in PANELS:
+            ledger_path = args.output / f"action_ledger_{panel}.npz"
+            np.savez_compressed(ledger_path, **ledgers[panel])
+            ledger_hashes[panel] = sha256_file(ledger_path)
+        summary = {
+            "status": "CHEMAWARE_V2_GNPS_SCORE_EXPORT_COMPLETE",
+            "labels_opened": False,
+            "benchmark": benchmark_fingerprint(args.benchmark),
+            "policy_sha256": policy_hash,
+            "selection_counts": counts,
+            "deployment_base_score_cache": (
+                None if args.deployment_base_score_cache is None
+                else str(args.deployment_base_score_cache)
+            ),
+            "deployment_base_method": base_method,
+            "action_ledger_sha256": ledger_hashes,
+            "cache_report_sha256": sha256_file(args.output / "report.json"),
+        }
+        (args.output / "selection_report.json").write_text(
+            json.dumps(summary, indent=2), encoding="utf-8",
+        )
+    except Exception:
+        shutil.rmtree(args.output, ignore_errors=True)
+        raise
     print(json.dumps({"cache": report, "summary": summary}, indent=2), flush=True)
 
 
@@ -278,6 +385,8 @@ def main() -> None:
     args = arguments()
     if args.batch_queries < 1:
         raise ValueError("--batch-queries must be positive")
+    if args.evidence is not None and args.deployment_base_score_cache is not None:
+        raise ValueError("--deployment-base-score-cache is supported only with --benchmark")
     policy, replay, policy_hash = _load_policy(args)
     if args.evidence is not None:
         _massspecgym(args, policy, replay, policy_hash)
