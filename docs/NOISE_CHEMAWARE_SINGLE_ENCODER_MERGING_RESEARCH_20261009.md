@@ -3,6 +3,8 @@
 日期：2026-10-09  
 状态：当前参数层整合的权威研究说明。本文替代“继续扫描 Noise→ChemAware 顺序微调早期 checkpoint”的建议；该建议已撤回。
 
+> **2026-10-10 结果更新：** 固定两臂 TSV-Merge 实验已由作业 `2358006` 完成。TSV 相对 official 在 GNPS identity/formula development 面板为 `+1.2096/+1.4826 pp` Recall@1，但相对 Noise V1 仅为 `+0.0091/+0.2281 pp`，配对区间均跨零，且 micro-candidate 与 pooled-pairwise AUC/AUPRC 多数下降。参数合并不进入最终 encoder；Noise V1 继续作为主干。完整结果和资格裁决见 [NOISE_CHEMAWARE_TSV_MERGE_GNPS_RESULT_20261010.md](./NOISE_CHEMAWARE_TSV_MERGE_GNPS_RESULT_20261010.md)。本文后续 Fisher/TIES 建议现仅保留为历史调研，不再构成执行计划。
+
 ## 1. 结论先行
 
 Noise V1 与 ChemAware Phase-A 不应再通过无约束的顺序全参数微调相连。作业 `2356060` 已经足以说明：从强 Noise V1 初始化后继续执行原 Phase-A 的 2,000-step 全 backbone 更新，会在只留下极小或不可确认 Top-1 波动的同时，系统性压缩候选间隔并降低 GNPS pooled AUROC。这个实验不进入论文主结果，也不值得继续在 MassSpecGym 上扫描训练步数。

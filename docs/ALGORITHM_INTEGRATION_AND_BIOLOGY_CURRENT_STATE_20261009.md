@@ -22,11 +22,12 @@ GNPS 双面板为：identity-disjoint `10,995` queries、`87,518` candidate mole
 | weighted spectral entropy | GNPS R@1 `87.37/88.27%`，实体找回 5% FDR coverage `67.11%` | 强经典开发基线 | 必须进入最终比较；统一模型先要胜过它 |
 | ChemAware Stage-1 encoder | MSG role-3 `n=1,929`，`+1.8144 pp`，CI `[+0.8155,+2.8703]` | role-3 曾作 validation loader；GNPS 仅 `+0.3001/+0.2091 pp` 且 CI 跨 0、risk-net 负 | 保留为独立资产/消融；没有 GNPS 正迁移资格 |
 | ChemAware Phase-A encoder | MSG role-2 `n=1,975`，`+2.1266 pp`，CI `[+1.2761,+3.0303]` | provisional；GNPS `+0.2274/+0.3992 pp` 且 CI 跨 0、risk-net 负 | 不与 Stage-1 合并，不作为默认 encoder |
+| Noise×Phase-A TSV-Merge | GNPS identity/formula R@1 `86.5666/88.2912%`，相对 official `+1.2096/+1.4826 pp` | development/consumed；相对 Noise V1 仅 `+0.0091/+0.2281 pp`，CI 均跨 0，micro/pairwise AUC 多数下降；未达到稳定 `+3 pp` | 仅作参数合并消融；不得替代 Noise V1，不进入 Enveda；详见 2026-10-10 结果文档 |
 | ChemAware V2 residual reranker | MSG role-3 `n=1,929`，`+3.9399 pp`，CI `[+2.8191,+5.1921]`；比 rotated null `+3.3178 pp` | post-outer development；无新独立确认；只在逐候选 evidence applicable 时有定义 | 候选级稀疏条件模块；不可作为每行都有的 dense score |
 | RRF reranker | official-geometry 探针约 `+1.77 pp`，但 Stage-1/GNPS 确认失败 | audit-only | `retired_audit_only`，不得复活为生产分支 |
 | BioAware B47 event module | 4,996 candidate-specific queries、2,239 opportunities；真实事件高于结构化 null | 两个外部研究，truth unopened；集中度和身份质量门失败；无 accuracy | unavailable；补救门通过前权重固定为 0 |
 
-统一融合本身目前没有胜利结果：真值盲无监督融合的 CI 跨 0；监督 router 只有约 `+0.5--0.6 pp` 且 3 个 split 中仅 2 个显著；NNLS v0 相对 WSE 三个 split 分别约 `−0.23/−0.02/−0.25 pp`；candidate-differential Gate-1 corrected/introduced=`660/1120`、risk-net=`−1580`，已停止。S1 oracle `+4.93/+5.44 pp` 和 router v2 `+2.93/+4.03 pp` 因真值/面板重叠泄漏撤回，绝不引用。
+统一融合本身目前没有胜利结果：Noise×Phase-A TSV 在两个固定合并臂中胜过线性平均，但相对 Noise V1 的 `+0.0091/+0.2281 pp` 无统计支持且全局 AUC 多数下降；真值盲无监督融合的 CI 跨 0；监督 router 只有约 `+0.5--0.6 pp` 且 3 个 split 中仅 2 个显著；NNLS v0 相对 WSE 三个 split 分别约 `−0.23/−0.02/−0.25 pp`；candidate-differential Gate-1 corrected/introduced=`660/1120`、risk-net=`−1580`，已停止。S1 oracle `+4.93/+5.44 pp` 和 router v2 `+2.93/+4.03 pp` 因真值/面板重叠泄漏撤回，绝不引用。
 
 因此“严格统一算法”当前是待冻结的条件决策系统，不是已证实的新冠军：Noise 提供共享几何；WSE 是强非学习基线；P2b 只在预定义安全域重排；ChemAware V2 只在候选级证据存在时工作；BioAware 没有事件上下文时完全缺失；所有分支都允许 abstain 并回退到最强基线。
 
