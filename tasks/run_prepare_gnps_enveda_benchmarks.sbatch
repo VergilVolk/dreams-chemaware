@@ -2,11 +2,11 @@
 #SBATCH --job-name=prep_gnps_e180
 #SBATCH --partition=gpu
 #SBATCH --gpus=1
-#SBATCH --time=36:00:00
+#SBATCH --time=48:00:00
 #SBATCH --output=data/validation/prepare_gnps_enveda_%j.out
 #SBATCH --error=data/validation/prepare_gnps_enveda_%j.err
 
-# Prepare, but do not score, the two labelled benchmark resources:
+# Prepare the clean benchmark and immediately generate unopened component scores:
 #   1) consumed GNPS clean benchmark -> development registry
 #   2) previously unused Enveda-180 -> frozen cross-condition external panels
 set -euo pipefail
@@ -46,8 +46,8 @@ required=(
   data/models/mona_pos_full.mgf
   data/models/mona_neg_full.mgf
   data/validation/bioaware_b44_massbank_panel_localcheck_20260913_v4/reference_library.csv.gz
-  data/massbank/massbank_full.mgf
   data/validation/chemaware_msnlib_external_manifest_v2/eligible_records.csv.gz
+  tasks/run_enveda180_layered_scoreblind.sbatch
 )
 for path in "${required[@]}"; do
   [[ -s "$path" ]] || { echo "BENCHMARK_PREP_MISSING: $path" >&2; exit 5; }
@@ -92,3 +92,6 @@ python -u tasks/build_enveda180_cross_condition_benchmark.py \
 
 echo "GNPS_DEVELOPMENT_READY: data/validation/unified_benchmark_assets/gnps_development_v1.json"
 echo "ENVEDA180_EXTERNAL_FROZEN_UNSCORED: $ENBENCH"
+echo "ENVEDA180_STARTING_SCOREBLIND_STAGE_IN_SAME_JOB"
+ENVEDA180_BENCHMARK="$ENBENCH" ENVEDA180_AUDIT="$ENAUDIT" \
+  bash tasks/run_enveda180_layered_scoreblind.sbatch

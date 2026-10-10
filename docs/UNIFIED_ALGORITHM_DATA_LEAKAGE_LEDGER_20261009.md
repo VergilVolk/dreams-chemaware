@@ -29,7 +29,7 @@
 
 ## 3. 新的 fail-closed 数据链
 
-1. `tasks/unified_consumed_sources_v1.json` 是唯一已消费源 registry。MassSpecGym、GNPS、MoNA 正/负、MassBank 2026.03、MSnLib 全部为 required。
+1. `tasks/unified_consumed_sources_v1.json` 是唯一已消费源 registry。MassSpecGym、GNPS、MoNA 正/负、MassBank 2026.03 已消费面板元数据、MSnLib 全部为 required。MassBank 全量 MGF 在仓库和服务器均不存在，不作为虚假依赖；MassBank 使用完整 `ik14/formula` 排除，未覆盖的全谱哈希明确记为残余边界。
 2. `tasks/prepare_enveda180_scoreblind_manifest.py` 在不加载模型、不计算性能的条件下汇总 identity、formula 与 normalized-spectrum hash，并记录每个源文件 SHA-256。任何 required 文件缺失即失败。
 3. `tasks/build_enveda180_cross_condition_benchmark.py` 验证 audit report、manifest、conflict ledger、源 MGF 与 registry 哈希，排除 consumed identity 和 spectrum overlap，才允许写入 `allow_final_claim=true`。
 4. `tasks/train_grand_unified_evidence_model.py` 只读取 development bundle，保存模型、训练 bundle、registry、超参数与验证结果；禁止接收 final test。

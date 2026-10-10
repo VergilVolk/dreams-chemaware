@@ -1,7 +1,7 @@
 {
   "schema": "unified_consumed_source_registry_v1",
   "frozen_on": "2026-10-09",
-  "purpose": "Fail-closed identity, formula and exact normalized-spectrum exclusion for the one-time Enveda-180 benchmark.",
+  "purpose": "Fail-closed identity, formula and available normalized-spectrum exclusion for the one-time Enveda-180 benchmark.",
   "sources": [
     {
       "name": "massspecgym_development",
@@ -34,17 +34,11 @@
       "required": true
     },
     {
-      "name": "massbank_2026_03_full_spectra_consumed",
-      "kind": "mgf",
-      "path": "data/massbank/massbank_full.mgf",
-      "required": true
-    },
-    {
       "name": "msnlib_consumed",
       "kind": "csv",
       "path": "data/validation/chemaware_msnlib_external_manifest_v2/eligible_records.csv.gz",
       "required": true
     }
   ],
-  "known_residual_boundary": "Unlabelled DreaMS pretraining spectra do not have a complete structure namespace in this repository. Exact labelled-source identity/formula and available spectrum-hash exclusions are enforced; this is not proof of zero pretraining exposure."
+  "known_residual_boundary": "MassBank selected references are excluded by complete ik14/formula metadata, but the unavailable full MassBank MGF cannot contribute spectrum hashes. Unlabelled DreaMS pretraining spectra also lack a complete structure namespace. Exact labelled-source identity/formula and available spectrum-hash exclusions are enforced; this is not proof of zero pretraining exposure."
 }

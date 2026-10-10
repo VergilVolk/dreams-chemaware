@@ -36,3 +36,11 @@ def test_freeze_contract_and_sbatch_are_score_blind():
     assert "evaluate_frozen" not in script
     assert "method_scores_unopened.npz" in script
     assert "#SBATCH --cpus-per-task" not in script
+
+
+def test_single_submission_pipeline_chains_scoreblind_stage():
+    script = (ROOT / "tasks/run_prepare_gnps_enveda_benchmarks.sbatch").read_text()
+    assert "data/massbank/massbank_full.mgf" not in script
+    assert 'bash tasks/run_enveda180_layered_scoreblind.sbatch' in script
+    assert "#SBATCH --gpus=1" in script
+    assert "#SBATCH --cpus-per-task" not in script
