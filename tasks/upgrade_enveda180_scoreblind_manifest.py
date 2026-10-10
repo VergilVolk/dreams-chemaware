@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import gzip
 import json
+import re
 import shutil
 from pathlib import Path
 
@@ -19,6 +20,8 @@ import pandas as pd
 from prepare_enveda180_scoreblind_manifest import (
     load_csv,
     load_exclusion_registry,
+    iter_mgf,
+    secondary_spectrum_hash,
     sha256_file,
 )
 
@@ -32,6 +35,7 @@ def as_bool(series: pd.Series) -> pd.Series:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--base-audit", type=Path, required=True)
+    parser.add_argument("--source-mgf", type=Path)
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--exclusion-registry", type=Path, required=True)
     parser.add_argument("--chunk-size", type=int, default=100_000)
@@ -52,8 +56,45 @@ def main() -> None:
     declared_manifest_sha256 = str(report.get("manifest_sha256", ""))
     actual_manifest_sha256 = sha256_file(base_manifest)
     manifest_byte_hash_match = actual_manifest_sha256 == declared_manifest_sha256
-    if sha256_file(base_conflicts) != report.get("conflicting_hashes_sha256"):
-        raise RuntimeError("base Enveda conflict ledger hash mismatch")
+    declared_conflicts_sha256 = str(report.get("conflicting_hashes_sha256", ""))
+    actual_conflicts_sha256 = sha256_file(base_conflicts)
+    conflicts_byte_hash_match = actual_conflicts_sha256 == declared_conflicts_sha256
+    with gzip.open(base_conflicts, "rt", encoding="utf-8") as handle:
+        conflicts = [line.strip() for line in handle if line.strip()]
+    if any(re.fullmatch(r"[0-9a-f]{64}", value) is None for value in conflicts):
+        raise RuntimeError("base conflict ledger contains malformed hashes")
+    if conflicts != sorted(set(conflicts)):
+        raise RuntimeError("base conflict ledger is not sorted and unique")
+    expected_conflicts = int(report.get("cross_identity_conflicting_hashes", -1))
+    if len(conflicts) != expected_conflicts:
+        raise RuntimeError(
+            f"base conflict-ledger semantic count mismatch: {len(conflicts)} != {expected_conflicts}"
+        )
+
+    base_columns = pd.read_csv(base_manifest, nrows=0).columns.tolist()
+    reconstruct_secondary = "spectrum_hash_secondary" not in base_columns
+    secondary_by_source_row: dict[int, str] = {}
+    if reconstruct_secondary:
+        if args.source_mgf is None or not args.source_mgf.is_file():
+            raise RuntimeError("legacy manifest lacks secondary hashes; --source-mgf is required")
+        if sha256_file(args.source_mgf) != report.get("source_mgf_sha256"):
+            raise RuntimeError("source MGF differs from legacy Enveda audit")
+        needed_rows = set(
+            pd.read_csv(base_manifest, usecols=["source_row"])["source_row"].astype(int)
+        )
+        for source_row, (_, peaks) in enumerate(iter_mgf(args.source_mgf)):
+            if source_row in needed_rows:
+                secondary_by_source_row[source_row] = secondary_spectrum_hash(peaks)
+            if source_row and source_row % 200_000 == 0:
+                print(
+                    f"secondary-hash source rows={source_row:,} "
+                    f"recovered={len(secondary_by_source_row):,}", flush=True,
+                )
+        if len(secondary_by_source_row) != len(needed_rows):
+            raise RuntimeError(
+                "failed to reconstruct every legacy secondary spectrum hash: "
+                f"{len(secondary_by_source_row)} != {len(needed_rows)}"
+            )
 
     old_by_path = {
         Path(str(row.get("path", ""))).as_posix(): row
@@ -93,7 +134,7 @@ def main() -> None:
     last_source_row = -1
     for chunk in pd.read_csv(base_manifest, chunksize=args.chunk_size, low_memory=False):
         required = {
-            "ik14", "formula", "spectrum_hash", "spectrum_hash_secondary",
+            "ik14", "formula", "spectrum_hash", "source_row",
             "consumed_identity_overlap", "consumed_formula_overlap", "consumed_spectrum_overlap",
         }
         if not required.issubset(chunk.columns):
@@ -110,6 +151,8 @@ def main() -> None:
             raise RuntimeError("base manifest contains malformed ik14 values")
         if not chunk["spectrum_hash"].fillna("").astype(str).str.fullmatch(r"[0-9a-f]{64}").all():
             raise RuntimeError("base manifest contains malformed primary spectrum hashes")
+        if reconstruct_secondary:
+            chunk["spectrum_hash_secondary"] = chunk["source_row"].astype(int).map(secondary_by_source_row)
         if not chunk["spectrum_hash_secondary"].fillna("").astype(str).str.fullmatch(r"[0-9a-f]{32}").all():
             raise RuntimeError("base manifest contains malformed secondary spectrum hashes")
         old_identity = as_bool(chunk["consumed_identity_overlap"])
@@ -181,6 +224,14 @@ def main() -> None:
             "base_manifest_actual_sha256": actual_manifest_sha256,
             "base_manifest_byte_hash_match": manifest_byte_hash_match,
             "base_manifest_semantic_contract_pass": True,
+            "base_conflicts_declared_sha256": declared_conflicts_sha256,
+            "base_conflicts_actual_sha256": actual_conflicts_sha256,
+            "base_conflicts_byte_hash_match": conflicts_byte_hash_match,
+            "base_conflicts_semantic_contract_pass": True,
+            "secondary_spectrum_hashes": (
+                "reconstructed_from_source_mgf_without_structure_parsing"
+                if reconstruct_secondary else "reused_from_base_manifest"
+            ),
             "added_sources": added_names,
             "structure_and_spectrum_hashes_reused": True,
         },
