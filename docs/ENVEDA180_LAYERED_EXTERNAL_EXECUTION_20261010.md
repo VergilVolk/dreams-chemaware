@@ -38,6 +38,8 @@ sbatch tasks/run_prepare_gnps_enveda_benchmarks.sbatch
 
 六个仓库实际存在的已消费来源全部 required，任一缺失即失败。MassBank 已消费面板通过完整的 `ik14/formula` 元数据排除；仓库不存在的全量 MassBank MGF 不再作为虚假硬依赖，其谱图哈希未覆盖被明确保留为残余边界。输出目录已存在时拒绝覆盖。新 panel 额外保存 `query_adduct`，使正负离子评价不再被统一伪写为 `[M+H]+`。
 
+为避免重复执行 1,175,202 次结构解析，若完整 v1 audit 的报告、569,890 行 manifest 和冲突哈希账本均存在且哈希自洽，作业会复用其中已经计算好的结构与双谱图哈希，只增量补入 MassBank、MSnLib 排除列；任一旧工件缺失或校验失败时才回退到原始 MGF 全量重建。
+
 面板构建成功且 report 显示全部 required exclusion source 为 loaded 后，同一作业自动进入 score-blind 阶段：
 
 - 用现有官方 DreaMS 与冻结 Noise V1 checkpoint 各编码一次；

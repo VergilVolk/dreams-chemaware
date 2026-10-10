@@ -23,6 +23,7 @@ GNPS="data/validation/gnps_gold_silver_10ppm_benchmark_v1"
 GNPS_REBUILT="data/validation/GLM_gnps_identity_panel_reconstruction"
 ENVDATA="data/external/enveda180_20260713"
 ENAUDIT="data/validation/enveda180_scoreblind_manifest_v2_20261010"
+ENAUDIT_V1="data/validation/enveda180_scoreblind_manifest_v1"
 ENBENCH="data/validation/enveda180_cross_condition_benchmark_v2_20261010"
 E180_MGF="$ENVDATA/enveda-180-filtered.mgf.gz"
 E180_EXPECTED_BYTES=285632591
@@ -40,6 +41,7 @@ required=(
   "$E180_MGF"
   tasks/prepare_gnps_unified_development_asset.py
   tasks/prepare_enveda180_scoreblind_manifest.py
+  tasks/upgrade_enveda180_scoreblind_manifest.py
   tasks/build_enveda180_cross_condition_benchmark.py
   tasks/unified_consumed_sources_v1.json
   data/models/MassSpecGym_MurckoHist_split.hdf5
@@ -74,10 +76,20 @@ python -u tasks/prepare_gnps_unified_development_asset.py \
   --identity-reconstruction-report "$GNPS_REBUILT/report.json" \
   --out data/validation/unified_benchmark_assets/gnps_development_v1.json
 
-python -u tasks/prepare_enveda180_scoreblind_manifest.py \
-  --mgf "$E180_MGF" \
-  --out "$ENAUDIT" \
-  --exclusion-registry tasks/unified_consumed_sources_v1.json
+if [[ -s "$ENAUDIT_V1/report.json" && -s "$ENAUDIT_V1/eligible_records.csv.gz" \
+      && -s "$ENAUDIT_V1/conflicting_spectrum_hashes.txt.gz" ]]; then
+  echo "ENVEDA180_REUSING_COMPLETE_V1_MANIFEST: $ENAUDIT_V1"
+  python -u tasks/upgrade_enveda180_scoreblind_manifest.py \
+    --base-audit "$ENAUDIT_V1" \
+    --out "$ENAUDIT" \
+    --exclusion-registry tasks/unified_consumed_sources_v1.json
+else
+  echo "ENVEDA180_V1_MANIFEST_UNAVAILABLE_FULL_REBUILD"
+  python -u tasks/prepare_enveda180_scoreblind_manifest.py \
+    --mgf "$E180_MGF" \
+    --out "$ENAUDIT" \
+    --exclusion-registry tasks/unified_consumed_sources_v1.json
+fi
 
 python -u tasks/build_enveda180_cross_condition_benchmark.py \
   --source-mgf "$E180_MGF" \

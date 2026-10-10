@@ -169,3 +169,47 @@ def test_secondary_msnlib_hash_contract_is_not_silently_ignored(tmp_path):
     report = json.loads((audit / "report.json").read_text(encoding="utf-8"))
     assert report["consumed_spectrum_hash_count"]["secondary_blake2b"] == 1
 
+
+def test_complete_manifest_can_be_incrementally_upgraded(tmp_path):
+    source = tmp_path / "fixture.mgf.gz"
+    base = tmp_path / "base"
+    upgraded = tmp_path / "upgraded"
+    old_csv = tmp_path / "old.csv"
+    added_csv = tmp_path / "added.csv"
+    old_registry = tmp_path / "old_registry.json"
+    new_registry = tmp_path / "new_registry.json"
+    write_fixture(source)
+    old_csv.write_text("ik14,formula,spectrum_hash\nDUMMYIDENTITY1,C2H6,\n", encoding="utf-8")
+    old_registry.write_text(json.dumps({
+        "schema": "unified_consumed_source_registry_v1",
+        "sources": [{"name": "old", "kind": "csv", "path": str(old_csv), "required": True}],
+    }), encoding="utf-8")
+    subprocess.run([
+        sys.executable, str(ROOT / "tasks/prepare_enveda180_scoreblind_manifest.py"),
+        "--mgf", str(source), "--out", str(base),
+        "--exclusion-registry", str(old_registry),
+    ], check=True)
+    base_frame = pd.read_csv(base / "eligible_records.csv.gz")
+    added_ik = str(base_frame.iloc[0]["ik14"])
+    added_csv.write_text(
+        f"ik14,formula,spectrum_hash\n{added_ik},DUMMYFORMULA,\n", encoding="utf-8",
+    )
+    new_registry.write_text(json.dumps({
+        "schema": "unified_consumed_source_registry_v1",
+        "sources": [
+            {"name": "old", "kind": "csv", "path": str(old_csv), "required": True},
+            {"name": "added", "kind": "csv", "path": str(added_csv), "required": True},
+        ],
+    }), encoding="utf-8")
+    subprocess.run([
+        sys.executable, str(ROOT / "tasks/upgrade_enveda180_scoreblind_manifest.py"),
+        "--base-audit", str(base), "--out", str(upgraded),
+        "--exclusion-registry", str(new_registry), "--chunk-size", "2",
+    ], check=True)
+    frame = pd.read_csv(upgraded / "eligible_records.csv.gz")
+    report = json.loads((upgraded / "report.json").read_text(encoding="utf-8"))
+    assert len(frame) == len(base_frame)
+    assert frame.loc[frame["ik14"] == added_ik, "consumed_identity_overlap"].all()
+    assert report["incremental_upgrade"]["added_sources"] == ["added"]
+    assert report["exclusion_policy_complete"] is True
+
