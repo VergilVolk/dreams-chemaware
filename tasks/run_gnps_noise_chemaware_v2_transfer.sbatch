@@ -31,8 +31,6 @@ OUT="data/validation/gnps_noise_chemaware_v2_transfer_run_${SLURM_JOB_ID}"
 mkdir -p "$OUT"
 
 required=(
-  "$POLICY_DIR/truthblind_policy.joblib"
-  "$POLICY_DIR/report.json"
   "$BENCHMARK/spectra.mgf"
   "$BENCHMARK/report.json"
   "$BENCHMARK/manifest.csv.gz"
@@ -40,7 +38,15 @@ required=(
   "$BENCHMARK/panel_formula_disjoint.npz"
   "$BASE_BUNDLE"
   "$OFFICIAL_GNPS"
+  data/validation/chemaware_corrected_candidate_manifest_v1/manifest.npz
+  data/validation/chemaware_corrected_manifest_tokens_v1/rows.npy
+  data/validation/chemaware_corrected_manifest_tokens_v1/official_embeddings_f32.npy
+  data/validation/chemaware_corrected_manifest_tokens_v1/mz_f32.npy
+  data/validation/chemaware_corrected_manifest_tokens_v1/intensity_f32.npy
+  data/validation/chemaware_corrected_manifest_tokens_v1/valid.npy
+  data/validation/chemaware_corrected_manifest_tokens_v1/precursor_mz_f32.npy
   dreams/models/chem_aware/chem_rules_data.json
+  tasks/audit_chemaware_orthogonal_rule_residual_policy.py
   tasks/build_gnps_chemaware_kernel_cache.py
   tasks/export_chemaware_v2_grand_fusion_scores.py
   tasks/extract_pair_score_cache_from_bundle.py
@@ -50,6 +56,25 @@ required=(
 for path in "${required[@]}"; do
   [[ -f "$path" ]] || { echo "NOISE_CHEMAWARE_V2_MISSING_INPUT: $path" >&2; exit 5; }
 done
+
+# The lightweight repository preserved the V2 ledgers but not the serialized
+# nuisance/residual estimators.  If the original bundle is absent, reproduce
+# that exact historical serialization once inside this job.  The assertions
+# below reject any result that differs from the already published V2 policy.
+if [[ ! -s "$POLICY_DIR/truthblind_policy.joblib" \
+   || ! -s "$POLICY_DIR/report.json" ]]; then
+  POLICY_DIR="$OUT/recovered_frozen_v2_policy"
+  python -u tasks/audit_chemaware_orthogonal_rule_residual_policy.py \
+    --rule-control-variants \
+      rule_response_content_permuted \
+      rule_response_content_permuted_b \
+      rule_response_content_permuted_c \
+    --contrast-representation symmetric_summary \
+    --selection-control-mode deployment_safe \
+    --output "$POLICY_DIR"
+fi
+test -s "$POLICY_DIR/truthblind_policy.joblib"
+test -s "$POLICY_DIR/report.json"
 
 # Confirm that the supplied immutable bundle is the preregistered V2 policy,
 # not an older single-null candidate policy carrying the same file names.

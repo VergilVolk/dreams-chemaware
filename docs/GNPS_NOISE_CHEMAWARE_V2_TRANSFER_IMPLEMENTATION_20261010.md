@@ -32,8 +32,10 @@ V2 不是候选分子结构模型，也不是 dense candidate score。它在历�
 - selection 结果 78 corrected / 17 introduced；
 - held-inner 结果 93 corrected / 17 introduced。
 
-作业要求已有的 `truthblind_policy.joblib` 和配套 `report.json` 同时存在，并校验这些冻结语义。
-缺少产物时直接失败，不从历史开发数据重建策略。
+轻量仓库只保留了 V2 结果账本，没有保留 nuisance/residual estimator 的序列化参数；账本本身
+不能对新 GNPS query 推理。因此作业优先复用已有的 `truthblind_policy.joblib`；若它缺失，则在
+同一作业内按历史固定命令恢复一次序列化 bundle。恢复结果必须逐项复现上述 dose、threshold、
+78/17 和 93/17，否则立即失败，不进入 GNPS。该恢复不改变本轮方法，也不以旧结果选择新参数。
 
 ## 3. Noise 迁移规则
 
