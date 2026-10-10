@@ -86,6 +86,9 @@ def test_sbatch_is_gnps_only_and_fail_closed() -> None:
     directives = [line.strip() for line in text.splitlines() if line.startswith("#SBATCH")]
     assert directives.count("#SBATCH --partition=gpu") == 1
     assert directives.count("#SBATCH --gpus=1") == 1
+    assert not any("--cpus-per-task" in line for line in directives)
+    assert not any("--mem" in line for line in directives)
+    assert 'export OMP_NUM_THREADS="$SLURM_CPUS_PER_TASK"' in text
     assert "--deployment-base-score-cache \"$OUT/noise_v1_cache\"" in text
     assert '"$POLICY_DIR/truthblind_policy.joblib"' in text
     assert '"$POLICY_DIR/report.json"' in text

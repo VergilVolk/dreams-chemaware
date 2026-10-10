@@ -6,7 +6,6 @@
 #SBATCH --partition=gpu
 #SBATCH --gpus=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=16
 #SBATCH --time=36:00:00
 #SBATCH --output=data/validation/noise_chem_v2_%j.out
 #SBATCH --error=data/validation/noise_chem_v2_%j.err
@@ -18,7 +17,9 @@ source /data02/home/scv7tsl/run/miniconda3/etc/profile.d/conda.sh
 conda activate dreams
 export PYTHONPATH="$PWD:$PWD/tasks:${PYTHONPATH:-}"
 export PYTHONUNBUFFERED=1
-export OMP_NUM_THREADS="${SLURM_CPUS_PER_TASK:-16}"
+if [[ -n "${SLURM_CPUS_PER_TASK:-}" ]]; then
+  export OMP_NUM_THREADS="$SLURM_CPUS_PER_TASK"
+fi
 
 POLICY_DIR="${CHEMAWARE_V2_POLICY_DIR:-data/validation/chemaware_multinull_deployment_safe_full_20260919}"
 BENCHMARK="${GNPS_BENCHMARK:-data/validation/gnps_gold_silver_10ppm_benchmark_v1}"
