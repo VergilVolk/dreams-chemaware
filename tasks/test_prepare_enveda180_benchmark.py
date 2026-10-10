@@ -190,6 +190,12 @@ def test_complete_manifest_can_be_incrementally_upgraded(tmp_path):
         "--exclusion-registry", str(old_registry),
     ], check=True)
     base_frame = pd.read_csv(base / "eligible_records.csv.gz")
+    # A recompressed/copied historical gzip may not retain its old byte hash.
+    # The upgrader must then require the stronger row/content/count contract.
+    base_report_path = base / "report.json"
+    base_report = json.loads(base_report_path.read_text(encoding="utf-8"))
+    base_report["manifest_sha256"] = "0" * 64
+    base_report_path.write_text(json.dumps(base_report), encoding="utf-8")
     added_ik = str(base_frame.iloc[0]["ik14"])
     added_csv.write_text(
         f"ik14,formula,spectrum_hash\n{added_ik},DUMMYFORMULA,\n", encoding="utf-8",
@@ -211,5 +217,7 @@ def test_complete_manifest_can_be_incrementally_upgraded(tmp_path):
     assert len(frame) == len(base_frame)
     assert frame.loc[frame["ik14"] == added_ik, "consumed_identity_overlap"].all()
     assert report["incremental_upgrade"]["added_sources"] == ["added"]
+    assert report["incremental_upgrade"]["base_manifest_byte_hash_match"] is False
+    assert report["incremental_upgrade"]["base_manifest_semantic_contract_pass"] is True
     assert report["exclusion_policy_complete"] is True
 

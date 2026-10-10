@@ -13,6 +13,7 @@ import json
 import shutil
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 from prepare_enveda180_scoreblind_manifest import (
@@ -48,8 +49,9 @@ def main() -> None:
         raise RuntimeError("base Enveda audit is incomplete")
     if report.get("performance_scores_opened") is not False or report.get("model_loaded") is not False:
         raise RuntimeError("base Enveda audit is not score blind")
-    if sha256_file(base_manifest) != report.get("manifest_sha256"):
-        raise RuntimeError("base Enveda manifest hash mismatch")
+    declared_manifest_sha256 = str(report.get("manifest_sha256", ""))
+    actual_manifest_sha256 = sha256_file(base_manifest)
+    manifest_byte_hash_match = actual_manifest_sha256 == declared_manifest_sha256
     if sha256_file(base_conflicts) != report.get("conflicting_hashes_sha256"):
         raise RuntimeError("base Enveda conflict ledger hash mismatch")
 
@@ -83,8 +85,12 @@ def main() -> None:
 
     args.out.mkdir(parents=True)
     output_manifest = args.out / "eligible_records.csv.gz"
-    totals = {"rows": 0, "identity": 0, "formula": 0, "spectrum": 0}
+    totals = {
+        "rows": 0, "identity": 0, "formula": 0, "spectrum": 0,
+        "old_identity": 0, "old_formula": 0, "old_spectrum": 0,
+    }
     first = True
+    last_source_row = -1
     for chunk in pd.read_csv(base_manifest, chunksize=args.chunk_size, low_memory=False):
         required = {
             "ik14", "formula", "spectrum_hash", "spectrum_hash_secondary",
@@ -92,10 +98,30 @@ def main() -> None:
         }
         if not required.issubset(chunk.columns):
             raise RuntimeError(f"base manifest lacks columns: {sorted(required-set(chunk.columns))}")
-        identity = as_bool(chunk["consumed_identity_overlap"]) | chunk["ik14"].fillna("").astype(str).isin(identities)
-        formula = as_bool(chunk["consumed_formula_overlap"]) | chunk["formula"].fillna("").astype(str).isin(formulas)
+        expected_row = np.arange(totals["rows"], totals["rows"] + len(chunk), dtype=np.int64)
+        if not np.array_equal(chunk["row"].to_numpy(np.int64), expected_row):
+            raise RuntimeError("base manifest row registry is not contiguous")
+        source_rows = chunk["source_row"].to_numpy(np.int64)
+        if len(source_rows) and (source_rows[0] <= last_source_row or np.any(np.diff(source_rows) <= 0)):
+            raise RuntimeError("base manifest source rows are not strictly increasing")
+        if len(source_rows):
+            last_source_row = int(source_rows[-1])
+        if not chunk["ik14"].fillna("").astype(str).str.fullmatch(r"[A-Z]{14}").all():
+            raise RuntimeError("base manifest contains malformed ik14 values")
+        if not chunk["spectrum_hash"].fillna("").astype(str).str.fullmatch(r"[0-9a-f]{64}").all():
+            raise RuntimeError("base manifest contains malformed primary spectrum hashes")
+        if not chunk["spectrum_hash_secondary"].fillna("").astype(str).str.fullmatch(r"[0-9a-f]{32}").all():
+            raise RuntimeError("base manifest contains malformed secondary spectrum hashes")
+        old_identity = as_bool(chunk["consumed_identity_overlap"])
+        old_formula = as_bool(chunk["consumed_formula_overlap"])
+        old_spectrum = as_bool(chunk["consumed_spectrum_overlap"])
+        totals["old_identity"] += int(old_identity.sum())
+        totals["old_formula"] += int(old_formula.sum())
+        totals["old_spectrum"] += int(old_spectrum.sum())
+        identity = old_identity | chunk["ik14"].fillna("").astype(str).isin(identities)
+        formula = old_formula | chunk["formula"].fillna("").astype(str).isin(formulas)
         spectrum = (
-            as_bool(chunk["consumed_spectrum_overlap"])
+            old_spectrum
             | chunk["spectrum_hash"].fillna("").astype(str).isin(hashes["primary_sha256"])
             | chunk["spectrum_hash_secondary"].fillna("").astype(str).isin(hashes["secondary_blake2b"])
         )
@@ -112,6 +138,23 @@ def main() -> None:
         )
         first = False
         print(f"upgraded rows={totals['rows']:,}", flush=True)
+
+    old_counts = report.get("counts", {})
+    expected_rows = int(old_counts.get("eligible_metadata_rows", -1))
+    if totals["rows"] != expected_rows:
+        raise RuntimeError(
+            f"base manifest semantic row-count mismatch: {totals['rows']} != {expected_rows}"
+        )
+    for key, total_key in (
+        ("consumed_identity_overlap", "old_identity"),
+        ("consumed_formula_overlap", "old_formula"),
+        ("consumed_spectrum_overlap", "old_spectrum"),
+    ):
+        if key in old_counts and int(old_counts[key]) != totals[total_key]:
+            raise RuntimeError(
+                f"base manifest semantic {key} mismatch: "
+                f"{totals[total_key]} != {old_counts[key]}"
+            )
 
     output_conflicts = args.out / "conflicting_spectrum_hashes.txt.gz"
     shutil.copyfile(base_conflicts, output_conflicts)
@@ -134,7 +177,10 @@ def main() -> None:
         "incremental_upgrade": {
             "base_audit": str(args.base_audit),
             "base_report_sha256": sha256_file(base_report_path),
-            "base_manifest_sha256": sha256_file(base_manifest),
+            "base_manifest_declared_sha256": declared_manifest_sha256,
+            "base_manifest_actual_sha256": actual_manifest_sha256,
+            "base_manifest_byte_hash_match": manifest_byte_hash_match,
+            "base_manifest_semantic_contract_pass": True,
             "added_sources": added_names,
             "structure_and_spectrum_hashes_reused": True,
         },
