@@ -150,7 +150,14 @@ def main() -> None:
             raise RuntimeError(f"unsupported exclusion source kind for {name}: {kind}")
         if not path.is_file():
             raise RuntimeError(f"required exclusion source missing: {name} -> {path}")
+        print(f"loading exclusion source: {name} ({kind})", flush=True)
         current = loaders[kind](path, identities, formulas, hashes)
+        print(
+            f"loaded exclusion source: {name}; identities={len(identities):,} "
+            f"formulas={len(formulas):,} primary_hashes={len(hashes['primary_sha256']):,} "
+            f"secondary_hashes={len(hashes['secondary_blake2b']):,}",
+            flush=True,
+        )
         if path.as_posix() not in old_loaded_paths:
             added_names.append(name)
         current.update({"name": name, "kind": kind, "required": True})
