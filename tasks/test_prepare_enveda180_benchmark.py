@@ -235,5 +235,18 @@ def test_complete_manifest_can_be_incrementally_upgraded(tmp_path):
     assert report["incremental_upgrade"]["source_mgf_binding"] == "independent_bytes_and_md5_match"
     assert report["incremental_upgrade"]["all_current_exclusion_sources_reloaded"] is True
     assert frame["spectrum_hash_secondary"].str.fullmatch(r"[0-9a-f]{32}").all()
+
+    # Resume contract: repair only the missing source binding in an otherwise
+    # complete v2 audit, without regenerating the 569k-style manifest.
+    report["source_mgf_sha256"] = None
+    (upgraded / "report.json").write_text(json.dumps(report), encoding="utf-8")
+    subprocess.run([
+        sys.executable, str(ROOT / "tasks/finalize_enveda180_upgraded_audit.py"),
+        "--audit", str(upgraded), "--source-mgf", str(source),
+        "--expected-source-bytes", str(source.stat().st_size),
+        "--expected-source-md5", __import__("hashlib").md5(source.read_bytes()).hexdigest(),
+    ], check=True)
+    finalized = json.loads((upgraded / "report.json").read_text(encoding="utf-8"))
+    assert finalized["source_mgf_sha256"] == __import__("hashlib").sha256(source.read_bytes()).hexdigest()
     assert report["exclusion_policy_complete"] is True
 

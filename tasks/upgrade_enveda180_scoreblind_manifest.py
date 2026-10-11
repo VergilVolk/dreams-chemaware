@@ -256,6 +256,10 @@ def main() -> None:
         "exclusion_registry": str(args.exclusion_registry),
         "exclusion_registry_sha256": sha256_file(args.exclusion_registry),
         "exclusion_sources": sources,
+        "source_mgf": str(args.source_mgf) if args.source_mgf else report.get("source_mgf"),
+        "source_mgf_bytes": args.source_mgf.stat().st_size if args.source_mgf else None,
+        "source_mgf_md5": md5_file(args.source_mgf) if args.source_mgf else None,
+        "source_mgf_sha256": sha256_file(args.source_mgf) if args.source_mgf else report.get("source_mgf_sha256"),
         "incremental_upgrade": {
             "base_audit": str(args.base_audit),
             "base_report_sha256": sha256_file(base_report_path),

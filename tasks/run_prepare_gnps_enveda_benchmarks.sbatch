@@ -42,6 +42,7 @@ required=(
   tasks/prepare_gnps_unified_development_asset.py
   tasks/prepare_enveda180_scoreblind_manifest.py
   tasks/upgrade_enveda180_scoreblind_manifest.py
+  tasks/finalize_enveda180_upgraded_audit.py
   tasks/build_enveda180_cross_condition_benchmark.py
   tasks/unified_consumed_sources_v1.json
   data/models/MassSpecGym_MurckoHist_split.hdf5
@@ -67,7 +68,6 @@ actual_md5=$(md5sum "$E180_MGF" | awk '{print $1}')
 }
 echo "ENVEDA180_STAGED_AND_VERIFIED: bytes=$actual_bytes md5=$actual_md5"
 
-[[ ! -e "$ENAUDIT" ]] || { echo "ENVEDA180_AUDIT_OUTPUT_EXISTS: $ENAUDIT" >&2; exit 8; }
 [[ ! -e "$ENBENCH" ]] || { echo "ENVEDA180_BENCHMARK_OUTPUT_EXISTS: $ENBENCH" >&2; exit 9; }
 
 python -u tasks/prepare_gnps_unified_development_asset.py \
@@ -76,7 +76,9 @@ python -u tasks/prepare_gnps_unified_development_asset.py \
   --identity-reconstruction-report "$GNPS_REBUILT/report.json" \
   --out data/validation/unified_benchmark_assets/gnps_development_v1.json
 
-if [[ -s "$ENAUDIT_V1/report.json" && -s "$ENAUDIT_V1/eligible_records.csv.gz" \
+if [[ -e "$ENAUDIT" ]]; then
+  echo "ENVEDA180_REUSING_COMPLETE_V2_AUDIT: $ENAUDIT"
+elif [[ -s "$ENAUDIT_V1/report.json" && -s "$ENAUDIT_V1/eligible_records.csv.gz" \
       && -s "$ENAUDIT_V1/conflicting_spectrum_hashes.txt.gz" ]]; then
   echo "ENVEDA180_REUSING_COMPLETE_V1_MANIFEST: $ENAUDIT_V1"
   python -u tasks/upgrade_enveda180_scoreblind_manifest.py \
@@ -93,6 +95,12 @@ else
     --out "$ENAUDIT" \
     --exclusion-registry tasks/unified_consumed_sources_v1.json
 fi
+
+python -u tasks/finalize_enveda180_upgraded_audit.py \
+  --audit "$ENAUDIT" \
+  --source-mgf "$E180_MGF" \
+  --expected-source-bytes "$E180_EXPECTED_BYTES" \
+  --expected-source-md5 "$E180_EXPECTED_MD5"
 
 python -u tasks/build_enveda180_cross_condition_benchmark.py \
   --source-mgf "$E180_MGF" \

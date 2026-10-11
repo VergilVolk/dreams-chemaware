@@ -44,5 +44,7 @@ def test_single_submission_pipeline_chains_scoreblind_stage():
     assert 'bash tasks/run_enveda180_layered_scoreblind.sbatch' in script
     assert "upgrade_enveda180_scoreblind_manifest.py" in script
     assert "ENVEDA180_REUSING_COMPLETE_V1_MANIFEST" in script
+    assert "ENVEDA180_REUSING_COMPLETE_V2_AUDIT" in script
+    assert "finalize_enveda180_upgraded_audit.py" in script
     assert "#SBATCH --gpus=1" in script
     assert "#SBATCH --cpus-per-task" not in script
