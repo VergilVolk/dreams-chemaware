@@ -82,6 +82,8 @@ if [[ -s "$ENAUDIT_V1/report.json" && -s "$ENAUDIT_V1/eligible_records.csv.gz" \
   python -u tasks/upgrade_enveda180_scoreblind_manifest.py \
     --base-audit "$ENAUDIT_V1" \
     --source-mgf "$E180_MGF" \
+    --expected-source-bytes "$E180_EXPECTED_BYTES" \
+    --expected-source-md5 "$E180_EXPECTED_MD5" \
     --out "$ENAUDIT" \
     --exclusion-registry tasks/unified_consumed_sources_v1.json
 else

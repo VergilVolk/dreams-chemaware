@@ -194,12 +194,13 @@ def test_complete_manifest_can_be_incrementally_upgraded(tmp_path):
     # The upgrader must then require the stronger row/content/count contract.
     base_report_path = base / "report.json"
     base_report = json.loads(base_report_path.read_text(encoding="utf-8"))
-    base_report["manifest_sha256"] = "0" * 64
-    base_report["conflicting_hashes_sha256"] = "0" * 64
+    base_report["manifest_sha256"] = None
+    base_report["conflicting_hashes_sha256"] = None
+    base_report["source_mgf_sha256"] = None
     base_report_path.write_text(json.dumps(base_report), encoding="utf-8")
     # Simulate the original v1 schema, which predates the MSnLib-compatible
     # secondary hash. The upgrader should recover it by a peak-only MGF pass.
-    base_frame.drop(columns=["spectrum_hash_secondary"]).to_csv(
+    base_frame.drop(columns=["spectrum_hash_secondary", "consumed_spectrum_overlap"]).to_csv(
         base / "eligible_records.csv.gz", index=False, compression="gzip",
     )
     added_ik = str(base_frame.iloc[0]["ik14"])
@@ -217,6 +218,8 @@ def test_complete_manifest_can_be_incrementally_upgraded(tmp_path):
         sys.executable, str(ROOT / "tasks/upgrade_enveda180_scoreblind_manifest.py"),
         "--base-audit", str(base), "--out", str(upgraded),
         "--source-mgf", str(source),
+        "--expected-source-bytes", str(source.stat().st_size),
+        "--expected-source-md5", __import__("hashlib").md5(source.read_bytes()).hexdigest(),
         "--exclusion-registry", str(new_registry), "--chunk-size", "2",
     ], check=True)
     frame = pd.read_csv(upgraded / "eligible_records.csv.gz")
@@ -224,11 +227,13 @@ def test_complete_manifest_can_be_incrementally_upgraded(tmp_path):
     assert len(frame) == len(base_frame)
     assert frame.loc[frame["ik14"] == added_ik, "consumed_identity_overlap"].all()
     assert report["incremental_upgrade"]["added_sources"] == ["added"]
-    assert report["incremental_upgrade"]["base_manifest_byte_hash_match"] is False
+    assert report["incremental_upgrade"]["base_manifest_byte_hash_status"] == "not_recorded"
     assert report["incremental_upgrade"]["base_manifest_semantic_contract_pass"] is True
-    assert report["incremental_upgrade"]["base_conflicts_byte_hash_match"] is False
+    assert report["incremental_upgrade"]["base_conflicts_byte_hash_status"] == "not_recorded"
     assert report["incremental_upgrade"]["base_conflicts_semantic_contract_pass"] is True
     assert report["incremental_upgrade"]["secondary_spectrum_hashes"].startswith("reconstructed")
+    assert report["incremental_upgrade"]["source_mgf_binding"] == "independent_bytes_and_md5_match"
+    assert report["incremental_upgrade"]["all_current_exclusion_sources_reloaded"] is True
     assert frame["spectrum_hash_secondary"].str.fullmatch(r"[0-9a-f]{32}").all()
     assert report["exclusion_policy_complete"] is True
 

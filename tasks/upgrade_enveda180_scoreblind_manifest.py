@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import gzip
+import hashlib
 import json
 import re
 import shutil
@@ -20,6 +21,8 @@ import pandas as pd
 from prepare_enveda180_scoreblind_manifest import (
     load_csv,
     load_exclusion_registry,
+    load_hdf5,
+    load_mgf,
     iter_mgf,
     secondary_spectrum_hash,
     sha256_file,
@@ -32,10 +35,20 @@ def as_bool(series: pd.Series) -> pd.Series:
     return series.astype(str).str.lower().isin({"true", "1", "yes"})
 
 
+def md5_file(path: Path) -> str:
+    digest = hashlib.md5()
+    with path.open("rb") as handle:
+        for block in iter(lambda: handle.read(8 << 20), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--base-audit", type=Path, required=True)
     parser.add_argument("--source-mgf", type=Path)
+    parser.add_argument("--expected-source-bytes", type=int)
+    parser.add_argument("--expected-source-md5")
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--exclusion-registry", type=Path, required=True)
     parser.add_argument("--chunk-size", type=int, default=100_000)
@@ -53,12 +66,18 @@ def main() -> None:
         raise RuntimeError("base Enveda audit is incomplete")
     if report.get("performance_scores_opened") is not False or report.get("model_loaded") is not False:
         raise RuntimeError("base Enveda audit is not score blind")
-    declared_manifest_sha256 = str(report.get("manifest_sha256", ""))
+    declared_manifest_sha256 = report.get("manifest_sha256")
     actual_manifest_sha256 = sha256_file(base_manifest)
-    manifest_byte_hash_match = actual_manifest_sha256 == declared_manifest_sha256
-    declared_conflicts_sha256 = str(report.get("conflicting_hashes_sha256", ""))
+    manifest_byte_hash_status = (
+        "not_recorded" if not declared_manifest_sha256 else
+        "match" if actual_manifest_sha256 == declared_manifest_sha256 else "mismatch"
+    )
+    declared_conflicts_sha256 = report.get("conflicting_hashes_sha256")
     actual_conflicts_sha256 = sha256_file(base_conflicts)
-    conflicts_byte_hash_match = actual_conflicts_sha256 == declared_conflicts_sha256
+    conflicts_byte_hash_status = (
+        "not_recorded" if not declared_conflicts_sha256 else
+        "match" if actual_conflicts_sha256 == declared_conflicts_sha256 else "mismatch"
+    )
     with gzip.open(base_conflicts, "rt", encoding="utf-8") as handle:
         conflicts = [line.strip() for line in handle if line.strip()]
     if any(re.fullmatch(r"[0-9a-f]{64}", value) is None for value in conflicts):
@@ -77,8 +96,24 @@ def main() -> None:
     if reconstruct_secondary:
         if args.source_mgf is None or not args.source_mgf.is_file():
             raise RuntimeError("legacy manifest lacks secondary hashes; --source-mgf is required")
-        if sha256_file(args.source_mgf) != report.get("source_mgf_sha256"):
-            raise RuntimeError("source MGF differs from legacy Enveda audit")
+        declared_source_sha256 = report.get("source_mgf_sha256")
+        if declared_source_sha256:
+            if sha256_file(args.source_mgf) != declared_source_sha256:
+                raise RuntimeError("source MGF differs from legacy Enveda audit")
+            source_binding = "legacy_sha256_match"
+        else:
+            if args.expected_source_bytes is None or not args.expected_source_md5:
+                raise RuntimeError(
+                    "legacy audit did not record source SHA-256; expected bytes and MD5 are required"
+                )
+            actual_bytes = args.source_mgf.stat().st_size
+            actual_md5 = md5_file(args.source_mgf)
+            if actual_bytes != args.expected_source_bytes or actual_md5 != args.expected_source_md5:
+                raise RuntimeError(
+                    "source MGF fails the independent bytes+MD5 binding: "
+                    f"bytes={actual_bytes}, md5={actual_md5}"
+                )
+            source_binding = "independent_bytes_and_md5_match"
         needed_rows = set(
             pd.read_csv(base_manifest, usecols=["source_row"])["source_row"].astype(int)
         )
@@ -96,30 +131,27 @@ def main() -> None:
                 f"{len(secondary_by_source_row)} != {len(needed_rows)}"
             )
 
-    old_by_path = {
-        Path(str(row.get("path", ""))).as_posix(): row
+    old_loaded_paths = {
+        Path(str(row.get("path", ""))).as_posix()
         for row in report.get("exclusion_sources", [])
+        if row.get("status") == "loaded"
     }
     identities: set[str] = set()
     formulas: set[str] = set()
     hashes = {"primary_sha256": set(), "secondary_blake2b": set()}
     sources: list[dict] = []
     added_names: list[str] = []
+    loaders = {"hdf5": load_hdf5, "csv": load_csv, "mgf": load_mgf}
     for source in load_exclusion_registry(args.exclusion_registry):
         name = str(source["name"])
         kind = str(source.get("kind", ""))
         path = Path(str(source.get("path", "")))
-        old = old_by_path.get(path.as_posix())
-        if old is not None and old.get("status") == "loaded":
-            current = dict(old)
-        else:
-            if kind != "csv":
-                raise RuntimeError(
-                    f"base audit lacks non-CSV source {name}; full rebuild required"
-                )
-            if not path.is_file():
-                raise RuntimeError(f"required added exclusion source missing: {name} -> {path}")
-            current = load_csv(path, identities, formulas, hashes)
+        if kind not in loaders:
+            raise RuntimeError(f"unsupported exclusion source kind for {name}: {kind}")
+        if not path.is_file():
+            raise RuntimeError(f"required exclusion source missing: {name} -> {path}")
+        current = loaders[kind](path, identities, formulas, hashes)
+        if path.as_posix() not in old_loaded_paths:
             added_names.append(name)
         current.update({"name": name, "kind": kind, "required": True})
         sources.append(current)
@@ -135,7 +167,6 @@ def main() -> None:
     for chunk in pd.read_csv(base_manifest, chunksize=args.chunk_size, low_memory=False):
         required = {
             "ik14", "formula", "spectrum_hash", "source_row",
-            "consumed_identity_overlap", "consumed_formula_overlap", "consumed_spectrum_overlap",
         }
         if not required.issubset(chunk.columns):
             raise RuntimeError(f"base manifest lacks columns: {sorted(required-set(chunk.columns))}")
@@ -155,17 +186,17 @@ def main() -> None:
             chunk["spectrum_hash_secondary"] = chunk["source_row"].astype(int).map(secondary_by_source_row)
         if not chunk["spectrum_hash_secondary"].fillna("").astype(str).str.fullmatch(r"[0-9a-f]{32}").all():
             raise RuntimeError("base manifest contains malformed secondary spectrum hashes")
-        old_identity = as_bool(chunk["consumed_identity_overlap"])
-        old_formula = as_bool(chunk["consumed_formula_overlap"])
-        old_spectrum = as_bool(chunk["consumed_spectrum_overlap"])
-        totals["old_identity"] += int(old_identity.sum())
-        totals["old_formula"] += int(old_formula.sum())
-        totals["old_spectrum"] += int(old_spectrum.sum())
-        identity = old_identity | chunk["ik14"].fillna("").astype(str).isin(identities)
-        formula = old_formula | chunk["formula"].fillna("").astype(str).isin(formulas)
+        for column, key in (
+            ("consumed_identity_overlap", "old_identity"),
+            ("consumed_formula_overlap", "old_formula"),
+            ("consumed_spectrum_overlap", "old_spectrum"),
+        ):
+            if column in chunk:
+                totals[key] += int(as_bool(chunk[column]).sum())
+        identity = chunk["ik14"].fillna("").astype(str).isin(identities)
+        formula = chunk["formula"].fillna("").astype(str).isin(formulas)
         spectrum = (
-            old_spectrum
-            | chunk["spectrum_hash"].fillna("").astype(str).isin(hashes["primary_sha256"])
+            chunk["spectrum_hash"].fillna("").astype(str).isin(hashes["primary_sha256"])
             | chunk["spectrum_hash_secondary"].fillna("").astype(str).isin(hashes["secondary_blake2b"])
         )
         chunk["consumed_identity_overlap"] = identity
@@ -188,12 +219,13 @@ def main() -> None:
         raise RuntimeError(
             f"base manifest semantic row-count mismatch: {totals['rows']} != {expected_rows}"
         )
+    base_columns_set = set(base_columns)
     for key, total_key in (
         ("consumed_identity_overlap", "old_identity"),
         ("consumed_formula_overlap", "old_formula"),
         ("consumed_spectrum_overlap", "old_spectrum"),
     ):
-        if key in old_counts and int(old_counts[key]) != totals[total_key]:
+        if key in base_columns_set and key in old_counts and int(old_counts[key]) != totals[total_key]:
             raise RuntimeError(
                 f"base manifest semantic {key} mismatch: "
                 f"{totals[total_key]} != {old_counts[key]}"
@@ -222,18 +254,20 @@ def main() -> None:
             "base_report_sha256": sha256_file(base_report_path),
             "base_manifest_declared_sha256": declared_manifest_sha256,
             "base_manifest_actual_sha256": actual_manifest_sha256,
-            "base_manifest_byte_hash_match": manifest_byte_hash_match,
+            "base_manifest_byte_hash_status": manifest_byte_hash_status,
             "base_manifest_semantic_contract_pass": True,
             "base_conflicts_declared_sha256": declared_conflicts_sha256,
             "base_conflicts_actual_sha256": actual_conflicts_sha256,
-            "base_conflicts_byte_hash_match": conflicts_byte_hash_match,
+            "base_conflicts_byte_hash_status": conflicts_byte_hash_status,
             "base_conflicts_semantic_contract_pass": True,
+            "source_mgf_binding": source_binding if reconstruct_secondary else "not_needed",
             "secondary_spectrum_hashes": (
                 "reconstructed_from_source_mgf_without_structure_parsing"
                 if reconstruct_secondary else "reused_from_base_manifest"
             ),
             "added_sources": added_names,
-            "structure_and_spectrum_hashes_reused": True,
+            "structure_and_primary_spectrum_hashes_reused": True,
+            "all_current_exclusion_sources_reloaded": True,
         },
         "counts": counts,
         "manifest": str(output_manifest),
@@ -241,11 +275,11 @@ def main() -> None:
         "conflicting_hashes": str(output_conflicts),
         "conflicting_hashes_sha256": sha256_file(output_conflicts),
     })
-    # Exact row-level exclusions are recomputed; union cardinalities are not
-    # guessed from overlapping source registries.
-    report.pop("consumed_identity_count", None)
-    report.pop("consumed_formula_count", None)
-    report.pop("consumed_spectrum_hash_count", None)
+    report["consumed_identity_count"] = len(identities)
+    report["consumed_formula_count"] = len(formulas)
+    report["consumed_spectrum_hash_count"] = {
+        key: len(value) for key, value in hashes.items()
+    }
     (args.out / "report.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
     print(json.dumps({
         "status": report["status"], "rows": totals["rows"],
