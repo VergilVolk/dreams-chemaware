@@ -1,6 +1,18 @@
-# 项目文档总索引（2026-10-09 更新）
+# 项目文档总索引（2026-10-12 更新）
 
 **用途：** 一页找到所有文档。按时间倒序、按研究线分组。
+
+> **2026-10-12 生物学方法定位正式冻结：** [GLM_BIOLOGY_METHOD_POSITION_DECLARATION_20261012.md](./GLM_BIOLOGY_METHOD_POSITION_DECLARATION_20261012.md) 确立本项目为"面向未知化学空间的无偏代谢组学发现范式"（Unbiased, structure-agnostic metabolomics discovery），冻结五条原则、三种入口、已封存路线和下一步优先级。后续所有实验设计必须与此对齐。
+
+> **2026-10-11 生物学应用二次纠偏：** `UNBIASED_STRUCTURE_AGNOSTIC_DISCOVERY_CORE_20261011.md` 将总地基恢复为无需标签的可观测化学表示，并并列支持无标签样本、有设计响应和单谱查询。`BIOLOGY_APPLICATION_METHOD_SCIENTIFIC_DECISION_20261011.md` 中的 response transport 降为有监督算子，不再是唯一主方向。
+
+> **2026-10-11 首个真实 M1 结果及纠偏：** `CHEMPROP2_RESPONSE_REPRODUCIBILITY_M1_RESULT_20261011.md` 在 MSV000094899 的 12 drugs x 3 replicate、36-query development/consumed 评测中确认 unresolved MS1 response 高于坐标打乱，但检索未使用 MS/MS 峰或 embedding；unknown 相对 library-supported 的增量不耐受 MQScore 0.70。删除含母药节点的 22 个 FBMN 成分后 R@1 仍为 38.89%，但这仍不是谱学算法增量证据。
+
+> **2026-10-11 ChemProp2 两项敏感性：** `audit_chemprop2_parent_drug_dependence.py` 删除含母药节点的 FBMN 成分；`audit_chemprop2_matched_unresolved.py` 在 MQScore 0.80 下对总体强度、检测率、QC CV、缺失和 MS2 峰数作 283-vs-283 匹配。matched unresolved R@1 41.67%、MRR 0.5379，但 score 0.70 身份阈值失败仍使 unknown 独立增量保持不通过。
+
+> **2026-10-11 ChemProp 跨设计 M1b：** `CHEMPROP_CROSS_DESIGN_M1B_RESULT_20261011.md` 的正式 v4 在共同 `10 ppm ∩ endpoint QC ∩ nonempty MS/MS` 图上完成 36-query development/consumed 对照。随机期望 16.67%；mass 与 WSE 均为 7/36，cosine 0.70 为 10/36、相对 mass +8.33 pp 但药物簇 CI `[-2.78,+19.44] pp`。全部方法 FAIL，relation transport 不启动，ChemProp 路线封存。
+
+> **2026-10-12 ST003325 事件级扰动裁决：** `ST003325_FEATURE_SPECTRUM_READINESS_RESULT_20261012.md` 确认 3,080 个 QC 合格 features、804 个 replicated-MS2 entity links 和 760 个独立 spectral units；但 `ST003325_STRUCTURE_HIDDEN_PERTURBATION_RESULT_20261012.md` 的冻结跨编辑机制任务仅 `10/27 = 37.04%`，CE/KO/PTC 均未超过 50%，2,000 次 clone-label permutation `p=0.7126`。正式 FAIL；不在此终点继续叠加 Noise/P2b/公共层。
 
 ## 一、谱图坐标代谢组学（当前主线）
 
@@ -38,11 +50,25 @@
 
 | 文档 | 内容 |
 |---|---|
+| **BIOLOGY_APPLICATION_FRONTIER_RESET_20261010.md** | **生物学应用主线重置：实体效应迁移、known+unknown 增量和前瞻功能三角验证** |
+| **LCNEC_ENTITY_EFFECT_TRANSPORT_P0_CONTRACT_20261010.md** | **LCNEC 同患者跨平台实体效应迁移：冻结顺序、联合检验和 fail-closed 实现** |
+| **LCNEC_ENTITY_EFFECT_TRANSPORT_P0_READINESS_RESULT_20261010.md** | **LIPn 表型盲实体门通过；HSST3n→LIPn 仅 6/263 有 5 ppm 候选，全局运输 headroom 失败** |
 | GLM_LCNEC_DARK_THREE_TIER_CLAIMS_20261007.md | 30 暗模块三级主张（blank 污染审计） |
 | GLM_LCNEC_FLUORINATED_HITS_MEDICATION_CROSSCHECK_SPEC_20261006.md | 含氟命中用药史核查规格 |
 | PHENOTYPE_CONDITIONED_CHEMICAL_TRANSFORMATION_PROGRAM_20261006.md | 化学转换程序合同（Stage-1d PASS） |
 | GLM_GLOBAL_REMODELING_STAGE2_CONTRACT_20261007.md | Stage-2 冻结合同 |
 | GLM_REMODELING_METHOD_DEVELOPMENT_REPORT_20261007.md | 重塑方法开发报告 |
+
+## 三-B、通用生物学方法与事件级扰动
+
+| 文档 | 内容 | 状态 |
+|---|---|---|
+| **UNBIASED_STRUCTURE_AGNOSTIC_DISCOVERY_CORE_20261011.md** | **结构非依赖总纲；Atlas/response transport 均非唯一主线** | 当前方法入口 |
+| BIOLOGY_APPLICATION_METHOD_SCIENTIFIC_DECISION_20261011.md | 三类科学问题、强基线与否定条件 | 当前边界 |
+| PUBLIC_SPECTRAL_EVIDENCE_SPACE_CORE_20261011.md | 公共谱学证据的可选层；失败可从生产方法删除 | 可选开发层 |
+| ST003325_FEATURE_SPECTRUM_READINESS_RESULT_20261012.md | 3,080 QC features、804 entity links、760 spectral units | readiness PASS |
+| ST003325_STRUCTURE_HIDDEN_PERTURBATION_CONTRACT_20261012.md | clone/edit-class 留出与 plate-confounding 边界 | 冻结 |
+| **ST003325_STRUCTURE_HIDDEN_PERTURBATION_RESULT_20261012.md** | **MS1-all 10/27，三 edit class 均未过，停止谱学追加** | **正式负结果** |
 
 ## 四、方法学探索历史（按时间倒序）
 
@@ -79,6 +105,11 @@
 | P0-M 边际弃权 | data/validation/GLM_p0m/ |
 | P2 v2 LCNEC 坐标投影 | data/validation/lcnec_p2v2/run_2354362/ |
 | Stage-1 重塑结果 | data/validation/lcnec_global_remodeling_stage1/run_2352292/ |
+| 公共谱学证据空间核心 | docs/PUBLIC_SPECTRAL_EVIDENCE_SPACE_CORE_20261011.md |
+| LCNEC 公共证据 M0 冻结合同 | docs/LCNEC_PUBLIC_EVIDENCE_SPACE_M0_CONTRACT_20261011.md |
+| 公共证据证书引擎 | tasks/build_public_spectral_evidence_certificates.py |
+| 公共证据样本投影 | tasks/project_public_evidence_certificates_to_samples.py |
+| 公共证据匹配置乱 | tasks/shuffle_public_evidence_certificates.py |
 | Stage-1d 患者bootstrap | data/validation/lcnec_global_remodeling_stage1d/run_2353147/ |
 | LCNEC 暗模块全量重扫 | data/validation/GLM_track2_census/lcnec_dark_full_rescan.json |
 | 天梯终版 | deliverables/GLM_gnps_article_ladder/ |
