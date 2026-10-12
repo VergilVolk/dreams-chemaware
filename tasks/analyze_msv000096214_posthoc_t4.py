@@ -27,6 +27,7 @@ import numpy as np
 import pandas as pd
 import pyopenms as oms
 from scipy import stats
+from scipy.stats import mannwhitneyu
 
 LOSSES = [162.0528, 146.0579, 308.1107, 176.0321]
 BRANCH_DELTA = 15.9949
@@ -87,6 +88,15 @@ def loss_present(frag_mz: np.ndarray, precursor_mz: float) -> bool:
     return False
 
 
+def prepare_log2(matrix: pd.DataFrame, median_center: bool) -> pd.DataFrame:
+    """v1.3 preprocessing: log2 of positive intensities, optional per-sample median centering."""
+    numeric = matrix.astype(float).where(matrix.astype(float) > 0)
+    transformed = np.log2(numeric)
+    if median_center:
+        transformed = transformed.subtract(transformed.median(axis=0, skipna=True), axis=1)
+    return transformed
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=Path, default=Path("data/external/msv000096214"))
@@ -123,7 +133,8 @@ def main() -> None:
                          for g in ["WT_Col0", "tt4_11_SALK_020583", "tt7_115_EMS",
                                    "tt7_8_SALK_039417", "tt7_9_SALK_seq_064306",
                                    "tt7_115__tt4_11", "tt7_8__tt4_11", "tt7_9__tt4_11"]}
-        log2 = np.log2(matrix)
+        log2 = prepare_log2(matrix, True)
+        log2_sensitivity = prepare_log2(matrix, False)
         wt_med = log2[genotype_cols["WT_Col0"]].median(axis=1)
 
         fc, pvalues = {}, np.ones(len(matrix))
@@ -154,6 +165,20 @@ def main() -> None:
         doubles = ["tt7_115__tt4_11", "tt7_8__tt4_11", "tt7_9__tt4_11"]
         for d in doubles:
             frame[f"fc_{d}"] = fc[d].to_numpy()
+
+        # v1.3 raw-log2 sensitivity frame: same FC definitions without centering
+        wt_med_s = log2_sensitivity[genotype_cols["WT_Col0"]].median(axis=1)
+        a_s = log2_sensitivity[tt4_cols].to_numpy()[idx] if len(idx) else np.zeros((0, len(tt4_cols)))
+        b_s = log2_sensitivity[wt_cols].to_numpy()[idx] if len(idx) else np.zeros((0, len(wt_cols)))
+        pvals_s = np.ones(len(matrix))
+        if len(idx):
+            pvals_s[idx] = [mannwhitneyu(a_s[k], b_s[k], alternative="two-sided").pvalue
+                            for k in range(len(idx))]
+        frame_s = frame.copy()
+        frame_s["fc_tt4"] = (log2_sensitivity[tt4_cols].median(axis=1) - wt_med_s).to_numpy()
+        frame_s["fdr_tt4"] = bh_fdr(pvals_s)
+        for d in doubles:
+            frame_s[f"fc_{d}"] = (log2_sensitivity[genotype_cols[d]].median(axis=1) - wt_med_s).to_numpy()
 
         f_mask = (frame["fc_tt4"] <= -1) & (frame["fdr_tt4"] < 0.05)
         double_down = sum((frame[f"fc_{d}"] <= -0.5).to_numpy() for d in doubles)
@@ -257,8 +282,19 @@ def main() -> None:
         tt7_partner = branch_partner_count(tt7_down_mask)
         c_partner = branch_partner_count(np.isin(frame.index, used_c))
 
+        # v1.3 sensitivity: repeat the F/C/Fisher computation on raw log2
+        f_mask_s = (frame_s["fc_tt4"] <= -1) & (frame_s["fdr_tt4"] < 0.05)
+        double_down_s = sum((frame_s[f"fc_{d}"] <= -0.5).to_numpy() for d in doubles)
+        f_mask_s &= (double_down_s >= 2)
+        sensitivity_summary = {
+            "n_F_raw_sensitivity": int(f_mask_s.sum()),
+            "F_ids_primary_minus_raw": int((f_mask & ~f_mask_s).sum()),
+            "F_ids_raw_minus_primary": int((f_mask_s & ~f_mask).sum()),
+        }
+
         report["polarity"][polarity] = {
             "n_F": int(f_mask.sum()), "n_C_pool": int(c_mask.sum()),
+            "sensitivity_raw_log2": sensitivity_summary,
             "n_matched_C": len(used_c),
             "F_linked_ms2": len(f_linked), "C_linked_ms2": len(c_linked),
             "F_with_glycoloss": int(sum(loss_flags[g] for g in f_linked)),
