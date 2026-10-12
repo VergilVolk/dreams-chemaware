@@ -14,13 +14,13 @@
 
 ## 二、为什么我们有优势
 
-传统"非靶向"代谢组学在解释阶段退回已知化合物和已知通路——名字叫非靶向，实际是靶向解释。94% 的检测信号因无结构鉴定而被排除在生物学分析之外。
+传统"非靶向"代谢组学在解释阶段经常退回已知化合物和已知通路；大量未获可靠结构身份的检测信号难以进入后续功能推断。这里不使用一个跨数据集统一的“未知比例”，因为该比例随平台、样本、过滤和注释等级显著变化。
 
 我们的独特资产：
-- **Noise**：跨实验条件稳健的谱图表示（外部验证 +1.20pp）
+- **Noise**：跨实验条件稳健的谱图表示；在已消费的 GNPS identity-disjoint development 面板相对 official DreaMS 提升约 +1.20 pp，不能称最终外部验证
 - **ChemAware**：碎裂化学证据约束候选边界
 - **P2b**：局部碎片判别能力
-- **15 方法天梯**：冻结的模型盲外部基准
+- **15 方法天梯**：同一候选图上的已消费 development 比较；最终未开封外测仍是 Enveda-180
 - **边际弃权发现**：置信来自 top1-top2 边际而非绝对分数（AUC 0.848）
 
 这些不是"模块堆砌"——是让未知信号参与生物学分析的**技术前提**。没有跨条件稳健表示，未知实体无法跨研究追踪；没有弃权机制，未知实体无法安全参与统计。
@@ -72,19 +72,20 @@
 
 ## 七、当前主线与下一步
 
-**主线**：公共谱学证据空间 + 事件级扰动复现
+**主线**：事件级、可证伪的结构隐藏化学推断。公共谱学证据空间只是可删除的条件增量层，不是方法成立的前提，也不要求产出 Atlas。
 
 **正在推进**：
-1. **公共证据证书引擎**：多来源、多证据族、带弃权的 unit assignment（已实现，待真实运行）
-2. **样本级投影**：certificate → unit occupancy → 样本化学组成（已实现，待真实运行）
-3. **四世界消融**：研究内 MS1 vs 研究内谱学 vs 真实公共 vs 匹配置乱公共（合同已冻结）
-4. **MSV000096214 Arabidopsis 扰动**：更好的实验设计（3 条独立 tt7 KO + 通路位置 + 上位关系），审计被限流中
+1. **MSV000096214 Arabidopsis 遗传反事实**：3 条独立 tt7 mutant alleles、3 个替代通路位置、3 条 tt7×tt4 上位关系；作者处理表的 structure-hidden MS1 正控已通过，raw mzXML 表型盲重建正在运行
+2. **研究内谱学增量**：只有 raw feature table 先通过等位留出、路径特异性和上位塌缩，才比较 MS1-only、m/z/RT、raw cosine 与冻结算法资产
+3. **公共证据证书引擎**：多来源、多证据族、带弃权的 unit assignment（已实现，待真实增量门）；失败即可删除
+4. **样本级投影**：certificate → unit occupancy → 样本化学组成（已实现，待真实增量门）
 
 **正确的下一步**（按优先级）：
-1. 在任意合格真实数据上完成四世界消融的首轮数字
-2. 用非药物、非时间序列研究验证通用性
-3. 证明 unresolved 对 known-only 有条件增量
-4. 一个完整案例：从无偏发现→跨研究复现→化学关系解释→前瞻功能验证
+1. 完成 MSV000096214 raw truth-blind feature table，并以 genotype/lineage 为推断单位裁决遗传反事实
+2. 在同一 feature universe 上证明研究内 MS/MS 相对 MS1-only 与简单谱学基线的条件增量；若无增量，停止算法包装
+3. 用另一条生物合成轴或另一实验室的非药物研究检验规则迁移，不为新数据重调
+4. 只有前两步成立时，再检验公共 reference 与 unresolved 对 matched-known 的条件增量
+5. 最终争取一个从结构隐藏发现到独立扰动或同位素功能验证的完整闭环
 
 ## 八、明确不做的事
 
@@ -105,5 +106,5 @@
 4. 一个完整案例从发现到功能闭环（决定性案例）
 5. 负结果证明停止门有效（诚实边界）
 
-**最强主张**：
+**目标主张（尚未由现有结果建立）**：
 > We test whether an unresolved LC-MS/MS entity can be carried, with calibrated correspondence uncertainty, from clinical association to independent replication and a prospective perturbation-isotope functional experiment, without treating exact structural annotation as a prerequisite or a substitute for mechanism.

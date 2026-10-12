@@ -34,6 +34,10 @@ def parse_args() -> argparse.Namespace:
         default=Path("data/validation/lcnec_hsst3n_qc_headroom_gate/precursor_family_ledger.csv"),
     )
     parser.add_argument(
+        "--expected-qc-families", type=int, default=263,
+        help="Fail-closed expected count for --target-mode all_qc_qualified.",
+    )
+    parser.add_argument(
         "--zip", type=Path,
         default=Path("data/validation/lcnec_zenodo19005638_preflight/MTB22_P073_HSST3n_mzML_public.zip"),
     )
@@ -82,14 +86,18 @@ def main() -> None:
         available_targets = int(merged["module_id"].nunique())
     else:
         ledger = pd.read_csv(args.qc_ledger)
-        representatives = ledger[ledger["passes_all"].astype(bool)].copy()
+        passes_all = ledger["passes_all"].astype(str).str.strip().str.lower().isin({"true", "1", "yes"})
+        representatives = ledger[passes_all].copy()
         representatives = representatives.rename(columns={"mz_median": "mz", "rt_median_sec": "rt_sec"})
         representatives["module_id"] = -1
         representatives["per_mg_drift_pqn_log2fc"] = np.nan
         representatives["per_mg_drift_pqn_q"] = np.nan
         representatives = representatives.sort_values("family_id").reset_index(drop=True)
-        if len(representatives) != 263:
-            raise RuntimeError(f"expected 263 QC-qualified families, found {len(representatives)}")
+        if len(representatives) != args.expected_qc_families:
+            raise RuntimeError(
+                f"expected {args.expected_qc_families} QC-qualified families, "
+                f"found {len(representatives)}"
+            )
         available_targets = len(representatives)
     if args.top_n:
         representatives = representatives.head(args.top_n).reset_index(drop=True)
@@ -161,6 +169,7 @@ def main() -> None:
     report = {
         "status": "lcnec_hsst3n_priority_ms2_complete", "formal": True,
         "target_mode": args.target_mode,
+        "expected_qc_families": args.expected_qc_families if args.target_mode == "all_qc_qualified" else None,
         "nonredundant_modules_available": available_targets,
         "modules_requested": len(targets), "modules_with_qc_ms2": len(manifest_rows),
         "pass_to_dreams_mona": len(manifest_rows) >= 20,

@@ -14,6 +14,10 @@
 
 > **2026-10-12 ST003325 事件级扰动裁决：** `ST003325_FEATURE_SPECTRUM_READINESS_RESULT_20261012.md` 确认 3,080 个 QC 合格 features、804 个 replicated-MS2 entity links 和 760 个独立 spectral units；但 `ST003325_STRUCTURE_HIDDEN_PERTURBATION_RESULT_20261012.md` 的冻结跨编辑机制任务仅 `10/27 = 37.04%`，CE/KO/PTC 均未超过 50%，2,000 次 clone-label permutation `p=0.7126`。正式 FAIL；不在此终点继续叠加 Noise/P2b/公共层。
 
+> **2026-10-12 遗传反事实新入口：** `MSV000096214_READINESS_RESULT_20261012.md` 在未打开 outcome 的条件下确认 49 个完整正负离子样本、10 genotype、98/98 研究文件含 1,095,667 MS2，及 66,958 pooled-QC MS2。`MSV000096214_GENETIC_CHEMICAL_RESPONSE_CONTRACT_20261012.md` 冻结三项真值：tt7 等位留出、路径特异性、tt7×tt4 双突变上位/救援；Atlas 不是方法前提。
+
+> **2026-10-12 遗传反事实首个正控：** `MSV000096214_STRUCTURE_HIDDEN_MS1_RESULT_20261012.md` 在作者处理的 920-feature、49-sample development/consumed 表中隔离全部注释后，真实 tt7 集合在 20 种 genotype-cluster 分配中唯一第一，12 个 pairwise AUROC 最差为 1.00、精确 `p=0.05`，3/3 双突变按预注册方向塌缩到 tt4；五个 QC/极性世界均复现。该结果只授权进入 raw truth-blind 重建，不是 MS/MS 或未知实体增量。`GLM_MSV000096214_STRUCTURE_HIDDEN_CONTRACT_20261012.md` v1.3 已修复 double-log 与 90 次伪重复推断。
+
 ## 一、谱图坐标代谢组学（当前主线）
 
 | 文档 | 内容 | 状态 |
@@ -69,6 +73,10 @@
 | ST003325_FEATURE_SPECTRUM_READINESS_RESULT_20261012.md | 3,080 QC features、804 entity links、760 spectral units | readiness PASS |
 | ST003325_STRUCTURE_HIDDEN_PERTURBATION_CONTRACT_20261012.md | clone/edit-class 留出与 plate-confounding 边界 | 冻结 |
 | **ST003325_STRUCTURE_HIDDEN_PERTURBATION_RESULT_20261012.md** | **MS1-all 10/27，三 edit class 均未过，停止谱学追加** | **正式负结果** |
+| MSV000096214_READINESS_RESULT_20261012.md | 49 paired samples、10 genotype、1,095,667 study MS2 | readiness PASS |
+| **MSV000096214_GENETIC_CHEMICAL_RESPONSE_CONTRACT_20261012.md** | **等位留出、路径特异性、双突变救援；注释后置** | **冻结主实验** |
+| **MSV000096214_STRUCTURE_HIDDEN_MS1_RESULT_20261012.md** | **作者处理表上的遗传反事实正控；20 种簇分配精确 p=0.05** | **development 正控 PASS** |
+| **GLM_MSV000096214_STRUCTURE_HIDDEN_CONTRACT_20261012.md** | **raw mzXML 表型盲重建；v1.3 修复 double-log 和伪重复** | **冻结 raw 主线** |
 
 ## 四、方法学探索历史（按时间倒序）
 

@@ -41,31 +41,35 @@ def ppm_window(value: float, ppm: float) -> tuple[float, float]:
     return value - delta, value + delta
 
 
-def prepare_groups(frame: pd.DataFrame, refs_per_identity: int):
+def prepare_groups(
+    frame: pd.DataFrame,
+    refs_per_identity: int,
+    query_energy: float,
+    reference_energy: float,
+):
+    """Build a complete fixed-condition reference library and eligible queries.
+
+    Every identity with a reference-energy spectrum may be a candidate.  Only
+    identities with both query and reference conditions may become queries.
+    This avoids the earlier bias that removed single-condition library entries
+    merely because they could not themselves serve as queries.
+    """
     groups = {}
     for key, group in frame.groupby(["ik14", "adduct"], sort=True):
         group = group.sort_values(["collision_energy", "source_row"], kind="stable")
-        energies = group.collision_energy.unique()
-        if len(energies) < 2:
+        refs = group[np.isclose(group.collision_energy, reference_energy)].head(refs_per_identity)
+        if refs.empty:
             continue
-        query = group[group.collision_energy == energies.max()].iloc[0]
-        low = group[group.collision_energy == energies.min()].head(refs_per_identity)
+        queries = group[np.isclose(group.collision_energy, query_energy)]
+        reference_mz = float(refs.precursor_mz.median())
         groups[key] = {
-            "query_row": int(query.row),
-            "query_mz": float(query.precursor_mz),
-            "formula": str(query.formula),
-            "ref_energy": float(energies.min()),
-            "reference_rows": low.row.to_numpy(np.int64),
-            "all": group,
+            "query_row": int(queries.iloc[0].row) if not queries.empty else None,
+            "query_mz": float(queries.iloc[0].precursor_mz) if not queries.empty else None,
+            "reference_mz": reference_mz,
+            "formula": str(refs.iloc[0].formula),
+            "reference_rows": refs.row.to_numpy(np.int64),
         }
     return groups
-
-
-def candidate_rows_for_group(group: dict, target_energy: float, refs_per_identity: int, query_row: int):
-    work = group["all"].copy()
-    work = work[work.row != query_row]
-    work["energy_distance"] = (work.collision_energy - target_energy).abs()
-    return work.sort_values(["energy_distance", "source_row"], kind="stable").head(refs_per_identity).row.to_numpy(np.int64)
 
 
 def build_panel(
@@ -75,13 +79,21 @@ def build_panel(
     refs_per_identity: int,
     max_queries: int,
     sampling_seed: int,
+    candidate_mode: str,
+    query_energy: float,
+    reference_energy: float,
 ):
-    groups = prepare_groups(frame, refs_per_identity)
+    if candidate_mode not in {"mass_10ppm", "same_formula"}:
+        raise ValueError(f"unsupported candidate mode: {candidate_mode}")
+    groups = prepare_groups(frame, refs_per_identity, query_energy, reference_energy)
     by_adduct = {}
     for adduct in sorted({key[1] for key in groups}):
-        entries = [(key, groups[key]["query_mz"]) for key in groups if key[1] == adduct]
+        entries = [(key, groups[key]["reference_mz"]) for key in groups if key[1] == adduct]
         entries.sort(key=lambda item: (item[1], item[0][0]))
         by_adduct[adduct] = (np.asarray([item[1] for item in entries], float), [item[0] for item in entries])
+    by_formula_adduct: dict[tuple[str, str], list[tuple[str, str]]] = {}
+    for key, group in groups.items():
+        by_formula_adduct.setdefault((str(group["formula"]), key[1]), []).append(key)
 
     query_row = []
     query_ik14 = []
@@ -102,7 +114,7 @@ def build_panel(
     # bounding the one-off construction cost on the 1.17M-spectrum release.
     # It is frozen before any model score is computed.
     query_keys = sorted(
-        groups,
+        [key for key, group in groups.items() if group["query_row"] is not None],
         key=lambda item: hashlib.sha256(
             f"{sampling_seed}|{item[0]}|{item[1]}".encode("utf-8")
         ).digest(),
@@ -110,32 +122,42 @@ def build_panel(
     for key in query_keys:
         truth, adduct = key
         source = groups[key]
-        values, keys = by_adduct[adduct]
-        low, high = ppm_window(source["query_mz"], ppm)
-        left = int(np.searchsorted(values, low, side="left"))
-        right = int(np.searchsorted(values, high, side="right"))
-        candidate_keys = keys[left:right]
-        negatives = [item for item in candidate_keys if item[0] != truth]
+        if candidate_mode == "mass_10ppm":
+            values, keys = by_adduct[adduct]
+            low, high = ppm_window(source["query_mz"], ppm)
+            left = int(np.searchsorted(values, low, side="left"))
+            right = int(np.searchsorted(values, high, side="right"))
+            candidate_keys = keys[left:right]
+        else:
+            candidate_keys = by_formula_adduct.get((str(source["formula"]), adduct), [])
+        # The positive obeys exactly the same candidate rule as negatives.
+        if key not in candidate_keys:
+            continue
+        negatives = [item for item in candidate_keys if item != key]
         if not negatives:
             continue
-        negatives.sort(key=lambda item: (abs(groups[item]["query_mz"] - source["query_mz"]), item[0]))
-        selected = [key] + negatives[: max_candidates - 1]
+        negatives.sort(key=lambda item: (abs(groups[item]["reference_mz"] - source["query_mz"]), item[0]))
+        selected = [key] + negatives
+        if max_candidates > 0 and len(selected) > max_candidates:
+            # A capped deployment search must not inject the truth after the cap.
+            closest = sorted(candidate_keys, key=lambda item: (
+                abs(groups[item]["reference_mz"] - source["query_mz"]), item[0]
+            ))[:max_candidates]
+            if key not in closest:
+                continue
+            selected = [key] + [item for item in closest if item != key]
         q_index = int(source["query_row"])
         q_formula = str(source["formula"])
         local_near = False
-        complete = True
         local_blocks = []
         for candidate in selected:
             c_group = groups[candidate]
-            rows = candidate_rows_for_group(c_group, source["ref_energy"], refs_per_identity, q_index)
-            if not len(rows):
-                complete = False
-                break
+            rows = c_group["reference_rows"]
             label = candidate[0] == truth
             same_formula = str(c_group["formula"]) == q_formula
             local_near = local_near or (same_formula and not label)
             local_blocks.append((candidate, rows, label, same_formula))
-        if not complete or len(local_blocks) < 2:
+        if len(local_blocks) < 2:
             continue
         query_row.append(q_index)
         query_ik14.append(truth)
@@ -143,7 +165,7 @@ def build_panel(
         query_adduct.append(adduct)
         query_precursor_mz.append(source["query_mz"])
         near_query.append(local_near)
-        independent_positive.append(True)  # distinct collision-energy record
+        independent_positive.append(True)  # fixed, distinct 60 -> 20 condition
         for candidate, rows, label, same_formula in local_blocks:
             molecule_label.append(label)
             molecule_ik14.append(candidate[0])
@@ -333,6 +355,8 @@ def main() -> None:
     parser.add_argument("--minimum-queries", type=int, default=1000)
     parser.add_argument("--minimum-formula-queries", type=int, default=100)
     parser.add_argument("--open-set-match-fraction", type=float, default=0.70)
+    parser.add_argument("--query-energy", type=float, default=60.0)
+    parser.add_argument("--reference-energy", type=float, default=20.0)
     args = parser.parse_args()
 
     if args.out.exists():
@@ -373,25 +397,39 @@ def main() -> None:
     ].copy()
     identity = build_panel(
         base, args.ppm, args.max_candidates, args.refs_per_identity,
-        args.max_queries, args.sampling_seed,
+        args.max_queries, args.sampling_seed, "mass_10ppm",
+        args.query_energy, args.reference_energy,
     )
     formula_base = base[~base.consumed_formula_overlap.astype(bool)].copy()
     formula = build_panel(
         formula_base, args.ppm, args.max_candidates, args.refs_per_identity,
-        args.max_queries, args.sampling_seed,
+        args.max_queries, args.sampling_seed, "mass_10ppm",
+        args.query_energy, args.reference_energy,
+    )
+    identity_same_formula = build_panel(
+        base, args.ppm, args.max_candidates, args.refs_per_identity,
+        args.max_queries, args.sampling_seed, "same_formula",
+        args.query_energy, args.reference_energy,
+    )
+    formula_same_formula = build_panel(
+        formula_base, args.ppm, args.max_candidates, args.refs_per_identity,
+        args.max_queries, args.sampling_seed, "same_formula",
+        args.query_energy, args.reference_energy,
     )
     if len(identity["query_row"]) < args.minimum_queries:
         raise RuntimeError(f"identity panel too small: {len(identity['query_row'])}")
     if len(formula["query_row"]) < args.minimum_formula_queries:
         raise RuntimeError(f"formula panel too small: {len(formula['query_row'])}")
 
-    used = selected_rows(identity, formula)
+    used = selected_rows(identity, formula, identity_same_formula, formula_same_formula)
     selected = frame.set_index("row").loc[used].sort_values("source_row").reset_index()
     mapping = {int(old): new for new, old in enumerate(selected.row.to_numpy(np.int64))}
     selected["audit_row"] = selected["row"]
     selected["row"] = np.arange(len(selected), dtype=np.int64)
     identity = remap_panel(identity, mapping)
     formula = remap_panel(formula, mapping)
+    identity_same_formula = remap_panel(identity_same_formula, mapping)
+    formula_same_formula = remap_panel(formula_same_formula, mapping)
     identity_open = build_open_set_panel(
         identity, args.open_set_match_fraction, args.sampling_seed, "identity",
     )
@@ -408,7 +446,12 @@ def main() -> None:
     )
     if written != len(selected):
         raise RuntimeError(f"curated MGF/manifest mismatch: {written} != {len(selected)}")
-    for name, panel in (("identity_disjoint", identity), ("formula_disjoint", formula)):
+    for name, panel in (
+        ("identity_disjoint", identity),
+        ("formula_disjoint", formula),
+        ("identity_same_formula", identity_same_formula),
+        ("formula_same_formula", formula_same_formula),
+    ):
         np.savez_compressed(args.out / f"panel_{name}.npz", **panel)
         np.savez_compressed(args.out / f"pairs_{name}.npz", **expand_pair_ledger(panel))
     for name, panel in (
@@ -422,7 +465,9 @@ def main() -> None:
         "panel_formula_disjoint.npz", "pairs_identity_disjoint.npz",
         "pairs_formula_disjoint.npz", "panel_identity_open_set.npz",
         "panel_formula_open_set.npz", "pairs_identity_open_set.npz",
-        "pairs_formula_open_set.npz",
+        "pairs_formula_open_set.npz", "panel_identity_same_formula.npz",
+        "panel_formula_same_formula.npz", "pairs_identity_same_formula.npz",
+        "pairs_formula_same_formula.npz",
     ]
     checksums = {name: sha256(args.out / name) for name in files}
     (args.out / "checksums.sha256").write_text(
@@ -430,7 +475,7 @@ def main() -> None:
     )
     report = {
         "status": "ENVEDA180_CROSS_CONDITION_BENCHMARK_FROZEN",
-        "schema": "enveda180_cross_condition_benchmark_v1",
+        "schema": "enveda180_cross_condition_benchmark_v2_scientific",
         "dataset_id": "enveda_180_filtered_20260713",
         "evaluation_role": "sealed_external_test",
         "truth_status": "frozen_unscored",
@@ -447,14 +492,16 @@ def main() -> None:
             "selected_consumed_formula_overlap_identity_panel_allowed": int(selected.consumed_formula_overlap.astype(bool).sum()),
             "selected_consumed_spectrum_overlap": int(selected.consumed_spectrum_overlap.astype(bool).sum()),
         },
-        "query_condition": "maximum collision energy",
-        "reference_condition": "different, lower collision energy",
+        "query_condition": f"fixed collision energy {args.query_energy:g}",
+        "reference_condition": f"fixed collision energy {args.reference_energy:g}",
         "candidate_window_ppm": args.ppm,
         "maximum_queries_per_panel": args.max_queries,
         "model_blind_sampling_seed": args.sampling_seed,
         "open_set_match_fraction": args.open_set_match_fraction,
         "identity_disjoint": panel_summary(identity),
         "formula_disjoint": panel_summary(formula),
+        "identity_same_formula": panel_summary(identity_same_formula),
+        "formula_same_formula": panel_summary(formula_same_formula),
         "identity_open_set": panel_summary(identity_open),
         "formula_open_set": panel_summary(formula_open),
         "curated_spectra": len(selected),

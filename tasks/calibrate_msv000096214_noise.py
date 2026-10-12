@@ -2,8 +2,9 @@
 """Genotype-blind noise-threshold calibration for MSV000096214 (contract 3.2).
 
 Runs the frozen OpenMS detection recipe on the pooled-QC mzXML files only,
-scans the pre-registered threshold grid, and freezes the smallest threshold
-whose median QC feature count reaches 2,000. Writes calibration.json which
+scans the pre-registered threshold grid from stringent to permissive, and
+freezes the highest threshold whose median QC feature count reaches 2,000.
+Writes calibration.json which
 the extraction stage consumes read-only. Never reads genotype metadata.
 """
 from __future__ import annotations
@@ -86,7 +87,7 @@ def main() -> None:
         "status": "MSV000096214_NOISE_CALIBRATION_FROZEN",
         "data_role": "development/consumed",
         "contract": "docs/GLM_MSV000096214_STRUCTURE_HIDDEN_CONTRACT_20261012.md",
-        "rule": "smallest grid threshold whose median QC feature count >= 2000",
+        "rule": "highest grid threshold whose median QC feature count >= 2000",
         "grid": GRID,
         "target_count": TARGET_COUNT,
         "genotype_column_read": False,
@@ -102,7 +103,10 @@ def main() -> None:
         experiments = {path.name: load_ms1(path) for path in qc_files}
         curve: dict[str, dict[str, int]] = {}
         chosen: float | None = None
-        for threshold in GRID:
+        # Feature count is non-increasing as the intensity threshold rises.
+        # Descending search therefore selects the most stringent threshold
+        # that retains the pre-registered minimum information floor.
+        for threshold in reversed(GRID):
             counts = {}
             for name, experiment in experiments.items():
                 counts[name] = detect(experiment, threshold)
@@ -110,7 +114,7 @@ def main() -> None:
             median = values[len(values) // 2]
             curve[f"{threshold:g}"] = {"counts": counts, "median": median}
             print(f"[{polarity}] T={threshold:g} counts={counts} median={median}", flush=True)
-            if chosen is None and median >= TARGET_COUNT:
+            if median >= TARGET_COUNT:
                 chosen = threshold
                 break
         if chosen is None:

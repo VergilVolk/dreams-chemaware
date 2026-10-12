@@ -1,5 +1,7 @@
 # Stage-2 冻结合同：全局化学重塑的跨平台复现、暗实体增量和转换边一致性
 
+> **2026-10-10 修订：** 本文的 Stage-2A/2B 主终点及 cosine 阈值 dark 定义已由 `LCNEC_ENTITY_EFFECT_TRANSPORT_P0_CONTRACT_20261010.md` 取代。本文保留为历史冻结合同；Stage-2C 在获得时间方向或同位素支持前仅为描述性探索，不再决定生物学主线晋级。
+
 **日期：** 2026-10-07
 **前置：** Stage-1 PASS（`LCNEC_GLOBAL_REMODELING_STAGE1_PASS`）
 **性质：** 冻结实验设计；Stage-1 结果出来前不得修改本合同的任何阈值或规则。

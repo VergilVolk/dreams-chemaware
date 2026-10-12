@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import http.client
 import json
 import time
 import urllib.error
@@ -69,7 +70,7 @@ def fetch_stream(remote: str, target: Path, expected_bytes: int, state: dict) ->
                 continue
             state["failed"][remote] = f"HTTP {error.code}"
             return
-        except (urllib.error.URLError, TimeoutError, OSError) as exc:
+        except (urllib.error.URLError, TimeoutError, OSError, http.client.HTTPException) as exc:
             if attempt < 7:
                 time.sleep(min(60.0, 10.0 * (attempt + 1)))
                 continue

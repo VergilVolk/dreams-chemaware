@@ -1,0 +1,47 @@
+{
+  "schema": "contrast_application_seed_registry_v1",
+  "created": "2026-10-11",
+  "algorithm_bundle": {
+    "production_channels": [
+      "official_dreams",
+      "weighted_spectral_entropy",
+      "noise_v1",
+      "p2b_noise_v1_frozen"
+    ],
+    "development_only_channels": [
+      "chemaware_stage1",
+      "chemaware_phase_a",
+      "chemaware_v2"
+    ],
+    "ineligible_channels": [
+      "noise_rrf_1_7",
+      "bioaware_static_catalog_or_topology",
+      "truth_or_phenotype_conditioned_router"
+    ],
+    "bioaware_entry_rule": "Only a frozen event-level sample context may enter as a separately ablated channel."
+  },
+  "studies": [
+    {
+      "study_id": "ST003325",
+      "repository": "Metabolomics Workbench",
+      "project_id": "PR001844",
+      "source_family": "JAX_MorPhiC_PR001844",
+      "analysis_role": "development_perturbation",
+      "consumption": "metadata_opened_2026-10-11",
+      "sealed": false,
+      "expected_perturbation": "STS null-allele designs with or without DHEA-S",
+      "allowed_next_action": "targeted raw-file acquisition audit only"
+    },
+    {
+      "study_id": "ST003940",
+      "repository": "Metabolomics Workbench",
+      "project_id": "PR001844",
+      "source_family": "JAX_MorPhiC_PR001844",
+      "analysis_role": "development_perturbation",
+      "consumption": "metadata_opened_2026-10-11",
+      "sealed": false,
+      "expected_perturbation": "CYP19A1, SLC22A11, CYP11A1, HSD17B1 and ABCG2 null alleles with or without DHEA-S",
+      "allowed_next_action": "resolve sample-level labels and full archive inventory before raw download"
+    }
+  ]
+}
