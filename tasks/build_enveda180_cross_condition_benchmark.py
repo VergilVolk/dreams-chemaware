@@ -2,10 +2,10 @@
 """Build a frozen cross-collision-energy Enveda-180 retrieval benchmark.
 
 Construction is model-blind. A high-collision-energy spectrum is the query;
-candidate reference spectra come from a different collision energy. Candidate
-molecules share the same adduct/polarity and lie within a fixed precursor-mass
-window. The positive molecule is materialised first and ties must later count
-against it, matching the existing GNPS evaluator contract.
+candidate reference spectra come from one fixed, different collision energy.
+Two candidate tasks are materialised: a complete 10-ppm mass-window task and a
+strict same-formula task.  The positive must satisfy the same eligibility rule
+as every negative; it is never injected after candidate construction.
 """
 from __future__ import annotations
 
@@ -348,7 +348,10 @@ def main() -> None:
     parser.add_argument("--audit", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--ppm", type=float, default=10.0)
-    parser.add_argument("--max-candidates", type=int, default=256)
+    parser.add_argument(
+        "--max-candidates", type=int, default=0,
+        help="0 keeps the complete candidate set; a positive cap is applied before truth inclusion.",
+    )
     parser.add_argument("--refs-per-identity", type=int, default=3)
     parser.add_argument("--max-queries", type=int, default=25_000)
     parser.add_argument("--sampling-seed", type=int, default=20261008)
@@ -384,16 +387,28 @@ def main() -> None:
     if sha256(args.source_mgf) != audit_report.get("source_mgf_sha256"):
         raise RuntimeError("Enveda source MGF differs from audited source")
     frame = pd.read_csv(manifest_path, low_memory=False)
-    required_columns = {"consumed_identity_overlap", "consumed_formula_overlap", "consumed_spectrum_overlap"}
+    required_columns = {
+        "consumed_identity_overlap", "consumed_formula_overlap",
+        "consumed_spectrum_overlap", "spectrum_hash_secondary",
+    }
     if not required_columns.issubset(frame.columns):
         raise RuntimeError(f"Enveda audit lacks leakage columns: {sorted(required_columns - set(frame.columns))}")
     conflicts = load_conflicts(conflicts_path)
+    # The legacy audit recorded exact primary-hash conflicts.  Its later
+    # secondary hash catches peak-order/rounding equivalents and therefore
+    # must receive the same cross-identity treatment.  Derive this exclusion
+    # deterministically from the audited manifest before selecting any query.
+    secondary_identity_counts = frame.groupby("spectrum_hash_secondary")["ik14"].nunique()
+    secondary_conflicts = set(
+        secondary_identity_counts[secondary_identity_counts > 1].index.astype(str)
+    )
     base = frame[
         frame.primary_adduct.astype(bool)
         & frame.primary_adduct_validated.astype(bool)
         & ~frame.consumed_identity_overlap.astype(bool)
         & ~frame.consumed_spectrum_overlap.astype(bool)
         & ~frame.spectrum_hash.astype(str).isin(conflicts)
+        & ~frame.spectrum_hash_secondary.astype(str).isin(secondary_conflicts)
     ].copy()
     identity = build_panel(
         base, args.ppm, args.max_candidates, args.refs_per_identity,
@@ -420,6 +435,14 @@ def main() -> None:
         raise RuntimeError(f"identity panel too small: {len(identity['query_row'])}")
     if len(formula["query_row"]) < args.minimum_formula_queries:
         raise RuntimeError(f"formula panel too small: {len(formula['query_row'])}")
+    if len(identity_same_formula["query_row"]) < args.minimum_formula_queries:
+        raise RuntimeError(
+            f"identity same-formula panel too small: {len(identity_same_formula['query_row'])}"
+        )
+    if len(formula_same_formula["query_row"]) < args.minimum_formula_queries:
+        raise RuntimeError(
+            f"formula same-formula panel too small: {len(formula_same_formula['query_row'])}"
+        )
 
     used = selected_rows(identity, formula, identity_same_formula, formula_same_formula)
     selected = frame.set_index("row").loc[used].sort_values("source_row").reset_index()
@@ -479,7 +502,11 @@ def main() -> None:
         "dataset_id": "enveda_180_filtered_20260713",
         "evaluation_role": "sealed_external_test",
         "truth_status": "frozen_unscored",
-        "allow_final_claim": True,
+        "allow_final_claim": False,
+        "claim_boundary": (
+            "sealed component/workflow benchmark; final unified-algorithm claim requires "
+            "a separately frozen unified decision function before labels are opened"
+        ),
         "construction_model_blind": True,
         "performance_scores_opened": False,
         "leakage_guard": {
@@ -491,10 +518,13 @@ def main() -> None:
             "selected_consumed_identity_overlap": int(selected.consumed_identity_overlap.astype(bool).sum()),
             "selected_consumed_formula_overlap_identity_panel_allowed": int(selected.consumed_formula_overlap.astype(bool).sum()),
             "selected_consumed_spectrum_overlap": int(selected.consumed_spectrum_overlap.astype(bool).sum()),
+            "cross_identity_primary_hashes_excluded": len(conflicts),
+            "cross_identity_secondary_hashes_excluded": len(secondary_conflicts),
         },
         "query_condition": f"fixed collision energy {args.query_energy:g}",
         "reference_condition": f"fixed collision energy {args.reference_energy:g}",
         "candidate_window_ppm": args.ppm,
+        "maximum_candidates": None if args.max_candidates <= 0 else args.max_candidates,
         "maximum_queries_per_panel": args.max_queries,
         "model_blind_sampling_seed": args.sampling_seed,
         "open_set_match_fraction": args.open_set_match_fraction,

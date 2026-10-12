@@ -1,10 +1,29 @@
 {
   "schema": "enveda180_layered_algorithm_freeze_v1",
-  "freeze_status": "FROZEN_BEFORE_ENVEDA_SCORING",
-  "frozen_on": "2026-10-10",
-  "benchmark_directory": "data/validation/enveda180_cross_condition_benchmark_v2_20261010",
+  "freeze_status": "COMPONENT_WORKFLOW_FROZEN_UNIFIED_DECISION_NOT_DEFINED",
+  "frozen_on": "2026-10-12",
+  "benchmark_directory": "data/validation/enveda180_cross_condition_benchmark_v3_20261012",
   "audit_directory": "data/validation/enveda180_scoreblind_manifest_v2_20261010",
   "dataset_role": "sealed_external_test",
+  "opening_authorized": false,
+  "claim_scope": "component and layered-workflow characterization only; not a unified-ranker external win",
+  "candidate_design": {
+    "query_condition": "60 eV",
+    "reference_condition": "20 eV",
+    "reference_library": "all eligible 20 eV identities including identities without 60 eV queries",
+    "truth_injection": false,
+    "candidate_cap": null,
+    "closed_panels": [
+      "identity_disjoint_10ppm",
+      "formula_disjoint_10ppm",
+      "identity_disjoint_same_formula",
+      "formula_disjoint_same_formula"
+    ],
+    "open_panels": [
+      "identity_disjoint_10ppm_open_set",
+      "formula_disjoint_10ppm_open_set"
+    ]
+  },
   "automatic_ranking_methods": [
     "official_dreams",
     "noise_v1",
@@ -28,7 +47,10 @@
       "sha256": "01ac8c7bfa75d89862e0b1eb2b5ffb297955cffae471fd483ad6c38d13f33beb"
     }
   },
-  "closed_set_primary_endpoint": "weighted_spectral_entropy_recall_at_1",
+  "closed_set_primary_endpoint": null,
+  "primary_contrast": null,
+  "unified_decision_function": null,
+  "scientific_blocker": "No single predeclared ranking/abstention function currently combines the registered modules; opening Enveda now would consume the final test before the claimed algorithm exists.",
   "secondary_endpoints": [
     "recall_at_2_3_5_10_20",
     "mrr",
@@ -38,12 +60,13 @@
     "formula_cluster_paired_ci",
     "corrected_introduced_risk_net"
   ],
-  "gnps_frozen_open_set_margin_thresholds_at_5pct_fdr": {
+  "gnps_calibrated_open_set_margin_thresholds_nominal_5pct_fdr": {
     "official_dreams": 0.295,
     "noise_v1": 0.375,
     "weighted_spectral_entropy": 0.36,
     "p2b_noise_v1_frozen": 0.365
   },
+  "threshold_interpretation": "Transport these thresholds unchanged and report observed Enveda risk and coverage. They must not be described as Enveda 5% FDR unless the observed Enveda estimate supports that statement.",
   "prohibited_after_opening": [
     "changing_method_or_checkpoint",
     "changing_p2b_weights_or_gate",

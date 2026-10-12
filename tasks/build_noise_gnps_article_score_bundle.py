@@ -28,7 +28,7 @@ from scoreblind_retrieval_graph import scoreblind_graph_from_panel
 
 
 ROOT = Path(__file__).resolve().parents[1]
-PANELS = ("identity_disjoint", "formula_disjoint")
+DEFAULT_PANELS = ("identity_disjoint", "formula_disjoint")
 METHODS = (
     "official_dreams",
     "noise_v1",
@@ -59,6 +59,7 @@ def arguments() -> argparse.Namespace:
     parser.add_argument("--workers", type=int, default=1)
     parser.add_argument("--fragment-tolerance", type=float, default=0.02)
     parser.add_argument("--n-highest-peaks", type=int, default=100)
+    parser.add_argument("--panels", nargs="+", default=list(DEFAULT_PANELS))
     return parser.parse_args()
 
 
@@ -123,9 +124,10 @@ def main() -> None:
     if not np.array_equal(official_rows, v1_rows):
         raise RuntimeError("official and Noise V1 embedding registries differ")
 
+    panels = tuple(args.panels)
     graphs = {
         name: scoreblind_graph_from_panel(args.benchmark / f"panel_{name}.npz")
-        for name in PANELS
+        for name in panels
     }
     used_rows: set[int] = set()
     unique_pairs: set[tuple[int, int]] = set()
@@ -202,8 +204,9 @@ def main() -> None:
         "status": "noise_gnps_article_score_bundle_complete",
         "labels_opened": False,
         "benchmark": str(args.benchmark),
+        "panels": list(panels),
         "methods": list(METHODS),
-        "score_rows": {name: int(arrays[f"scores_{name}"].shape[1]) for name in PANELS},
+        "score_rows": {name: int(arrays[f"scores_{name}"].shape[1]) for name in panels},
         "fragment_tolerance_da": args.fragment_tolerance,
         "n_highest_peaks": args.n_highest_peaks,
         "weighted_spectral_entropy_backend": entropy_backend,

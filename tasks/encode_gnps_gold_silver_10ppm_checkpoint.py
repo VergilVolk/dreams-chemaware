@@ -38,6 +38,9 @@ def arguments() -> argparse.Namespace:
     parser.add_argument("--batch-size", type=int, default=64)
     parser.add_argument("--label", default="checkpoint")
     parser.add_argument(
+        "--panels", nargs="+", default=["identity_disjoint", "formula_disjoint"],
+    )
+    parser.add_argument(
         "--expected-selected-rows", type=int, default=52871,
         help="Set to 0 for another frozen benchmark whose selected-row count is report-defined.",
     )
@@ -56,9 +59,13 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
-def required_rows(benchmark: Path, expected_selected_rows: int = 52871) -> np.ndarray:
+def required_rows(
+    benchmark: Path,
+    expected_selected_rows: int = 52871,
+    panels: tuple[str, ...] = ("identity_disjoint", "formula_disjoint"),
+) -> np.ndarray:
     rows: list[np.ndarray] = []
-    for panel_name in ("identity_disjoint", "formula_disjoint"):
+    for panel_name in panels:
         with np.load(benchmark / f"panel_{panel_name}.npz", allow_pickle=False) as body:
             rows.extend((
                 np.asarray(body["query_row"], dtype=np.int64),
@@ -171,7 +178,9 @@ def main() -> None:
     from dreams.utils.dformats import DataFormatA
     from train_e1_identity import load_base_model
 
-    selected = required_rows(args.benchmark, args.expected_selected_rows)
+    selected = required_rows(
+        args.benchmark, args.expected_selected_rows, tuple(args.panels),
+    )
     spectra = load_selected_spectra(
         args.benchmark / "spectra.mgf", selected,
         expected_records=args.expected_records,

@@ -19,7 +19,7 @@ PROTON = 1.007276466621
 
 
 def write_fixture(path: Path) -> None:
-    smiles_values = ["CCCO", "CC(O)C", "CCOC"]  # three C3H8O connectivities
+    smiles_values = ["CCCC=O", "CCC(=O)C", "C1CCOC1", "OC1CCC1"]
     with gzip.open(path, "wt", encoding="utf-8") as handle:
         index = 0
         for molecule_index, smiles in enumerate(smiles_values):
@@ -27,7 +27,9 @@ def write_fixture(path: Path) -> None:
             key = Chem.MolToInchiKey(mol)
             formula = rdMolDescriptors.CalcMolFormula(mol)
             precursor = Descriptors.ExactMolWt(mol) + PROTON
-            for energy in (20, 60):
+            # The fourth identity is reference-only. It must still appear as a
+            # candidate for the first three fixed 60 -> 20 queries.
+            for energy in ((20,) if molecule_index == 3 else (20, 60)):
                 index += 1
                 handle.write("BEGIN IONS\n")
                 handle.write(f"TITLE=fixture_{index:03d}\n")
@@ -84,6 +86,10 @@ def test_scoreblind_enveda_builder_end_to_end(tmp_path):
     assert report["formula_disjoint"]["queries"] == 3
     assert report["identity_open_set"]["queries"] == 3
     assert report["identity_disjoint"]["query_adducts"] == {"[M+H]+": 3}
+    assert report["identity_same_formula"]["queries"] == 3
+    assert report["formula_same_formula"]["queries"] == 3
+    assert report["query_condition"] == "fixed collision energy 60"
+    assert report["reference_condition"] == "fixed collision energy 20"
     assert (
         report["identity_open_set"]["match_queries"]
         + report["identity_open_set"]["no_match_queries"]
@@ -97,6 +103,12 @@ def test_scoreblind_enveda_builder_end_to_end(tmp_path):
             local = labels[ptr[q]:ptr[q + 1]]
             assert local[0] == 1
             assert int(local.sum()) == 1
+        # All four identities, including the reference-only one, are present
+        # in each complete same-mass candidate library.
+        assert len(body["molecule_label"]) == 12
+    with np.load(benchmark / "panel_identity_same_formula.npz", allow_pickle=False) as body:
+        assert np.all(body["molecule_same_formula"])
+        assert len(body["molecule_label"]) == 12
     with np.load(benchmark / "panel_identity_open_set.npz", allow_pickle=False) as body:
         ptr = body["query_ptr"]
         labels = body["molecule_label"]

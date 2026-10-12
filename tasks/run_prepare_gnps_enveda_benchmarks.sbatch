@@ -24,7 +24,7 @@ GNPS_REBUILT="data/validation/GLM_gnps_identity_panel_reconstruction"
 ENVDATA="data/external/enveda180_20260713"
 ENAUDIT="data/validation/enveda180_scoreblind_manifest_v2_20261010"
 ENAUDIT_V1="data/validation/enveda180_scoreblind_manifest_v1"
-ENBENCH="data/validation/enveda180_cross_condition_benchmark_v2_20261010"
+ENBENCH="data/validation/enveda180_cross_condition_benchmark_v3_20261012"
 E180_MGF="$ENVDATA/enveda-180-filtered.mgf.gz"
 E180_EXPECTED_BYTES=285632591
 E180_EXPECTED_MD5=6d06a2c916aefe1c0b2d86bf40628441
@@ -107,7 +107,7 @@ python -u tasks/build_enveda180_cross_condition_benchmark.py \
   --audit "$ENAUDIT" \
   --out "$ENBENCH" \
   --ppm 10 \
-  --max-candidates 256 \
+  --max-candidates 0 \
   --refs-per-identity 3 \
   --max-queries 25000 \
   --sampling-seed 20261008 \

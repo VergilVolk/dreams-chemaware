@@ -20,7 +20,7 @@ if [[ -n "${SLURM_CPUS_PER_TASK:-}" ]]; then
   export OMP_NUM_THREADS="$SLURM_CPUS_PER_TASK"
 fi
 
-BENCHMARK="${ENVEDA180_BENCHMARK:-data/validation/enveda180_cross_condition_benchmark_v2_20261010}"
+BENCHMARK="${ENVEDA180_BENCHMARK:-data/validation/enveda180_cross_condition_benchmark_v3_20261012}"
 AUDIT="${ENVEDA180_AUDIT:-data/validation/enveda180_scoreblind_manifest_v2_20261010}"
 FREEZE="tasks/enveda180_layered_freeze_contract_v1.json"
 OFFICIAL="data/e1/official_embedding_slim.pt"
@@ -35,6 +35,10 @@ required=(
   "$BENCHMARK/manifest.csv.gz"
   "$BENCHMARK/panel_identity_disjoint.npz"
   "$BENCHMARK/panel_formula_disjoint.npz"
+  "$BENCHMARK/panel_identity_same_formula.npz"
+  "$BENCHMARK/panel_formula_same_formula.npz"
+  "$BENCHMARK/panel_identity_open_set.npz"
+  "$BENCHMARK/panel_formula_open_set.npz"
   "$AUDIT/report.json"
   "$FREEZE"
   "$OFFICIAL"
@@ -91,12 +95,14 @@ export PYTHONPATH="$LOCAL_DEPS:$PYTHONPATH"
 python -u tasks/encode_gnps_gold_silver_10ppm_checkpoint.py \
   --benchmark "$BENCHMARK" --checkpoint "$OFFICIAL" --architecture-checkpoint "$ARCH" \
   --output "$OUT/official_embeddings.npz" --label enveda180_official \
-  --batch-size 64 --expected-selected-rows 0 --expected-records 0
+  --batch-size 64 --expected-selected-rows 0 --expected-records 0 \
+  --panels identity_disjoint formula_disjoint identity_same_formula formula_same_formula identity_open_set formula_open_set
 
 python -u tasks/encode_gnps_gold_silver_10ppm_checkpoint.py \
   --benchmark "$BENCHMARK" --checkpoint "$NOISE" --architecture-checkpoint "$ARCH" \
   --output "$OUT/noise_v1_embeddings.npz" --label enveda180_noise_v1 \
-  --batch-size 64 --expected-selected-rows 0 --expected-records 0
+  --batch-size 64 --expected-selected-rows 0 --expected-records 0 \
+  --panels identity_disjoint formula_disjoint identity_same_formula formula_same_formula identity_open_set formula_open_set
 
 WORKERS="${SLURM_CPUS_PER_TASK:-10}"
 python -u tasks/build_noise_gnps_article_score_bundle.py \
@@ -104,6 +110,7 @@ python -u tasks/build_noise_gnps_article_score_bundle.py \
   --official-embeddings "$OUT/official_embeddings.npz" \
   --noise-v1-embeddings "$OUT/noise_v1_embeddings.npz" \
   --output "$OUT/method_scores_unopened.npz" \
+  --panels identity_disjoint formula_disjoint identity_same_formula formula_same_formula identity_open_set formula_open_set \
   --workers "$WORKERS" --fragment-tolerance 0.02 --n-highest-peaks 100
 
 cp "$FREEZE" "$OUT/freeze_contract.json"

@@ -28,7 +28,9 @@ def test_score_graph_never_requires_truth_arrays(tmp_path):
 
 def test_freeze_contract_and_sbatch_are_score_blind():
     freeze = json.loads((ROOT / "tasks/enveda180_layered_freeze_contract_v1.json").read_text())
-    assert freeze["freeze_status"] == "FROZEN_BEFORE_ENVEDA_SCORING"
+    assert freeze["freeze_status"] == "COMPONENT_WORKFLOW_FROZEN_UNIFIED_DECISION_NOT_DEFINED"
+    assert freeze["opening_authorized"] is False
+    assert freeze["unified_decision_function"] is None
     assert freeze["layered_algorithm"]["primary_top1_output"] == "weighted_spectral_entropy"
     assert freeze["layered_algorithm"]["chemical_evidence"].endswith("not_an_automatic_reranker")
     script = (ROOT / "tasks/run_enveda180_layered_scoreblind.sbatch").read_text()
