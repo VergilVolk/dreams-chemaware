@@ -44,6 +44,10 @@ def arguments() -> argparse.Namespace:
         "--panels", nargs="+", default=["identity_disjoint", "formula_disjoint"],
     )
     parser.add_argument(
+        "--panel-file", action="append", default=[], metavar="NAME=PATH",
+        help="Override a panel path when it is stored outside --benchmark.",
+    )
+    parser.add_argument(
         "--expected-selected-rows", type=int, default=52871,
         help="Set to 0 for another frozen benchmark whose selected-row count is report-defined.",
     )
@@ -132,13 +136,19 @@ def sha256_file(path: Path) -> str:
 
 
 def required_rows(
-    benchmark: Path,
+    benchmark_or_panel_paths: Path | dict[str, Path],
     expected_selected_rows: int = 52871,
     panels: tuple[str, ...] = ("identity_disjoint", "formula_disjoint"),
 ) -> np.ndarray:
+    if isinstance(benchmark_or_panel_paths, dict):
+        panel_paths = benchmark_or_panel_paths
+    else:
+        panel_paths = {
+            name: benchmark_or_panel_paths / f"panel_{name}.npz" for name in panels
+        }
     rows: list[np.ndarray] = []
     for panel_name in panels:
-        with np.load(benchmark / f"panel_{panel_name}.npz", allow_pickle=False) as body:
+        with np.load(panel_paths[panel_name], allow_pickle=False) as body:
             rows.extend((
                 np.asarray(body["query_row"], dtype=np.int64),
                 np.asarray(body["candidate_row"], dtype=np.int64),
@@ -234,17 +244,27 @@ def main() -> None:
         raise RuntimeError("--reuse-benchmark and --reuse-embeddings must be provided together")
     if args.output.exists():
         raise FileExistsError(args.output)
+    panel_paths = {
+        name: args.benchmark / f"panel_{name}.npz" for name in args.panels
+    }
+    for specification in args.panel_file:
+        if "=" not in specification:
+            raise ValueError("--panel-file must have NAME=PATH form")
+        name, value = specification.split("=", 1)
+        if name not in panel_paths:
+            raise ValueError(f"--panel-file names an undeclared panel: {name}")
+        panel_paths[name] = Path(value)
     for path in (
         args.benchmark / "spectra.mgf",
         args.checkpoint,
         args.architecture_checkpoint,
-        *(args.benchmark / f"panel_{name}.npz" for name in args.panels),
+        *(panel_paths[name] for name in args.panels),
     ):
         if not path.is_file():
             raise FileNotFoundError(path)
 
     selected = required_rows(
-        args.benchmark, args.expected_selected_rows, tuple(args.panels),
+        panel_paths, args.expected_selected_rows, tuple(args.panels),
     )
     checkpoint_sha256 = sha256_file(args.checkpoint)
     embeddings = np.full((len(selected), 1024), np.nan, dtype=np.float32)
@@ -314,6 +334,10 @@ def main() -> None:
         "reuse_benchmark": str(args.reuse_benchmark) if args.reuse_benchmark else None,
         "reuse_embeddings": str(args.reuse_embeddings) if args.reuse_embeddings else None,
         "embedding_dimension": int(embeddings.shape[1]),
+        "panels": {name: str(panel_paths[name]) for name in args.panels},
+        "panel_sha256": {
+            name: sha256_file(panel_paths[name]) for name in args.panels
+        },
         "native_preprocessing": {
             "n_highest_peaks": 100,
             "precursor_intensity": 1.1,

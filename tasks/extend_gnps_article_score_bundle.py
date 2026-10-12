@@ -30,6 +30,8 @@ def arguments() -> argparse.Namespace:
         default=ROOT / "data/validation/gnps_gold_silver_10ppm_benchmark_v1",
     )
     parser.add_argument("--base-bundle", type=Path, required=True)
+    parser.add_argument("--identity-panel", type=Path)
+    parser.add_argument("--formula-panel", type=Path)
     parser.add_argument(
         "--embedding-method", action="append", default=[], metavar="NAME=PATH",
         help="Aligned embedding cache created by encode_gnps_gold_silver_10ppm_checkpoint.py",
@@ -78,9 +80,14 @@ def main() -> None:
         raise RuntimeError("at least one method must be appended")
 
     manifest_rows = len(pd.read_csv(args.benchmark / "manifest.csv.gz", usecols=["row"]))
-    graphs = {
-        name: graph_from_panel(args.benchmark / f"panel_{name}.npz") for name in PANELS
+    panel_paths = {
+        "identity_disjoint": args.identity_panel or args.benchmark / "panel_identity_disjoint.npz",
+        "formula_disjoint": args.formula_panel or args.benchmark / "panel_formula_disjoint.npz",
     }
+    for path in panel_paths.values():
+        if not path.is_file():
+            raise FileNotFoundError(path)
+    graphs = {name: graph_from_panel(panel_paths[name]) for name in PANELS}
     with np.load(args.base_bundle, allow_pickle=False) as base:
         base_methods = list(map(str, base["method_names"]))
         base_scores = {
@@ -146,6 +153,10 @@ def main() -> None:
         },
         "appended_sources": sources,
         "methods": all_methods,
+        "panels": {
+            name: {"path": str(path), "sha256": sha256_file(path)}
+            for name, path in panel_paths.items()
+        },
         "gnps_used_for_checkpoint_selection_or_tuning": False,
         "aggregation_deferred_to_evaluator": "maximum pair score within candidate molecule",
         "claim_limit": (
