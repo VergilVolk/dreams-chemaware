@@ -142,23 +142,23 @@ def greedy_groups(frames: dict[str, pd.DataFrame]) -> list[dict[str, Any]]:
         if len(window) == 0:
             used[anchor] = True
             continue
-        # closest warped RT per file; anchor file contributes the anchor itself
-        members = {int(file_index[anchor]): (int(row_index[anchor]), float(all_rt[anchor]))}
+        # closest warped RT per file; the anchor file contributes the anchor itself.
+        # members maps file_index -> (global entry index, per-frame row, warped rt)
+        members = {int(file_index[anchor]): (int(anchor), int(row_index[anchor]), float(all_rt[anchor]))}
         for candidate in window:
             fi = int(file_index[candidate])
             d = abs(all_rt[candidate] - rt0)
-            if fi not in members or d < abs(members[fi][1] - rt0):
-                members[fi] = (int(row_index[candidate]), float(all_rt[candidate]))
-        chosen = [idx for idx, _ in members.values()]
+            if fi not in members or d < abs(members[fi][2] - rt0):
+                members[fi] = (int(candidate), int(row_index[candidate]), float(all_rt[candidate]))
+        chosen = [entry for entry, _, _ in members.values()]
         used[chosen] = True
-        member_files = list(members.keys())
         groups.append({
             "group_id": len(groups),
             "mz": float(np.median(all_mz[chosen])),
             "rt_sec": float(np.median(all_rt[chosen])),
             "n_files": len(chosen),
             "files": {file_names[fi]: frames[file_names[fi]].iloc[row].to_dict()
-                      for fi, (row, _) in members.items()},
+                      for fi, (_, row, _) in members.items()},
         })
     return groups
 
