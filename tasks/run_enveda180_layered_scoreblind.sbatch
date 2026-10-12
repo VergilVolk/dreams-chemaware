@@ -27,6 +27,8 @@ OFFICIAL="data/e1/official_embedding_slim.pt"
 NOISE="data/validation/noise_relation_t1_t3_run_2347055/checkpoint/primary_seed_3407_slim.pt"
 ARCH="dreams/models/pretrained/ssl_model_server.pt"
 OUT="data/validation/enveda180_layered_scoreblind_run_${SLURM_JOB_ID}"
+REUSE_RUN="${ENVEDA180_REUSE_RUN:-data/validation/enveda180_layered_scoreblind_run_2361083}"
+REUSE_BENCHMARK="${ENVEDA180_REUSE_BENCHMARK:-data/validation/enveda180_cross_condition_benchmark_v2_20261010}"
 
 required=(
   "$BENCHMARK/report.json"
@@ -64,7 +66,8 @@ def sha(path):
         for block in iter(lambda:f.read(8<<20),b""): h.update(block)
     return h.hexdigest()
 checks = {
-    "freeze": freeze.get("freeze_status") == "FROZEN_BEFORE_ENVEDA_SCORING",
+    "freeze": freeze.get("freeze_status") == "COMPONENT_WORKFLOW_FROZEN_UNIFIED_DECISION_NOT_DEFINED",
+    "opening_prohibited": freeze.get("opening_authorized") is False,
     "benchmark_path": freeze.get("benchmark_directory") == str(benchmark),
     "benchmark_status": report.get("status") == "ENVEDA180_CROSS_CONDITION_BENCHMARK_FROZEN",
     "unopened": report.get("performance_scores_opened") is False,
@@ -92,17 +95,35 @@ python -m pip install --no-deps --target "$LOCAL_DEPS" \
   third_party/noise_article_wheels/ms_entropy-1.5.2-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl
 export PYTHONPATH="$LOCAL_DEPS:$PYTHONPATH"
 
-python -u tasks/encode_gnps_gold_silver_10ppm_checkpoint.py \
-  --benchmark "$BENCHMARK" --checkpoint "$OFFICIAL" --architecture-checkpoint "$ARCH" \
-  --output "$OUT/official_embeddings.npz" --label enveda180_official \
-  --batch-size 64 --expected-selected-rows 0 --expected-records 0 \
-  --panels identity_disjoint formula_disjoint identity_same_formula formula_same_formula identity_open_set formula_open_set
-
-python -u tasks/encode_gnps_gold_silver_10ppm_checkpoint.py \
-  --benchmark "$BENCHMARK" --checkpoint "$NOISE" --architecture-checkpoint "$ARCH" \
-  --output "$OUT/noise_v1_embeddings.npz" --label enveda180_noise_v1 \
-  --batch-size 64 --expected-selected-rows 0 --expected-records 0 \
-  --panels identity_disjoint formula_disjoint identity_same_formula formula_same_formula identity_open_set formula_open_set
+if [[ -s "$REUSE_RUN/official_embeddings.npz" && -s "$REUSE_RUN/official_embeddings.json" \
+      && -s "$REUSE_RUN/noise_v1_embeddings.npz" && -s "$REUSE_RUN/noise_v1_embeddings.json" \
+      && -s "$REUSE_BENCHMARK/manifest.csv.gz" ]]; then
+  echo "ENVEDA180_REUSING_EMBEDDINGS_BY_SOURCE_ROW: $REUSE_RUN"
+  python -u tasks/encode_gnps_gold_silver_10ppm_checkpoint.py \
+    --benchmark "$BENCHMARK" --checkpoint "$OFFICIAL" --architecture-checkpoint "$ARCH" \
+    --output "$OUT/official_embeddings.npz" --label enveda180_official \
+    --reuse-benchmark "$REUSE_BENCHMARK" --reuse-embeddings "$REUSE_RUN/official_embeddings.npz" \
+    --batch-size 64 --expected-selected-rows 0 --expected-records 0 \
+    --panels identity_disjoint formula_disjoint identity_same_formula formula_same_formula identity_open_set formula_open_set
+  python -u tasks/encode_gnps_gold_silver_10ppm_checkpoint.py \
+    --benchmark "$BENCHMARK" --checkpoint "$NOISE" --architecture-checkpoint "$ARCH" \
+    --output "$OUT/noise_v1_embeddings.npz" --label enveda180_noise_v1 \
+    --reuse-benchmark "$REUSE_BENCHMARK" --reuse-embeddings "$REUSE_RUN/noise_v1_embeddings.npz" \
+    --batch-size 64 --expected-selected-rows 0 --expected-records 0 \
+    --panels identity_disjoint formula_disjoint identity_same_formula formula_same_formula identity_open_set formula_open_set
+else
+  echo "ENVEDA180_REUSE_CACHE_UNAVAILABLE: encoding complete v3 row set"
+  python -u tasks/encode_gnps_gold_silver_10ppm_checkpoint.py \
+    --benchmark "$BENCHMARK" --checkpoint "$OFFICIAL" --architecture-checkpoint "$ARCH" \
+    --output "$OUT/official_embeddings.npz" --label enveda180_official \
+    --batch-size 64 --expected-selected-rows 0 --expected-records 0 \
+    --panels identity_disjoint formula_disjoint identity_same_formula formula_same_formula identity_open_set formula_open_set
+  python -u tasks/encode_gnps_gold_silver_10ppm_checkpoint.py \
+    --benchmark "$BENCHMARK" --checkpoint "$NOISE" --architecture-checkpoint "$ARCH" \
+    --output "$OUT/noise_v1_embeddings.npz" --label enveda180_noise_v1 \
+    --batch-size 64 --expected-selected-rows 0 --expected-records 0 \
+    --panels identity_disjoint formula_disjoint identity_same_formula formula_same_formula identity_open_set formula_open_set
+fi
 
 WORKERS="${SLURM_CPUS_PER_TASK:-10}"
 python -u tasks/build_noise_gnps_article_score_bundle.py \

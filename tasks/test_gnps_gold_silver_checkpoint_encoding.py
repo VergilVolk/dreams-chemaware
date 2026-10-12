@@ -3,11 +3,17 @@
 from __future__ import annotations
 
 import tempfile
+import json
 from pathlib import Path
 
 import numpy as np
+import pytest
 
-from encode_gnps_gold_silver_10ppm_checkpoint import load_selected_spectra, required_rows
+from encode_gnps_gold_silver_10ppm_checkpoint import (
+    load_selected_spectra,
+    required_rows,
+    reuse_by_source_row,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -51,7 +57,43 @@ def test_sbatch_is_one_gpu_evaluation_without_training_or_memory_request() -> No
 
 def test_two_panel_union_is_complete() -> None:
     benchmark = ROOT / "data/validation/gnps_gold_silver_10ppm_benchmark_v1"
+    if not (benchmark / "panel_identity_disjoint.npz").is_file():
+        pytest.skip("large frozen GNPS panel is not present in this checkout")
     assert len(required_rows(benchmark)) == 52871
+
+
+def test_reuse_cache_is_joined_by_source_row_not_local_row(tmp_path: Path) -> None:
+    old = tmp_path / "old"
+    new = tmp_path / "new"
+    old.mkdir()
+    new.mkdir()
+    import pandas as pd
+    pd.DataFrame({"row": [0, 1], "source_row": [100, 200]}).to_csv(
+        old / "manifest.csv.gz", index=False,
+    )
+    pd.DataFrame({"row": [0, 1, 2], "source_row": [200, 300, 100]}).to_csv(
+        new / "manifest.csv.gz", index=False,
+    )
+    source_binding = {"leakage_guard": {"source_mgf_sha256": "source-abc"}}
+    (old / "report.json").write_text(json.dumps(source_binding), encoding="utf-8")
+    (new / "report.json").write_text(json.dumps(source_binding), encoding="utf-8")
+    cache = tmp_path / "cache.npz"
+    vectors = np.zeros((2, 1024), dtype=np.float32)
+    vectors[0, 0] = 1.0
+    vectors[1, 1] = 1.0
+    np.savez(cache, rows=np.asarray([0, 1]), embeddings=vectors)
+    cache.with_suffix(".json").write_text(
+        '{"checkpoint_sha256":"abc","native_preprocessing":'
+        '{"n_highest_peaks":100,"precursor_intensity":1.1,'
+        '"precision":32,"augmentation":false}}', encoding="utf-8",
+    )
+    output, reused = reuse_by_source_row(
+        np.asarray([0, 1, 2]), new, old, cache, "abc",
+    )
+    assert reused.tolist() == [True, False, True]
+    assert output[0, 1] == 1.0
+    assert output[2, 0] == 1.0
+    assert np.isnan(output[1]).all()
 
 
 def main() -> None:

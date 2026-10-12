@@ -100,3 +100,11 @@ The v3 builder, six score-blind panels (four closed, two open), all-panel
 encoding/scoring, and scientific contract tests are implemented in `tasks/`.
 The old v1/v2 benchmark directories must remain historical artifacts and must
 not be opened as the final test.
+
+The completed v2 score-blind run `2361083` may be reused computationally but
+not scientifically substituted for v3.  Its official/Noise embeddings are
+joined to v3 only through the immutable original-MGF `source_row`, after
+requiring identical source-MGF SHA-256, checkpoint SHA-256, native
+preprocessing and unit-vector shape.  Local benchmark row numbers are never
+joined across versions.  Any v3 spectra absent from the prior cache are encoded
+normally; candidate scores are always recomputed on the corrected v3 graph.

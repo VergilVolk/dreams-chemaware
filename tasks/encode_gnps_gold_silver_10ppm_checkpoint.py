@@ -17,6 +17,7 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+import pandas as pd
 import torch
 import torch.nn.functional as F
 
@@ -37,6 +38,8 @@ def arguments() -> argparse.Namespace:
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--batch-size", type=int, default=64)
     parser.add_argument("--label", default="checkpoint")
+    parser.add_argument("--reuse-benchmark", type=Path)
+    parser.add_argument("--reuse-embeddings", type=Path)
     parser.add_argument(
         "--panels", nargs="+", default=["identity_disjoint", "formula_disjoint"],
     )
@@ -49,6 +52,75 @@ def arguments() -> argparse.Namespace:
         help="Set to 0 to accept the complete record count of another curated benchmark.",
     )
     return parser.parse_args()
+
+
+def reuse_by_source_row(
+    selected: np.ndarray,
+    benchmark: Path,
+    reuse_benchmark: Path,
+    reuse_embeddings: Path,
+    checkpoint_sha256: str,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Map a prior label-blind cache onto a new panel by immutable source row."""
+    old_benchmark_report = json.loads(
+        (reuse_benchmark / "report.json").read_text(encoding="utf-8")
+    )
+    new_benchmark_report = json.loads(
+        (benchmark / "report.json").read_text(encoding="utf-8")
+    )
+    old_source_sha = old_benchmark_report.get("leakage_guard", {}).get("source_mgf_sha256")
+    new_source_sha = new_benchmark_report.get("leakage_guard", {}).get("source_mgf_sha256")
+    if not old_source_sha or old_source_sha != new_source_sha:
+        raise RuntimeError("old and new benchmarks are not bound to the same source MGF")
+    reuse_report_path = reuse_embeddings.with_suffix(".json")
+    if not reuse_report_path.is_file():
+        raise FileNotFoundError(reuse_report_path)
+    reuse_report = json.loads(reuse_report_path.read_text(encoding="utf-8"))
+    if reuse_report.get("checkpoint_sha256") != checkpoint_sha256:
+        raise RuntimeError("reuse cache checkpoint differs from requested checkpoint")
+    preprocessing = reuse_report.get("native_preprocessing", {})
+    if preprocessing != {
+        "n_highest_peaks": 100,
+        "precursor_intensity": 1.1,
+        "precision": 32,
+        "augmentation": False,
+    }:
+        raise RuntimeError("reuse cache preprocessing differs from native encoding contract")
+
+    with np.load(reuse_embeddings, allow_pickle=False) as body:
+        old_rows = np.asarray(body["rows"], dtype=np.int64)
+        old_embeddings = np.asarray(body["embeddings"], dtype=np.float32)
+    if old_embeddings.shape != (len(old_rows), 1024):
+        raise RuntimeError("reuse embedding cache has invalid shape")
+    if len(np.unique(old_rows)) != len(old_rows):
+        raise RuntimeError("reuse embedding cache has duplicate local rows")
+
+    old_manifest = pd.read_csv(
+        reuse_benchmark / "manifest.csv.gz", usecols=["row", "source_row"],
+    ).set_index("row")
+    new_manifest = pd.read_csv(
+        benchmark / "manifest.csv.gz", usecols=["row", "source_row"],
+    ).set_index("row")
+    try:
+        old_sources = old_manifest.loc[old_rows, "source_row"].to_numpy(np.int64)
+        new_sources = new_manifest.loc[selected, "source_row"].to_numpy(np.int64)
+    except KeyError as exc:
+        raise RuntimeError("embedding rows are absent from their benchmark manifest") from exc
+    if len(np.unique(old_sources)) != len(old_sources):
+        raise RuntimeError("reuse benchmark has duplicate immutable source rows")
+    source_to_old = {int(source): index for index, source in enumerate(old_sources)}
+    output = np.full((len(selected), 1024), np.nan, dtype=np.float32)
+    reused = np.zeros(len(selected), dtype=bool)
+    for index, source in enumerate(new_sources):
+        old_index = source_to_old.get(int(source))
+        if old_index is not None:
+            output[index] = old_embeddings[old_index]
+            reused[index] = True
+    if reused.any():
+        norms = np.linalg.norm(output[reused], axis=1)
+        if not np.all(np.isfinite(norms)) or np.max(np.abs(norms - 1.0)) > 2e-3:
+            raise RuntimeError("reused embeddings are not finite unit vectors")
+    return output, reused
 
 
 def sha256_file(path: Path) -> str:
@@ -158,51 +230,68 @@ def encode(
 
 def main() -> None:
     args = arguments()
-    if not torch.cuda.is_available():
-        raise RuntimeError("GNPS DreaMS encoding requires an allocated GPU")
+    if (args.reuse_benchmark is None) != (args.reuse_embeddings is None):
+        raise RuntimeError("--reuse-benchmark and --reuse-embeddings must be provided together")
     if args.output.exists():
         raise FileExistsError(args.output)
     for path in (
         args.benchmark / "spectra.mgf",
-        args.benchmark / "panel_identity_disjoint.npz",
-        args.benchmark / "panel_formula_disjoint.npz",
         args.checkpoint,
         args.architecture_checkpoint,
+        *(args.benchmark / f"panel_{name}.npz" for name in args.panels),
     ):
         if not path.is_file():
             raise FileNotFoundError(path)
 
-    # Keep CPU-only row/format tests importable on machines without the full
-    # DreaMS runtime.  These imports are required only for actual GPU encoding.
-    from dreams.utils.data import SpectrumPreprocessor
-    from dreams.utils.dformats import DataFormatA
-    from train_e1_identity import load_base_model
-
     selected = required_rows(
         args.benchmark, args.expected_selected_rows, tuple(args.panels),
     )
-    spectra = load_selected_spectra(
-        args.benchmark / "spectra.mgf", selected,
-        expected_records=args.expected_records,
-    )
-    model, checkpoint_kind = load_base_model(
-        args.checkpoint,
-        args.architecture_checkpoint,
-        torch.device("cuda"),
-        100,
-    )
-    preprocessor = SpectrumPreprocessor(
-        dformat=DataFormatA(),
-        prec_intens=1.1,
-        n_highest_peaks=100,
-        spec_entropy_cleaning=False,
-        precision=32,
-        mz_shift_aug_p=0,
-        mz_shift_aug_max=0,
-    )
-    embeddings = encode(
-        model, selected, spectra, preprocessor, args.batch_size, args.label,
-    )
+    checkpoint_sha256 = sha256_file(args.checkpoint)
+    embeddings = np.full((len(selected), 1024), np.nan, dtype=np.float32)
+    reused = np.zeros(len(selected), dtype=bool)
+    checkpoint_kind = None
+    if args.reuse_embeddings is not None:
+        embeddings, reused = reuse_by_source_row(
+            selected, args.benchmark, args.reuse_benchmark,
+            args.reuse_embeddings, checkpoint_sha256,
+        )
+        checkpoint_kind = json.loads(
+            args.reuse_embeddings.with_suffix(".json").read_text(encoding="utf-8")
+        ).get("checkpoint_kind")
+        print(
+            f"[{args.label}] reused {int(reused.sum()):,}/{len(selected):,} "
+            "embeddings by immutable source_row",
+            flush=True,
+        )
+    missing_rows = selected[~reused]
+    if len(missing_rows):
+        if not torch.cuda.is_available():
+            raise RuntimeError("missing DreaMS embeddings require an allocated GPU")
+        # Heavy DreaMS imports and model construction are unnecessary when the
+        # prior cache covers every source spectrum in the corrected panel.
+        from dreams.utils.data import SpectrumPreprocessor
+        from dreams.utils.dformats import DataFormatA
+        from train_e1_identity import load_base_model
+
+        spectra = load_selected_spectra(
+            args.benchmark / "spectra.mgf", missing_rows,
+            expected_records=args.expected_records,
+        )
+        model, checkpoint_kind = load_base_model(
+            args.checkpoint, args.architecture_checkpoint,
+            torch.device("cuda"), 100,
+        )
+        preprocessor = SpectrumPreprocessor(
+            dformat=DataFormatA(), prec_intens=1.1, n_highest_peaks=100,
+            spec_entropy_cleaning=False, precision=32,
+            mz_shift_aug_p=0, mz_shift_aug_max=0,
+        )
+        embeddings[~reused] = encode(
+            model, missing_rows, spectra, preprocessor, args.batch_size, args.label,
+        )
+    norms = np.linalg.norm(embeddings, axis=1)
+    if not np.all(np.isfinite(norms)) or np.max(np.abs(norms - 1.0)) > 2e-3:
+        raise RuntimeError("merged embedding cache is not finite unit vectors")
     args.output.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.NamedTemporaryFile(
         prefix=f".{args.output.name}.", suffix=".npz", dir=args.output.parent,
@@ -218,8 +307,12 @@ def main() -> None:
         "status": "gnps_gold_silver_10ppm_checkpoint_encoding_complete",
         "label": args.label,
         "checkpoint_kind": checkpoint_kind,
-        "checkpoint_sha256": sha256_file(args.checkpoint),
+        "checkpoint_sha256": checkpoint_sha256,
         "rows": int(len(selected)),
+        "rows_reused_by_source_row": int(reused.sum()),
+        "rows_newly_encoded": int((~reused).sum()),
+        "reuse_benchmark": str(args.reuse_benchmark) if args.reuse_benchmark else None,
+        "reuse_embeddings": str(args.reuse_embeddings) if args.reuse_embeddings else None,
         "embedding_dimension": int(embeddings.shape[1]),
         "native_preprocessing": {
             "n_highest_peaks": 100,
