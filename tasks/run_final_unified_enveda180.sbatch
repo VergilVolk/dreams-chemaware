@@ -20,19 +20,26 @@ export PYTHONUNBUFFERED=1
 
 GNPS_RUN="${UNIFIED_GNPS_RUN:-data/validation/unified_candidate_energy_run_2364137}"
 BENCHMARK="${ENVEDA180_BENCHMARK:-data/validation/enveda180_cross_condition_benchmark_v3_20261012}"
-LAYER_OUT="data/validation/enveda180_layered_scoreblind_run_${SLURM_JOB_ID}"
+LAYER_OUT="${ENVEDA180_LAYER_RUN:-data/validation/enveda180_layered_scoreblind_run_${SLURM_JOB_ID}}"
 OUT="data/validation/unified_candidate_energy_enveda_final_run_${SLURM_JOB_ID}"
 REGISTRY="tasks/unified_candidate_energy_final_registry_v1.json"
 V2_POLICY="${CHEMAWARE_V2_POLICY_DIR:-data/validation/gnps_noise_chemaware_v2_transfer_run_2358497/recovered_frozen_v2_policy}"
 STAGE1="${CHEMAWARE_STAGE1_CHECKPOINT:-data/validation/chemaware_high_coverage_native/run_2340721_resume_2340524/training/best.ckpt}"
 PHASEA="${CHEMAWARE_PHASEA_CHECKPOINT:-data/validation/chemaware_online_role_budget_native/run_2345481/phasea_reproduction_gate/chemaware_phasea_max_boundary_step2000.ckpt}"
 ARCH="${DREAMS_ARCHITECTURE_CHECKPOINT:-dreams/models/pretrained/ssl_model_server.pt}"
-if [[ ! -s "$V2_POLICY/truthblind_policy.joblib" ]]; then
+if [[ ! -s "$V2_POLICY/truthblind_policy.joblib" || ! -s "$V2_POLICY/report.json" ]]; then
   V2_POLICY="data/validation/chemaware_multinull_deployment_safe_full_20260919"
+fi
+REBUILD_V2=0
+if [[ ! -s "$V2_POLICY/truthblind_policy.joblib" || ! -s "$V2_POLICY/report.json" ]]; then
+  V2_POLICY="$OUT/recovered_frozen_v2_policy"
+  REBUILD_V2=1
 fi
 
 [[ ! -e "$OUT" ]] || { echo "FINAL_UNIFIED_OUTPUT_COLLISION: $OUT" >&2; exit 3; }
-[[ ! -e "$LAYER_OUT" ]] || { echo "FINAL_UNIFIED_LAYER_OUTPUT_COLLISION: $LAYER_OUT" >&2; exit 3; }
+if [[ -z "${ENVEDA180_LAYER_RUN:-}" ]]; then
+  [[ ! -e "$LAYER_OUT" ]] || { echo "FINAL_UNIFIED_LAYER_OUTPUT_COLLISION: $LAYER_OUT" >&2; exit 3; }
+fi
 
 required=(
   "$GNPS_RUN/evidence_identity_disjoint.npz"
@@ -41,8 +48,6 @@ required=(
   "$BENCHMARK/checksums.sha256"
   "$BENCHMARK/panel_identity_disjoint.npz"
   "$BENCHMARK/panel_formula_disjoint.npz"
-  "$V2_POLICY/truthblind_policy.joblib"
-  "$V2_POLICY/report.json"
   "$STAGE1"
   "$PHASEA"
   "$ARCH"
@@ -61,6 +66,32 @@ required=(
   tasks/reserve_candidate_energy_enveda_opening.py
   tasks/test_unified_candidate_energy.py
 )
+if [[ "$REBUILD_V2" == 1 ]]; then
+  required+=(
+    data/validation/chemaware_corrected_candidate_manifest_v1/manifest.npz
+    data/validation/chemaware_corrected_manifest_tokens_v1/rows.npy
+    data/validation/chemaware_corrected_manifest_tokens_v1/official_embeddings_f32.npy
+    data/validation/chemaware_corrected_manifest_tokens_v1/mz_f32.npy
+    data/validation/chemaware_corrected_manifest_tokens_v1/intensity_f32.npy
+    data/validation/chemaware_corrected_manifest_tokens_v1/valid.npy
+    data/validation/chemaware_corrected_manifest_tokens_v1/precursor_mz_f32.npy
+    dreams/models/chem_aware/chem_rules_data.json
+    tasks/audit_chemaware_orthogonal_rule_residual_policy.py
+  )
+else
+  required+=("$V2_POLICY/truthblind_policy.joblib" "$V2_POLICY/report.json")
+fi
+if [[ -n "${ENVEDA180_LAYER_RUN:-}" ]]; then
+  required+=(
+    "$LAYER_OUT/scoreblind_report.json"
+    "$LAYER_OUT/method_scores_unopened.npz"
+    "$LAYER_OUT/method_scores_unopened.npz.json"
+    "$LAYER_OUT/official_embeddings.npz"
+    "$LAYER_OUT/official_embeddings.json"
+    "$LAYER_OUT/noise_v1_embeddings.npz"
+    "$LAYER_OUT/noise_v1_embeddings.json"
+  )
+fi
 for path in "${required[@]}"; do
   [[ -s "$path" ]] || { echo "FINAL_UNIFIED_MISSING_INPUT: $path" >&2; exit 4; }
 done
@@ -71,6 +102,37 @@ python -m py_compile \
   tasks/evaluate_frozen_candidate_energy_external.py \
   tasks/reserve_candidate_energy_enveda_opening.py
 python -m pytest tasks/test_unified_candidate_energy.py -q
+
+mkdir -p "$OUT"
+if [[ "$REBUILD_V2" == 1 ]]; then
+  python -u tasks/audit_chemaware_orthogonal_rule_residual_policy.py \
+    --rule-control-variants \
+      rule_response_content_permuted \
+      rule_response_content_permuted_b \
+      rule_response_content_permuted_c \
+    --contrast-representation symmetric_summary \
+    --selection-control-mode deployment_safe \
+    --output "$V2_POLICY"
+fi
+python - "$V2_POLICY/report.json" <<'PY'
+import json, math, sys
+r=json.load(open(sys.argv[1], encoding="utf-8")); m=r.get("method",{}); s=r.get("selection",{}); h=r.get("held_inner",{}).get("correct",{})
+checks={
+ "status":r.get("status")=="CHEMAWARE_ORTHOGONAL_RULE_RESIDUAL_POLICY_COMPLETE",
+ "nulls":m.get("rule_control_variants")==["rule_response_content_permuted","rule_response_content_permuted_b","rule_response_content_permuted_c"],
+ "representation":m.get("contrast_representation")=="symmetric_summary",
+ "deployment_safe":r.get("selection_control_mode")=="deployment_safe",
+ "candidate_conditioned":r.get("candidate_conditioned") is True,
+ "dose":abs(float(s.get("dose",float("nan")))-2.0)<1e-12,
+ "threshold":math.isfinite(float(s.get("threshold",float("nan")))),
+ "selection_exchange":s.get("correct",{}).get("corrected_at_1",0)>2*s.get("correct",{}).get("introduced_at_1",0),
+ "held_exchange":h.get("corrected_at_1",0)>2*h.get("introduced_at_1",0),
+ "gates":bool(r.get("gates")) and all(r["gates"].values()),
+}
+failed=[k for k,v in checks.items() if not v]
+if failed: raise SystemExit(f"CHEMAWARE_V2_POLICY_CONTRACT_FAIL: {failed}")
+print(json.dumps({"status":"CHEMAWARE_V2_POLICY_CONTRACT_PASS","checks":checks},indent=2))
+PY
 
 # This is the only model fitting in the job: four global scalar reliabilities
 # on consumed GNPS development, using the already selected preplanned arm.
@@ -83,8 +145,32 @@ python -u tasks/freeze_unified_candidate_energy.py \
 
 # Generate all spectral component scores while Enveda labels remain unopened.
 # The existing v2 embeddings are reused by immutable source_row wherever valid.
-ENVEDA180_SCORE_PANELS="identity_disjoint formula_disjoint" \
-  bash tasks/run_enveda180_layered_scoreblind.sbatch
+if [[ -n "${ENVEDA180_LAYER_RUN:-}" ]]; then
+  python - "$LAYER_OUT" "$BENCHMARK" <<'PY'
+import hashlib, json, pathlib, sys
+layer, benchmark = map(pathlib.Path, sys.argv[1:])
+def sha(p):
+ h=hashlib.sha256()
+ with p.open("rb") as f:
+  for b in iter(lambda:f.read(8<<20),b""): h.update(b)
+ return h.hexdigest()
+r=json.load(open(layer/"scoreblind_report.json",encoding="utf-8"))
+m=json.load(open(layer/"method_scores_unopened.npz.json",encoding="utf-8"))
+checks={
+ "status":r.get("status")=="ENVEDA180_LAYERED_COMPONENT_SCORES_READY_UNOPENED",
+ "labels_unopened":r.get("labels_opened") is False and m.get("labels_opened") is False,
+ "score_hash":r.get("score_bundle_sha256")==sha(layer/"method_scores_unopened.npz"),
+ "benchmark_path":m.get("benchmark")==str(benchmark),
+ "primary_panels":all(x in m.get("panels",[]) for x in ("identity_disjoint","formula_disjoint")),
+}
+failed=[k for k,v in checks.items() if not v]
+if failed: raise SystemExit(f"ENVEDA180_LAYER_REUSE_FAIL: {failed}")
+print(json.dumps({"status":"ENVEDA180_LAYER_REUSE_PASS","checks":checks},indent=2))
+PY
+else
+  ENVEDA180_SCORE_PANELS="identity_disjoint formula_disjoint" \
+    bash tasks/run_enveda180_layered_scoreblind.sbatch
+fi
 
 # Preserve both historical ChemAware embedding assets as frozen external
 # comparators.  They do not enter the selected four-module decision function.
