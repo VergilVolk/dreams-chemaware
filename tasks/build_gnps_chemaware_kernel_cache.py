@@ -32,6 +32,11 @@ def arguments() -> argparse.Namespace:
     parser.add_argument("--official-embeddings", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--n-highest-peaks", type=int, default=100)
+    parser.add_argument(
+        "--panels", nargs="+", default=["identity_disjoint", "formula_disjoint"],
+    )
+    parser.add_argument("--expected-selected-rows", type=int, default=52871)
+    parser.add_argument("--expected-records", type=int, default=329607)
     return parser.parse_args()
 
 
@@ -41,15 +46,27 @@ def main() -> None:
         raise FileExistsError(args.output)
     if args.n_highest_peaks != 100:
         raise ValueError("frozen ChemAware V2 requires exactly 100 peaks")
-    rows = required_rows(args.benchmark)
-    spectra = load_selected_spectra(args.benchmark / "spectra.mgf", rows)
+    rows = required_rows(
+        args.benchmark, args.expected_selected_rows, tuple(args.panels),
+    )
+    spectra = load_selected_spectra(
+        args.benchmark / "spectra.mgf", rows,
+        expected_records=args.expected_records,
+    )
     with np.load(args.official_embeddings, allow_pickle=False) as body:
         embedding_rows = np.asarray(body["rows"], dtype=np.int64)
         embeddings = np.asarray(body["embeddings"], dtype=np.float32)
-    if not np.array_equal(embedding_rows, rows):
-        raise RuntimeError("official embedding rows do not match the sealed GNPS row order")
-    if embeddings.ndim != 2 or len(embeddings) != len(rows):
+    if embeddings.ndim != 2 or len(embeddings) != len(embedding_rows):
         raise RuntimeError("official embedding cache is malformed")
+    if len(np.unique(embedding_rows)) != len(embedding_rows):
+        raise RuntimeError("official embedding cache contains duplicate rows")
+    row_to_embedding = {int(row): index for index, row in enumerate(embedding_rows)}
+    missing = [int(row) for row in rows if int(row) not in row_to_embedding]
+    if missing:
+        raise RuntimeError(
+            f"official embedding cache misses {len(missing)} selected rows"
+        )
+    embeddings = embeddings[[row_to_embedding[int(row)] for row in rows]]
 
     shape = (len(rows), args.n_highest_peaks)
     args.output.parent.mkdir(parents=True, exist_ok=True)
@@ -87,6 +104,7 @@ def main() -> None:
             "spectra": int(len(rows)),
             "n_highest_peaks": args.n_highest_peaks,
             "labels_opened": False,
+            "panels": list(args.panels),
             "benchmark": benchmark_fingerprint(args.benchmark),
             "provenance": {
                 "official_embeddings_sha256": sha256_file(args.official_embeddings),

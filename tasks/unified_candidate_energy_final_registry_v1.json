@@ -1,0 +1,38 @@
+{
+  "schema": "unified_candidate_energy_final_registry_v1",
+  "frozen_module_policy": "GNPS preplanned best Top-1 ablation; no Enveda labels opened",
+  "modules": [
+    {
+      "name": "noise_v1",
+      "family": "condition_robust_spectral_embedding",
+      "status": "enabled"
+    },
+    {
+      "name": "weighted_spectral_entropy",
+      "family": "full_spectrum_classical",
+      "status": "enabled"
+    },
+    {
+      "name": "p2b_noise_v1_frozen",
+      "family": "local_fragment_reranker",
+      "status": "enabled"
+    },
+    {
+      "name": "chemaware_v2_action",
+      "family": "candidate_specific_chemical_evidence",
+      "status": "enabled",
+      "applicability": "sparse; abstention is availability zero"
+    }
+  ],
+  "representation_only_assets": [
+    {
+      "name": "chemaware_stage1_encoder",
+      "reason": "improved candidate AUROC/AUPRC but reduced both GNPS Top-1 point estimates in the preregistered leave-one-channel-out comparison"
+    }
+  ],
+  "forbidden": [
+    "noise_rrf_1_7",
+    "raw_p2b_constituent_channels",
+    "bioaware_without_real_event_context"
+  ]
+}
