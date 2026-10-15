@@ -102,7 +102,7 @@ python -m py_compile \
   tasks/build_gnps_chemaware_kernel_cache.py \
   tasks/evaluate_frozen_candidate_energy_external.py \
   tasks/reserve_candidate_energy_enveda_opening.py
-python -m pytest tasks/test_unified_candidate_energy.py -q
+python tasks/test_unified_candidate_energy.py
 
 mkdir -p "$OUT"
 if [[ "$REBUILD_V2" == 1 ]]; then
