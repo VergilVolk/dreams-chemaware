@@ -29,18 +29,17 @@ ARCH="dreams/models/pretrained/ssl_model_server.pt"
 OUT="data/validation/enveda180_layered_scoreblind_run_${SLURM_JOB_ID}"
 REUSE_RUN="${ENVEDA180_REUSE_RUN:-data/validation/enveda180_layered_scoreblind_run_2361083}"
 REUSE_BENCHMARK="${ENVEDA180_REUSE_BENCHMARK:-data/validation/enveda180_cross_condition_benchmark_v2_20261010}"
+read -r -a PANELS <<< "${ENVEDA180_SCORE_PANELS:-identity_disjoint formula_disjoint identity_same_formula formula_same_formula identity_open_set formula_open_set}"
+if [[ " ${PANELS[*]} " != *" identity_disjoint "* || " ${PANELS[*]} " != *" formula_disjoint "* ]]; then
+  echo "ENVEDA180_SCOREBLIND_PRIMARY_PANELS_REQUIRED" >&2
+  exit 5
+fi
 
 required=(
   "$BENCHMARK/report.json"
   "$BENCHMARK/checksums.sha256"
   "$BENCHMARK/spectra.mgf"
   "$BENCHMARK/manifest.csv.gz"
-  "$BENCHMARK/panel_identity_disjoint.npz"
-  "$BENCHMARK/panel_formula_disjoint.npz"
-  "$BENCHMARK/panel_identity_same_formula.npz"
-  "$BENCHMARK/panel_formula_same_formula.npz"
-  "$BENCHMARK/panel_identity_open_set.npz"
-  "$BENCHMARK/panel_formula_open_set.npz"
   "$AUDIT/report.json"
   "$FREEZE"
   "$OFFICIAL"
@@ -49,6 +48,9 @@ required=(
   tasks/encode_gnps_gold_silver_10ppm_checkpoint.py
   tasks/build_noise_gnps_article_score_bundle.py
 )
+for panel in "${PANELS[@]}"; do
+  required+=("$BENCHMARK/panel_${panel}.npz")
+done
 for path in "${required[@]}"; do
   [[ -s "$path" ]] || { echo "ENVEDA180_SCOREBLIND_MISSING_INPUT: $path" >&2; exit 5; }
 done
@@ -104,25 +106,25 @@ if [[ -s "$REUSE_RUN/official_embeddings.npz" && -s "$REUSE_RUN/official_embeddi
     --output "$OUT/official_embeddings.npz" --label enveda180_official \
     --reuse-benchmark "$REUSE_BENCHMARK" --reuse-embeddings "$REUSE_RUN/official_embeddings.npz" \
     --batch-size 64 --expected-selected-rows 0 --expected-records 0 \
-    --panels identity_disjoint formula_disjoint identity_same_formula formula_same_formula identity_open_set formula_open_set
+    --panels "${PANELS[@]}"
   python -u tasks/encode_gnps_gold_silver_10ppm_checkpoint.py \
     --benchmark "$BENCHMARK" --checkpoint "$NOISE" --architecture-checkpoint "$ARCH" \
     --output "$OUT/noise_v1_embeddings.npz" --label enveda180_noise_v1 \
     --reuse-benchmark "$REUSE_BENCHMARK" --reuse-embeddings "$REUSE_RUN/noise_v1_embeddings.npz" \
     --batch-size 64 --expected-selected-rows 0 --expected-records 0 \
-    --panels identity_disjoint formula_disjoint identity_same_formula formula_same_formula identity_open_set formula_open_set
+    --panels "${PANELS[@]}"
 else
   echo "ENVEDA180_REUSE_CACHE_UNAVAILABLE: encoding complete v3 row set"
   python -u tasks/encode_gnps_gold_silver_10ppm_checkpoint.py \
     --benchmark "$BENCHMARK" --checkpoint "$OFFICIAL" --architecture-checkpoint "$ARCH" \
     --output "$OUT/official_embeddings.npz" --label enveda180_official \
     --batch-size 64 --expected-selected-rows 0 --expected-records 0 \
-    --panels identity_disjoint formula_disjoint identity_same_formula formula_same_formula identity_open_set formula_open_set
+    --panels "${PANELS[@]}"
   python -u tasks/encode_gnps_gold_silver_10ppm_checkpoint.py \
     --benchmark "$BENCHMARK" --checkpoint "$NOISE" --architecture-checkpoint "$ARCH" \
     --output "$OUT/noise_v1_embeddings.npz" --label enveda180_noise_v1 \
     --batch-size 64 --expected-selected-rows 0 --expected-records 0 \
-    --panels identity_disjoint formula_disjoint identity_same_formula formula_same_formula identity_open_set formula_open_set
+    --panels "${PANELS[@]}"
 fi
 
 WORKERS="${SLURM_CPUS_PER_TASK:-10}"
@@ -131,7 +133,7 @@ python -u tasks/build_noise_gnps_article_score_bundle.py \
   --official-embeddings "$OUT/official_embeddings.npz" \
   --noise-v1-embeddings "$OUT/noise_v1_embeddings.npz" \
   --output "$OUT/method_scores_unopened.npz" \
-  --panels identity_disjoint formula_disjoint identity_same_formula formula_same_formula identity_open_set formula_open_set \
+  --panels "${PANELS[@]}" \
   --workers "$WORKERS" --fragment-tolerance 0.02 --n-highest-peaks 100
 
 cp "$FREEZE" "$OUT/freeze_contract.json"

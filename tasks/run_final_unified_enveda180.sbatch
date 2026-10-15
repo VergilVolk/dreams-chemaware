@@ -24,6 +24,9 @@ LAYER_OUT="data/validation/enveda180_layered_scoreblind_run_${SLURM_JOB_ID}"
 OUT="data/validation/unified_candidate_energy_enveda_final_run_${SLURM_JOB_ID}"
 REGISTRY="tasks/unified_candidate_energy_final_registry_v1.json"
 V2_POLICY="${CHEMAWARE_V2_POLICY_DIR:-data/validation/gnps_noise_chemaware_v2_transfer_run_2358497/recovered_frozen_v2_policy}"
+STAGE1="${CHEMAWARE_STAGE1_CHECKPOINT:-data/validation/chemaware_high_coverage_native/run_2340721_resume_2340524/training/best.ckpt}"
+PHASEA="${CHEMAWARE_PHASEA_CHECKPOINT:-data/validation/chemaware_online_role_budget_native/run_2345481/phasea_reproduction_gate/chemaware_phasea_max_boundary_step2000.ckpt}"
+ARCH="${DREAMS_ARCHITECTURE_CHECKPOINT:-dreams/models/pretrained/ssl_model_server.pt}"
 if [[ ! -s "$V2_POLICY/truthblind_policy.joblib" ]]; then
   V2_POLICY="data/validation/chemaware_multinull_deployment_safe_full_20260919"
 fi
@@ -40,10 +43,16 @@ required=(
   "$BENCHMARK/panel_formula_disjoint.npz"
   "$V2_POLICY/truthblind_policy.joblib"
   "$V2_POLICY/report.json"
+  "$STAGE1"
+  "$PHASEA"
+  "$ARCH"
   "$REGISTRY"
   tasks/freeze_unified_candidate_energy.py
   tasks/run_enveda180_layered_scoreblind.sbatch
   tasks/build_gnps_chemaware_kernel_cache.py
+  tasks/normalize_dreams_slim_checkpoint.py
+  tasks/encode_gnps_gold_silver_10ppm_checkpoint.py
+  tasks/extend_gnps_article_score_bundle.py
   tasks/export_chemaware_v2_grand_fusion_scores.py
   tasks/build_chemaware_v2_sparse_action_evidence.py
   tasks/build_grand_unified_evidence_bundle.py
@@ -74,7 +83,33 @@ python -u tasks/freeze_unified_candidate_energy.py \
 
 # Generate all spectral component scores while Enveda labels remain unopened.
 # The existing v2 embeddings are reused by immutable source_row wherever valid.
-bash tasks/run_enveda180_layered_scoreblind.sbatch
+ENVEDA180_SCORE_PANELS="identity_disjoint formula_disjoint" \
+  bash tasks/run_enveda180_layered_scoreblind.sbatch
+
+# Preserve both historical ChemAware embedding assets as frozen external
+# comparators.  They do not enter the selected four-module decision function.
+SCRATCH_ROOT="${SLURM_TMPDIR:-/tmp}/unified_e180_${SLURM_JOB_ID}"
+mkdir -p "$SCRATCH_ROOT"
+cleanup() { rm -rf -- "$SCRATCH_ROOT"; }
+trap cleanup EXIT
+for item in "stage1:$STAGE1" "phase_a:$PHASEA"; do
+  name="${item%%:*}"
+  checkpoint="${item#*:}"
+  slim="$SCRATCH_ROOT/chemaware_${name}_slim.pt"
+  embedding="$SCRATCH_ROOT/chemaware_${name}_embeddings.npz"
+  python -u tasks/normalize_dreams_slim_checkpoint.py \
+    --input "$checkpoint" --output "$slim"
+  cp "${slim}.json" "$OUT/chemaware_${name}_normalization.json"
+  python -u tasks/encode_gnps_gold_silver_10ppm_checkpoint.py \
+    --benchmark "$BENCHMARK" \
+    --checkpoint "$slim" \
+    --architecture-checkpoint "$ARCH" \
+    --output "$embedding" \
+    --panels identity_disjoint formula_disjoint \
+    --expected-selected-rows 0 --expected-records 0 \
+    --batch-size 64 --label "chemaware-${name}-enveda180"
+  cp "${embedding%.npz}.json" "$OUT/chemaware_${name}_encoding.json"
+done
 
 python -u tasks/extract_pair_score_cache_from_bundle.py \
   --benchmark "$BENCHMARK" \
@@ -97,6 +132,14 @@ python -u tasks/export_chemaware_v2_grand_fusion_scores.py \
   --output "$OUT/noise_v1_chemaware_v2_cache" \
   --batch-queries 256
 
+python -u tasks/extend_gnps_article_score_bundle.py \
+  --benchmark "$BENCHMARK" \
+  --base-bundle "$LAYER_OUT/method_scores_unopened.npz" \
+  --embedding-method "chemaware_stage1_encoder=$SCRATCH_ROOT/chemaware_stage1_embeddings.npz" \
+  --embedding-method "chemaware_phase_a_encoder=$SCRATCH_ROOT/chemaware_phase_a_embeddings.npz" \
+  --pair-score-method "noise_v1_chemaware_v2_hard_promotion=$OUT/noise_v1_chemaware_v2_cache" \
+  --output "$OUT/reference_scores_unopened.npz"
+
 # From this point onward the final truth is considered opened once.  All
 # component scores and the model already exist; both panels are reserved
 # together so the first result cannot influence the second.
@@ -104,7 +147,7 @@ python -u tasks/reserve_candidate_energy_enveda_opening.py \
   --model "$OUT/frozen_model/model.pt" \
   --freeze-report "$OUT/frozen_model/freeze_report.json" \
   --benchmark-report "$BENCHMARK/report.json" \
-  --reference-score-bundle "$LAYER_OUT/method_scores_unopened.npz" \
+  --reference-score-bundle "$OUT/reference_scores_unopened.npz" \
   --v2-selection-report "$OUT/noise_v1_chemaware_v2_cache/selection_report.json" \
   --output "$OUT/opening_global.json"
 
@@ -118,7 +161,7 @@ for panel in identity_disjoint formula_disjoint; do
   python -u tasks/build_grand_unified_evidence_bundle.py \
     --panel "$panel" \
     --panel-npz "$PANEL_PATH" \
-    --base-scores "$LAYER_OUT/method_scores_unopened.npz" \
+    --base-scores "$OUT/reference_scores_unopened.npz" \
     --module noise_v1 \
     --module weighted_spectral_entropy \
     --module p2b_noise_v1_frozen \
@@ -145,7 +188,7 @@ python -u tasks/evaluate_frozen_candidate_energy_external.py \
   --freeze-report "$OUT/frozen_model/freeze_report.json" \
   --test-bundle "$OUT/sealed_identity_disjoint.npz" \
   --component-score-bundle "$OUT/component_identity_disjoint.npz" \
-  --reference-score-bundle "$LAYER_OUT/method_scores_unopened.npz" \
+  --reference-score-bundle "$OUT/reference_scores_unopened.npz" \
   --module-registry "$REGISTRY" \
   --benchmark-report "$BENCHMARK/report.json" \
   --benchmark-checksums "$BENCHMARK/checksums.sha256" \
@@ -161,7 +204,7 @@ python -u tasks/evaluate_frozen_candidate_energy_external.py \
   --freeze-report "$OUT/frozen_model/freeze_report.json" \
   --test-bundle "$OUT/sealed_formula_disjoint.npz" \
   --component-score-bundle "$OUT/component_formula_disjoint.npz" \
-  --reference-score-bundle "$LAYER_OUT/method_scores_unopened.npz" \
+  --reference-score-bundle "$OUT/reference_scores_unopened.npz" \
   --module-registry "$REGISTRY" \
   --benchmark-report "$BENCHMARK/report.json" \
   --benchmark-checksums "$BENCHMARK/checksums.sha256" \
