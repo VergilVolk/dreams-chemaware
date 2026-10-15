@@ -58,6 +58,7 @@ required=(
   tasks/normalize_dreams_slim_checkpoint.py
   tasks/encode_gnps_gold_silver_10ppm_checkpoint.py
   tasks/extend_gnps_article_score_bundle.py
+  tasks/extract_pair_score_cache_from_bundle.py
   tasks/export_chemaware_v2_grand_fusion_scores.py
   tasks/build_chemaware_v2_sparse_action_evidence.py
   tasks/build_grand_unified_evidence_bundle.py
