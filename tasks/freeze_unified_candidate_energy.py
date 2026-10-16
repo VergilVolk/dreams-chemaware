@@ -28,6 +28,64 @@ MODULES = (
 SELECTED_ARM = "without_chemaware_stage1_encoder"
 
 
+def validate_selected_arm(crossfit: dict) -> tuple[dict, dict]:
+    """Validate the predeclared development arm before any external freeze.
+
+    The cross-fit producer applies a positive risk-net gate to its full arm.
+    The final selected ablation must satisfy the same scientific boundary;
+    otherwise an ablation search could silently bypass the external-admission
+    contract merely by improving mean Recall@1.
+    """
+    if crossfit.get("status") != "UNIFIED_CANDIDATE_ENERGY_CROSSFIT_COMPLETE":
+        raise RuntimeError("GNPS crossfit report is incomplete")
+    arm = crossfit.get("arms", {}).get(SELECTED_ARM)
+    if arm is None or tuple(arm.get("modules", ())) != MODULES:
+        raise RuntimeError("selected preplanned ablation is absent or has drifted")
+
+    development = {}
+    for panel in ("identity", "formula"):
+        result = arm["panels"][panel]
+        selected_r1 = float(result["candidate"]["recall@1"])
+        competing = {
+            name: float(body["panels"][panel]["candidate"]["recall@1"])
+            for name, body in crossfit["arms"].items()
+            if name != SELECTED_ARM
+        }
+        if selected_r1 < max(competing.values()):
+            raise RuntimeError(
+                f"selected arm is not the highest preplanned Recall@1 arm on {panel}"
+            )
+
+        paired = result["paired_vs_wse"]
+        if paired["delta_recall@1"] <= 0 or paired["formula_cluster_bootstrap_95ci"][0] <= 0:
+            raise RuntimeError(f"selected arm lacks positive GNPS support on {panel}")
+        if paired["risk_net_corrected_minus_2introduced"] <= 0:
+            raise RuntimeError(
+                f"selected arm fails corrected-2*introduced safety on {panel}"
+            )
+        micro_auc_delta = (
+            float(result["candidate"]["micro_candidate_auroc"])
+            - float(result["baseline_wse"]["micro_candidate_auroc"])
+        )
+        if micro_auc_delta < -0.001:
+            raise RuntimeError(
+                f"selected arm materially lowers micro candidate AUROC on {panel}"
+            )
+        development[panel] = {
+            "queries": result["candidate"]["queries"],
+            "recall@1": result["candidate"]["recall@1"],
+            "delta_recall@1_vs_wse": paired["delta_recall@1"],
+            "formula_cluster_bootstrap_95ci": paired["formula_cluster_bootstrap_95ci"],
+            "corrected": paired["corrected"],
+            "introduced": paired["introduced"],
+            "risk_net_corrected_minus_2introduced": paired[
+                "risk_net_corrected_minus_2introduced"
+            ],
+            "micro_candidate_auroc_delta_vs_wse": micro_auc_delta,
+        }
+    return arm, development
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--identity-bundle", type=Path, required=True)
@@ -43,39 +101,7 @@ def main() -> None:
             raise FileNotFoundError(path)
 
     crossfit = json.loads(args.crossfit_report.read_text(encoding="utf-8"))
-    if crossfit.get("status") != "UNIFIED_CANDIDATE_ENERGY_CROSSFIT_COMPLETE":
-        raise RuntimeError("GNPS crossfit report is incomplete")
-    arm = crossfit.get("arms", {}).get(SELECTED_ARM)
-    if arm is None or tuple(arm.get("modules", ())) != MODULES:
-        raise RuntimeError("selected preplanned ablation is absent or has drifted")
-    for panel in ("identity", "formula"):
-        selected_r1 = float(arm["panels"][panel]["candidate"]["recall@1"])
-        competing = {
-            name: float(body["panels"][panel]["candidate"]["recall@1"])
-            for name, body in crossfit["arms"].items()
-            if name != SELECTED_ARM
-        }
-        if selected_r1 < max(competing.values()):
-            raise RuntimeError(
-                f"selected arm is not the highest preplanned Recall@1 arm on {panel}"
-            )
-    development = {}
-    for panel in ("identity", "formula"):
-        result = arm["panels"][panel]
-        paired = result["paired_vs_wse"]
-        if paired["delta_recall@1"] <= 0 or paired["formula_cluster_bootstrap_95ci"][0] <= 0:
-            raise RuntimeError(f"selected arm lacks positive GNPS support on {panel}")
-        development[panel] = {
-            "queries": result["candidate"]["queries"],
-            "recall@1": result["candidate"]["recall@1"],
-            "delta_recall@1_vs_wse": paired["delta_recall@1"],
-            "formula_cluster_bootstrap_95ci": paired["formula_cluster_bootstrap_95ci"],
-            "corrected": paired["corrected"],
-            "introduced": paired["introduced"],
-            "risk_net_corrected_minus_2introduced": paired[
-                "risk_net_corrected_minus_2introduced"
-            ],
-        }
+    arm, development = validate_selected_arm(crossfit)
 
     raw = load_bundle(args.identity_bundle)
     selected = select_modules(raw, MODULES)
@@ -112,8 +138,8 @@ def main() -> None:
         "module_names": list(MODULES),
         "development_evidence": development,
         "risk_boundary": (
-            "Recall@1 and rank metrics improved, but corrected-2*introduced remained "
-            "negative and is retained as a secondary safety warning"
+            "Each GNPS development stratum passed positive Recall@1 CI, "
+            "corrected-2*introduced > 0, and micro-candidate AUROC delta >= -0.001"
         ),
         "final_residual_coefficients": dict(zip(MODULES, map(float, residual), strict=True)),
         "final_all_available_mixture_weights": dict(zip(MODULES, map(float, mixture), strict=True)),

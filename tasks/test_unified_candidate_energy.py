@@ -10,14 +10,116 @@ from pathlib import Path
 import numpy as np
 import torch
 
+from freeze_unified_candidate_energy import validate_selected_arm
+from train_unified_candidate_energy_risk_confirmatory import qualification_gates
 from train_unified_candidate_energy_crossfit import (
     AnchoredCandidateEnergy,
     crossfit,
     formula_fold,
+    listwise_loss,
 )
 
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def synthetic_crossfit(risk_net: int = 1) -> dict:
+    modules = [
+        "noise_v1",
+        "weighted_spectral_entropy",
+        "p2b_noise_v1_frozen",
+        "chemaware_v2_action",
+    ]
+    selected_panel = {
+        "candidate": {
+            "queries": 100,
+            "recall@1": 0.91,
+            "micro_candidate_auroc": 0.951,
+        },
+        "baseline_wse": {
+            "recall@1": 0.90,
+            "micro_candidate_auroc": 0.950,
+        },
+        "paired_vs_wse": {
+            "delta_recall@1": 0.01,
+            "corrected": 5,
+            "introduced": 2,
+            "risk_net_corrected_minus_2introduced": risk_net,
+            "formula_cluster_bootstrap_95ci": [0.001, 0.02],
+        },
+    }
+    competing_panel = {
+        "candidate": {"recall@1": 0.90},
+    }
+    return {
+        "status": "UNIFIED_CANDIDATE_ENERGY_CROSSFIT_COMPLETE",
+        "arms": {
+            "without_chemaware_stage1_encoder": {
+                "modules": modules,
+                "panels": {
+                    "identity": selected_panel,
+                    "formula": selected_panel,
+                },
+            },
+            "full": {
+                "panels": {
+                    "identity": competing_panel,
+                    "formula": competing_panel,
+                },
+            },
+        },
+    }
+
+
+def test_final_freeze_requires_positive_risk_net() -> None:
+    _, development = validate_selected_arm(synthetic_crossfit(risk_net=1))
+    assert development["identity"]["risk_net_corrected_minus_2introduced"] == 1
+
+    try:
+        validate_selected_arm(synthetic_crossfit(risk_net=0))
+    except RuntimeError as error:
+        assert "corrected-2*introduced safety" in str(error)
+    else:
+        raise AssertionError("non-positive risk net must block the external freeze")
+
+
+def test_cost_sensitive_listwise_loss_penalizes_baseline_correct_queries() -> None:
+    logits = torch.tensor([3.0, 0.0, 0.0, 3.0])
+    ptr = np.asarray([0, 2, 4], dtype=np.int64)
+    labels = np.asarray([1, 0, 1, 0], dtype=np.int8)
+    ordinary = listwise_loss(logits, ptr, labels)
+    weighted = listwise_loss(
+        logits, ptr, labels, np.asarray([2.0, 1.0], dtype=np.float32),
+    )
+    assert float(weighted) < float(ordinary)
+
+
+def test_confirmatory_gates_require_near_and_global_safety() -> None:
+    result = {
+        "candidate": {
+            "mrr": 0.91,
+            "micro_candidate_auroc": 0.951,
+            "micro_candidate_auprc": 0.801,
+        },
+        "baseline_wse": {
+            "mrr": 0.90,
+            "micro_candidate_auroc": 0.950,
+            "micro_candidate_auprc": 0.800,
+        },
+        "paired_vs_wse": {
+            "delta_recall@1": 0.01,
+            "formula_cluster_bootstrap_95ci": [0.001, 0.02],
+            "risk_net_corrected_minus_2introduced": 1,
+        },
+    }
+    near = {
+        "evaluable": True,
+        "delta_recall@1": 0.0,
+        "risk_net_corrected_minus_2introduced": 0,
+    }
+    assert all(qualification_gates(result, near).values())
+    near["risk_net_corrected_minus_2introduced"] = -1
+    assert qualification_gates(result, near)["near_risk_net_nonnegative"] is False
 
 
 def test_continuous_energy() -> None:
@@ -135,6 +237,9 @@ def test_formula_target_truth_cannot_change_predictions() -> None:
 
 
 if __name__ == "__main__":
+    test_final_freeze_requires_positive_risk_net()
+    test_cost_sensitive_listwise_loss_penalizes_baseline_correct_queries()
+    test_confirmatory_gates_require_near_and_global_safety()
     test_continuous_energy()
     test_formula_partition()
     test_sparse_adapter_never_needs_truth()

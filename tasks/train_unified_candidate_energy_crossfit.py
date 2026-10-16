@@ -90,7 +90,12 @@ def candidate_indices(ptr: np.ndarray, queries: np.ndarray) -> tuple[np.ndarray,
     return index, np.concatenate(([0], np.cumsum(lengths)))
 
 
-def listwise_loss(logits: torch.Tensor, ptr: np.ndarray, labels: np.ndarray) -> torch.Tensor:
+def listwise_loss(
+    logits: torch.Tensor,
+    ptr: np.ndarray,
+    labels: np.ndarray,
+    query_weights: np.ndarray | None = None,
+) -> torch.Tensor:
     losses = []
     for left, right in zip(ptr[:-1], ptr[1:]):
         left, right = int(left), int(right)
@@ -101,7 +106,13 @@ def listwise_loss(logits: torch.Tensor, ptr: np.ndarray, labels: np.ndarray) -> 
             logits[left:right][None, :],
             torch.tensor([int(target[0])], device=logits.device),
         ))
-    return torch.stack(losses).mean()
+    stacked = torch.stack(losses)
+    if query_weights is None:
+        return stacked.mean()
+    weights = torch.as_tensor(query_weights, dtype=stacked.dtype, device=stacked.device)
+    if weights.shape != stacked.shape or torch.any(weights <= 0):
+        raise ValueError("query_weights must be positive and match the query batch")
+    return torch.sum(stacked * weights) / torch.sum(weights)
 
 
 def prepare(bundle: dict) -> dict:
@@ -128,11 +139,24 @@ def fit_model(
     anchor_strength: float,
     seed: int,
     device: torch.device,
+    baseline_correct_penalty: float = 1.0,
 ) -> AnchoredCandidateEnergy:
+    if baseline_correct_penalty < 1.0:
+        raise ValueError("baseline_correct_penalty must be at least one")
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
     model = AnchoredCandidateEnergy(module_names).to(device)
+    # Compute the cost weights only for the queries supplied to this fit.  In
+    # cross-fitting this avoids even reading labels from the held formula fold.
+    train_index, train_ptr = candidate_indices(prepared["query_ptr"], queries)
+    train_ranks = strict_ranks(
+        prepared["evidence"][model.base_index, train_index],
+        train_ptr,
+        prepared["labels"][train_index],
+    )
+    base_correct = np.zeros(len(prepared["query_ptr"]) - 1, dtype=bool)
+    base_correct[queries] = train_ranks == 1
     optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate, weight_decay=1e-4)
     rng = np.random.default_rng(seed)
     for _ in range(epochs):
@@ -145,7 +169,10 @@ def fit_model(
             labels = prepared["labels"][index]
             logits = model(evidence, availability)
             anchor = evidence[model.base_index]
-            loss = listwise_loss(logits, ptr, labels)
+            query_weights = np.where(
+                base_correct[batch], baseline_correct_penalty, 1.0,
+            ).astype(np.float32)
+            loss = listwise_loss(logits, ptr, labels, query_weights)
             loss = loss + anchor_strength * torch.mean(torch.square(logits - anchor))
             optimizer.zero_grad(set_to_none=True)
             loss.backward()
@@ -278,6 +305,7 @@ def crossfit(
     anchor_strength: float,
     seed: int,
     device: torch.device,
+    baseline_correct_penalty: float = 1.0,
 ) -> tuple[dict[str, np.ndarray], list[dict]]:
     outputs = {
         name: np.full(len(body["labels"]), np.nan, dtype=np.float32)
@@ -294,6 +322,7 @@ def crossfit(
         model = fit_model(
             train, module_names, train_queries, epochs, batch_queries,
             learning_rate, anchor_strength, seed + fold, device,
+            baseline_correct_penalty,
         )
         fold_report = {
             "fold": fold,
@@ -309,6 +338,7 @@ def crossfit(
                 )
             },
             "prediction_queries": {},
+            "baseline_correct_penalty": float(baseline_correct_penalty),
         }
         for name, body in targets.items():
             queries = np.flatnonzero(target_folds[name] == fold)
@@ -341,6 +371,7 @@ def main() -> None:
     parser.add_argument("--batch-queries", type=int, default=256)
     parser.add_argument("--learning-rate", type=float, default=2e-3)
     parser.add_argument("--anchor-strength", type=float, default=0.01)
+    parser.add_argument("--baseline-correct-penalty", type=float, default=1.0)
     parser.add_argument("--bootstrap-resamples", type=int, default=5000)
     parser.add_argument("--seed", type=int, default=20261012)
     parser.add_argument("--run-ablations", action="store_true")
@@ -383,6 +414,7 @@ def main() -> None:
             "batch_queries": args.batch_queries,
             "learning_rate": args.learning_rate,
             "anchor_strength": args.anchor_strength,
+            "baseline_correct_penalty": args.baseline_correct_penalty,
             "seed": args.seed,
         },
         "bioaware": "unavailable_without_real_sample_event_context",
@@ -400,6 +432,7 @@ def main() -> None:
             identity, {"identity": identity, "formula": formula}, arm_names,
             args.folds, args.epochs, args.batch_queries, args.learning_rate,
             args.anchor_strength, args.seed, device,
+            args.baseline_correct_penalty,
         )
         base_index = arm_names.index(BASE)
         arm_report = {"modules": list(arm_names), "folds": folds, "panels": {}}
@@ -435,6 +468,7 @@ def main() -> None:
     final_model = fit_model(
         identity, names, all_queries, args.epochs, args.batch_queries,
         args.learning_rate, args.anchor_strength, args.seed + 1000, device,
+        args.baseline_correct_penalty,
     )
     model_path = args.output / "model.pt"
     torch.save({
