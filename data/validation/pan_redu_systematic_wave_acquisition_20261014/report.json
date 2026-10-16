@@ -1,0 +1,15 @@
+{
+  "schema": "pan_redu_systematic_wave_acquisition_v2",
+  "denominators": {
+    "input_files": 8565,
+    "acquisition_files": 8008,
+    "collapsed_mirror_files": 557,
+    "input_bytes": 465568959305,
+    "acquisition_bytes": 447487155523,
+    "acquisition_gib": 416.7548897890374,
+    "collapsed_mirror_bytes": 18081803782,
+    "within_accession_collection_mirror_files": 373
+  },
+  "leakage_status": "metadata_and_file_inventory_only",
+  "claim_boundary": "Mirror collapse saves acquisition bytes; it does not turn remaining accessions into independent cohorts."
+}

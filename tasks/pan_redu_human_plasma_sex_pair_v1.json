@@ -1,0 +1,20 @@
+{
+  "schema": "crosssectional_contrast_pair_v1",
+  "status": "active",
+  "contrast_family": "human_blood_plasma_biological_sex",
+  "effect_direction": "male_minus_female",
+  "studies": [
+    {
+      "study_id": "MSV000085607_HNRC_plasma",
+      "dataset_accession": "MSV000085607",
+      "contrast_id": "ff350fc631478574",
+      "source_family": "source:afa664afb579a604"
+    },
+    {
+      "study_id": "MSV000082630_ONR_Wright_plasma",
+      "dataset_accession": "MSV000082630",
+      "contrast_id": "035c275e62851ae1",
+      "source_family": "source:14525832482b5e25"
+    }
+  ]
+}

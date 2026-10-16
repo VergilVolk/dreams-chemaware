@@ -1,0 +1,20 @@
+{
+  "schema": "pan_redu_high_value_raw_tranche_v1",
+  "selection_rule": "lowest_GiB_per_candidate_panel_after_reusing_schema_qualified_processed_sources",
+  "denominators": {
+    "processed_accessions_reused": 9,
+    "processed_source_families_reused_in_wave": 7,
+    "selected_new_source_families": 20,
+    "selected_accessions": 21,
+    "selected_candidate_panels": 42,
+    "selected_raw_files": 3845,
+    "selected_raw_bytes": 157279532029,
+    "selected_raw_gib": 146.4779787035659
+  },
+  "leakage_status": "metadata_file_size_and_processed_schema_availability_only",
+  "claim_boundary": [
+    "Cost-efficient acquisition does not establish biological truth or analysis readiness.",
+    "Processed sources are reused only as inputs; they do not count as independent raw reprocessing validations.",
+    "The full post-deduplication acquisition manifest remains frozen and can be added without changing the method."
+  ]
+}

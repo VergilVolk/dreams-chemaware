@@ -1,0 +1,53 @@
+{
+  "schema": "factorial_longitudinal_contrast_pair_v1",
+  "status": "invalidated_do_not_run",
+  "invalidation_reason": "Lowry ATTRIBUTE_asd was not established as sleep deprivation; matching it to the Turek sleep-deprivation factor would manufacture cross-study truth.",
+  "contrast_family": "acute_sleep_disruption_fecal_metabolome",
+  "effect_direction": "sleep_disruption_minus_control_on_endpoint_minus_baseline_change",
+  "studies": [
+    {
+      "study_id": "MSV000082608_Turek",
+      "dataset_accession": "MSV000082608",
+      "source_family": "source:fed52d7f3788571d",
+      "quant_path": "data/reference/pan_redu_systematic_wave_quant_pairs_20261014/MSV000082608/updates/2018-07-22_fevargas_5bcf2494/other/mzmine_turek/ONR_Primary_Turek_mouse_experiment1_MS2_features.csv",
+      "mgf_path": "data/reference/pan_redu_systematic_wave_quant_pairs_20261014/MSV000082608/updates/2018-07-22_fevargas_7ef5d859/other/ONR_Primary_Turek_experiment1_GNPS.mgf",
+      "design_path": "data/reference/pan_redu_systematic_wave_design_assets_20261014/MSV000082608/updates/2018-07-22_fevargas_5bcf2494/other/mzmine_turek/ONR_Primary_Turek_mouse_metadata.txt",
+      "filename_column": "filename",
+      "unit_column": "host_subject_id",
+      "time_column": "ATTRIBUTE_timepoint",
+      "baseline_level": "Pre_Sleep_Dep_D",
+      "endpoint_level": "Necropsy_F",
+      "target": {
+        "column": "ATTRIBUTE_sleep_deprivation_group",
+        "reference": "Ad_Lib",
+        "exposed": "Sleep_Deprivation"
+      },
+      "adjustments": [
+        {"column": "ATTRIBUTE_stress_group", "reference": "Home_Cage", "exposed": "Social_Defeat"},
+        {"column": "ATTRIBUTE_treatment_group", "reference": "BBS", "exposed": "MV"}
+      ]
+    },
+    {
+      "study_id": "MSV000082650_Lowry",
+      "dataset_accession": "MSV000082650",
+      "source_family": "source:68b19d0101f53ec3",
+      "quant_path": "data/reference/pan_redu_systematic_wave_quant_pairs_20261014/MSV000082650/updates/2018-07-22_fevargas_e3ca2c31/other/mzmine_lowry/ONR_Primary_Lowry_mouse_experiment1_ms2.csv",
+      "mgf_path": "data/reference/pan_redu_systematic_wave_quant_pairs_20261014/MSV000082650/other/ONR_Primary_Lowry_mouse_experiment1_GNPS.mgf",
+      "design_path": "data/reference/pan_redu_systematic_wave_design_assets_20261014/MSV000082650/updates/2018-07-22_fevargas_e3ca2c31/other/mzmine_lowry/ONR_Primary_Lowry_mouse_metadata.txt",
+      "filename_column": "filename",
+      "unit_column": "host_subject_id",
+      "time_column": "ATTRIBUTE_timepoint",
+      "baseline_level": "-1",
+      "endpoint_level": "62",
+      "target": {
+        "column": "ATTRIBUTE_asd",
+        "reference": "SHC",
+        "exposed": "SD"
+      },
+      "adjustments": [
+        {"column": "ATTRIBUTE_cdr", "reference": "NLD", "exposed": "CDR"},
+        {"column": "ATTRIBUTE_treatment", "reference": "VEH", "exposed": "MVAC"}
+      ]
+    }
+  ]
+}

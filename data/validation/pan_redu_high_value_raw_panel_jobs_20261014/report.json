@@ -1,0 +1,21 @@
+{
+  "schema": "pan_redu_raw_panel_jobs_v1",
+  "status": "development_inputs_prepared_no_abundance_opened",
+  "denominators": {
+    "panels": 23,
+    "contrasts": 42,
+    "accessions": 21,
+    "sample_files": 3845,
+    "biological_units_across_panel_namespaces": 2859,
+    "expected_bytes": 157279532029,
+    "sealed_membership_rows": 5136,
+    "contrasts_passing_reported_unit_topology": 39,
+    "contrasts_failing_cross_level_units": 3
+  },
+  "leakage_status": "quantification manifests exclude contrast fields and levels; sealed memberships must not be opened until each panel abundance matrix is frozen",
+  "claim_boundary": [
+    "Pan-ReDU labels qualify candidate contrasts but do not establish biological truth.",
+    "Hashed subject identifiers preserve unit topology; they do not prove independence or remove confounding.",
+    "Raw acquisition and quantification are pending until byte-verified files exist."
+  ]
+}
