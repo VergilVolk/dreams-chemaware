@@ -184,9 +184,9 @@ class AdditiveBoundedResidualEnergy(nn.Module):
 
     Each head receives only one evidence family.  The two scalar outputs are
     independently bounded and then summed, so neither hidden units nor a
-    shared output nonlinearity can form a cross-family interaction.  Each head receives the full registered hidden
-    width; this deliberately gives the additive comparator more parameters
-    than the joint head rather than making interaction easy to win.
+    shared output nonlinearity can form a cross-family interaction.  The
+    optional chemical width permits an exact parameter-count match to a joint
+    model while leaving the default historical construction unchanged.
     """
 
     def __init__(
@@ -194,12 +194,14 @@ class AdditiveBoundedResidualEnergy(nn.Module):
         feature_count: int,
         spectral_feature_count: int = 3,
         hidden: int = 16,
+        chemical_hidden: int | None = None,
         residual_bound: float = 0.25,
     ):
         super().__init__()
         if not 0 < spectral_feature_count < feature_count:
             raise ValueError("additive split must leave both evidence families non-empty")
-        if hidden < 1 or residual_bound <= 0:
+        chemical_hidden = hidden if chemical_hidden is None else int(chemical_hidden)
+        if hidden < 1 or chemical_hidden < 1 or residual_bound <= 0:
             raise ValueError("invalid additive residual dimensions")
         self.spectral_feature_count = int(spectral_feature_count)
         self.residual_bound = float(residual_bound)
@@ -207,9 +209,9 @@ class AdditiveBoundedResidualEnergy(nn.Module):
             nn.Linear(self.spectral_feature_count, hidden), nn.Tanh(), nn.Linear(hidden, 1),
         )
         self.chemical_network = nn.Sequential(
-            nn.Linear(feature_count - self.spectral_feature_count, hidden),
+            nn.Linear(feature_count - self.spectral_feature_count, chemical_hidden),
             nn.Tanh(),
-            nn.Linear(hidden, 1),
+            nn.Linear(chemical_hidden, 1),
         )
         for network in (self.spectral_network, self.chemical_network):
             nn.init.zeros_(network[-1].weight)
