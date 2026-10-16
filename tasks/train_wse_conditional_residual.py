@@ -37,6 +37,7 @@ WSE = "weighted_spectral_entropy"
 NOISE = "noise_v1"
 P2B = "p2b_noise_v1_frozen"
 OLD_MODULES = (NOISE, WSE, P2B, "chemaware_v2_action")
+V2_ACTION = "chemaware_v2_action"
 SPECTRAL_FEATURE_NAMES = (
     "wse_raw", "wse_gap_to_query_top", "wse_query_top1_top2_margin",
     "noise_v1_raw", "noise_v1_gap_to_query_top", "noise_v1_query_top1_top2_margin",
@@ -169,6 +170,16 @@ def build_panel(bundle: dict, chem_path: Path) -> dict:
     ])
     return {
         "base": scores[positions[WSE]].copy(),
+        # Keep the frozen component axes for descriptive diagnostics only.  They
+        # are never fed back into the fitted A/B models or used for selection.
+        "raw_module_scores": {
+            name: scores[names.index(name)].copy()
+            for name in (WSE, NOISE, P2B, V2_ACTION) if name in names
+        },
+        "raw_module_available": {
+            name: availability[names.index(name)].astype(bool, copy=True)
+            for name in (WSE, NOISE, P2B, V2_ACTION) if name in names
+        },
         "features": actual,
         "null_features": nulls,
         "chemical_available": chemical_available,
@@ -416,6 +427,173 @@ def arm_beats(comparisons: dict, panels: tuple[str, ...]) -> bool:
     )
 
 
+def unique_top_candidate(scores: np.ndarray, query_ptr: np.ndarray) -> np.ndarray:
+    """Deployment-visible unique winners; -1 represents a top tie.
+
+    This deliberately does not look at labels.  It is used only to form the
+    observable spectral-agreement stratum, never as a router.
+    """
+    scores = np.asarray(scores, dtype=np.float64)
+    result = np.full(len(query_ptr) - 1, -1, dtype=np.int64)
+    for query, (left, right) in enumerate(zip(query_ptr[:-1], query_ptr[1:])):
+        left, right = int(left), int(right)
+        block = scores[left:right]
+        winners = np.flatnonzero(block == np.max(block))
+        if len(winners) == 1:
+            result[query] = left + int(winners[0])
+    return result
+
+
+def query_true_gap(base: np.ndarray, query_ptr: np.ndarray, labels: np.ndarray) -> np.ndarray:
+    """Raw-WSE deficit of the true candidate relative to the WSE leader."""
+    gap = np.empty(len(query_ptr) - 1, dtype=np.float64)
+    for query, (left, right) in enumerate(zip(query_ptr[:-1], query_ptr[1:])):
+        left, right = int(left), int(right)
+        block_labels = labels[left:right]
+        if int(block_labels.sum()) != 1:
+            raise ValueError("every query needs one positive candidate")
+        true_score = float(base[left:right][block_labels.astype(bool)][0])
+        gap[query] = float(np.max(base[left:right]) - true_score)
+    return gap
+
+
+def query_complete_availability(availability: np.ndarray, query_ptr: np.ndarray) -> np.ndarray:
+    availability = np.asarray(availability, dtype=bool)
+    return np.asarray([
+        bool(np.all(availability[int(left):int(right)]))
+        for left, right in zip(query_ptr[:-1], query_ptr[1:])
+    ])
+
+
+def quantile_summary(values: np.ndarray) -> dict:
+    values = np.asarray(values, dtype=np.float64)
+    if not len(values):
+        return {"n": 0, "min": None, "q25": None, "median": None, "q75": None, "q90": None, "max": None}
+    return {
+        "n": int(len(values)), "min": float(np.min(values)),
+        "q25": float(np.quantile(values, 0.25)), "median": float(np.median(values)),
+        "q75": float(np.quantile(values, 0.75)), "q90": float(np.quantile(values, 0.90)),
+        "max": float(np.max(values)),
+    }
+
+
+def rank_metrics_for_queries(ranks: np.ndarray, query_mask: np.ndarray) -> dict:
+    selected = np.asarray(ranks, dtype=np.int64)[np.asarray(query_mask, dtype=bool)]
+    if not len(selected):
+        return {"queries": 0, "recall@1": None, "recall@3": None, "recall@5": None,
+                "recall@10": None, "recall@20": None, "mrr": None}
+    return {
+        "queries": int(len(selected)),
+        **{f"recall@{k}": float(np.mean(selected <= k)) for k in (1, 3, 5, 10, 20)},
+        "mrr": float(np.mean(1.0 / selected)),
+    }
+
+
+def residual_diagnostics(
+    panel: dict,
+    scores: dict[str, np.ndarray],
+    b_bound_by_query: np.ndarray,
+) -> dict:
+    """Describe capacity and exchanges without changing the fitted system.
+
+    For B, each candidate residual lies in [-rho, rho].  Therefore a true
+    candidate whose raw-WSE deficit is >= 2*rho cannot become a *strict* Top-1
+    candidate under B.  The equality case is included because strict ties are
+    not counted as correct throughout this benchmark.
+    """
+    ptr, labels = panel["query_ptr"], panel["labels"]
+    ranks = {
+        name: strict_ranks(value, ptr, labels)
+        for name, value in scores.items()
+        if name in ("wse", "old_four_module", "A", "B")
+    }
+    wse_error = ranks["wse"] != 1
+    b_corrected = (ranks["B"] == 1) & wse_error
+    b_introduced = (ranks["B"] != 1) & (ranks["wse"] == 1)
+    true_gap = query_true_gap(panel["base"], ptr, labels)
+    b_bound_by_query = np.asarray(b_bound_by_query, dtype=np.float64)
+    if b_bound_by_query.shape != true_gap.shape or np.any(~np.isfinite(b_bound_by_query)):
+        raise ValueError("B residual-bound axis is incomplete")
+    unreachable = true_gap >= (2.0 * b_bound_by_query - 1e-12)
+
+    direct_corrections = {}
+    direct_any = np.zeros(len(wse_error), dtype=bool)
+    for name in (NOISE, P2B, V2_ACTION):
+        if name not in panel["raw_module_scores"]:
+            direct_corrections[name] = {"status": "NOT_PRESENT", "complete_queries": 0, "corrected_wse_errors": 0}
+            continue
+        complete = query_complete_availability(panel["raw_module_available"][name], ptr)
+        module_ranks = strict_ranks(panel["raw_module_scores"][name], ptr, labels)
+        correction = wse_error & complete & (module_ranks == 1)
+        direct_any |= correction
+        direct_corrections[name] = {
+            "status": "COMPLETE_QUERY_ONLY",
+            "complete_queries": int(complete.sum()),
+            "corrected_wse_errors": int(correction.sum()),
+            "wse_errors_with_complete_module": int((wse_error & complete).sum()),
+        }
+    old_correction = wse_error & (ranks["old_four_module"] == 1)
+
+    wse_leader = unique_top_candidate(panel["raw_module_scores"][WSE], ptr)
+    noise_leader = unique_top_candidate(panel["raw_module_scores"][NOISE], ptr)
+    p2b_leader = unique_top_candidate(panel["raw_module_scores"][P2B], ptr)
+    spectral_agreement = (
+        (wse_leader >= 0) & (wse_leader == noise_leader) & (wse_leader == p2b_leader)
+    )
+    chemistry_available = np.asarray([
+        bool(np.any(panel["chemical_available"][int(left):int(right)]))
+        for left, right in zip(ptr[:-1], ptr[1:])
+    ])
+    chemistry_complete = query_complete_availability(panel["chemical_available"], ptr)
+    strata = {
+        "spectral_agreement_unique_top1": spectral_agreement,
+        "spectral_conflict_or_top_tie": ~spectral_agreement,
+        "chemistry_unavailable_all_candidates": ~chemistry_available,
+        "chemistry_partially_available": chemistry_available & ~chemistry_complete,
+        "chemistry_available_all_candidates": chemistry_complete,
+    }
+    stratum_report = {}
+    for name, mask in strata.items():
+        stratum_report[name] = {
+            "observable_pretruth_only": True,
+            "methods": {method: rank_metrics_for_queries(rank, mask) for method, rank in ranks.items()},
+            "B_vs_wse": {
+                "corrected": int(np.sum(b_corrected & mask)),
+                "introduced": int(np.sum(b_introduced & mask)),
+                "delta_recall@1": float(np.mean(
+                    (ranks["B"] == 1)[mask].astype(float)
+                    - (ranks["wse"] == 1)[mask].astype(float)
+                )) if np.any(mask) else None,
+            },
+        }
+    return {
+        "status": "DESCRIPTIVE_NO_SELECTION_OR_RETRAINING",
+        "residual_capacity": {
+            "theorem": "With B residuals bounded in [-rho,+rho], a raw-WSE true-candidate deficit >= 2*rho cannot yield strict Top-1.",
+            "wse_errors": int(wse_error.sum()),
+            "wse_errors_structurally_unreachable_by_B_bound": int(np.sum(wse_error & unreachable)),
+            "wse_errors_structurally_crossable_by_B_bound": int(np.sum(wse_error & ~unreachable)),
+            "B_corrected": int(b_corrected.sum()),
+            "B_corrected_above_or_at_bound_should_be_zero": int(np.sum(b_corrected & unreachable)),
+            "B_introduced": int(b_introduced.sum()),
+            "B_residual_bound_raw_wse_units": quantile_summary(b_bound_by_query),
+            "raw_wse_true_candidate_gap": {
+                "all_wse_errors": quantile_summary(true_gap[wse_error]),
+                "B_corrected": quantile_summary(true_gap[b_corrected]),
+                "B_introduced": quantile_summary(true_gap[b_introduced]),
+            },
+        },
+        "existing_component_correctability": {
+            "definition": "WSE errors made strict Top-1 by a frozen component only on queries where that component is complete; descriptive, not a fusion rule.",
+            "per_component": direct_corrections,
+            "corrected_by_any_noise_p2b_or_v2_action": int(direct_any.sum()),
+            "of_any_component_correctable_unreachable_by_B_bound": int(np.sum(direct_any & unreachable)),
+            "old_four_module_corrected_wse_errors": int(old_correction.sum()),
+        },
+        "observable_strata": stratum_report,
+    }
+
+
 def write_query_ledger(path: Path, panels: dict, scores: dict) -> None:
     with gzip.open(path, "wt", newline="", encoding="utf-8") as handle:
         writer = csv.writer(handle)
@@ -500,6 +678,13 @@ def main() -> None:
         }
         for panel, body in panels.items()
     }
+    # Bound values are assigned only from the model trained without the held
+    # formula fold.  They are recorded for a post-fit capacity diagnosis, not
+    # revisited to select a larger bound.
+    b_bound_by_query = {
+        panel: np.full(len(body["query_ids"]), np.nan, dtype=np.float64)
+        for panel, body in panels.items()
+    }
     identity_folds = np.asarray([
         formula_fold(value, args.folds, args.seed) for value in panels["identity"]["formulas"]
     ])
@@ -536,6 +721,7 @@ def main() -> None:
                     outputs[panel_name]["B_zero_replay"][index] = replay[0]
                     outputs[panel_name]["B_reversed_replay"][index] = replay[1]
                     outputs[panel_name]["B_candidate_mismatch_replay"][index] = replay[2]
+                    b_bound_by_query[panel_name][queries] = bound
                 arm_record["prediction_queries"][panel_name] = int(len(queries))
             fold_report["arms"][arm_name] = arm_record
         fold_reports.append(fold_report)
@@ -545,6 +731,8 @@ def main() -> None:
         for methods in outputs.values() for values in methods.values()
     ):
         raise RuntimeError("cross-fitted prediction ledger is incomplete")
+    if any(np.any(~np.isfinite(values)) for values in b_bound_by_query.values()):
+        raise RuntimeError("cross-fitted B residual-bound ledger is incomplete")
 
     report = {
         "status": "WSE_CONDITIONAL_RESIDUAL_DEVELOPMENT_COMPLETE",
@@ -612,6 +800,9 @@ def main() -> None:
             "comparisons": comparisons,
             "null_replay_interpretation": (
                 "input-dependence falsification only; not a standalone chemical causal claim"
+            ),
+            "diagnostics": residual_diagnostics(
+                panel, outputs[panel_name], b_bound_by_query[panel_name],
             ),
         }
 
@@ -694,6 +885,7 @@ def main() -> None:
         arrays[f"{panel_name}__formula"] = panel["formulas"]
         arrays[f"{panel_name}__near"] = panel["near"]
         arrays[f"{panel_name}__chemical_available"] = panel["chemical_available"]
+        arrays[f"{panel_name}__B_residual_bound_by_query"] = b_bound_by_query[panel_name]
     np.savez_compressed(prediction_path, **arrays)
     ledger_path = args.output / "query_predictions_and_exchange.csv.gz"
     write_query_ledger(ledger_path, panels, outputs)
@@ -701,7 +893,8 @@ def main() -> None:
     with table_path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.writer(handle)
         writer.writerow((
-            "panel", "method", "queries", "recall@1", "mrr",
+            "panel", "method", "queries", "recall@1", "recall@3", "recall@5",
+            "recall@10", "recall@20", "mrr",
             "macro_query_auroc", "macro_query_auprc",
             "micro_candidate_auroc", "micro_candidate_auprc", "near_recall@1",
         ))
@@ -710,6 +903,8 @@ def main() -> None:
                 metrics = report["panels"][panel_name]["methods"][method]
                 writer.writerow((
                     panel_name, method, metrics["queries"], metrics["recall@1"],
+                    metrics["recall@3"], metrics["recall@5"], metrics["recall@10"],
+                    metrics["recall@20"],
                     metrics["mrr"], metrics["macro_query_auroc"],
                     metrics["macro_query_auprc"], metrics["micro_candidate_auroc"],
                     metrics["micro_candidate_auprc"], metrics["near"].get("recall@1", ""),

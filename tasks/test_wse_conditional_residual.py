@@ -14,6 +14,7 @@ from train_wse_conditional_residual import (
     fit_scaler,
     query_score_features,
     reconstruct_old_scores,
+    residual_diagnostics,
     training_residual_bound,
     transform_features,
 )
@@ -151,6 +152,42 @@ def test_old_four_module_scores_are_replayed_without_retraining() -> None:
     assert np.allclose(observed, expected, atol=1e-6)
 
 
+def test_residual_capacity_diagnostic_marks_impossible_wse_deficits() -> None:
+    ptr = np.asarray([0, 2, 4, 6], dtype=np.int64)
+    labels = np.asarray([1, 0, 1, 0, 1, 0], dtype=np.int8)
+    wse = np.asarray([0.0, 1.0, 1.0, 0.0, 0.8, 1.0], dtype=np.float32)
+    panel = {
+        "query_ptr": ptr,
+        "labels": labels,
+        "base": wse,
+        "chemical_available": np.asarray([True, True, False, False, True, False]),
+        "raw_module_scores": {
+            "weighted_spectral_entropy": wse,
+            "noise_v1": np.asarray([1.0, 0.0, 1.0, 0.0, 0.8, 1.0]),
+            "p2b_noise_v1_frozen": np.asarray([1.0, 0.0, 1.0, 0.0, 1.0, 0.0]),
+            "chemaware_v2_action": np.asarray([0.0, 1.0, 1.0, 0.0, 1.0, 0.0]),
+        },
+        "raw_module_available": {
+            name: np.ones(6, dtype=bool)
+            for name in ("weighted_spectral_entropy", "noise_v1", "p2b_noise_v1_frozen", "chemaware_v2_action")
+        },
+    }
+    scores = {
+        "wse": wse,
+        "old_four_module": wse,
+        "A": wse,
+        "B": np.asarray([0.1, 1.0, 0.0, 1.0, 1.1, 1.0]),
+    }
+    diagnostics = residual_diagnostics(panel, scores, np.asarray([0.4, 0.4, 0.4]))
+    capacity = diagnostics["residual_capacity"]
+    assert capacity["wse_errors"] == 2
+    assert capacity["wse_errors_structurally_unreachable_by_B_bound"] == 1
+    assert capacity["B_corrected"] == 1
+    assert capacity["B_corrected_above_or_at_bound_should_be_zero"] == 0
+    assert capacity["B_introduced"] == 1
+    assert diagnostics["existing_component_correctability"]["per_component"]["noise_v1"]["corrected_wse_errors"] == 1
+
+
 if __name__ == "__main__":
     test_raw_scores_and_competition_state_are_preserved()
     test_chemical_features_cancel_shared_nuisance_and_mark_missing()
@@ -158,4 +195,5 @@ if __name__ == "__main__":
     test_residual_bound_reads_training_queries_only()
     test_joint_chemical_zero_is_exact_noop()
     test_old_four_module_scores_are_replayed_without_retraining()
+    test_residual_capacity_diagnostic_marks_impossible_wse_deficits()
     print("PASS: WSE conditional-residual scientific contracts")
