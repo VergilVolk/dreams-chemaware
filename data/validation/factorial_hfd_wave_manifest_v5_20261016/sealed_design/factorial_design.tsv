@@ -1,0 +1,245 @@
+panel_id	dataset_accession	sample_id	biological_unit_id	source_family	genotype	diet	genotype_code	diet_code
+afc7fb9c30058cb4	MTBLS135	Sb61b815330ca037214f8	Sb61b815330ca037214f8	Dana-Farber_Hi-MYC_wave1	wild type genotype	Control Group	0	0
+afc7fb9c30058cb4	MTBLS135	S4928f34aa69f6b7806a9	S4928f34aa69f6b7806a9	Dana-Farber_Hi-MYC_wave1	wild type genotype	Control Group	0	0
+afc7fb9c30058cb4	MTBLS135	S747a7740f7c3236141cf	S747a7740f7c3236141cf	Dana-Farber_Hi-MYC_wave1	wild type genotype	Control Group	0	0
+afc7fb9c30058cb4	MTBLS135	Se8803df309552f3c6dcc	Se8803df309552f3c6dcc	Dana-Farber_Hi-MYC_wave1	wild type genotype	Control Group	0	0
+afc7fb9c30058cb4	MTBLS135	Scc5558fb8a93db66209b	Scc5558fb8a93db66209b	Dana-Farber_Hi-MYC_wave1	wild type genotype	Control Group	0	0
+afc7fb9c30058cb4	MTBLS135	Sfa24c62511636580ba24	Sfa24c62511636580ba24	Dana-Farber_Hi-MYC_wave1	wild type genotype	Control Group	0	0
+afc7fb9c30058cb4	MTBLS135	Sef05b0805c7ad1106078	Sef05b0805c7ad1106078	Dana-Farber_Hi-MYC_wave1	wild type genotype	Diet, High-Fat	0	1
+afc7fb9c30058cb4	MTBLS135	Sdcf5b5e762d11c9b2518	Sdcf5b5e762d11c9b2518	Dana-Farber_Hi-MYC_wave1	wild type genotype	Diet, High-Fat	0	1
+afc7fb9c30058cb4	MTBLS135	Se8080b7abbc994cde8db	Se8080b7abbc994cde8db	Dana-Farber_Hi-MYC_wave1	wild type genotype	Diet, High-Fat	0	1
+afc7fb9c30058cb4	MTBLS135	Sacc60280ee3c4c6b2047	Sacc60280ee3c4c6b2047	Dana-Farber_Hi-MYC_wave1	wild type genotype	Diet, High-Fat	0	1
+afc7fb9c30058cb4	MTBLS135	S7416153427f10e5c3b02	S7416153427f10e5c3b02	Dana-Farber_Hi-MYC_wave1	wild type genotype	Diet, High-Fat	0	1
+afc7fb9c30058cb4	MTBLS135	S378ca297034495cdd835	S378ca297034495cdd835	Dana-Farber_Hi-MYC_wave1	wild type genotype	Diet, High-Fat	0	1
+afc7fb9c30058cb4	MTBLS135	Sd9762717a3db01b9723f	Sd9762717a3db01b9723f	Dana-Farber_Hi-MYC_wave1	Hi-MYC	Control Group	1	0
+afc7fb9c30058cb4	MTBLS135	S3097daa0d180482879da	S3097daa0d180482879da	Dana-Farber_Hi-MYC_wave1	Hi-MYC	Control Group	1	0
+afc7fb9c30058cb4	MTBLS135	S00badc31e7b038c02845	S00badc31e7b038c02845	Dana-Farber_Hi-MYC_wave1	Hi-MYC	Control Group	1	0
+afc7fb9c30058cb4	MTBLS135	S891c515be81963ca2cd3	S891c515be81963ca2cd3	Dana-Farber_Hi-MYC_wave1	Hi-MYC	Control Group	1	0
+afc7fb9c30058cb4	MTBLS135	S21b53581e3af26ea317d	S21b53581e3af26ea317d	Dana-Farber_Hi-MYC_wave1	Hi-MYC	Control Group	1	0
+afc7fb9c30058cb4	MTBLS135	Saa48f7af52fec818bc20	Saa48f7af52fec818bc20	Dana-Farber_Hi-MYC_wave1	Hi-MYC	Control Group	1	0
+afc7fb9c30058cb4	MTBLS135	S3605aad810bf933aa4b5	S3605aad810bf933aa4b5	Dana-Farber_Hi-MYC_wave1	Hi-MYC	Diet, High-Fat	1	1
+afc7fb9c30058cb4	MTBLS135	S41bc21c8b073c1be6117	S41bc21c8b073c1be6117	Dana-Farber_Hi-MYC_wave1	Hi-MYC	Diet, High-Fat	1	1
+afc7fb9c30058cb4	MTBLS135	S49bc021d7b8a09c4c02e	S49bc021d7b8a09c4c02e	Dana-Farber_Hi-MYC_wave1	Hi-MYC	Diet, High-Fat	1	1
+afc7fb9c30058cb4	MTBLS135	S94f5dbef13089509eb7c	S94f5dbef13089509eb7c	Dana-Farber_Hi-MYC_wave1	Hi-MYC	Diet, High-Fat	1	1
+afc7fb9c30058cb4	MTBLS135	S2fc2da0bf878c36fe7ed	S2fc2da0bf878c36fe7ed	Dana-Farber_Hi-MYC_wave1	Hi-MYC	Diet, High-Fat	1	1
+afc7fb9c30058cb4	MTBLS135	S4ac3eaa0f4fdecdf170e	S4ac3eaa0f4fdecdf170e	Dana-Farber_Hi-MYC_wave1	Hi-MYC	Diet, High-Fat	1	1
+99e80c167103e040	MTBLS135	Sb61b815330ca037214f8	Sb61b815330ca037214f8	Dana-Farber_Hi-MYC_wave1	wild type genotype	Control Group	0	0
+99e80c167103e040	MTBLS135	S4928f34aa69f6b7806a9	S4928f34aa69f6b7806a9	Dana-Farber_Hi-MYC_wave1	wild type genotype	Control Group	0	0
+99e80c167103e040	MTBLS135	S747a7740f7c3236141cf	S747a7740f7c3236141cf	Dana-Farber_Hi-MYC_wave1	wild type genotype	Control Group	0	0
+99e80c167103e040	MTBLS135	Se8803df309552f3c6dcc	Se8803df309552f3c6dcc	Dana-Farber_Hi-MYC_wave1	wild type genotype	Control Group	0	0
+99e80c167103e040	MTBLS135	Scc5558fb8a93db66209b	Scc5558fb8a93db66209b	Dana-Farber_Hi-MYC_wave1	wild type genotype	Control Group	0	0
+99e80c167103e040	MTBLS135	Sfa24c62511636580ba24	Sfa24c62511636580ba24	Dana-Farber_Hi-MYC_wave1	wild type genotype	Control Group	0	0
+99e80c167103e040	MTBLS135	Sef05b0805c7ad1106078	Sef05b0805c7ad1106078	Dana-Farber_Hi-MYC_wave1	wild type genotype	Diet, High-Fat	0	1
+99e80c167103e040	MTBLS135	Sdcf5b5e762d11c9b2518	Sdcf5b5e762d11c9b2518	Dana-Farber_Hi-MYC_wave1	wild type genotype	Diet, High-Fat	0	1
+99e80c167103e040	MTBLS135	Se8080b7abbc994cde8db	Se8080b7abbc994cde8db	Dana-Farber_Hi-MYC_wave1	wild type genotype	Diet, High-Fat	0	1
+99e80c167103e040	MTBLS135	Sacc60280ee3c4c6b2047	Sacc60280ee3c4c6b2047	Dana-Farber_Hi-MYC_wave1	wild type genotype	Diet, High-Fat	0	1
+99e80c167103e040	MTBLS135	S7416153427f10e5c3b02	S7416153427f10e5c3b02	Dana-Farber_Hi-MYC_wave1	wild type genotype	Diet, High-Fat	0	1
+99e80c167103e040	MTBLS135	S378ca297034495cdd835	S378ca297034495cdd835	Dana-Farber_Hi-MYC_wave1	wild type genotype	Diet, High-Fat	0	1
+99e80c167103e040	MTBLS135	Sd9762717a3db01b9723f	Sd9762717a3db01b9723f	Dana-Farber_Hi-MYC_wave1	Hi-MYC	Control Group	1	0
+99e80c167103e040	MTBLS135	S3097daa0d180482879da	S3097daa0d180482879da	Dana-Farber_Hi-MYC_wave1	Hi-MYC	Control Group	1	0
+99e80c167103e040	MTBLS135	S00badc31e7b038c02845	S00badc31e7b038c02845	Dana-Farber_Hi-MYC_wave1	Hi-MYC	Control Group	1	0
+99e80c167103e040	MTBLS135	S891c515be81963ca2cd3	S891c515be81963ca2cd3	Dana-Farber_Hi-MYC_wave1	Hi-MYC	Control Group	1	0
+99e80c167103e040	MTBLS135	S21b53581e3af26ea317d	S21b53581e3af26ea317d	Dana-Farber_Hi-MYC_wave1	Hi-MYC	Control Group	1	0
+99e80c167103e040	MTBLS135	Saa48f7af52fec818bc20	Saa48f7af52fec818bc20	Dana-Farber_Hi-MYC_wave1	Hi-MYC	Control Group	1	0
+99e80c167103e040	MTBLS135	S3605aad810bf933aa4b5	S3605aad810bf933aa4b5	Dana-Farber_Hi-MYC_wave1	Hi-MYC	Diet, High-Fat	1	1
+99e80c167103e040	MTBLS135	S41bc21c8b073c1be6117	S41bc21c8b073c1be6117	Dana-Farber_Hi-MYC_wave1	Hi-MYC	Diet, High-Fat	1	1
+99e80c167103e040	MTBLS135	S49bc021d7b8a09c4c02e	S49bc021d7b8a09c4c02e	Dana-Farber_Hi-MYC_wave1	Hi-MYC	Diet, High-Fat	1	1
+99e80c167103e040	MTBLS135	S94f5dbef13089509eb7c	S94f5dbef13089509eb7c	Dana-Farber_Hi-MYC_wave1	Hi-MYC	Diet, High-Fat	1	1
+99e80c167103e040	MTBLS135	S2fc2da0bf878c36fe7ed	S2fc2da0bf878c36fe7ed	Dana-Farber_Hi-MYC_wave1	Hi-MYC	Diet, High-Fat	1	1
+99e80c167103e040	MTBLS135	S4ac3eaa0f4fdecdf170e	S4ac3eaa0f4fdecdf170e	Dana-Farber_Hi-MYC_wave1	Hi-MYC	Diet, High-Fat	1	1
+befb7f467ef5afe1	MTBLS135	Sb61b815330ca037214f8	Sb61b815330ca037214f8	Dana-Farber_Hi-MYC_wave1	wild type genotype	Control Group	0	0
+befb7f467ef5afe1	MTBLS135	S4928f34aa69f6b7806a9	S4928f34aa69f6b7806a9	Dana-Farber_Hi-MYC_wave1	wild type genotype	Control Group	0	0
+befb7f467ef5afe1	MTBLS135	S747a7740f7c3236141cf	S747a7740f7c3236141cf	Dana-Farber_Hi-MYC_wave1	wild type genotype	Control Group	0	0
+befb7f467ef5afe1	MTBLS135	Se8803df309552f3c6dcc	Se8803df309552f3c6dcc	Dana-Farber_Hi-MYC_wave1	wild type genotype	Control Group	0	0
+befb7f467ef5afe1	MTBLS135	Scc5558fb8a93db66209b	Scc5558fb8a93db66209b	Dana-Farber_Hi-MYC_wave1	wild type genotype	Control Group	0	0
+befb7f467ef5afe1	MTBLS135	Sfa24c62511636580ba24	Sfa24c62511636580ba24	Dana-Farber_Hi-MYC_wave1	wild type genotype	Control Group	0	0
+befb7f467ef5afe1	MTBLS135	Sef05b0805c7ad1106078	Sef05b0805c7ad1106078	Dana-Farber_Hi-MYC_wave1	wild type genotype	Diet, High-Fat	0	1
+befb7f467ef5afe1	MTBLS135	Sdcf5b5e762d11c9b2518	Sdcf5b5e762d11c9b2518	Dana-Farber_Hi-MYC_wave1	wild type genotype	Diet, High-Fat	0	1
+befb7f467ef5afe1	MTBLS135	Se8080b7abbc994cde8db	Se8080b7abbc994cde8db	Dana-Farber_Hi-MYC_wave1	wild type genotype	Diet, High-Fat	0	1
+befb7f467ef5afe1	MTBLS135	Sacc60280ee3c4c6b2047	Sacc60280ee3c4c6b2047	Dana-Farber_Hi-MYC_wave1	wild type genotype	Diet, High-Fat	0	1
+befb7f467ef5afe1	MTBLS135	S7416153427f10e5c3b02	S7416153427f10e5c3b02	Dana-Farber_Hi-MYC_wave1	wild type genotype	Diet, High-Fat	0	1
+befb7f467ef5afe1	MTBLS135	S378ca297034495cdd835	S378ca297034495cdd835	Dana-Farber_Hi-MYC_wave1	wild type genotype	Diet, High-Fat	0	1
+befb7f467ef5afe1	MTBLS135	Sd9762717a3db01b9723f	Sd9762717a3db01b9723f	Dana-Farber_Hi-MYC_wave1	Hi-MYC	Control Group	1	0
+befb7f467ef5afe1	MTBLS135	S3097daa0d180482879da	S3097daa0d180482879da	Dana-Farber_Hi-MYC_wave1	Hi-MYC	Control Group	1	0
+befb7f467ef5afe1	MTBLS135	S00badc31e7b038c02845	S00badc31e7b038c02845	Dana-Farber_Hi-MYC_wave1	Hi-MYC	Control Group	1	0
+befb7f467ef5afe1	MTBLS135	S891c515be81963ca2cd3	S891c515be81963ca2cd3	Dana-Farber_Hi-MYC_wave1	Hi-MYC	Control Group	1	0
+befb7f467ef5afe1	MTBLS135	S21b53581e3af26ea317d	S21b53581e3af26ea317d	Dana-Farber_Hi-MYC_wave1	Hi-MYC	Control Group	1	0
+befb7f467ef5afe1	MTBLS135	Saa48f7af52fec818bc20	Saa48f7af52fec818bc20	Dana-Farber_Hi-MYC_wave1	Hi-MYC	Control Group	1	0
+befb7f467ef5afe1	MTBLS135	S3605aad810bf933aa4b5	S3605aad810bf933aa4b5	Dana-Farber_Hi-MYC_wave1	Hi-MYC	Diet, High-Fat	1	1
+befb7f467ef5afe1	MTBLS135	S41bc21c8b073c1be6117	S41bc21c8b073c1be6117	Dana-Farber_Hi-MYC_wave1	Hi-MYC	Diet, High-Fat	1	1
+befb7f467ef5afe1	MTBLS135	S49bc021d7b8a09c4c02e	S49bc021d7b8a09c4c02e	Dana-Farber_Hi-MYC_wave1	Hi-MYC	Diet, High-Fat	1	1
+befb7f467ef5afe1	MTBLS135	S94f5dbef13089509eb7c	S94f5dbef13089509eb7c	Dana-Farber_Hi-MYC_wave1	Hi-MYC	Diet, High-Fat	1	1
+befb7f467ef5afe1	MTBLS135	S2fc2da0bf878c36fe7ed	S2fc2da0bf878c36fe7ed	Dana-Farber_Hi-MYC_wave1	Hi-MYC	Diet, High-Fat	1	1
+befb7f467ef5afe1	MTBLS135	S4ac3eaa0f4fdecdf170e	S4ac3eaa0f4fdecdf170e	Dana-Farber_Hi-MYC_wave1	Hi-MYC	Diet, High-Fat	1	1
+3dd3a0afbb9e6efe	MTBLS3316	Sed4f496307834f92ba54	Sed4f496307834f92ba54	Dana-Farber_Hi-MYC_wave2	wild type (WT)	control diet (CTD)	0	0
+3dd3a0afbb9e6efe	MTBLS3316	Sd52abb8f2c55d162aa6c	Sd52abb8f2c55d162aa6c	Dana-Farber_Hi-MYC_wave2	wild type (WT)	control diet (CTD)	0	0
+3dd3a0afbb9e6efe	MTBLS3316	S5b1564cb6f7b454f67ac	S5b1564cb6f7b454f67ac	Dana-Farber_Hi-MYC_wave2	wild type (WT)	control diet (CTD)	0	0
+3dd3a0afbb9e6efe	MTBLS3316	Se8ecaadde3367fe4a71d	Se8ecaadde3367fe4a71d	Dana-Farber_Hi-MYC_wave2	wild type (WT)	control diet (CTD)	0	0
+3dd3a0afbb9e6efe	MTBLS3316	S51e957af766a7ae296d3	S51e957af766a7ae296d3	Dana-Farber_Hi-MYC_wave2	wild type (WT)	control diet (CTD)	0	0
+3dd3a0afbb9e6efe	MTBLS3316	S4092464dec329db3bbc0	S4092464dec329db3bbc0	Dana-Farber_Hi-MYC_wave2	wild type (WT)	control diet (CTD)	0	0
+3dd3a0afbb9e6efe	MTBLS3316	S18f7e6b3a684dde52d3f	S18f7e6b3a684dde52d3f	Dana-Farber_Hi-MYC_wave2	wild type (WT)	high-fat diet (HFD)	0	1
+3dd3a0afbb9e6efe	MTBLS3316	Sf56f081d21e1faae5697	Sf56f081d21e1faae5697	Dana-Farber_Hi-MYC_wave2	wild type (WT)	high-fat diet (HFD)	0	1
+3dd3a0afbb9e6efe	MTBLS3316	S89e5d265e43ab63aee13	S89e5d265e43ab63aee13	Dana-Farber_Hi-MYC_wave2	wild type (WT)	high-fat diet (HFD)	0	1
+3dd3a0afbb9e6efe	MTBLS3316	Sf5516d13a40073fc6fd7	Sf5516d13a40073fc6fd7	Dana-Farber_Hi-MYC_wave2	wild type (WT)	high-fat diet (HFD)	0	1
+3dd3a0afbb9e6efe	MTBLS3316	S8e81d3ccbc90bfeacadd	S8e81d3ccbc90bfeacadd	Dana-Farber_Hi-MYC_wave2	wild type (WT)	high-fat diet (HFD)	0	1
+3dd3a0afbb9e6efe	MTBLS3316	Sf0b37e0bcd17b10a764d	Sf0b37e0bcd17b10a764d	Dana-Farber_Hi-MYC_wave2	wild type (WT)	high-fat diet (HFD)	0	1
+3dd3a0afbb9e6efe	MTBLS3316	Sc7dc14b55f6130e0c2a6	Sc7dc14b55f6130e0c2a6	Dana-Farber_Hi-MYC_wave2	Hi-MYC	control diet (CTD)	1	0
+3dd3a0afbb9e6efe	MTBLS3316	S3c3f0ed1216db4c8de0c	S3c3f0ed1216db4c8de0c	Dana-Farber_Hi-MYC_wave2	Hi-MYC	control diet (CTD)	1	0
+3dd3a0afbb9e6efe	MTBLS3316	S4c0f779989da4dc85969	S4c0f779989da4dc85969	Dana-Farber_Hi-MYC_wave2	Hi-MYC	control diet (CTD)	1	0
+3dd3a0afbb9e6efe	MTBLS3316	S8980651f2f2c8c7773fd	S8980651f2f2c8c7773fd	Dana-Farber_Hi-MYC_wave2	Hi-MYC	control diet (CTD)	1	0
+3dd3a0afbb9e6efe	MTBLS3316	S14ca971d8c8be0ce9b35	S14ca971d8c8be0ce9b35	Dana-Farber_Hi-MYC_wave2	Hi-MYC	control diet (CTD)	1	0
+3dd3a0afbb9e6efe	MTBLS3316	S5040f755afc141201f85	S5040f755afc141201f85	Dana-Farber_Hi-MYC_wave2	Hi-MYC	control diet (CTD)	1	0
+3dd3a0afbb9e6efe	MTBLS3316	Se751602f7d1befb7974d	Se751602f7d1befb7974d	Dana-Farber_Hi-MYC_wave2	Hi-MYC	high-fat diet (HFD)	1	1
+3dd3a0afbb9e6efe	MTBLS3316	S5477c20c30839bc14c87	S5477c20c30839bc14c87	Dana-Farber_Hi-MYC_wave2	Hi-MYC	high-fat diet (HFD)	1	1
+3dd3a0afbb9e6efe	MTBLS3316	Sdf09dd0c6e78c418e787	Sdf09dd0c6e78c418e787	Dana-Farber_Hi-MYC_wave2	Hi-MYC	high-fat diet (HFD)	1	1
+3dd3a0afbb9e6efe	MTBLS3316	Sa945dbfa88e5e871bb7b	Sa945dbfa88e5e871bb7b	Dana-Farber_Hi-MYC_wave2	Hi-MYC	high-fat diet (HFD)	1	1
+3dd3a0afbb9e6efe	MTBLS3316	S5c7744e12a5e4652c6e8	S5c7744e12a5e4652c6e8	Dana-Farber_Hi-MYC_wave2	Hi-MYC	high-fat diet (HFD)	1	1
+3dd3a0afbb9e6efe	MTBLS3316	S9b659d01432c9e0a7ae9	S9b659d01432c9e0a7ae9	Dana-Farber_Hi-MYC_wave2	Hi-MYC	high-fat diet (HFD)	1	1
+3d43685105b128b6	MTBLS3316	Sed4f496307834f92ba54	Sed4f496307834f92ba54	Dana-Farber_Hi-MYC_wave2	wild type (WT)	control diet (CTD)	0	0
+3d43685105b128b6	MTBLS3316	Sd52abb8f2c55d162aa6c	Sd52abb8f2c55d162aa6c	Dana-Farber_Hi-MYC_wave2	wild type (WT)	control diet (CTD)	0	0
+3d43685105b128b6	MTBLS3316	S5b1564cb6f7b454f67ac	S5b1564cb6f7b454f67ac	Dana-Farber_Hi-MYC_wave2	wild type (WT)	control diet (CTD)	0	0
+3d43685105b128b6	MTBLS3316	Se8ecaadde3367fe4a71d	Se8ecaadde3367fe4a71d	Dana-Farber_Hi-MYC_wave2	wild type (WT)	control diet (CTD)	0	0
+3d43685105b128b6	MTBLS3316	S51e957af766a7ae296d3	S51e957af766a7ae296d3	Dana-Farber_Hi-MYC_wave2	wild type (WT)	control diet (CTD)	0	0
+3d43685105b128b6	MTBLS3316	S4092464dec329db3bbc0	S4092464dec329db3bbc0	Dana-Farber_Hi-MYC_wave2	wild type (WT)	control diet (CTD)	0	0
+3d43685105b128b6	MTBLS3316	S18f7e6b3a684dde52d3f	S18f7e6b3a684dde52d3f	Dana-Farber_Hi-MYC_wave2	wild type (WT)	high-fat diet (HFD)	0	1
+3d43685105b128b6	MTBLS3316	Sf56f081d21e1faae5697	Sf56f081d21e1faae5697	Dana-Farber_Hi-MYC_wave2	wild type (WT)	high-fat diet (HFD)	0	1
+3d43685105b128b6	MTBLS3316	S89e5d265e43ab63aee13	S89e5d265e43ab63aee13	Dana-Farber_Hi-MYC_wave2	wild type (WT)	high-fat diet (HFD)	0	1
+3d43685105b128b6	MTBLS3316	Sf5516d13a40073fc6fd7	Sf5516d13a40073fc6fd7	Dana-Farber_Hi-MYC_wave2	wild type (WT)	high-fat diet (HFD)	0	1
+3d43685105b128b6	MTBLS3316	S8e81d3ccbc90bfeacadd	S8e81d3ccbc90bfeacadd	Dana-Farber_Hi-MYC_wave2	wild type (WT)	high-fat diet (HFD)	0	1
+3d43685105b128b6	MTBLS3316	Sf0b37e0bcd17b10a764d	Sf0b37e0bcd17b10a764d	Dana-Farber_Hi-MYC_wave2	wild type (WT)	high-fat diet (HFD)	0	1
+3d43685105b128b6	MTBLS3316	Sc7dc14b55f6130e0c2a6	Sc7dc14b55f6130e0c2a6	Dana-Farber_Hi-MYC_wave2	Hi-MYC	control diet (CTD)	1	0
+3d43685105b128b6	MTBLS3316	S3c3f0ed1216db4c8de0c	S3c3f0ed1216db4c8de0c	Dana-Farber_Hi-MYC_wave2	Hi-MYC	control diet (CTD)	1	0
+3d43685105b128b6	MTBLS3316	S4c0f779989da4dc85969	S4c0f779989da4dc85969	Dana-Farber_Hi-MYC_wave2	Hi-MYC	control diet (CTD)	1	0
+3d43685105b128b6	MTBLS3316	S8980651f2f2c8c7773fd	S8980651f2f2c8c7773fd	Dana-Farber_Hi-MYC_wave2	Hi-MYC	control diet (CTD)	1	0
+3d43685105b128b6	MTBLS3316	S14ca971d8c8be0ce9b35	S14ca971d8c8be0ce9b35	Dana-Farber_Hi-MYC_wave2	Hi-MYC	control diet (CTD)	1	0
+3d43685105b128b6	MTBLS3316	S5040f755afc141201f85	S5040f755afc141201f85	Dana-Farber_Hi-MYC_wave2	Hi-MYC	control diet (CTD)	1	0
+3d43685105b128b6	MTBLS3316	Se751602f7d1befb7974d	Se751602f7d1befb7974d	Dana-Farber_Hi-MYC_wave2	Hi-MYC	high-fat diet (HFD)	1	1
+3d43685105b128b6	MTBLS3316	S5477c20c30839bc14c87	S5477c20c30839bc14c87	Dana-Farber_Hi-MYC_wave2	Hi-MYC	high-fat diet (HFD)	1	1
+3d43685105b128b6	MTBLS3316	Sdf09dd0c6e78c418e787	Sdf09dd0c6e78c418e787	Dana-Farber_Hi-MYC_wave2	Hi-MYC	high-fat diet (HFD)	1	1
+3d43685105b128b6	MTBLS3316	Sa945dbfa88e5e871bb7b	Sa945dbfa88e5e871bb7b	Dana-Farber_Hi-MYC_wave2	Hi-MYC	high-fat diet (HFD)	1	1
+3d43685105b128b6	MTBLS3316	S5c7744e12a5e4652c6e8	S5c7744e12a5e4652c6e8	Dana-Farber_Hi-MYC_wave2	Hi-MYC	high-fat diet (HFD)	1	1
+3d43685105b128b6	MTBLS3316	S9b659d01432c9e0a7ae9	S9b659d01432c9e0a7ae9	Dana-Farber_Hi-MYC_wave2	Hi-MYC	high-fat diet (HFD)	1	1
+9860f5a627bf4a01	MTBLS3316	Sed4f496307834f92ba54	Sed4f496307834f92ba54	Dana-Farber_Hi-MYC_wave2	wild type (WT)	control diet (CTD)	0	0
+9860f5a627bf4a01	MTBLS3316	Sd52abb8f2c55d162aa6c	Sd52abb8f2c55d162aa6c	Dana-Farber_Hi-MYC_wave2	wild type (WT)	control diet (CTD)	0	0
+9860f5a627bf4a01	MTBLS3316	S5b1564cb6f7b454f67ac	S5b1564cb6f7b454f67ac	Dana-Farber_Hi-MYC_wave2	wild type (WT)	control diet (CTD)	0	0
+9860f5a627bf4a01	MTBLS3316	Se8ecaadde3367fe4a71d	Se8ecaadde3367fe4a71d	Dana-Farber_Hi-MYC_wave2	wild type (WT)	control diet (CTD)	0	0
+9860f5a627bf4a01	MTBLS3316	S51e957af766a7ae296d3	S51e957af766a7ae296d3	Dana-Farber_Hi-MYC_wave2	wild type (WT)	control diet (CTD)	0	0
+9860f5a627bf4a01	MTBLS3316	S4092464dec329db3bbc0	S4092464dec329db3bbc0	Dana-Farber_Hi-MYC_wave2	wild type (WT)	control diet (CTD)	0	0
+9860f5a627bf4a01	MTBLS3316	S18f7e6b3a684dde52d3f	S18f7e6b3a684dde52d3f	Dana-Farber_Hi-MYC_wave2	wild type (WT)	high-fat diet (HFD)	0	1
+9860f5a627bf4a01	MTBLS3316	Sf56f081d21e1faae5697	Sf56f081d21e1faae5697	Dana-Farber_Hi-MYC_wave2	wild type (WT)	high-fat diet (HFD)	0	1
+9860f5a627bf4a01	MTBLS3316	S89e5d265e43ab63aee13	S89e5d265e43ab63aee13	Dana-Farber_Hi-MYC_wave2	wild type (WT)	high-fat diet (HFD)	0	1
+9860f5a627bf4a01	MTBLS3316	Sf5516d13a40073fc6fd7	Sf5516d13a40073fc6fd7	Dana-Farber_Hi-MYC_wave2	wild type (WT)	high-fat diet (HFD)	0	1
+9860f5a627bf4a01	MTBLS3316	S8e81d3ccbc90bfeacadd	S8e81d3ccbc90bfeacadd	Dana-Farber_Hi-MYC_wave2	wild type (WT)	high-fat diet (HFD)	0	1
+9860f5a627bf4a01	MTBLS3316	Sf0b37e0bcd17b10a764d	Sf0b37e0bcd17b10a764d	Dana-Farber_Hi-MYC_wave2	wild type (WT)	high-fat diet (HFD)	0	1
+9860f5a627bf4a01	MTBLS3316	Sc7dc14b55f6130e0c2a6	Sc7dc14b55f6130e0c2a6	Dana-Farber_Hi-MYC_wave2	Hi-MYC	control diet (CTD)	1	0
+9860f5a627bf4a01	MTBLS3316	S3c3f0ed1216db4c8de0c	S3c3f0ed1216db4c8de0c	Dana-Farber_Hi-MYC_wave2	Hi-MYC	control diet (CTD)	1	0
+9860f5a627bf4a01	MTBLS3316	S4c0f779989da4dc85969	S4c0f779989da4dc85969	Dana-Farber_Hi-MYC_wave2	Hi-MYC	control diet (CTD)	1	0
+9860f5a627bf4a01	MTBLS3316	S8980651f2f2c8c7773fd	S8980651f2f2c8c7773fd	Dana-Farber_Hi-MYC_wave2	Hi-MYC	control diet (CTD)	1	0
+9860f5a627bf4a01	MTBLS3316	S14ca971d8c8be0ce9b35	S14ca971d8c8be0ce9b35	Dana-Farber_Hi-MYC_wave2	Hi-MYC	control diet (CTD)	1	0
+9860f5a627bf4a01	MTBLS3316	S5040f755afc141201f85	S5040f755afc141201f85	Dana-Farber_Hi-MYC_wave2	Hi-MYC	control diet (CTD)	1	0
+9860f5a627bf4a01	MTBLS3316	Se751602f7d1befb7974d	Se751602f7d1befb7974d	Dana-Farber_Hi-MYC_wave2	Hi-MYC	high-fat diet (HFD)	1	1
+9860f5a627bf4a01	MTBLS3316	S5477c20c30839bc14c87	S5477c20c30839bc14c87	Dana-Farber_Hi-MYC_wave2	Hi-MYC	high-fat diet (HFD)	1	1
+9860f5a627bf4a01	MTBLS3316	Sdf09dd0c6e78c418e787	Sdf09dd0c6e78c418e787	Dana-Farber_Hi-MYC_wave2	Hi-MYC	high-fat diet (HFD)	1	1
+9860f5a627bf4a01	MTBLS3316	Sa945dbfa88e5e871bb7b	Sa945dbfa88e5e871bb7b	Dana-Farber_Hi-MYC_wave2	Hi-MYC	high-fat diet (HFD)	1	1
+9860f5a627bf4a01	MTBLS3316	S5c7744e12a5e4652c6e8	S5c7744e12a5e4652c6e8	Dana-Farber_Hi-MYC_wave2	Hi-MYC	high-fat diet (HFD)	1	1
+9860f5a627bf4a01	MTBLS3316	S9b659d01432c9e0a7ae9	S9b659d01432c9e0a7ae9	Dana-Farber_Hi-MYC_wave2	Hi-MYC	high-fat diet (HFD)	1	1
+6be83bf6eac0a948	MTBLS3316	Sed4f496307834f92ba54	Sed4f496307834f92ba54	Dana-Farber_Hi-MYC_wave2	wild type (WT)	control diet (CTD)	0	0
+6be83bf6eac0a948	MTBLS3316	Sd52abb8f2c55d162aa6c	Sd52abb8f2c55d162aa6c	Dana-Farber_Hi-MYC_wave2	wild type (WT)	control diet (CTD)	0	0
+6be83bf6eac0a948	MTBLS3316	S5b1564cb6f7b454f67ac	S5b1564cb6f7b454f67ac	Dana-Farber_Hi-MYC_wave2	wild type (WT)	control diet (CTD)	0	0
+6be83bf6eac0a948	MTBLS3316	Se8ecaadde3367fe4a71d	Se8ecaadde3367fe4a71d	Dana-Farber_Hi-MYC_wave2	wild type (WT)	control diet (CTD)	0	0
+6be83bf6eac0a948	MTBLS3316	S51e957af766a7ae296d3	S51e957af766a7ae296d3	Dana-Farber_Hi-MYC_wave2	wild type (WT)	control diet (CTD)	0	0
+6be83bf6eac0a948	MTBLS3316	S4092464dec329db3bbc0	S4092464dec329db3bbc0	Dana-Farber_Hi-MYC_wave2	wild type (WT)	control diet (CTD)	0	0
+6be83bf6eac0a948	MTBLS3316	S18f7e6b3a684dde52d3f	S18f7e6b3a684dde52d3f	Dana-Farber_Hi-MYC_wave2	wild type (WT)	high-fat diet (HFD)	0	1
+6be83bf6eac0a948	MTBLS3316	Sf56f081d21e1faae5697	Sf56f081d21e1faae5697	Dana-Farber_Hi-MYC_wave2	wild type (WT)	high-fat diet (HFD)	0	1
+6be83bf6eac0a948	MTBLS3316	S89e5d265e43ab63aee13	S89e5d265e43ab63aee13	Dana-Farber_Hi-MYC_wave2	wild type (WT)	high-fat diet (HFD)	0	1
+6be83bf6eac0a948	MTBLS3316	Sf5516d13a40073fc6fd7	Sf5516d13a40073fc6fd7	Dana-Farber_Hi-MYC_wave2	wild type (WT)	high-fat diet (HFD)	0	1
+6be83bf6eac0a948	MTBLS3316	S8e81d3ccbc90bfeacadd	S8e81d3ccbc90bfeacadd	Dana-Farber_Hi-MYC_wave2	wild type (WT)	high-fat diet (HFD)	0	1
+6be83bf6eac0a948	MTBLS3316	Sf0b37e0bcd17b10a764d	Sf0b37e0bcd17b10a764d	Dana-Farber_Hi-MYC_wave2	wild type (WT)	high-fat diet (HFD)	0	1
+6be83bf6eac0a948	MTBLS3316	Sc7dc14b55f6130e0c2a6	Sc7dc14b55f6130e0c2a6	Dana-Farber_Hi-MYC_wave2	Hi-MYC	control diet (CTD)	1	0
+6be83bf6eac0a948	MTBLS3316	S3c3f0ed1216db4c8de0c	S3c3f0ed1216db4c8de0c	Dana-Farber_Hi-MYC_wave2	Hi-MYC	control diet (CTD)	1	0
+6be83bf6eac0a948	MTBLS3316	S4c0f779989da4dc85969	S4c0f779989da4dc85969	Dana-Farber_Hi-MYC_wave2	Hi-MYC	control diet (CTD)	1	0
+6be83bf6eac0a948	MTBLS3316	S8980651f2f2c8c7773fd	S8980651f2f2c8c7773fd	Dana-Farber_Hi-MYC_wave2	Hi-MYC	control diet (CTD)	1	0
+6be83bf6eac0a948	MTBLS3316	S14ca971d8c8be0ce9b35	S14ca971d8c8be0ce9b35	Dana-Farber_Hi-MYC_wave2	Hi-MYC	control diet (CTD)	1	0
+6be83bf6eac0a948	MTBLS3316	S5040f755afc141201f85	S5040f755afc141201f85	Dana-Farber_Hi-MYC_wave2	Hi-MYC	control diet (CTD)	1	0
+6be83bf6eac0a948	MTBLS3316	Se751602f7d1befb7974d	Se751602f7d1befb7974d	Dana-Farber_Hi-MYC_wave2	Hi-MYC	high-fat diet (HFD)	1	1
+6be83bf6eac0a948	MTBLS3316	S5477c20c30839bc14c87	S5477c20c30839bc14c87	Dana-Farber_Hi-MYC_wave2	Hi-MYC	high-fat diet (HFD)	1	1
+6be83bf6eac0a948	MTBLS3316	Sdf09dd0c6e78c418e787	Sdf09dd0c6e78c418e787	Dana-Farber_Hi-MYC_wave2	Hi-MYC	high-fat diet (HFD)	1	1
+6be83bf6eac0a948	MTBLS3316	Sa945dbfa88e5e871bb7b	Sa945dbfa88e5e871bb7b	Dana-Farber_Hi-MYC_wave2	Hi-MYC	high-fat diet (HFD)	1	1
+6be83bf6eac0a948	MTBLS3316	S5c7744e12a5e4652c6e8	S5c7744e12a5e4652c6e8	Dana-Farber_Hi-MYC_wave2	Hi-MYC	high-fat diet (HFD)	1	1
+6be83bf6eac0a948	MTBLS3316	S9b659d01432c9e0a7ae9	S9b659d01432c9e0a7ae9	Dana-Farber_Hi-MYC_wave2	Hi-MYC	high-fat diet (HFD)	1	1
+c3de83ddeba99a6b	MTBLS2085	S5182fe1236f0b985d970	S5182fe1236f0b985d970	NIA_NQO1	WT	standard diet (SD)	0	0
+c3de83ddeba99a6b	MTBLS2085	S69e00af7bb1e073531e7	S69e00af7bb1e073531e7	NIA_NQO1	WT	standard diet (SD)	0	0
+c3de83ddeba99a6b	MTBLS2085	S864a86a4f24a1a16c50d	S864a86a4f24a1a16c50d	NIA_NQO1	WT	standard diet (SD)	0	0
+c3de83ddeba99a6b	MTBLS2085	S92996c1b5d2a7ea14c47	S92996c1b5d2a7ea14c47	NIA_NQO1	WT	standard diet (SD)	0	0
+c3de83ddeba99a6b	MTBLS2085	Sa8d3a31b0249302b9797	Sa8d3a31b0249302b9797	NIA_NQO1	NQO1-Tg	standard diet (SD)	1	0
+c3de83ddeba99a6b	MTBLS2085	S38dbaf7e9fc4df624687	S38dbaf7e9fc4df624687	NIA_NQO1	NQO1-Tg	standard diet (SD)	1	0
+c3de83ddeba99a6b	MTBLS2085	Sd4085cfd90d05691181b	Sd4085cfd90d05691181b	NIA_NQO1	NQO1-Tg	standard diet (SD)	1	0
+c3de83ddeba99a6b	MTBLS2085	S522eb6c5dc0239df4830	S522eb6c5dc0239df4830	NIA_NQO1	NQO1-Tg	standard diet (SD)	1	0
+c3de83ddeba99a6b	MTBLS2085	Sc5e6e94cfa27f9c958ce	Sc5e6e94cfa27f9c958ce	NIA_NQO1	NQO1-Tg	standard diet (SD)	1	0
+c3de83ddeba99a6b	MTBLS2085	Sb450184ef39313ce1c22	Sb450184ef39313ce1c22	NIA_NQO1	WT	high-fat diet (HFD)	0	1
+c3de83ddeba99a6b	MTBLS2085	S45900d9eb5a144ee25b9	S45900d9eb5a144ee25b9	NIA_NQO1	WT	high-fat diet (HFD)	0	1
+c3de83ddeba99a6b	MTBLS2085	Sdf1b73269adb497a56a2	Sdf1b73269adb497a56a2	NIA_NQO1	WT	high-fat diet (HFD)	0	1
+c3de83ddeba99a6b	MTBLS2085	Sea4b52eaa156d45c2b63	Sea4b52eaa156d45c2b63	NIA_NQO1	WT	high-fat diet (HFD)	0	1
+c3de83ddeba99a6b	MTBLS2085	Seae0a4f123660899cfca	Seae0a4f123660899cfca	NIA_NQO1	WT	high-fat diet (HFD)	0	1
+c3de83ddeba99a6b	MTBLS2085	Sb03d4393548c6deb34e0	Sb03d4393548c6deb34e0	NIA_NQO1	NQO1-Tg	high-fat diet (HFD)	1	1
+c3de83ddeba99a6b	MTBLS2085	S41b5385e6b362bbf59c7	S41b5385e6b362bbf59c7	NIA_NQO1	NQO1-Tg	high-fat diet (HFD)	1	1
+c3de83ddeba99a6b	MTBLS2085	S146781312b6a2c23f099	S146781312b6a2c23f099	NIA_NQO1	NQO1-Tg	high-fat diet (HFD)	1	1
+c3de83ddeba99a6b	MTBLS2085	S9e9937872c2406f72210	S9e9937872c2406f72210	NIA_NQO1	NQO1-Tg	high-fat diet (HFD)	1	1
+c3de83ddeba99a6b	MTBLS2085	S0c300a1725ed831385ed	S0c300a1725ed831385ed	NIA_NQO1	NQO1-Tg	high-fat diet (HFD)	1	1
+79f16e6c2d2b4cc7	MTBLS2085	S5182fe1236f0b985d970	S5182fe1236f0b985d970	NIA_NQO1	WT	standard diet (SD)	0	0
+79f16e6c2d2b4cc7	MTBLS2085	S69e00af7bb1e073531e7	S69e00af7bb1e073531e7	NIA_NQO1	WT	standard diet (SD)	0	0
+79f16e6c2d2b4cc7	MTBLS2085	S864a86a4f24a1a16c50d	S864a86a4f24a1a16c50d	NIA_NQO1	WT	standard diet (SD)	0	0
+79f16e6c2d2b4cc7	MTBLS2085	S92996c1b5d2a7ea14c47	S92996c1b5d2a7ea14c47	NIA_NQO1	WT	standard diet (SD)	0	0
+79f16e6c2d2b4cc7	MTBLS2085	Sa8d3a31b0249302b9797	Sa8d3a31b0249302b9797	NIA_NQO1	NQO1-Tg	standard diet (SD)	1	0
+79f16e6c2d2b4cc7	MTBLS2085	S38dbaf7e9fc4df624687	S38dbaf7e9fc4df624687	NIA_NQO1	NQO1-Tg	standard diet (SD)	1	0
+79f16e6c2d2b4cc7	MTBLS2085	Sd4085cfd90d05691181b	Sd4085cfd90d05691181b	NIA_NQO1	NQO1-Tg	standard diet (SD)	1	0
+79f16e6c2d2b4cc7	MTBLS2085	S522eb6c5dc0239df4830	S522eb6c5dc0239df4830	NIA_NQO1	NQO1-Tg	standard diet (SD)	1	0
+79f16e6c2d2b4cc7	MTBLS2085	Sc5e6e94cfa27f9c958ce	Sc5e6e94cfa27f9c958ce	NIA_NQO1	NQO1-Tg	standard diet (SD)	1	0
+79f16e6c2d2b4cc7	MTBLS2085	Sb450184ef39313ce1c22	Sb450184ef39313ce1c22	NIA_NQO1	WT	high-fat diet (HFD)	0	1
+79f16e6c2d2b4cc7	MTBLS2085	S45900d9eb5a144ee25b9	S45900d9eb5a144ee25b9	NIA_NQO1	WT	high-fat diet (HFD)	0	1
+79f16e6c2d2b4cc7	MTBLS2085	Sdf1b73269adb497a56a2	Sdf1b73269adb497a56a2	NIA_NQO1	WT	high-fat diet (HFD)	0	1
+79f16e6c2d2b4cc7	MTBLS2085	Sea4b52eaa156d45c2b63	Sea4b52eaa156d45c2b63	NIA_NQO1	WT	high-fat diet (HFD)	0	1
+79f16e6c2d2b4cc7	MTBLS2085	Seae0a4f123660899cfca	Seae0a4f123660899cfca	NIA_NQO1	WT	high-fat diet (HFD)	0	1
+79f16e6c2d2b4cc7	MTBLS2085	Sb03d4393548c6deb34e0	Sb03d4393548c6deb34e0	NIA_NQO1	NQO1-Tg	high-fat diet (HFD)	1	1
+79f16e6c2d2b4cc7	MTBLS2085	S41b5385e6b362bbf59c7	S41b5385e6b362bbf59c7	NIA_NQO1	NQO1-Tg	high-fat diet (HFD)	1	1
+79f16e6c2d2b4cc7	MTBLS2085	S146781312b6a2c23f099	S146781312b6a2c23f099	NIA_NQO1	NQO1-Tg	high-fat diet (HFD)	1	1
+79f16e6c2d2b4cc7	MTBLS2085	S9e9937872c2406f72210	S9e9937872c2406f72210	NIA_NQO1	NQO1-Tg	high-fat diet (HFD)	1	1
+79f16e6c2d2b4cc7	MTBLS2085	S0c300a1725ed831385ed	S0c300a1725ed831385ed	NIA_NQO1	NQO1-Tg	high-fat diet (HFD)	1	1
+6a24b71d4b0b491e	MTBLS2085	S5182fe1236f0b985d970	S5182fe1236f0b985d970	NIA_NQO1	WT	standard diet (SD)	0	0
+6a24b71d4b0b491e	MTBLS2085	S69e00af7bb1e073531e7	S69e00af7bb1e073531e7	NIA_NQO1	WT	standard diet (SD)	0	0
+6a24b71d4b0b491e	MTBLS2085	S864a86a4f24a1a16c50d	S864a86a4f24a1a16c50d	NIA_NQO1	WT	standard diet (SD)	0	0
+6a24b71d4b0b491e	MTBLS2085	S92996c1b5d2a7ea14c47	S92996c1b5d2a7ea14c47	NIA_NQO1	WT	standard diet (SD)	0	0
+6a24b71d4b0b491e	MTBLS2085	Sa8d3a31b0249302b9797	Sa8d3a31b0249302b9797	NIA_NQO1	NQO1-Tg	standard diet (SD)	1	0
+6a24b71d4b0b491e	MTBLS2085	S38dbaf7e9fc4df624687	S38dbaf7e9fc4df624687	NIA_NQO1	NQO1-Tg	standard diet (SD)	1	0
+6a24b71d4b0b491e	MTBLS2085	Sd4085cfd90d05691181b	Sd4085cfd90d05691181b	NIA_NQO1	NQO1-Tg	standard diet (SD)	1	0
+6a24b71d4b0b491e	MTBLS2085	S522eb6c5dc0239df4830	S522eb6c5dc0239df4830	NIA_NQO1	NQO1-Tg	standard diet (SD)	1	0
+6a24b71d4b0b491e	MTBLS2085	Sc5e6e94cfa27f9c958ce	Sc5e6e94cfa27f9c958ce	NIA_NQO1	NQO1-Tg	standard diet (SD)	1	0
+6a24b71d4b0b491e	MTBLS2085	Sb450184ef39313ce1c22	Sb450184ef39313ce1c22	NIA_NQO1	WT	high-fat diet (HFD)	0	1
+6a24b71d4b0b491e	MTBLS2085	S45900d9eb5a144ee25b9	S45900d9eb5a144ee25b9	NIA_NQO1	WT	high-fat diet (HFD)	0	1
+6a24b71d4b0b491e	MTBLS2085	Sdf1b73269adb497a56a2	Sdf1b73269adb497a56a2	NIA_NQO1	WT	high-fat diet (HFD)	0	1
+6a24b71d4b0b491e	MTBLS2085	Sea4b52eaa156d45c2b63	Sea4b52eaa156d45c2b63	NIA_NQO1	WT	high-fat diet (HFD)	0	1
+6a24b71d4b0b491e	MTBLS2085	Seae0a4f123660899cfca	Seae0a4f123660899cfca	NIA_NQO1	WT	high-fat diet (HFD)	0	1
+6a24b71d4b0b491e	MTBLS2085	Sb03d4393548c6deb34e0	Sb03d4393548c6deb34e0	NIA_NQO1	NQO1-Tg	high-fat diet (HFD)	1	1
+6a24b71d4b0b491e	MTBLS2085	S41b5385e6b362bbf59c7	S41b5385e6b362bbf59c7	NIA_NQO1	NQO1-Tg	high-fat diet (HFD)	1	1
+6a24b71d4b0b491e	MTBLS2085	S146781312b6a2c23f099	S146781312b6a2c23f099	NIA_NQO1	NQO1-Tg	high-fat diet (HFD)	1	1
+6a24b71d4b0b491e	MTBLS2085	S9e9937872c2406f72210	S9e9937872c2406f72210	NIA_NQO1	NQO1-Tg	high-fat diet (HFD)	1	1
+6a24b71d4b0b491e	MTBLS2085	S0c300a1725ed831385ed	S0c300a1725ed831385ed	NIA_NQO1	NQO1-Tg	high-fat diet (HFD)	1	1
+1aa3348e6628cb21	MTBLS2085	S5182fe1236f0b985d970	S5182fe1236f0b985d970	NIA_NQO1	WT	standard diet (SD)	0	0
+1aa3348e6628cb21	MTBLS2085	S69e00af7bb1e073531e7	S69e00af7bb1e073531e7	NIA_NQO1	WT	standard diet (SD)	0	0
+1aa3348e6628cb21	MTBLS2085	S864a86a4f24a1a16c50d	S864a86a4f24a1a16c50d	NIA_NQO1	WT	standard diet (SD)	0	0
+1aa3348e6628cb21	MTBLS2085	S92996c1b5d2a7ea14c47	S92996c1b5d2a7ea14c47	NIA_NQO1	WT	standard diet (SD)	0	0
+1aa3348e6628cb21	MTBLS2085	Sa8d3a31b0249302b9797	Sa8d3a31b0249302b9797	NIA_NQO1	NQO1-Tg	standard diet (SD)	1	0
+1aa3348e6628cb21	MTBLS2085	S38dbaf7e9fc4df624687	S38dbaf7e9fc4df624687	NIA_NQO1	NQO1-Tg	standard diet (SD)	1	0
+1aa3348e6628cb21	MTBLS2085	Sd4085cfd90d05691181b	Sd4085cfd90d05691181b	NIA_NQO1	NQO1-Tg	standard diet (SD)	1	0
+1aa3348e6628cb21	MTBLS2085	S522eb6c5dc0239df4830	S522eb6c5dc0239df4830	NIA_NQO1	NQO1-Tg	standard diet (SD)	1	0
+1aa3348e6628cb21	MTBLS2085	Sc5e6e94cfa27f9c958ce	Sc5e6e94cfa27f9c958ce	NIA_NQO1	NQO1-Tg	standard diet (SD)	1	0
+1aa3348e6628cb21	MTBLS2085	Sb450184ef39313ce1c22	Sb450184ef39313ce1c22	NIA_NQO1	WT	high-fat diet (HFD)	0	1
+1aa3348e6628cb21	MTBLS2085	S45900d9eb5a144ee25b9	S45900d9eb5a144ee25b9	NIA_NQO1	WT	high-fat diet (HFD)	0	1
+1aa3348e6628cb21	MTBLS2085	Sdf1b73269adb497a56a2	Sdf1b73269adb497a56a2	NIA_NQO1	WT	high-fat diet (HFD)	0	1
+1aa3348e6628cb21	MTBLS2085	Sea4b52eaa156d45c2b63	Sea4b52eaa156d45c2b63	NIA_NQO1	WT	high-fat diet (HFD)	0	1
+1aa3348e6628cb21	MTBLS2085	Seae0a4f123660899cfca	Seae0a4f123660899cfca	NIA_NQO1	WT	high-fat diet (HFD)	0	1
+1aa3348e6628cb21	MTBLS2085	Sb03d4393548c6deb34e0	Sb03d4393548c6deb34e0	NIA_NQO1	NQO1-Tg	high-fat diet (HFD)	1	1
+1aa3348e6628cb21	MTBLS2085	S41b5385e6b362bbf59c7	S41b5385e6b362bbf59c7	NIA_NQO1	NQO1-Tg	high-fat diet (HFD)	1	1
+1aa3348e6628cb21	MTBLS2085	S146781312b6a2c23f099	S146781312b6a2c23f099	NIA_NQO1	NQO1-Tg	high-fat diet (HFD)	1	1
+1aa3348e6628cb21	MTBLS2085	S9e9937872c2406f72210	S9e9937872c2406f72210	NIA_NQO1	NQO1-Tg	high-fat diet (HFD)	1	1
+1aa3348e6628cb21	MTBLS2085	S0c300a1725ed831385ed	S0c300a1725ed831385ed	NIA_NQO1	NQO1-Tg	high-fat diet (HFD)	1	1

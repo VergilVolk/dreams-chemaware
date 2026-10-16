@@ -1,0 +1,98 @@
+{
+  "schema": "factorial_hfd_wave_v1",
+  "status": "official_metadata_frozen_raw_unopened",
+  "denominators": {
+    "studies": 3,
+    "source_families": 3,
+    "assay_panels": 11,
+    "panel_sample_files": 244,
+    "unique_biological_units_across_studies": 67,
+    "download_bytes": 3586894955,
+    "download_gib": 3.340556244365871
+  },
+  "primary_biological_objects": [
+    "HFD_minus_control_in_reference_genotype",
+    "HFD_minus_control_in_modified_genotype",
+    "modified_minus_reference_under_control_diet",
+    "modified_minus_reference_under_HFD",
+    "genotype_by_HFD_interaction"
+  ],
+  "leakage_status": "official design metadata opened; abundance_MS2_and_cross_study_scores_unopened",
+  "provenance": [
+    {
+      "accession": "MTBLS135",
+      "assay_file": "a_MTBLS135_LC-MS_NEG_1_SERUM_metabolite_profiling_mass_spectrometry.txt",
+      "assay_snapshot_sha256": "e616237a7a10a8ed3612e2c5ae9fb1356bc64add483b85134ac93d4c6e29dc82"
+    },
+    {
+      "accession": "MTBLS135",
+      "assay_file": "a_MTBLS135_LC-MS_NEG_2_SERUM_metabolite_profiling_mass_spectrometry-2.txt",
+      "assay_snapshot_sha256": "39b10c65c6b62bb044bc295b8d696d6a1faa4a655a493a13c2c684785691b65b"
+    },
+    {
+      "accession": "MTBLS135",
+      "assay_file": "a_MTBLS135_LC-MS_POS_1_SERUM_metabolite_profiling_mass_spectrometry-4.txt",
+      "assay_snapshot_sha256": "fb07eb5dd8f17ac26f4dc34d236847483684bfbc657dc1df54f58f95c0c0b627"
+    },
+    {
+      "accession": "MTBLS135",
+      "study_snapshot_sha256": "48329a6b4f64f3ecfbdb83af1cb5324498361e6fa07a43b0436aca6c1e046a16",
+      "sample_snapshot_sha256": "a5fec3b67ab7a828ee485ebcc37af6e5a1fd2bd1d2063b2139bd962fd780798e"
+    },
+    {
+      "accession": "MTBLS3316",
+      "assay_file": "a_MTBLS3316_LC-MS_METHOD1_POS_1_metabolite_profiling_mass_spectrometry.txt",
+      "assay_snapshot_sha256": "2859a5804c66ff6b1a7ec792755513ca42109275ddbfbd3ac73d638381ac6f0d"
+    },
+    {
+      "accession": "MTBLS3316",
+      "assay_file": "a_MTBLS3316_LC-MS_METHOD2_POS_2_metabolite_profiling_mass_spectrometry-1.txt",
+      "assay_snapshot_sha256": "a9f05aae326444fd1dfc0dd8fbebaeda3d175856193cc54f5505d99deb9e0ba6"
+    },
+    {
+      "accession": "MTBLS3316",
+      "assay_file": "a_MTBLS3316_LC-MS_METHOD3_NEG_1_metabolite_profiling_mass_spectrometry-2.txt",
+      "assay_snapshot_sha256": "2dab86ca46ad65398926c41137afbe765b478bea2a8943317ead31f0ab9ba400"
+    },
+    {
+      "accession": "MTBLS3316",
+      "assay_file": "a_MTBLS3316_LC-MS_METHOD4_NEG_2_metabolite_profiling_mass_spectrometry-3.txt",
+      "assay_snapshot_sha256": "f5a79884aabc43d2bf26460ac3b6dd6fbbb7206879c6226d31ad9b1cad69cd83"
+    },
+    {
+      "accession": "MTBLS3316",
+      "study_snapshot_sha256": "e7522cb0b8f5e7681c17f71ac197ca8ba5651d712aefac8294d8eabab894f6a3",
+      "sample_snapshot_sha256": "39f8e979f6d41a3109e99b72f102900098d4b6bd356b6bffac7f255a2bb40e32"
+    },
+    {
+      "accession": "MTBLS2085",
+      "assay_file": "a_MTBLS2085_LC-MS_Serum_Method1_Pos1_metabolite_profiling_mass_spectrometry-12.txt",
+      "assay_snapshot_sha256": "61c14c994a1a02a13373ed50fa768e99a9bf14e9ee21ebe3b04fb4af8a1b91c7"
+    },
+    {
+      "accession": "MTBLS2085",
+      "assay_file": "a_MTBLS2085_LC-MS_Serum_Method2_Pos2_metabolite_profiling_mass_spectrometry-13.txt",
+      "assay_snapshot_sha256": "7967c31eee1a0405fcfea38fc4973a9de50a9dcb9f4470dce3fdfde3c456a87e"
+    },
+    {
+      "accession": "MTBLS2085",
+      "assay_file": "a_MTBLS2085_LC-MS_Serum_Method3_Neg1_metabolite_profiling_mass_spectrometry-14.txt",
+      "assay_snapshot_sha256": "2e063c7af1d8895bc3b5c58d59d4e8607d8ee69d1222277c7aab90f621135a1a"
+    },
+    {
+      "accession": "MTBLS2085",
+      "assay_file": "a_MTBLS2085_LC-MS_Serum_Method4_Neg2_metabolite_profiling_mass_spectrometry-15.txt",
+      "assay_snapshot_sha256": "1068aa40839f606e9b40cfec45adcd5570c1840b66a90bbd8b91331e145e8f64"
+    },
+    {
+      "accession": "MTBLS2085",
+      "study_snapshot_sha256": "02b57ffc8b5f0688d2906ed8082f4cbf59f7c6bfc43dc1f09daeb736abee33a7",
+      "sample_snapshot_sha256": "6c6f9e3c5cdcbf760a09e1ab3fa79ea696bc2257d4fe87c5d3c3e1d79eded4bc"
+    }
+  ],
+  "claim_boundary": [
+    "MTBLS135 and MTBLS3316 are separate Hi-MYC experiments but share model and research lineage.",
+    "MTBLS2085 is a distinct NQO1 experiment and is not assumed to have the same interaction direction.",
+    "MS1+MSn declarations establish acquisition capacity, not usable linked-entity coverage."
+  ]
+}

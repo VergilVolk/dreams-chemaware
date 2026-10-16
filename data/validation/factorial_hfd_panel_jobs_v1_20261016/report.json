@@ -1,0 +1,16 @@
+{
+  "schema": "factorial_hfd_panel_jobs_v1",
+  "status": "phenotype_blind_panel_jobs_frozen",
+  "denominators": {
+    "panels": 11,
+    "sample_files": 244,
+    "studies": 3,
+    "expected_bytes": 3586894955
+  },
+  "provenance": {
+    "acquisition_manifest_sha256": "f7711ff99d1154381091dd773f7f8ac0ce50623d4b9546470d41a9632276f187",
+    "panel_registry_sha256": "8e8360a6ba989416da26808661a0872bfa91956120a212e80fc14ea0d674f933"
+  },
+  "leakage_status": "no genotype_or_diet_fields_written_to_panel_quantification_manifests",
+  "claim_boundary": "Acquisition jobs only; no abundance, response, or retrieval result."
+}
