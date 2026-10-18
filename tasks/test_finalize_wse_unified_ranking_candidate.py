@@ -30,11 +30,6 @@ def test_primary_ranking_can_pass_while_lambda2_utility_is_reported_failed() -> 
         "formulas": np.asarray([f"F{query}" for query in range(queries)]),
         "near": np.ones(queries, dtype=bool),
     }
-    bundle = {
-        "module_names": np.asarray(["official_dreams"]),
-        "scores": baseline[None, :],
-        "availability": np.ones((1, len(baseline)), dtype=np.float32),
-    }
     scores = {
         "wse": baseline,
         "old_four_module": baseline,
@@ -43,7 +38,6 @@ def test_primary_ranking_can_pass_while_lambda2_utility_is_reported_failed() -> 
     }
     result, selected = adjudicate(
         {"identity": panel, "formula": panel},
-        {"identity": bundle, "formula": bundle},
         {"identity": scores, "formula": scores},
         seed=17, resamples=200,
     )
