@@ -10,8 +10,11 @@ from train_wse_conditional_residual import (
     CHEMICAL_FEATURE_NAMES,
     OLD_MODULES,
     SPECTRAL_FEATURE_NAMES,
+    arm_beats,
     build_chemical_features,
     fit_scaler,
+    lambda2_risk_beats,
+    metric_profile_noninferior,
     query_score_features,
     reconstruct_old_scores,
     residual_diagnostics,
@@ -188,6 +191,48 @@ def test_residual_capacity_diagnostic_marks_impossible_wse_deficits() -> None:
     assert diagnostics["existing_component_correctability"]["per_component"]["noise_v1"]["corrected_wse_errors"] == 1
 
 
+def test_primary_ranking_selection_does_not_conflate_lambda2_utility() -> None:
+    comparisons = {
+        panel: {
+            "delta_recall@1": 0.01,
+            "corrected": 10,
+            "introduced": 7,
+            "risk_net_corrected_minus_2introduced": -4,
+            "formula_cluster_bootstrap_95ci": [0.002, 0.018],
+            "near": {
+                "delta_recall@1": 0.012,
+                "risk_net_corrected_minus_2introduced": -3,
+            },
+        }
+        for panel in ("identity", "formula")
+    }
+    assert arm_beats(comparisons, ("identity", "formula"))
+    assert not lambda2_risk_beats(comparisons, ("identity", "formula"))
+
+    report_panels = {
+        panel: {
+            "methods": {
+                "candidate": {
+                    "mrr": 0.91,
+                    "micro_candidate_auroc": 0.94,
+                    "micro_candidate_auprc": 0.82,
+                    "near": {"recall@1": 0.80},
+                },
+                "baseline": {
+                    "mrr": 0.90,
+                    "micro_candidate_auroc": 0.93,
+                    "micro_candidate_auprc": 0.81,
+                    "near": {"recall@1": 0.79},
+                },
+            },
+        }
+        for panel in ("identity", "formula")
+    }
+    assert metric_profile_noninferior(
+        report_panels, "candidate", "baseline", ("identity", "formula"),
+    )
+
+
 if __name__ == "__main__":
     test_raw_scores_and_competition_state_are_preserved()
     test_chemical_features_cancel_shared_nuisance_and_mark_missing()
@@ -196,4 +241,5 @@ if __name__ == "__main__":
     test_joint_chemical_zero_is_exact_noop()
     test_old_four_module_scores_are_replayed_without_retraining()
     test_residual_capacity_diagnostic_marks_impossible_wse_deficits()
+    test_primary_ranking_selection_does_not_conflate_lambda2_utility()
     print("PASS: WSE conditional-residual scientific contracts")
