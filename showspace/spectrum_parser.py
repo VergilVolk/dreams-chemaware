@@ -151,17 +151,32 @@ class SpectrumParser:
         try:
             with mzml.read(str(file_path)) as reader:
                 for idx, spectrum in enumerate(reader):
-                    if spectrum['ms level'] == 2:  # MS2 spectra
+                    if spectrum.get('ms level') == 2:  # MS2 spectra
+                        spectrum_id = spectrum.get('id', spectrum.get('ID', f'spectrum_{idx}'))
+                        precursors = spectrum.get('precursorList', {}).get('precursor', [])
+                        if not precursors:
+                            raise ValueError(f"谱图 {spectrum_id} 缺少前体信息")
+                        precursor = precursors[0]
+                        selected_ions = precursor.get('selectedIonList', {}).get('selectedIon', [])
+                        selected_ion = selected_ions[0] if selected_ions else {}
+                        precursor_mz = selected_ion.get('selected ion m/z')
+                        if precursor_mz is None:
+                            precursor_mz = precursor.get('isolationWindow', {}).get('isolation window target m/z')
+                        if precursor_mz is None:
+                            raise ValueError(f"谱图 {spectrum_id} 缺少前体 m/z")
+
                         spec_dict = {
-                            'spectrum_id': spectrum.get('ID', f'spectrum_{idx}'),
-                            'precursor_mz': spectrum.get('precursor', {}).get('mz', 0.0),
-                            'charge': spectrum.get('precursor', {}).get('charge', [1])[0],
+                            'spectrum_id': spectrum_id,
+                            'precursor_mz': float(precursor_mz),
+                            'charge': int(selected_ion.get('charge state', 1)),
                             'peaks': np.array([])
                         }
 
                         # 提取峰值
                         mz_array = spectrum.get('m/z array', [])
                         intensity_array = spectrum.get('intensity array', [])
+                        if len(mz_array) != len(intensity_array):
+                            raise ValueError(f"谱图 {spectrum_id} 的 m/z 与 intensity 数量不一致")
 
                         if len(mz_array) > 0 and len(intensity_array) > 0:
                             peaks = np.column_stack([mz_array, intensity_array])
@@ -191,25 +206,25 @@ class SpectrumParser:
             with mzxml.read(str(file_path)) as reader:
                 for idx, spectrum in enumerate(reader):
                     if spectrum.get('msLevel') == 2:  # MS2 spectra
+                        spectrum_id = spectrum.get('id', spectrum.get('ID', f'spectrum_{idx}'))
+                        precursors = spectrum.get('precursorMz', [])
+                        if not precursors or precursors[0].get('precursorMz') is None:
+                            raise ValueError(f"谱图 {spectrum_id} 缺少前体 m/z")
+                        precursor = precursors[0]
                         spec_dict = {
-                            'spectrum_id': spectrum.get('ID', f'spectrum_{idx}'),
-                            'precursor_mz': 0.0,
-                            'charge': 1,
+                            'spectrum_id': spectrum_id,
+                            'precursor_mz': float(precursor['precursorMz']),
+                            'charge': int(precursor.get('precursorCharge', 1)),
                             'peaks': np.array([])
                         }
 
-                        # 提取前体信息
-                        if 'precursorMz' in spectrum:
-                            precursor_list = spectrum['precursorMz']
-                            if isinstance(precursor_list, list) and len(precursor_list) > 0:
-                                spec_dict['precursor_mz'] = precursor_list[0]['mz']
-                                spec_dict['charge'] = int(precursor_list[0].get('precursorCharge', 1))
-
-                        # 提取峰值
-                        peaks_data = spectrum.get('peaks', [])
-                        if peaks_data and len(peaks_data) > 0:
-                            peaks = np.array(peaks_data, dtype=np.float32)
-                            spec_dict['peaks'] = peaks
+                        # Pyteomics 已将编码的 peaks 解码成两个数组。
+                        mz_array = spectrum.get('m/z array', [])
+                        intensity_array = spectrum.get('intensity array', [])
+                        if len(mz_array) != len(intensity_array):
+                            raise ValueError(f"谱图 {spectrum_id} 的 m/z 与 intensity 数量不一致")
+                        if len(mz_array) > 0:
+                            spec_dict['peaks'] = np.column_stack([mz_array, intensity_array]).astype(np.float32)
                             spectra.append(spec_dict)
 
         except Exception as e:
