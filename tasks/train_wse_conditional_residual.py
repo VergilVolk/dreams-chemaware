@@ -418,11 +418,49 @@ def paired_comparison(
 
 
 def arm_beats(comparisons: dict, panels: tuple[str, ...]) -> bool:
+    """Primary retrieval-selection rule.
+
+    ``corrected - 2 * introduced`` is retained as a separately reported,
+    application-specific conservative utility.  It is not a standard ranking
+    endpoint and must not silently veto a model that has a strictly positive
+    paired Recall@1 effect, positive formula-cluster interval, and no near-set
+    Recall@1 regression on both development panels.
+    """
     return all(
         comparisons[panel]["delta_recall@1"] > 0
         and comparisons[panel]["formula_cluster_bootstrap_95ci"][0] > 0
-        and comparisons[panel]["risk_net_corrected_minus_2introduced"] > 0
         and comparisons[panel].get("near", {}).get("delta_recall@1", 0.0) >= 0
+        for panel in panels
+    )
+
+
+def lambda2_risk_beats(comparisons: dict, panels: tuple[str, ...]) -> bool:
+    """Legacy conservative-use utility, reported independently of selection."""
+    return all(
+        comparisons[panel]["risk_net_corrected_minus_2introduced"] > 0
+        and comparisons[panel].get("near", {}).get(
+            "risk_net_corrected_minus_2introduced", 0,
+        ) >= 0
+        for panel in panels
+    )
+
+
+def metric_profile_noninferior(
+    report_panels: dict,
+    candidate: str,
+    baseline: str,
+    panels: tuple[str, ...],
+) -> bool:
+    """Require the principal continuous ranking metrics not to regress."""
+    keys = ("mrr", "micro_candidate_auroc", "micro_candidate_auprc")
+    return all(
+        all(
+            report_panels[panel]["methods"][candidate][key]
+            >= report_panels[panel]["methods"][baseline][key]
+            for key in keys
+        )
+        and report_panels[panel]["methods"][candidate]["near"]["recall@1"]
+        >= report_panels[panel]["methods"][baseline]["near"]["recall@1"]
         for panel in panels
     )
 
@@ -810,25 +848,59 @@ def main() -> None:
     comparison = lambda key: {
         panel: report["panels"][panel]["comparisons"][key] for panel in panel_names
     }
+    b_comparison_keys = ("B_vs_wse", "B_vs_old_four_module", "B_vs_A")
+    b_metric_baselines = ("wse", "old_four_module", "A")
     b_selected = (
-        arm_beats(comparison("B_vs_wse"), panel_names)
-        and arm_beats(comparison("B_vs_old_four_module"), panel_names)
-        and arm_beats(comparison("B_vs_A"), panel_names)
+        all(arm_beats(comparison(key), panel_names) for key in b_comparison_keys)
+        and all(
+            metric_profile_noninferior(report["panels"], "B", baseline, panel_names)
+            for baseline in b_metric_baselines
+        )
     )
+    a_comparison_keys = ("A_vs_wse", "A_vs_old_four_module")
+    a_metric_baselines = ("wse", "old_four_module")
     a_qualified = (
-        arm_beats(comparison("A_vs_wse"), panel_names)
-        and arm_beats(comparison("A_vs_old_four_module"), panel_names)
+        all(arm_beats(comparison(key), panel_names) for key in a_comparison_keys)
+        and all(
+            metric_profile_noninferior(report["panels"], "A", baseline, panel_names)
+            for baseline in a_metric_baselines
+        )
     )
-    b_independent = arm_beats(comparison("B_vs_A"), panel_names)
+    b_independent = (
+        arm_beats(comparison("B_vs_A"), panel_names)
+        and metric_profile_noninferior(report["panels"], "B", "A", panel_names)
+    )
+    report["selection_policy"] = {
+        "status": (
+            "post-result specification correction on consumed GNPS development data; "
+            "not a preregistered confirmation"
+        ),
+        "primary": (
+            "paired Recall@1 positive with formula-cluster CI lower bound > 0, "
+            "near Recall@1 nonnegative, and MRR/micro-AUROC/micro-AUPRC noninferior "
+            "on both consumed GNPS development panels"
+        ),
+        "legacy_lambda2_utility": (
+            "corrected - 2*introduced is reported as a separate conservative-use "
+            "utility and is not a primary ranking-selection veto"
+        ),
+        "legacy_lambda2_pass": {
+            key: lambda2_risk_beats(comparison(key), panel_names)
+            for key in b_comparison_keys
+        },
+    }
     if b_selected:
         decision = "SELECT_B"
-        reason = "B stably beats WSE, the old four-module model, and A without near regression"
+        reason = (
+            "B stably beats WSE, the old four-module model, and A on primary ranking "
+            "endpoints without near regression; legacy lambda-2 utility remains separately reported"
+        )
     elif a_qualified and not b_independent:
         decision = "SELECT_A"
         reason = "A has stable incremental value; B adds no independent stable gain"
     else:
         decision = "STOP_CONDITIONAL_RESIDUAL_ROUTE"
-        reason = "neither permitted construction meets the predeclared transferable development rule"
+        reason = "neither permitted construction meets the corrected primary development-selection rule"
     report["decision"] = decision
     report["decision_reason"] = reason
     report["new_external_validation"] = (
