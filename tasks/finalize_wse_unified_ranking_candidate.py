@@ -34,8 +34,7 @@ from train_wse_conditional_residual import (
 )
 
 
-OFFICIAL = "official_dreams"
-BASELINES = (OFFICIAL, "wse", "old_four_module", "A")
+BASELINES = ("wse", "old_four_module", "A")
 PARENT_METHODS = ("wse", "old_four_module", "A", "B")
 
 
@@ -79,23 +78,8 @@ def load_parent_scores(path: Path, panels: dict[str, dict]) -> dict[str, dict[st
     return output
 
 
-def official_scores(bundle: dict) -> np.ndarray:
-    names = tuple(map(str, bundle["module_names"]))
-    if OFFICIAL not in names:
-        raise RuntimeError(f"{OFFICIAL} is absent from frozen evidence bundle")
-    position = names.index(OFFICIAL)
-    available = np.asarray(bundle["availability"])[position]
-    if not np.all(available == 1):
-        raise RuntimeError("official DreaMS must be complete on the candidate axis")
-    values = np.asarray(bundle["scores"], dtype=np.float32)[position]
-    if not np.all(np.isfinite(values)):
-        raise RuntimeError("official DreaMS contains non-finite scores")
-    return values
-
-
 def adjudicate(
     panels: dict[str, dict],
-    bundles: dict[str, dict],
     scores: dict[str, dict[str, np.ndarray]],
     seed: int,
     resamples: int,
@@ -103,7 +87,7 @@ def adjudicate(
     report_panels: dict[str, dict] = {}
     comparisons_by_baseline: dict[str, dict] = {baseline: {} for baseline in BASELINES}
     for panel_index, (panel_name, panel) in enumerate(panels.items()):
-        methods = {**scores[panel_name], OFFICIAL: official_scores(bundles[panel_name])}
+        methods = scores[panel_name]
         metrics = {}
         for method, values in methods.items():
             metrics[method], _ = metric_summary(
@@ -175,7 +159,7 @@ def main() -> None:
     }
     scores = load_parent_scores(args.parent_predictions, panels)
     adjudication, selected = adjudicate(
-        panels, bundles, scores, int(recipe["seed"]), args.bootstrap_resamples,
+        panels, scores, int(recipe["seed"]), args.bootstrap_resamples,
     )
 
     report = {
