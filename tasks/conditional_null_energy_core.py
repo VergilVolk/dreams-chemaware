@@ -338,6 +338,7 @@ def conditional_null_loss(
     null_margin: float = 0.02,
     null_weight: float = 0.5,
     trust_weight: float = 0.05,
+    query_weights: torch.Tensor | None = None,
 ) -> LossBreakdown:
     """Listwise candidate loss plus a worst-null falsification constraint.
 
@@ -376,7 +377,16 @@ def conditional_null_loss(
     log_partition = maximum + torch.log(exp_sum)
     true_actual = actual_score[positive]
     actual_query_loss = log_partition - true_actual
-    listwise = torch.mean(actual_query_loss)
+    if query_weights is None:
+        weights = torch.ones_like(actual_query_loss)
+    else:
+        weights = query_weights.to(device=actual_query_loss.device, dtype=actual_query_loss.dtype)
+        if weights.shape != actual_query_loss.shape or not bool(torch.all(torch.isfinite(weights))):
+            raise ValueError("query weights must be finite and align with queries")
+        if not bool(torch.all(weights > 0)):
+            raise ValueError("query weights must be positive")
+    weight_sum = torch.sum(weights)
+    listwise = torch.sum(weights * actual_query_loss) / weight_sum
     null_query_losses = []
     for arm in range(null_scores.shape[0]):
         arm_score = null_scores[arm]
@@ -391,9 +401,10 @@ def conditional_null_loss(
         arm_partition = arm_maximum + torch.log(arm_exp_sum)
         null_query_losses.append(arm_partition - arm_score[positive])
     null_query_loss = torch.stack(null_query_losses, dim=0)
-    arm_losses = torch.relu(
+    arm_query_losses = torch.relu(
         float(null_margin) + actual_query_loss[None, :] - null_query_loss
-    ).mean(dim=1)
+    )
+    arm_losses = torch.sum(arm_query_losses * weights[None, :], dim=1) / weight_sum
     worst_null = torch.max(arm_losses)
     trust = torch.mean(model.residual(actual_features) ** 2)
     total = listwise + float(null_weight) * worst_null + float(trust_weight) * trust
