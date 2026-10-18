@@ -1,14 +1,14 @@
 #!/bin/bash
-# One fixed final development experiment: selected additive C with 2:1 risk
+# One fixed post-C development experiment: selected additive C with 2:1 risk
 # alignment, plus one matched candidate-mismatch chemistry training control.
-# No hyperparameter scan and no Enveda access.
-#SBATCH --job-name=wse_risk_final
+# No hyperparameter scan, no confirmatory claim, and no Enveda access.
+#SBATCH --job-name=wse_risk_dev
 #SBATCH --partition=gpu
 #SBATCH --gpus=1
 #SBATCH --ntasks=1
 #SBATCH --time=12:00:00
-#SBATCH --output=data/validation/wse_risk_final_%j.out
-#SBATCH --error=data/validation/wse_risk_final_%j.err
+#SBATCH --output=data/validation/wse_risk_dev_%j.out
+#SBATCH --error=data/validation/wse_risk_dev_%j.err
 
 set -euo pipefail
 
@@ -22,7 +22,7 @@ AB_RUN="${WSE_AB_PARENT_RUN:-data/validation/wse_conditional_residual_run_237664
 C_RUN="${WSE_ADDITIVE_CONTROL_RUN:-data/validation/wse_additive_mechanism_control_run_2377151}"
 SOURCE_RUN="${UNIFIED_GNPS_SOURCE_RUN:-data/validation/unified_candidate_energy_run_2364137}"
 CHEM_CACHE="${CHEMAWARE_CONTINUOUS_CACHE:-$AB_RUN/continuous_chem_evidence}"
-OUT="data/validation/wse_risk_aligned_additive_final_run_${SLURM_JOB_ID}"
+OUT="data/validation/wse_risk_aligned_additive_development_run_${SLURM_JOB_ID}"
 
 required=(
   "$SOURCE_RUN/evidence_identity_disjoint.npz"
@@ -57,4 +57,4 @@ python -u tasks/train_wse_risk_aligned_additive_final.py \
   --output "$OUT" \
   --device cuda
 
-echo "WSE_RISK_ALIGNED_ADDITIVE_FINAL_COMPLETE_NO_ENVEDA_ACCESS: $OUT"
+echo "WSE_RISK_ALIGNED_ADDITIVE_DEVELOPMENT_COMPLETE_NO_ENVEDA_ACCESS: $OUT"

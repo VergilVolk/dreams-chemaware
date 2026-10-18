@@ -1,10 +1,12 @@
 #!/usr/bin/env python
-"""One fixed risk-aligned final development experiment for additive model C.
+"""One fixed risk-aligned development experiment for additive model C.
 
 True chemistry and a frozen candidate-mismatch chemistry control use identical
 architecture, initialization, train-fold scaler, residual budget, optimizer,
 and query weights.  WSE-correct training queries receive weight two and WSE-
-incorrect queries weight one, exactly matching corrected-2*introduced utility.
+incorrect queries weight one.  This is a listwise surrogate aligned with the
+predeclared corrected-2*introduced utility, not an exact optimization of the
+discrete evaluation statistic.
 """
 from __future__ import annotations
 
@@ -24,6 +26,46 @@ from train_wse_conditional_residual import (
     SPECTRAL_FEATURE_NAMES, build_panel, evaluation_scores, fit_scaler, metric_input, paired_comparison,
     sha256, training_residual_bound, transform_features,
 )
+
+
+MAX_MICRO_METRIC_LOSS = 0.001
+
+
+def ranker_gate(candidate: dict, baseline: dict, comparison: dict) -> dict[str, bool]:
+    """Apply the complete frozen ranker gate to one baseline comparison."""
+    near = comparison.get("near", {})
+    return {
+        "positive_recall1": comparison["delta_recall@1"] > 0,
+        "positive_formula_cluster_ci": comparison["formula_cluster_bootstrap_95ci"][0] > 0,
+        "positive_risk_net": comparison["risk_net_corrected_minus_2introduced"] > 0,
+        "mrr_nonnegative": candidate["mrr"] >= baseline["mrr"],
+        "micro_auroc_not_materially_lower": (
+            candidate["micro_candidate_auroc"]
+            >= baseline["micro_candidate_auroc"] - MAX_MICRO_METRIC_LOSS
+        ),
+        "micro_auprc_not_materially_lower": (
+            candidate["micro_candidate_auprc"]
+            >= baseline["micro_candidate_auprc"] - MAX_MICRO_METRIC_LOSS
+        ),
+        "near_recall1_nonnegative": near.get("delta_recall@1", float("-inf")) >= 0,
+        "near_risk_net_nonnegative": (
+            near.get("risk_net_corrected_minus_2introduced", float("-inf")) >= 0
+        ),
+    }
+
+
+def chemistry_gate(comparison: dict) -> dict[str, bool]:
+    """Require true chemistry to beat the matched mismatch training control."""
+    near = comparison.get("near", {})
+    return {
+        "positive_recall1": comparison["delta_recall@1"] > 0,
+        "positive_formula_cluster_ci": comparison["formula_cluster_bootstrap_95ci"][0] > 0,
+        "positive_risk_net": comparison["risk_net_corrected_minus_2introduced"] > 0,
+        "near_recall1_nonnegative": near.get("delta_recall@1", float("-inf")) >= 0,
+        "near_risk_net_nonnegative": (
+            near.get("risk_net_corrected_minus_2introduced", float("-inf")) >= 0
+        ),
+    }
 
 
 def variant_features(panel: dict, variant: str) -> tuple[np.ndarray, np.ndarray]:
@@ -182,11 +224,18 @@ def main() -> None:
         raise RuntimeError("risk-aligned OOF prediction ledger incomplete")
 
     report = {
-        "status": "WSE_RISK_ALIGNED_ADDITIVE_FINAL_DEVELOPMENT_COMPLETE",
+        "status": "WSE_RISK_ALIGNED_ADDITIVE_DEVELOPMENT_COMPLETE",
         "dataset_role": "development_consumed", "enveda_accessed": False,
         "architecture": "capacity-matched additive C; no spectral-chemical hidden interaction",
-        "risk_alignment": "training query weight 2 for WSE-correct and 1 for WSE-error",
+        "risk_alignment": (
+            "listwise-surrogate query weight 2 for WSE-correct and 1 for WSE-error; "
+            "not exact discrete-risk optimization"
+        ),
         "risk_utility": "corrected_minus_2introduced", "hyperparameter_scan": False,
+        "selection_history": (
+            "post-C development successor under the previously stated 2:1 risk utility; "
+            "not an external or confirmatory result"
+        ),
         "chemical_training_control": "frozen truth-blind candidate mismatch with identical preprocessing and initialization",
         "optimization_replayed_from_parent": recipe, "folds": fold_reports, "panels": {},
     }
@@ -214,21 +263,28 @@ def main() -> None:
         vs_wse = comparisons["F_true_risk_aligned_vs_wse"]
         vs_old = comparisons["F_true_risk_aligned_vs_old_four_module"]
         vs_mismatch = comparisons["F_true_risk_aligned_vs_F_mismatch_risk_aligned"]
-        risk_pass &= all(
-            block["delta_recall@1"] > 0
-            and block["formula_cluster_bootstrap_95ci"][0] > 0
-            and block["risk_net_corrected_minus_2introduced"] > 0
-            and block.get("near", {}).get("delta_recall@1", 0.0) >= 0
-            for block in (vs_wse, vs_old)
+        gates = {
+            "vs_wse": ranker_gate(metrics["F_true_risk_aligned"], metrics["wse"], vs_wse),
+            "vs_old_four_module": ranker_gate(
+                metrics["F_true_risk_aligned"], metrics["old_four_module"], vs_old,
+            ),
+            "true_chemistry_vs_candidate_mismatch": chemistry_gate(vs_mismatch),
+        }
+        panel_risk_pass = (
+            all(gates["vs_wse"].values())
+            and all(gates["vs_old_four_module"].values())
         )
-        chemistry_pass &= (
-            vs_mismatch["delta_recall@1"] > 0
-            and vs_mismatch["formula_cluster_bootstrap_95ci"][0] > 0
-        )
-        report["panels"][panel_name] = {"methods": metrics, "comparisons": comparisons}
-    report["final_decision"] = (
-        "FREEZE_F_TRUE_FOR_NEW_EXTERNAL_VALIDATION" if risk_pass and chemistry_pass
-        else "DO_NOT_FREEZE_RISK_ALIGNED_MODEL"
+        panel_chemistry_pass = all(gates["true_chemistry_vs_candidate_mismatch"].values())
+        risk_pass &= panel_risk_pass
+        chemistry_pass &= panel_chemistry_pass
+        report["panels"][panel_name] = {
+            "methods": metrics, "comparisons": comparisons, "gates": gates,
+            "risk_gate_passed": bool(panel_risk_pass),
+            "chemistry_gate_passed": bool(panel_chemistry_pass),
+        }
+    report["development_decision"] = (
+        "ADVANCE_F_TRUE_TO_GENUINELY_NEW_EXTERNAL_VALIDATION"
+        if risk_pass and chemistry_pass else "STOP_RISK_ALIGNED_ADDITIVE_ROUTE"
     )
     report["risk_gate_passed_both_panels"] = bool(risk_pass)
     report["true_chemistry_training_control_passed_both_panels"] = bool(chemistry_pass)
@@ -239,7 +295,7 @@ def main() -> None:
         model, mean, scale, bound, capacity, chem_hidden, parameters, final, weight_counts = fit_model(
             panels["identity"], all_queries, "true_chemistry", recipe, seed + 1000, args.device,
         )
-        model_path = args.output / "frozen_final_model.pt"
+        model_path = args.output / "development_candidate_model.pt"
         torch.save({
             "state_dict": model.cpu().state_dict(),
             "model_class": "AdditiveBoundedResidualEnergy",
@@ -253,13 +309,13 @@ def main() -> None:
             "training_seed": seed + 1000, "training_queries": int(len(all_queries)),
             "enveda_accessed": False,
         }, model_path)
-        report["frozen_final_model"] = {
+        report["development_candidate_model"] = {
             "path": str(model_path), "sha256": sha256(model_path),
             "fit_scope": "all GNPS identity development queries after OOF selection",
             "capacity": capacity, "final_loss": final, **weight_counts,
         }
     else:
-        report["frozen_final_model"] = None
+        report["development_candidate_model"] = None
     prediction_path = args.output / "risk_aligned_predictions.npz"
     np.savez_compressed(prediction_path, **{
         f"{panel}__{variant}": value
@@ -273,7 +329,10 @@ def main() -> None:
         "identity_chem": sha256(args.identity_chem), "formula_chem": sha256(args.formula_chem),
     }
     (args.output / "report.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
-    print(json.dumps({"status": report["status"], "decision": report["final_decision"], "output": str(args.output)}, indent=2))
+    print(json.dumps({
+        "status": report["status"], "decision": report["development_decision"],
+        "output": str(args.output),
+    }, indent=2))
 
 
 if __name__ == "__main__":
