@@ -333,7 +333,6 @@ class DreaMSInterface:
         bioaware_seed_file: Optional[str] = None,
     ):
         """Run one spectrum through embedding, rules, matching and exports."""
-        empty = ("", "", "", None, [], [], "", None, None, [])
         try:
             peaks = parse_spectrum_input(spectrum_text)
             record = validate_record({
@@ -409,9 +408,11 @@ class DreaMSInterface:
                 json_path, csv_path, candidates_data
             )
         except (ValueError, TypeError) as exc:
-            return (*empty[:-1], f"❌ 输入错误: {str(exc)}")
+            message = f"❌ 输入错误: {str(exc)}"
+            return (message, "", "", None, [], [], message, None, None, [])
         except Exception as exc:
-            return (*empty[:-1], f"❌ 分析失败: {type(exc).__name__}")
+            message = f"❌ 分析失败: {type(exc).__name__}"
+            return (message, "", "", None, [], [], message, None, None, [])
 
     def compare_models(self, spectrum_text: str, precursor_mz: float, charge: int = 1) -> str:
         """Compare the two reproducible demo representation modes."""
