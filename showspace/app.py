@@ -671,6 +671,15 @@ def build_app():
                 json_download = gr.File(label="下载完整 JSON", interactive=False)
                 csv_download = gr.File(label="下载 embedding CSV", interactive=False)
             run_btn.click(
+                lambda: (
+                    "<div class='candidate-empty'>旧结构结果已清除。本次分析成功后，请点击“展示候选结构”查看新结果。</div>",
+                    [],
+                ),
+                inputs=None,
+                outputs=[molecule_cards, candidate_state],
+                queue=False,
+                api_name=False,
+            ).then(
                 interface.process_spectrum,
                 inputs=[spectrum_input, precursor_mz, charge, adduct, analyze_rules, model_type,
                         tolerance_ppm, max_results, p2b_preview, bioaware_seed_file],
