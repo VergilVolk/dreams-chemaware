@@ -105,6 +105,10 @@ The positive MAF has 477 feature rows and 155 abundance columns; 217 rows have a
 
 Wieder et al. 2026 report [96 MTBLS1866 samples](https://pmc.ncbi.nlm.nih.gov/articles/PMC13372841/) and state that a positive-mode XCMS table from the MetaboLights Galaxy API was used for LAMP. However, at GitHub commit [`17b9fd6`](https://github.com/cwieder/MetaNetworkIntegration/tree/17b9fd63c948da5fd754c65003f9308e33a89070/Studies/MTBLS1866), only the sample sheet and three MAFs are present for this accession; no XCMS matrix or 96-row inclusion ledger is deposited there.
 
+The complete public notebooks at that same immutable commit were also inspected through the GitHub blob API. Their `MTBLS1866` object reads the three submitter MAFs, retains `HEALTHY` and `COVID-19`, joins the processed assay tables by their common sample index, and explicitly drops `SA 8`. It contains no Galaxy history ID, dataset ID, XCMS download URL, or separate 96-sample ledger. Replaying that declared membership rule on the deposited tables yields the 94/93 counts below, confirming that the notebook itself cannot reconstruct the LAMP positive-mode denominator of 96.
+
+The live MetaboLights Labs Galaxy API was queried anonymously on 2026-10-19. It exposed zero published or importable histories. Its library registry exposed a public-facing library named `MTBLS Spectral Matrices`, but anonymous library-content enumeration returned HTTP 403, and no `MTBLS1866` history or dataset identifier was discoverable. This is evidence that the matrix is not anonymously recoverable through the currently exposed public API, not evidence that the private Galaxy artifact has been deleted.
+
 Exact current-file matching gives:
 
 - GCxGC MAF: 96 case-control columns matching the sample sheet (76 COVID + 20 healthy);

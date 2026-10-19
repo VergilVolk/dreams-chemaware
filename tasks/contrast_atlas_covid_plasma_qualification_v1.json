@@ -188,6 +188,25 @@
         "xcms_matrix_stably_located_in_audited_github_tree": false,
         "wieder_github_commit": "17b9fd63c948da5fd754c65003f9308e33a89070",
         "wieder_github_path": "Studies/MTBLS1866",
+        "wieder_notebook_recovery_audit": {
+          "complete_blob_inspection": true,
+          "declared_inputs": "three submitter MAFs plus s_MTBLS1866.txt",
+          "declared_group_filter": "HEALTHY versus COVID-19",
+          "declared_outlier": "SA 8",
+          "galaxy_history_id_present": false,
+          "galaxy_dataset_id_present": false,
+          "xcms_download_url_present": false,
+          "independent_96_sample_ledger_present": false
+        },
+        "metabolights_labs_public_api_audit": {
+          "audit_date": "2026-10-19",
+          "published_histories_visible_anonymously": 0,
+          "importable_histories_visible_anonymously": 0,
+          "library_registry_contains_mtbls_spectral_matrices": true,
+          "anonymous_library_content_enumeration": "HTTP_403",
+          "mtbls1866_history_or_dataset_id_discovered": false,
+          "interpretation": "not anonymously recoverable through the exposed public API; artifact deletion is not inferred"
+        },
         "known_only_control_possible": true,
         "unbiased_all_entity_response_ready": false
       },
