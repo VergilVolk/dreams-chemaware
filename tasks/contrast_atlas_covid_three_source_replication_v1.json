@@ -44,6 +44,7 @@
       "design": "COVID_vs_age_sex_matched_control",
       "biological_units": {"matched_pairs": 39, "covid": 39, "control": 39},
       "response_asset": "data/validation/contrast_atlas_msv000092887_paired_response_v1_20261019",
+      "phenotype_blind_mzxml_manifest": "data/validation/msv000092887_hilic_positive_mzxml_manifest_v2_20261019",
       "response_denominators": {
         "features": 3041,
         "abundance_qc_pass": 2598,
@@ -56,7 +57,7 @@
         "implied_ms2_without_reference_hit": 1807,
         "feature_level_ms2_membership_ready": false
       },
-      "response_status": "built_raw_ms2_link_pending",
+      "response_status": "built_raw_ms2_download_universe_frozen_link_pending",
       "signed_truth_status": "not_truth"
     }
   ],

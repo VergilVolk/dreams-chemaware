@@ -91,4 +91,6 @@ The completed `MSV000092887` build proves that one independent matched study can
 
 The immediate high-value task is phenotype-blind raw-MS2 linkage for this 838.6 MB HILIC-positive collection, followed by recovery of the two small blockers in the other sources. No larger Atlas construction is justified before the three rotations yield an actual held-out chemical-response result.
 
+That acquisition universe is now frozen in `data/validation/msv000092887_hilic_positive_mzxml_manifest_v2_20261019`: 129 mzXML files and 838,574,158 bytes, including 78 biological files and 51 blank/QC files. The linkage-facing manifest contains paths, sizes and URLs but physically omits biological unit, pair and group columns. Blank/QC files are retained to measure acquisition-domain and false-link behavior. The publication's alignment tolerances (0.05 min retention time and 0.005 Da MS1) are frozen as initial audit values, not tunable success parameters. No file has yet been marked downloaded, and the manifest does not claim that any feature has MS2 evidence.
+
 Machine-readable contract: `tasks/contrast_atlas_covid_three_source_replication_v1.json`.

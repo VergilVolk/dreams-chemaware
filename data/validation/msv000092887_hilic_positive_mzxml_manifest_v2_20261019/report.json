@@ -1,0 +1,37 @@
+{
+  "schema": "msv000092887_hilic_positive_mzxml_manifest_v2_phenotype_blind",
+  "status": "DOWNLOAD_UNIVERSE_FROZEN",
+  "evidence_role": {
+    "dataset_status": "development_consumed",
+    "leakage_state": "outcome_open_but_manifest_construction_metadata_only",
+    "external_validation_claim": false
+  },
+  "denominators": {
+    "files": 129,
+    "bytes": 838574158,
+    "biological_files": 78,
+    "biological_bytes": 509571140,
+    "blank_or_qc_files": 51,
+    "blank_or_qc_bytes": 329003018
+  },
+  "provenance": {
+    "file_index_sha256": "c48584aec8960a8f26cadb5dce5868c76ad54f3f3f6fad26109ef1de3d1a9969",
+    "assay_ledger_sha256": "e3e8f3e2125de1c357115b96d24a547c41a4387ff0e6687f7c92976cbd52c3e5"
+  },
+  "linkage_contract": {
+    "download_universe_includes_all_129_files": true,
+    "download_completed": false,
+    "reason": "blank and QC files are retained for acquisition-domain and false-link calibration",
+    "phenotype_columns_absent_from_linkage_manifest": [
+      "biological_unit_id",
+      "pair_id",
+      "group"
+    ],
+    "published_alignment_tolerances": {
+      "retention_time_minutes": 0.05,
+      "ms1_da": 0.005
+    },
+    "published_tolerances_are_initial_audit_values_not_posthoc_tunable_success_parameters": true
+  },
+  "claim_boundary": "This freezes acquisition only; it does not establish feature-level MS2 membership or a biological response replication."
+}
