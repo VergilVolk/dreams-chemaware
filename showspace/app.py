@@ -604,7 +604,9 @@ def build_app():
     default_model = next((key for key in ("e8_shared", "e4a_shared", "official_dreams") if registry[key]["ready"]), "official_dreams")
     css = """
     .hero{padding:24px;border-radius:16px;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:white}
-    .note{padding:12px 16px;border-radius:12px;background:#f6f7ff}
+    .gradio-container .note{padding:12px 16px;border-radius:12px;background:#f6f7ff;color:#1f2937}
+    .gradio-container .note b{color:#111827}
+    .gradio-container .note code{background:#e5e7eb;color:#111827}
     .candidate-list{display:flex;flex-direction:column;gap:16px;margin-top:12px}
     .candidate-card{border:1px solid #d9deea;border-radius:14px;padding:18px;background:#ffffff;color:#1f2937;box-shadow:0 2px 8px rgba(20,30,60,.08)}
     .candidate-card-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;border-bottom:1px solid #e5e7eb;padding-bottom:10px;color:#1f2937}
