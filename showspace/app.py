@@ -510,7 +510,20 @@ class DreaMSInterface:
             return [], None, None, "请先上传文件。"
         try:
             official = model_type in {"official_dreams", "e4a_shared", "e8_shared"}
-            records = [validate_record(record, official=official) for record in SpectrumParser.parse_file(file_path)]
+            records, errors = [], []
+            for index, record in enumerate(SpectrumParser.parse_file(file_path), 1):
+                spectrum_id = str(record.get("spectrum_id") or f"spectrum_{index}")
+                try:
+                    records.append(validate_record(record, official=official))
+                except (ValueError, TypeError, KeyError, OverflowError) as exc:
+                    errors.append(f"{spectrum_id}: 输入无效，{str(exc)}")
+            if not records:
+                status = f"❌ 批量分析未执行: 0 成功，{len(errors)} 失败。"
+                if errors:
+                    status += "\n\n" + "\n".join(f"- {error}" for error in errors)
+                else:
+                    status += " 文件中没有可分析的谱图。"
+                return [], None, None, status
             self.ensure_model(model_type)
             embeddings = batch_generate_embeddings(
                 self.model, [r["peaks"] for r in records], [r["precursor_mz"] for r in records],
@@ -518,7 +531,7 @@ class DreaMSInterface:
                 spectrum_ids=[r["spectrum_id"] for r in records],
                 chem_aware=False,
             )
-            rows, errors, complete = [], [], []
+            rows, complete = [], []
             for record, (embedding, metadata) in zip(records, embeddings):
                 if embedding is None:
                     errors.append(record["spectrum_id"] + ": embedding 失败")
@@ -550,7 +563,10 @@ class DreaMSInterface:
                 })
             csv_path = self._write_csv(embeddings)
             backend = model_type if model_type != "demo" else "reproducible_demo"
-            json_path = self._write_json({"schema_version": 1, "model_type": model_type, "backend": backend, "records": complete})
+            json_path = self._write_json({
+                "schema_version": 1, "model_type": model_type, "backend": backend,
+                "records": complete, "errors": errors,
+            })
             status = f"✅ 批量完成: {len(rows)} 成功，{len(errors)} 失败。"
             if errors:
                 status += "\n\n" + "\n".join(f"- {error}" for error in errors)
