@@ -1,0 +1,311 @@
+{
+  "schema": "contrast_atlas_cross_source_qualification_v1",
+  "generated_at": "2026-10-19T14:01:54+08:00",
+  "pair_id": "MSV000085505__MTBLS1866",
+  "audit_mode": "read_only_metadata_and_small_public_tables",
+  "large_raw_download_performed": false,
+  "retrieval_run_performed": false,
+  "response_model_fit": false,
+  "evidence_role": {
+    "dataset_status": "development_consumed",
+    "truth_status": "not_signed_truth",
+    "leakage_state": "outcome_open_public_pair",
+    "allowed_use": "qualification_and_method_development_only",
+    "forbidden_use": [
+      "unopened_external_confirmation",
+      "same_disease_label_as_signed_truth",
+      "posthoc_top1_as_truth",
+      "randomized_treatment_effect_without_arm_and_timing_crosswalk"
+    ]
+  },
+  "verdict": {
+    "source_family_independence": "PASS",
+    "positive_mode_dda_available": "PASS",
+    "candidate_related_contrast": "PASS_WITH_SCOPE_MISMATCH",
+    "signed_truth_registration": "FAIL",
+    "all_entity_beta_se_pair": "NO_GO_PENDING_METADATA_AND_MATRIX",
+    "large_download_now": "HOLD",
+    "overall": "NO_GO_PENDING_SMALL_ASSETS"
+  },
+  "sources": {
+    "MSV000085505": {
+      "source_family": {
+        "institution": "University of Sao Paulo",
+        "country": "Brazil",
+        "instrument": "Bruker micrOTOF-Q II",
+        "chromatography": "Shimadzu HPLC, C18",
+        "specimen": "blood plasma"
+      },
+      "official_record": {
+        "status": "Partial Public",
+        "doi": "10.25345/C52988",
+        "task_id": "16326d112dfc42b7b4502e275167bbc9",
+        "displayed_file_count": 144,
+        "url": "https://massive.ucsd.edu/ProteoSAFe/dataset.jsp?task=16326d112dfc42b7b4502e275167bbc9",
+        "file_manifest_url": "https://massive.ucsd.edu/ProteoSAFe/dataset_files.jsp?task=16326d112dfc42b7b4502e275167bbc9",
+        "local_index_evidence": "data/validation/massive_index.json:9436"
+      },
+      "positive_dda_inventory": {
+        "acquisition_method": "positive_mode_top5_DDA",
+        "acquisition_method_source": "https://www.nature.com/articles/s41587-022-01368-1",
+        "open_format_runs": 68,
+        "mzml_directory": "ccms_peak/",
+        "mzxml_directory": "peak/",
+        "mzml_count": 68,
+        "mzxml_count": 68,
+        "biological_files": 46,
+        "covid_files": 33,
+        "healthy_files": 13,
+        "blank_files": 19,
+        "standard_files": 3,
+        "ms2_spectra_total": 158124,
+        "ms2_spectra_covid": 80444,
+        "ms2_spectra_healthy": 31633,
+        "ms2_spectra_blanks": 39478,
+        "ms2_spectra_standards": 6569,
+        "pan_redu_classification": "Unclassified",
+        "local_pan_redu_evidence": "data/reference/pan_redu_snapshot_20261014.tsv:1065800"
+      },
+      "public_analysis_assets": {
+        "base_path": "updates/2020-06-05_mwang87_b131d026/other/",
+        "quantification_file": "COVID19_Brazil_only-plasma-sample_quant.csv",
+        "quant_feature_rows": 1031,
+        "quant_nonempty_abundance_columns": 53,
+        "quant_biological_columns": 46,
+        "quant_blank_columns": 4,
+        "quant_standard_columns": 3,
+        "mgf_file": "COVID19_Brazil_only-plasma-sample.mgf",
+        "mgf_spectra": 1031,
+        "feature_id_sets_equal": true,
+        "max_precursor_mismatch_ppm": 0.46783,
+        "max_retention_time_mismatch_seconds": 0.0005,
+        "metadata_file": "gnps_metadata.tsv",
+        "metadata_rows": 68,
+        "processing_file": "COVID19_Brazil_mzmine-batch.xml",
+        "quant_only_missing_raw_qc": "Branco 23_1-50_01_11245.mzXML"
+      },
+      "biological_design": {
+        "case_label": "hospitalized COVID-19, moderate_severe_or_critical",
+        "control_label": "external healthy controls",
+        "case_n": 33,
+        "control_n": 13,
+        "randomized_trial_flag_counts": {
+          "yes": 6,
+          "no": 24,
+          "unspecified": 3
+        },
+        "chloroquine_flag_counts": {
+          "yes": 14,
+          "no": 16,
+          "unspecified": 3
+        },
+        "colchicine_placebo_arm_available": false,
+        "stable_subject_id_available": false,
+        "unique_subject_id_observed_value": "MSV000085505_not specified",
+        "repeat_subjects_excludable": false,
+        "claim_safe_name": "hospitalized_COVID_under_observed_2020_treatment_mix_vs_external_healthy",
+        "randomized_treatment_effect_eligible": false
+      },
+      "denominator_reconciliation": {
+        "massive_144": "68 mzML plus 68 mzXML representations plus 8 ancillary files",
+        "biological_46": "33 COVID plus 13 healthy",
+        "trial_randomized_75": "full clinical trial denominator, not the deposited metabolomics panel",
+        "trial_analyzed_72": "full clinical trial analyzed denominator, not the deposited metabolomics panel"
+      }
+    },
+    "MTBLS1866": {
+      "source_family": {
+        "recruitment_site": "Novara University Hospital",
+        "country": "Italy",
+        "instrument": "Thermo Q Exactive Plus",
+        "chromatography": "Thermo Vanquish UHPLC, reverse-phase C18",
+        "specimen": "blood plasma"
+      },
+      "official_record": {
+        "status": "Public",
+        "api_revision_number": 2,
+        "api_revision_datetime": "2025-09-06T16:40:33.410035",
+        "api_modified_time": "2026-04-14T22:35:58.058045",
+        "ftp_url": "https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/",
+        "original_paper_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7696386/",
+        "local_pan_redu_evidence": "data/reference/pan_redu_snapshot_20261014.tsv:617937"
+      },
+      "original_paper_subjects": {
+        "total": 161,
+        "noncritical_covid": 84,
+        "icu_covid": 19,
+        "symptomatic_noncovid": 20,
+        "icu_noncovid": 12,
+        "healthy": 26
+      },
+      "current_sample_sheet": {
+        "file": "s_MTBLS1866.txt",
+        "rows": 157,
+        "unique_source_names": 157,
+        "unique_sample_names": 157,
+        "noncritical_covid": 84,
+        "icu_covid": 19,
+        "symptomatic_noncovid": 16,
+        "icu_noncovid": 12,
+        "healthy": 26,
+        "paper_difference": "four symptomatic non-COVID subjects absent relative to the published 20"
+      },
+      "positive_dda_inventory": {
+        "assay_file": "a_MTBLS1866_LC-MS_positive_reverse-phase_metabolite_profiling.txt",
+        "acquisition_method": "positive_mode_top10_ddMS2",
+        "assay_rows": 155,
+        "unique_assay_sample_names": 155,
+        "raw_spectral_data_file_field_nonempty": 0,
+        "derived_mzml_paths_nonempty": 155,
+        "noncritical_covid_files": 83,
+        "healthy_files": 26,
+        "icu_covid_files": 18,
+        "symptomatic_noncovid_files": 16,
+        "icu_noncovid_files": 12,
+        "sample_sheet_rows_without_positive_assay": [
+          "13",
+          "DA 13"
+        ],
+        "primary_case_control_files": 109,
+        "primary_case_control_rounded_size_gib": 9.76,
+        "primary_case_control_ms2_spectra": 1110010,
+        "physical_primary_directory_objects": 111,
+        "cross_copied_objects_not_additional_assay_rows": [
+          "AI_p.mzML",
+          "IRA_p.mzML"
+        ],
+        "authoritative_file_universe": "ISA assay table, not directory enumeration"
+      },
+      "public_matrix_state": {
+        "positive_maf_file": "m_MTBLS1866_LC-MS_positive_reverse-phase_metabolite_profiling_v2_maf.tsv",
+        "positive_maf_feature_rows": 477,
+        "positive_maf_abundance_columns": 155,
+        "positive_maf_database_identifier_nonempty_rows": 217,
+        "positive_maf_database_identifier_missing_rows": 260,
+        "paper_total_positive_identified_and_unidentified_features": 2075,
+        "paper_identified_positive_lipids": 467,
+        "all_unknown_feature_matrix_in_accession_root": false,
+        "xcms_matrix_stably_located_in_audited_github_tree": false,
+        "wieder_github_commit": "17b9fd63c948da5fd754c65003f9308e33a89070",
+        "wieder_github_path": "Studies/MTBLS1866",
+        "known_only_control_possible": true,
+        "unbiased_all_entity_response_ready": false
+      },
+      "denominator_reconciliation": {
+        "official_positive_primary": {
+          "total": 109,
+          "covid": 83,
+          "healthy": 26
+        },
+        "wieder_2026_reported_samples": 96,
+        "current_exact_sample_name_matches": {
+          "gc_case_control": {
+            "total": 96,
+            "covid": 76,
+            "healthy": 20
+          },
+          "lc_positive_case_control": {
+            "total": 97,
+            "covid": 74,
+            "healthy": 23
+          },
+          "lc_negative_case_control": {
+            "total": 97,
+            "covid": 74,
+            "healthy": 23
+          },
+          "three_assay_intersection_before_outlier": {
+            "total": 94,
+            "covid": 74,
+            "healthy": 20
+          },
+          "three_assay_intersection_after_declared_SA8_outlier": {
+            "total": 93,
+            "covid": 74,
+            "healthy": 19
+          }
+        },
+        "qualification_conclusion": "96 is a downstream analysis denominator and cannot replace the official 109-file positive-DDA universe without its exact inclusion ledger"
+      }
+    }
+  },
+  "pair_level_scientific_boundary": {
+    "source_families_independent": true,
+    "shared_specimen": "plasma",
+    "shared_broad_condition": "COVID-19 versus healthy",
+    "contrast_population_equivalent": false,
+    "msv_population": "hospitalized moderate_severe_or_critical under heterogeneous medication exposure",
+    "mtbls_population": "noncritical COVID-19",
+    "feature_level_expected_direction_registered": false,
+    "same_condition_is_truth": false,
+    "admissible_relation_type_now": "candidate_related_contrast_only",
+    "signed_relation_admissible_now": false
+  },
+  "blockers": [
+    {
+      "id": "MSV_SUBJECT_AND_TREATMENT_CROSSWALK",
+      "severity": "hard",
+      "missing": "filename to stable subject ID, draw timing, randomized status, colchicine/placebo arm, and pre-dose/baseline status"
+    },
+    {
+      "id": "MTBLS_ALL_FEATURE_MATRIX",
+      "severity": "hard",
+      "missing": "positive-mode XCMS or MS-DIAL all-feature abundance matrix with sample crosswalk"
+    },
+    {
+      "id": "MTBLS_96_INCLUSION_LEDGER",
+      "severity": "hard_if_96_is_used",
+      "missing": "exact inclusion, exclusion, alias-resolution, and outlier ledger for the published 96"
+    },
+    {
+      "id": "SIGNED_TRUTH_DEFINITION",
+      "severity": "hard",
+      "missing": "independently pre-registered entity-level expected directions or a third held-out source"
+    }
+  ],
+  "minimal_acquisition_plan": [
+    {
+      "order": 1,
+      "action": "request_or_recover_MSV_deidentified_subject_treatment_crosswalk",
+      "expected_size": "small_table",
+      "large_spectrum_download": false
+    },
+    {
+      "order": 2,
+      "action": "request_or_recover_MTBLS_positive_XCMS_or_MSDIAL_matrix_and_96_sample_ledger",
+      "expected_size": "small_to_medium_table",
+      "large_spectrum_download": false
+    },
+    {
+      "order": 3,
+      "action": "freeze_exact_contrast_names_covariates_and_primary_assay_file_universes",
+      "large_spectrum_download": false
+    },
+    {
+      "order": 4,
+      "action": "only_if_matrix_unrecoverable_download_109_assay_listed_positive_mzML_files",
+      "expected_size_gib_rounded": 9.76,
+      "exclude_other_polarity_and_nonprimary_groups": true
+    },
+    {
+      "order": 5,
+      "action": "construct_development_responses_without_registering_signed_truth",
+      "requires_prior_orders": [
+        1,
+        2,
+        3
+      ]
+    }
+  ],
+  "stop_conditions": [
+    "MSV biological files cannot be mapped to independent subjects or repeat draws cannot be identified",
+    "MSV treatment timing and arm remain unavailable while the claim is a pure infection or randomized treatment effect",
+    "MTBLS all-feature matrix cannot be linked one-to-one to the 109 assay-listed files and MS2 evidence",
+    "published denominator 96 is used without an exact frozen inclusion ledger",
+    "fewer than 10 independent biological units remain in either arm after prospectively defined QC",
+    "truth is defined only by shared disease naming, spectral similarity, or posthoc retrieval rank",
+    "model selection or thresholding reads the cross-study relation outcome before freezing"
+  ],
+  "next_decision": "obtain_two_small_crosswalk_assets_before_any_large_download_or_beta_se_fit",
+  "human_readable_audit": "docs/COVID_PLASMA_CROSS_SOURCE_QUALIFICATION_AUDIT_20261019.md"
+}

@@ -1,5 +1,7 @@
 # 面向未知化学空间的通用发现核心：纠偏后的研究设计
 
+> **REPOSITIONED 2026-10-12：** 本文的可观测化学表示、三种入口和证据分解保留为 Contrast Atlas 的底层能力；它不再取代以 study-level contrast signatures 为核心的两层 Atlas。总纲见 `METABOLOMIC_CONTRAST_ATLAS_MASTER_CONTRACT_20261012.md`。
+
 日期：2026-10-11  
 状态：方法总纲；其中只有 ChemProp2 的同表 MS1 响应基线已有 development/consumed 结果，其余均为待证伪假设
 

@@ -2,7 +2,17 @@
 
 **用途：** 一页找到所有文档。按时间倒序、按研究线分组。
 
-> **2026-10-12 生物学方法定位正式冻结：** [GLM_BIOLOGY_METHOD_POSITION_DECLARATION_20261012.md](./GLM_BIOLOGY_METHOD_POSITION_DECLARATION_20261012.md) 确立本项目为"面向未知化学空间的无偏代谢组学发现范式"（Unbiased, structure-agnostic metabolomics discovery），冻结五条原则、三种入口、已封存路线和下一步优先级。后续所有实验设计必须与此对齐。
+> **2026-10-12 生物学应用总纲恢复：** [METABOLOMIC_CONTRAST_ATLAS_MASTER_CONTRACT_20261012.md](./METABOLOMIC_CONTRAST_ATLAS_MASTER_CONTRACT_20261012.md) 恢复以 study-level contrast signatures 为索引对象的两层 Metabolomic Contrast Atlas；核心算法是多层级、可弃权的跨研究化学响应检索。TT7、ChemProp、ST003325、LCNEC 和 transport/certificate 均为验证 shard 或技术算子，不再替代总方法。
+
+> **2026-10-12 Contrast Atlas 核心原型：** [METABOLOMIC_CONTRAST_ATLAS_METHOD_FRONTIER_20261012.md](./METABOLOMIC_CONTRAST_ATLAS_METHOD_FRONTIER_20261012.md) 冻结竞争边界、双侧可观测覆盖、经验 null 和 unknown 增量终点；[METABOLOMIC_CONTRAST_ATLAS_CORE_PROTOTYPE_RESULT_20261012.md](./METABOLOMIC_CONTRAST_ATLAS_CORE_PROTOTYPE_RESULT_20261012.md) 记录机器 schema、三层可弃权检索及 `3/3` 合成合同测试。该结果不含真实生物学成绩。
+
+> **2026-10-13 真实负 shard 入库重放：** [CONTRAST_ATLAS_NEGATIVE_SHARD_ADMISSION_RESULT_20261013.md](./CONTRAST_ATLAS_NEGATIVE_SHARD_ADMISSION_RESULT_20261013.md) 将 ChemProp、ST003325、LCNEC 按各自真实独立分母和失败层重放；`3` 个 shard、`0` 个获准进入 shared-pattern/study-association，历史停止门全部保留。该结果证明 fail-closed 语义，不提供新阳性。
+
+> **2026-10-13 Contrast Atlas 内层校准：** [CONTRAST_ATLAS_CALIBRATION_COMPONENT_RESULT_20261013.md](./CONTRAST_ATLAS_CALIBRATION_COMPONENT_RESULT_20261013.md) 实现 target pattern-label permutation、similar/opposite empirical p 和 query 内 BH-FDR；两模式 smoke 即使 cosine 为 ±1 也因少于 8 个共同模式而全部弃权。当前相关测试 `6 passed`；尚无真实 calibrated association。
+
+> **2026-10-12 遗传验证 shard：** [GENETIC_COUNTERFACTUAL_CHEMICAL_INFERENCE_METHOD_20261012.md](./GENETIC_COUNTERFACTUAL_CHEMICAL_INFERENCE_METHOD_20261012.md) 仅定义 Atlas 中一类强遗传正控；不再作为总方法。
+
+> **2026-10-12 Atlas 验证 shard 初筛：** [SECOND_COUNTERFACTUAL_DATASET_TRIAGE_20261012.md](./SECOND_COUNTERFACTUAL_DATASET_TRIAGE_20261012.md) 只用于补充验证数据源；独立 Atlas 晋级仍要求至少两个 source family 的合格 contrast records。
 
 > **2026-10-11 生物学应用二次纠偏：** `UNBIASED_STRUCTURE_AGNOSTIC_DISCOVERY_CORE_20261011.md` 将总地基恢复为无需标签的可观测化学表示，并并列支持无标签样本、有设计响应和单谱查询。`BIOLOGY_APPLICATION_METHOD_SCIENTIFIC_DECISION_20261011.md` 中的 response transport 降为有监督算子，不再是唯一主方向。
 

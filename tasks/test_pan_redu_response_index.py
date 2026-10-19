@@ -24,6 +24,29 @@ def test_mgf_anchor_ids_are_preserved(tmp_path: Path) -> None:
     assert np.asarray(records[0]["peaks"]).shape == (2, 3)
 
 
+def test_mgf_scan_id_is_valid_feature_anchor(tmp_path: Path) -> None:
+    mgf = tmp_path / "spectra.mgf"
+    mgf.write_text(
+        "BEGIN IONS\nSCANS=17\nPEPMASS=200.2\n"
+        "20 1\n30 2\n40 3\nEND IONS\n",
+        encoding="utf-8",
+    )
+    ids, records = load_mgf(mgf)
+    assert ids == ["17"]
+    assert records[0]["precursor_mz"] == 200.2
+
+
+def test_mgf_can_abstain_from_too_sparse_spectrum(tmp_path: Path) -> None:
+    mgf = tmp_path / "spectra.mgf"
+    mgf.write_text(
+        "BEGIN IONS\nSCANS=1\nPEPMASS=100\n20 1\n30 2\nEND IONS\n"
+        "BEGIN IONS\nSCANS=2\nPEPMASS=200\n20 1\n30 2\n40 3\nEND IONS\n",
+        encoding="utf-8",
+    )
+    ids, _ = load_mgf(mgf, minimum_peaks=3, skip_ineligible=True)
+    assert ids == ["2"]
+
+
 def test_effects_and_embeddings_assemble_without_calling_missing_identity_unknown(
     tmp_path: Path,
 ) -> None:
@@ -82,4 +105,3 @@ def test_effects_and_embeddings_assemble_without_calling_missing_identity_unknow
         assert np.linalg.norm(packed["positive_all"][0]) > 0
         assert np.linalg.norm(packed["negative_all"][0]) > 0
         assert np.linalg.norm(packed["positive_unresolved"][0]) == 0
-

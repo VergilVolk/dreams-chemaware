@@ -1,0 +1,79 @@
+{
+  "schema": "contrast_atlas_confirmatory_contract_v1",
+  "frozen_at_local_date": "2026-10-14",
+  "role": "development_independent_cohort_confirmation_of_consumed_posthoc_hypothesis",
+  "query_study": "MSV000082094 UC severity multiomics cohort",
+  "query_contrast": {
+    "positive": "current_5ASA == 1",
+    "negative": "current_5ASA == 0",
+    "expected_mapped_counts": {
+      "positive": 20,
+      "negative": 19
+    },
+    "mapping_rule": "vial_name must map exactly to one nonblank quantification column after stripping Peak area and run suffix",
+    "missing_metadata_sample_policy": "exclude before effect estimation; do not infer treatment from abundance",
+    "effect_direction": "current 5-ASA minus not-current 5-ASA"
+  },
+  "candidate_study": "MSV000084775 IBD200 reprocessing already consumed in the primary pediatric IBD query",
+  "candidate_universe": [
+    "adult_all_ibd_vs_healthy",
+    "adult_cd_vs_healthy",
+    "adult_uc_vs_healthy",
+    "adult_cd_vs_uc",
+    "adult_activity_high_or_moderate_vs_low",
+    "adult_ibd_female_vs_male",
+    "adult_current_5asa_yes_vs_no",
+    "adult_current_steroids_yes_vs_no"
+  ],
+  "exact_positive": "adult_current_5asa_yes_vs_no",
+  "negative_label_policy": "all non-target contrasts are real alternatives, not asserted biological negatives",
+  "primary_gate": "exact_positive must be the unique rank 1 in the all-entity world",
+  "unknown_increment_gate": "primary gate passes, unresolved-only exact_positive is unique rank 1, and the all-world target-over-best-competitor margin is strictly larger than the known-only margin",
+  "entity_link": {
+    "precursor_ppm": 10.0,
+    "fragment_tolerance_da": 0.02,
+    "minimum_matched_fragments": 6,
+    "minimum_weighted_spectral_entropy": 0.7,
+    "reciprocal_best": true,
+    "phenotype_blind": true
+  },
+  "feature_qc": {
+    "minimum_biological_prevalence": 0.05,
+    "minimum_mean_biological_to_blank_fold": 5.0,
+    "transform": "robust CLR per sample over positive values; zeros remain zero"
+  },
+  "response_score": "weighted cosine of tanh(beta/(2*study median_abs_beta))*abs(beta/SE)/(1+abs(beta/SE)); pair weights are WSE squared",
+  "worlds": [
+    "all",
+    "known_only",
+    "unresolved_only",
+    "adult_spectrum_intensity_shuffled_link_count"
+  ],
+  "provenance": {
+    "query_quant_sha256": "1db9eaf15ce7427f5cbdb13f0fce9b26b262e82e9a515d862aa9354bbf259310",
+    "query_mgf_sha256": "2efe68e6c1affb060bc95bfc9f096b1f87ca70ac652fad01f74d25182846fbca",
+    "query_annotations_sha256": "381718f93dafa3b8b7eaed9f3f957cdfc7103962abcdf59c8d3e75df29afdd21",
+    "query_metadata_sha256": "e5989b36350fe01ae4f678c7b6ae7f19285d82728c8ca6800b64c42f56d79e20",
+    "query_metadata_repo_commit": "9e53d861a0bfb706c50aabb794e82b4c4ee516e6",
+    "query_reanalysis_task": "10033b6efd11402fa83e4fedee5bab7e",
+    "candidate_quant_sha256": "515c4821d9b0b86322cd7d6493ae9a5345a4541babbf189214e97719ed1e05fb",
+    "candidate_metadata_sha256": "8b5ab6e63dbb55f059ee3e14fe2d200c8e3040d6a9646d79cb4b9441d07dae03",
+    "candidate_mgf_sha256": "6aeba8b4c1e9cc94e127985cc18bde9a4d1df8c99030d470d4cec888bc5465e6",
+    "candidate_annotations_sha256": "61a7325e9c7b224970b224247170c8447003954a84216aafd447b0766109c869"
+  },
+  "independence_gate": {
+    "required": true,
+    "observed_exact_vial_id_overlap_before_effect_estimation": 0,
+    "query_metadata_subjects": 40,
+    "candidate_mapped_biological_samples": 177,
+    "failure_policy": "abort if any exact query vial_name occurs in any candidate metadata field"
+  },
+  "leakage_boundary": {
+    "query_and_target_labels_were_hypothesis_directed_from_opened_prior_results_and_publication": true,
+    "query_feature_effects_examined_before_contract": false,
+    "candidate_scores_examined_before_contract": false,
+    "entity_linking_may_read_treatment_or_candidate_truth": false,
+    "cross_study_truth_may_tune_thresholds_or_score": false
+  },
+  "claim_boundary": "A primary PASS is a real independent-cohort positive control on development data, not final external validation. The publication and prior pediatric result motivated the treatment hypothesis. A FAIL is frozen without retuning. Unknown-entity value is adjudicated separately from overall response retrieval."
+}

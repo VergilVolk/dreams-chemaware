@@ -23,6 +23,7 @@ fi
 
 python -u tasks/encode_pan_redu_panel_spectra.py \
   --panel-object "$panel_object" \
+  --panel-id "$panel_id" \
   --output-dir "data/validation/pan_redu_high_value_raw_panel_embeddings_official_20261016/${panel_id}" \
   --encoder-name official_dreams \
   --device cuda \

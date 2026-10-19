@@ -1,0 +1,10 @@
+query_study_id,query_contrast_id,query_entity_id,target_study_id,target_contrast_id,target_entity_id,match_probability,claim_level,phenotype_blind
+Q,q,Q0,S,s,S0,0.95,strict_entity,true
+Q,q,Q1,S,s,S1,0.95,strict_entity,true
+Q,q,Q2,S,s,S2,0.95,strict_entity,true
+Q,q,Q3,S,s,S3,0.95,strict_entity,true
+Q,q,Q0,O,o,O0,0.95,strict_entity,true
+Q,q,Q1,O,o,O1,0.95,strict_entity,true
+Q,q,Q2,O,o,O2,0.95,strict_entity,true
+Q,q,Q3,O,o,O3,0.95,strict_entity,true
+Q,q,Q0,L,l,L0,0.95,strict_entity,true

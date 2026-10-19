@@ -1,0 +1,14 @@
+study_id,contrast_id,entity_id,pattern_id,weight,calibrated,phenotype_blind
+Q,q,Q0,p1,1.0,true,true
+Q,q,Q1,p1,1.0,true,true
+Q,q,Q2,p2,1.0,true,true
+Q,q,Q3,p2,1.0,true,true
+S,s,S0,p1,1.0,true,true
+S,s,S1,p1,1.0,true,true
+S,s,S2,p2,1.0,true,true
+S,s,S3,p2,1.0,true,true
+O,o,O0,p1,1.0,true,true
+O,o,O1,p1,1.0,true,true
+O,o,O2,p2,1.0,true,true
+O,o,O3,p2,1.0,true,true
+L,l,L0,p1,1.0,true,true

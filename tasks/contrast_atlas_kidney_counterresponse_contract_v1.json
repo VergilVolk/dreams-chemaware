@@ -1,0 +1,254 @@
+{
+  "schema": "contrast_atlas_kidney_counterresponse_contract_v1",
+  "created_on": "2026-10-19",
+  "status": "DEVELOPMENT_ONLY_WITH_BLOCKERS",
+  "decision": "ADMIT_AS_SYSTEMATIC_DEVELOPMENT_SUBSTRATE_NOT_AS_GOLD_OR_EXTERNAL_VALIDATION",
+  "go_no_go": {
+    "systematic_score_blind_development": "CONDITIONAL_GO_AFTER_GATES",
+    "gold_relation_truth": "NO_GO",
+    "sealed_external_validation": "NO_GO",
+    "protective_or_rescue_claim_before_orthogonal_endpoint_freeze": "NO_GO"
+  },
+  "asset": {
+    "version_doi": "10.5281/zenodo.20506874",
+    "version": "v0.19",
+    "archive_bytes": 1587694,
+    "archive_md5": "3a7df3447ca9b315eaa181dd140a60fa",
+    "concept_doi_from_zenodo_api": "10.5281/zenodo.19893079",
+    "forbidden_readme_concept_doi": "10.5281/zenodo.19893080",
+    "local_root": "data/reference/zenodo_20506874_kidney_meta/zenodo_v0.19",
+    "publication_doi": "10.3390/metabo16080538",
+    "publication_pmc": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13515413/",
+    "local_file_sha256": {
+      "README.md": "a5e11610be47b0efdf5cac3645bf94f275463e891bebcea10fdf122a221aff07",
+      "supplementary/Table_S1_cohort_inventory.tsv": "db4f93c42a6c9b37631bfd39acb4da849cf7fe935f21b12080db0cdb66b3a355",
+      "docs/cohort_msdial_qc.tsv": "c295bbde28ede15eba76c6e4f9c266d2c6828fa11ad527e52dd053b4305c14ff"
+    }
+  },
+  "denominators": {
+    "accessions": 16,
+    "mwb_parent_projects": 13,
+    "arm_assigned_accession_sample_records": {
+      "control": 151,
+      "disease": 147,
+      "intervention": 85,
+      "total": 383,
+      "derivation": "sum sample_groups_counts over the 16 accessions listed in Table_S1_cohort_inventory.tsv, excluding records labelled exclude"
+    },
+    "known_exact_duplicate_specimens": {
+      "source_family": "PR002122",
+      "accessions": ["ST003458", "ST003465"],
+      "assigned_specimens_counted_twice": 22,
+      "exact_local_sample_ids_and_raw_names_match": true
+    },
+    "nonredundant_specimens_after_known_exact_duplicate_fold": 361,
+    "nonredundant_specimen_caveat": "361 removes the proven PR002122 duplicate only; it is not a claim of 361 independent animals until all cross-accession subject links are audited.",
+    "mzml_or_vendor_file_records_in_table_s1": 771,
+    "file_record_caveat": "771 includes polarity duplication, QC/blank files and non-LCMS platform records; it is not a biological-sample denominator."
+  },
+  "truth_boundary": {
+    "consumption_status": "development_consumed",
+    "class_labels_are_truth": false,
+    "published_phase_labels_are_truth": false,
+    "published_h4_candidates_are_truth": false,
+    "allowed_uses": [
+      "method development",
+      "source-family-held-out internal evaluation",
+      "negative and stress-test panels",
+      "hypothesis generation"
+    ],
+    "forbidden_uses": [
+      "sealed external validation",
+      "treating kidney injury class as a positive relation label",
+      "counting polarity slices or sister accessions as independent cohorts",
+      "calling a treatment protective from its metabolomic direction alone",
+      "using publication-selected metabolites as hidden truth"
+    ]
+  },
+  "source_families": [
+    {"project_id": "PR000874", "project_doi": "10.21228/M8Q975", "accessions": ["ST001292"]},
+    {"project_id": "PR001170", "project_doi": "10.21228/M8G98C", "accessions": ["ST001855", "ST001856"]},
+    {"project_id": "PR001537", "project_doi": "10.21228/M81B0N", "accessions": ["ST002390"]},
+    {"project_id": "PR001585", "project_doi": "10.21228/M8TD8H", "accessions": ["ST002457", "ST002458"]},
+    {"project_id": "PR001628", "project_doi": "10.21228/M8899W", "accessions": ["ST002532"]},
+    {"project_id": "PR001893", "project_doi": "10.21228/M81F0P", "accessions": ["ST003042"]},
+    {"project_id": "PR001933", "project_doi": "10.21228/M8VM8W", "accessions": ["ST003111"]},
+    {"project_id": "PR002013", "project_doi": "10.21228/M8DJ7S", "accessions": ["ST003242"]},
+    {"project_id": "PR002122", "project_doi": "10.21228/M8B52G", "accessions": ["ST003458", "ST003465"], "same_specimens_across_accessions": true},
+    {"project_id": "PR002185", "project_doi": "10.21228/M86527", "accessions": ["ST003549"]},
+    {"project_id": "PR002262", "project_doi": "10.21228/M87N8N", "accessions": ["ST003652"]},
+    {"project_id": "PR002324", "project_doi": "10.21228/M87C17", "accessions": ["ST003738"]},
+    {"project_id": "PR002876", "project_doi": "10.21228/M8X55W", "accessions": ["ST004565"]}
+  ],
+  "exclusive_development_layers": {
+    "sample_level_ms2_primary_representatives": [
+      "ST001292",
+      "ST001855",
+      "ST002390",
+      "ST002532",
+      "ST003242",
+      "ST003549"
+    ],
+    "ms1_or_annotation_only_pressure_representatives": [
+      "ST002457",
+      "ST003042",
+      "ST003111",
+      "ST003458",
+      "ST003652",
+      "ST003738",
+      "ST004565"
+    ],
+    "same_source_sensitivity_accessions": [
+      "ST001856",
+      "ST002458",
+      "ST003465"
+    ],
+    "partition_is_exhaustive_and_disjoint": true,
+    "primary_ms2_note": "Only ST002390 and ST002532 currently have local per-biological-file MS2 scan counts. The other four primary representatives have official DDA/MSMS or local Path-A aggregate MGF evidence but still require a per-file scan ledger before a strict sample-level claim.",
+    "pressure_note": "ST003111 and ST004565 officially describe DDA, but the deposited v0.19 processing exposed no usable MS2 MGF and treated them as Path C. They remain pressure/recovery candidates, not unknown-MS2 inputs, until raw per-file recovery is verified.",
+    "sensitivity_note": "These accessions can test within-family reproducibility or tissue/modality sensitivity only. They never form an outer train-test split against their project-family representative."
+  },
+  "cohorts": [
+    {"accession": "ST001292", "project_id": "PR000874", "n_control": 40, "n_disease": 37, "n_intervention": 0, "layer": "sample_level_ms2_primary_representative", "published_path": "A", "ms2_evidence": "Path-A aggregate MGF 15415 POS and 8717 NEG; official project says MS/MSMS; native WIFF per-file scan audit pending", "design": "dbdb_vs_dbm_factorial_by_eNOS_and_ACE_ARB"},
+    {"accession": "ST001855", "project_id": "PR001170", "n_control": 4, "n_disease": 4, "n_intervention": 4, "layer": "sample_level_ms2_primary_representative", "published_path": "A", "ms2_evidence": "Path-A aggregate MGF 6788 POS and 4476 NEG; per-file native RAW scan audit pending", "recorded_timepoint": "UIR_day21", "correct_phase_by_preregistered_rule": "chronic"},
+    {"accession": "ST001856", "project_id": "PR001170", "n_control": 4, "n_disease": 4, "n_intervention": 4, "layer": "same_source_sensitivity", "published_path": "A", "ms2_evidence": "Path-A aggregate MGF 9626 POS; deposited NEG is a byte-identical upload duplicate and is excluded", "recorded_timepoint": "UIR_day10", "correct_phase_by_preregistered_rule": "transition"},
+    {"accession": "ST002390", "project_id": "PR001537", "n_control": 5, "n_disease": 5, "n_intervention": 5, "layer": "sample_level_ms2_primary_representative", "published_path": "A", "ms2_evidence": "ReDU file audit: 30/30 biological polarity files have MS2, 433418 spectra total, 13855-14976 per file"},
+    {"accession": "ST002457", "project_id": "PR001585", "n_control": 8, "n_disease": 7, "n_intervention": 11, "layer": "ms1_or_annotation_only_pressure_representative", "published_path": "C", "ms2_evidence": "no usable sample-level MS2 in v0.19"},
+    {"accession": "ST002458", "project_id": "PR001585", "n_control": 3, "n_disease": 3, "n_intervention": 3, "layer": "same_source_sensitivity", "published_path": "B", "ms2_evidence": "author table only; proximal-tubule-cell rather than whole-kidney sensitivity"},
+    {"accession": "ST002532", "project_id": "PR001628", "n_control": 5, "n_disease": 5, "n_intervention": 5, "layer": "sample_level_ms2_primary_representative", "published_path": "A", "ms2_evidence": "ReDU file audit: 29/30 biological polarity files have MS2, 177271 spectra total, 2547-9052 per nonzero file; pos/T-A4 has zero MS2"},
+    {"accession": "ST003042", "project_id": "PR001893", "n_control": 7, "n_disease": 7, "n_intervention": 7, "layer": "ms1_or_annotation_only_pressure_representative", "published_path": "C", "ms2_evidence": "ReDU file audit: 42/42 deposited mzXML files classified NO_MS2; do not infer sample MS2 from method prose"},
+    {"accession": "ST003111", "project_id": "PR001933", "n_control": 5, "n_disease": 5, "n_intervention": 8, "layer": "ms1_or_annotation_only_pressure_representative", "published_path": "C", "ms2_evidence": "official method declares top-10 DDA but v0.19 exported zero MS2; raw recovery and per-file audit required"},
+    {"accession": "ST003242", "project_id": "PR002013", "n_control": 4, "n_disease": 4, "n_intervention": 0, "layer": "sample_level_ms2_primary_representative", "published_path": "A", "ms2_evidence": "official top-10 DDA; Path-A aggregate MGF 14223 POS and 11309 NEG; per-file native RAW scan audit pending"},
+    {"accession": "ST003458", "project_id": "PR002122", "n_control": 11, "n_disease": 11, "n_intervention": 0, "layer": "ms1_or_annotation_only_pressure_representative", "published_path": "B", "ms2_evidence": "author RefMet table; no transportable sample-level spectrum object in v0.19"},
+    {"accession": "ST003465", "project_id": "PR002122", "n_control": 11, "n_disease": 11, "n_intervention": 0, "layer": "same_source_sensitivity", "published_path": "C", "ms2_evidence": "MS1-only lipid layer", "same_specimens_as": "ST003458"},
+    {"accession": "ST003549", "project_id": "PR002185", "n_control": 3, "n_disease": 3, "n_intervention": 0, "layer": "sample_level_ms2_primary_representative", "published_path": "A", "ms2_evidence": "official polarity-switching Top5/Top3 DDA; kidney aggregate MGF 8035 POS and 5321 NEG; per-file native RAW scan audit pending"},
+    {"accession": "ST003652", "project_id": "PR002262", "n_control": 22, "n_disease": 22, "n_intervention": 0, "layer": "ms1_or_annotation_only_pressure_representative", "published_path": "C", "ms2_evidence": "LCMS retained POS only and no usable sample-level MS2"},
+    {"accession": "ST003738", "project_id": "PR002324", "n_control": 7, "n_disease": 7, "n_intervention": 14, "layer": "ms1_or_annotation_only_pressure_representative", "published_path": "C", "ms2_evidence": "method describes fragmentation of QC identities; not biological-sample MS2", "design": "genotype_by_transfat_factorial_not_simple_three_arm"},
+    {"accession": "ST004565", "project_id": "PR002876", "n_control": 12, "n_disease": 12, "n_intervention": 24, "layer": "ms1_or_annotation_only_pressure_representative", "published_path": "C", "ms2_evidence": "official method declares Top10 ddMS2 but v0.19 exported zero MS2; raw recovery and per-file audit required", "design": "hypoxia_by_glucose_by_NMN_dose_multiarm"}
+  ],
+  "directed_response_contract": {
+    "common_scale": "within-cohort log2 abundance after a single frozen preprocessing route",
+    "beta_DC": "mean(disease)-mean(control)",
+    "beta_ID": "mean(intervention)-mean(disease)",
+    "strict_between_correction": "beta_DC*beta_ID<0 and 0.40<=abs(beta_ID)/abs(beta_DC)<=1.00",
+    "overshoot": "beta_DC*beta_ID<0 and abs(beta_ID)/abs(beta_DC)>1.00; report separately, never silently count as correction",
+    "worsening": "beta_DC*beta_ID>=0",
+    "standardized_effect_note": "Hedges g and SE may be reported, but correction fraction is computed on a common unstandardized log2 scale because DC and ID Hedges g use different pooled SD denominators.",
+    "shared_arm_debiased_field_test": {
+      "population_estimand": "theta=<mu_D-mu_C,mu_D-mu_I>_K for a phenotype-blind positive-semidefinite sample kernel K",
+      "primary_kernel": "phi_i=[1,unit_embedding_i]/sqrt(2); z_s=sum_i q_i*h_si*phi_i; K(s,t)=z_s^T*z_t, where h is phenotype-blind abundance and q is fixed full-universe ion-family capacity",
+      "world_mask_rule": "mask inactive feature columns but never renormalize q after all/known-only/matched-known/shuffled-world projection",
+      "unbiased_estimator": "offdiagonal_mean_K_DD-mean_K_DI-mean_K_CD+mean_K_CI; distinct disease animals supply the two disease terms",
+      "naive_bias_diagnostic": "naive empirical-centroid estimate minus the off-diagonal U-statistic; report explicitly because shared disease-arm variance can manufacture positive correction",
+      "companion_endpoint": "unbiased_MMD2(D,C)-unbiased_MMD2(I,C)",
+      "no_overshoot_gate": "0<theta/unbiased_MMD2(D,C)<=1, with the denominator stably positive; point eligibility never substitutes for a biological-unit interval",
+      "numerical_gate": "one tolerance from the double-centred label-free K is shared by denominator, direction, contraction, no-overshoot and joint-score decisions; adding c*11T cannot change the verdict",
+      "joint_interpretation": "directional projection, distance contraction and no overshoot are non-substitutable; orthogonal movement, movement beyond control and near-zero disease response are not correction",
+      "independence_boundary": "Rows must be independent biological units. Collapse technical replicates; use a cluster-aware estimator for paired/longitudinal animals, litter/cage clusters or shared specimens.",
+      "kernel_boundary": "K must be PSD and frozen without phenotype labels. Frozen embedding inner products are eligible; arbitrary non-PSD pair reranker scores are not silently converted into kernels. MMD is distance in this selected RKHS and implies full-distribution equality only under a characteristic kernel.",
+      "randomization_inference": "Permute disease/intervention labels at fixed margins within predeclared blocks only under a documented equiprobable fixed-margin assignment. Report both directional and joint direction-plus-contraction-plus-no-overshoot p-values. Minimisation, adaptive or unequal-probability designs need their actual assignment distribution; otherwise no randomization p-value is permitted.",
+      "implementation": "tasks/contrast_counter_response.py"
+    },
+    "simple_or_nested_three_arm_axes": [
+      {"accession": "ST001855", "control": "sham_no_FG4592", "disease": "UIR_no_FG4592", "intervention": "UIR_FG4592_10mgkg", "n": "4/4/4"},
+      {"accession": "ST001856", "control": "sham_no_FG4592", "disease": "UIR_no_FG4592", "intervention": "UIR_FG4592_10mgkg", "n": "4/4/4", "same_source_family_as": "ST001855"},
+      {"accession": "ST002390", "control": "control", "disease": "vehicle_plus_cisplatin", "intervention": "DMXAA_plus_cisplatin", "n": "5/5/5"},
+      {"accession": "ST002457", "control": "WT_none", "disease": "Tsc1KO_none", "intervention": "Tsc1KO_rapamycin", "n": "8/7/11"},
+      {"accession": "ST002458", "control": "WT_none", "disease": "Tsc1KO_none", "intervention": "Tsc1KO_rapamycin", "n": "3/3/3", "same_source_family_as": "ST002457", "sensitivity_only": true},
+      {"accession": "ST002532", "control": "control", "disease": "vehicle_plus_cisplatin", "intervention": "TRAF1_plus_cisplatin", "n": "5/5/5"},
+      {"accession": "ST003042", "control": "control", "disease": "vehicle_plus_cisplatin", "intervention": "DY131_plus_cisplatin", "n": "7/7/7"},
+      {"accession": "ST003111", "control": "Ctrl_Scr_ASO", "disease": "KO_Scr_ASO", "intervention": "KO_Asns_ASO", "n": "5/5/5", "off_axis_arm": "Ctrl_Asns_ASO_n3", "repair": "v0.19 incorrectly pooled both Asns-ASO genotypes into n_intervention=8"}
+    ],
+    "factorial_or_multiarm_axes": [
+      {"accession": "ST001292", "rule": "estimate dbdb-db/m separately within eNOS background and ACE/ARB stratum; estimate ACE/ARB effect within db/db and each eNOS background; never pool into a three-arm rescue"},
+      {"accession": "ST003738", "rule": "fit diet, genotype and diet-by-genotype interaction; do not pool both heterozygous diet arms as one intervention"},
+      {"accession": "ST004565", "rule": "compare low/high NMN with the matched hypoxia arm separately within glucose strata; never pool doses or glucose strata before heterogeneity testing"}
+    ],
+    "phenotype_guard": {
+      "rule": "A protective direction is admissible only when renal function, kidney injury marker, kidney volume, survival or histology was assessed independently of the metabolomic readout and frozen before response scoring.",
+      "endpoint_linkage_tiers": {
+        "A": "renal endpoint is linked to the same biological animals used for metabolomics",
+        "B": "renal endpoint is from the same randomized experiment and arm, but animal-level linkage is unavailable",
+        "C": "primary paper supports the same intervention and disease model in a separate experiment only; expected-direction development use, not cohort-level rescue",
+        "BLOCKED": "no qualifying non-metabolomic efficacy endpoint or provenance cannot connect it to the intervention design"
+      },
+      "claim_rule_by_tier": "Only A or B may support a cohort-level protective direction; only A permits animal-level phenotype-response coupling. C is a development prior and never a rescue truth label.",
+      "source_reported_orthogonal_endpoint_not_yet_machine_frozen": ["ST001855", "ST001856", "ST002390", "ST002532", "ST003042", "ST003111"],
+      "insufficient_in_current_bundle_for_protection_label": ["ST002457", "ST002458", "ST004565"],
+      "not_a_protection_axis": ["ST001292", "ST003738"],
+      "default_if_not_adjudicated": "directed_response_only_no_rescue_or_causal_claim"
+    },
+    "endpoint_adjudication_manifest": "tasks/contrast_atlas_kidney_endpoint_manifest_v1.json",
+    "endpoint_adjudication_result": {
+      "sample_linked_counterresponse_validation": "BLOCKED_FOR_ALL_SIX",
+      "randomization_inference_on_metabolomics_animals": "BLOCKED_FOR_ALL_SIX",
+      "directional_efficacy_anchors": ["ST001855", "ST002390", "ST002532", "ST003042", "ST003111"],
+      "endpoint_blocked": ["ST001856"],
+      "machine_freezable_group_endpoint_vectors": ["ST003111"],
+      "parent_randomized_but_metabolomics_subset_unknown": ["ST002532"]
+    }
+  },
+  "published_result_inconsistencies": [
+    {
+      "id": "PHASE_ST001855",
+      "published_or_bundle_claim": "ST001855 is transition D7-D14",
+      "official_record": "UIR day 21",
+      "official_url": "https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Study&ResultType=1&StudyID=ST001855&StudyType=MS",
+      "impact": "transition-only and transition pooled estimates must be recomputed; published phase labels are forbidden truth inputs"
+    },
+    {
+      "id": "PHASE_ST001856",
+      "official_record": "UIR day 10",
+      "official_url": "https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Study&ResultType=1&StudyID=ST001856&StudyType=MS"
+    },
+    {
+      "id": "H4_METHOD_CODE_MISMATCH",
+      "publication_rule": "disease-intervention effect between zero and disease-control effect with at least 40 percent attenuation; correction in at least 4 of 8 cohorts; sign consistency at least 60 percent",
+      "v019_code_rule": "abs(gDC)>=0.4, pDC<0.05, abs(gDI)>=0.3 and same sign; aggregate by cohort-polarity slice; candidate sign consistency at least 75 percent",
+      "impact": "all published H4 candidates are consumed hypotheses, not response truth"
+    }
+  ],
+  "published_scope_already_consumed": [
+    "InChIKey-2D anchored cross-cohort disease-control meta-analysis",
+    "known or predicted-structure tiering through FlashEntropy, SIRIUS and RefMet",
+    "phase and model-class stratification of mapped entities",
+    "reported H4 intervention correction of mapped entities",
+    "uric acid and AICAR nomination"
+  ],
+  "nonredundant_question": "Can precursor-resolved, structurally unresolved MS2 entities and calibrated related-chemistry families carry reproducible directed disease and counter-response information across held-out MWB source families, and do they increase correct selective coverage beyond known-only and measurement-matched-known analyses without using disease, phase or model-class labels as relation truth?",
+  "evaluation_worlds": {
+    "all": "resolved plus unresolved eligible MS2 entities",
+    "known_only": "accepted structure or library-identified entities only",
+    "measurement_matched_known": "known entities matched to unresolved entities on source family, polarity, precursor-mass bin, prevalence, intensity missingness and MS2 count without outcome matching",
+    "all_identity_field": "the same all-entity abundance matrix, full-universe capacities and world mask with K_entity(i,j)=1[i=j]; required abundance-only baseline before crediting learned spectral relations",
+    "unresolved_shuffled_ms2": "shuffle unresolved spectrum assignments within source-family, instrument, polarity, precursor-mass and acquisition-density blocks while preserving abundance/effect vectors",
+    "same_candidate_universe_required": true,
+    "primary_endpoint": "correct non-abstained source-family-held-out response retrieval coverage at a frozen false-linkage or FDR bound",
+    "mechanism_gate": "all must outperform all_identity_field on the same entities, abundances and capacities before a gain is credited to learned MS/MS chemical relations",
+    "secondary_endpoints": [
+      "direction concordance",
+      "effect-size transport calibration",
+      "abstention rate",
+      "known-to-unresolved incremental correct links",
+      "identity versus related-chemistry error breakdown",
+      "full spectral field versus all-entity identity-kernel mechanism increment"
+    ]
+  },
+  "independence_rules": {
+    "outer_split_unit": "MWB project_id",
+    "polarity_slices_are_independent": false,
+    "sister_accessions_are_independent": false,
+    "same_specimen_modalities_are_independent": false,
+    "within_cohort_control_disease_intervention_role": "causal-direction or counter-response check only, never cross-study generalization",
+    "recommended_additional_sensitivity": "leave one institution or laboratory cluster out because four intervention projects originate from the same Nanjing institution"
+  },
+  "gates_before_running_unknown_ms2_transport": [
+    "freeze per-file MS2 scan ledger and sample joins for every primary MS2 accession",
+    "recode ST001855 as day-21 chronic and recompute all phase-dependent summaries",
+    "replace slice counts with unique MWB project-family counts",
+    "repair ST003111 and all factorial or multiarm contrasts",
+    "freeze non-metabolomic phenotype endpoints before assigning protective direction",
+    "freeze all, known-only, measurement-matched-known, all-identity-field and unresolved-shuffled-MS2 worlds on the same query and candidate universe",
+    "report this resource only as consumed development evidence"
+  ]
+}

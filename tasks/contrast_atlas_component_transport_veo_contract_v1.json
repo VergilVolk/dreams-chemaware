@@ -1,0 +1,41 @@
+{
+  "schema": "contrast_atlas_component_transport_consumed_transfer_contract_v1",
+  "frozen_before_component_scores": true,
+  "role": "development_consumed_fixed_method_transfer",
+  "query": {
+    "dataset": "pediatric VEO-IBD public cohort",
+    "contrast": "VEOIBD minus Healthy",
+    "expected_counts": {
+      "positive": 21,
+      "negative": 27
+    }
+  },
+  "candidate_dataset": "MSV000084775 adult IBD200",
+  "candidate_universe": [
+    "adult_all_ibd_vs_healthy",
+    "adult_cd_vs_healthy",
+    "adult_uc_vs_healthy",
+    "adult_cd_vs_uc",
+    "adult_activity_high_or_moderate_vs_low",
+    "adult_ibd_female_vs_male",
+    "adult_current_5asa_yes_vs_no",
+    "adult_current_steroids_yes_vs_no"
+  ],
+  "exact_target": "adult_all_ibd_vs_healthy",
+  "method_lock": {
+    "implementation": "develop_component_response_transport_msv082094.py",
+    "entity_edges": "unchanged 10 ppm, 0.02 Da, at least 6 fragments, WSE at least 0.70",
+    "component": "connected component over all qualifying bipartite edges",
+    "aggregation": "per-side median signed uncertainty-shrunk response",
+    "score": "component max-WSE-squared weighted cosine",
+    "no_parameter_changes_after_scoring": true
+  },
+  "primary_gate": "exact target is unique rank 1 in all-component world",
+  "unresolved_gate": "exact target is unique rank 1 in unresolved-only component world",
+  "claim_boundary": [
+    "both data sets and the reciprocal-best baseline result were previously opened",
+    "component scores were unseen when this contract was written",
+    "a pass is consumed fixed-method transfer evidence, not independent validation",
+    "the method must later pass an unopened source-family-disjoint panel"
+  ]
+}

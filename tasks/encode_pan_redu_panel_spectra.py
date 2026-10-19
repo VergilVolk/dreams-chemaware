@@ -28,7 +28,9 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def load_mgf(path: Path) -> tuple[list[str], list[dict[str, object]]]:
+def load_mgf(
+    path: Path, *, minimum_peaks: int = 3, skip_ineligible: bool = False,
+) -> tuple[list[str], list[dict[str, object]]]:
     ids: list[str] = []
     records: list[dict[str, object]] = []
     fields: dict[str, str] = {}
@@ -44,11 +46,14 @@ def load_mgf(path: Path) -> tuple[list[str], list[dict[str, object]]]:
             elif line == "END IONS":
                 if not inside:
                     raise ValueError("END IONS without BEGIN IONS")
-                anchor_id = fields.get("FEATURE_ID") or fields.get("TITLE")
+                anchor_id = fields.get("FEATURE_ID") or fields.get("TITLE") or fields.get("SCANS")
                 if not anchor_id or "PEPMASS" not in fields:
-                    raise ValueError("spectrum lacks FEATURE_ID/TITLE or PEPMASS")
-                if len(peaks) < 3:
-                    raise ValueError(f"{anchor_id} has fewer than three fragment peaks")
+                    raise ValueError("spectrum lacks FEATURE_ID/TITLE/SCANS or PEPMASS")
+                if len(peaks) < minimum_peaks:
+                    if skip_ineligible:
+                        inside = False
+                        continue
+                    raise ValueError(f"{anchor_id} has fewer than {minimum_peaks} fragment peaks")
                 array = np.asarray(peaks, dtype=np.float32).T
                 ids.append(anchor_id)
                 records.append({"peaks": array, "precursor_mz": float(fields["PEPMASS"].split()[0])})
@@ -74,6 +79,10 @@ def load_mgf(path: Path) -> tuple[list[str], list[dict[str, object]]]:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--panel-object", required=True, type=Path)
+    parser.add_argument(
+        "--panel-id",
+        help="Stable panel identifier; defaults to the panel-object stem for legacy callers.",
+    )
     parser.add_argument("--output-dir", required=True, type=Path)
     parser.add_argument("--raw-checkpoint", type=Path, default=ROOT / "dreams/models/pretrained/ssl_model_server.pt")
     parser.add_argument("--official-checkpoint", type=Path, default=ROOT / "data/e1/official_embedding_slim.pt")
@@ -114,6 +123,7 @@ def main() -> None:
     report = {
         "schema": "pan_redu_anchor_embeddings_v1",
         "status": "phenotype_blind_frozen_spectral_embeddings",
+        "panel_id": args.panel_id or args.panel_object.stem,
         "encoder_name": args.encoder_name,
         "denominators": {"anchors": len(anchor_ids), "embedding_dimensions": int(embeddings.shape[1])},
         "leakage_status": "no contrast membership_effect_or_cross_study_truth_read",

@@ -1,0 +1,93 @@
+{
+  "schema": "contrast_atlas_open_collection_extension_v1",
+  "base_contract": "tasks/contrast_atlas_open_collection_v1.json",
+  "data_role": "development_consumed",
+  "sources": [
+    {
+      "study_id": "MSV000097610",
+      "source_family": "MSV000097610_veo_ibd_case_control",
+      "species": "Homo sapiens",
+      "biospecimen": "feces",
+      "biological_units": 48,
+      "effect_adapter": "flat_csv",
+      "effects_path": "data/validation/contrast_atlas_ibd_source_artifacts_20261019_v1/msv000097610_veoibd_response_artifact.tsv.gz",
+      "effects_sep": "\t",
+      "effect_report_path": "data/validation/contrast_atlas_ibd_source_artifacts_20261019_v1/report.json",
+      "expected_effect_status": "DEVELOPMENT_CONSUMED_IBD_SOURCE_ARTIFACTS_COMPLETE",
+      "entity_column": "ms2_join_id",
+      "beta_column": "beta",
+      "se_column": "se",
+      "effect_model_column": "effect_model",
+      "mgf_path": "data/reference/contrast_atlas_ibd_cross_study_20261014/pediatric_veoibd_consensus.mgf",
+      "mgf_report_path": "data/validation/contrast_atlas_ibd_source_artifacts_20261019_v1/report.json",
+      "expected_mgf_status": "DEVELOPMENT_CONSUMED_IBD_SOURCE_ARTIFACTS_COMPLETE",
+      "nonempty_ms2_spectra": 10446,
+      "identity_path": "data/validation/contrast_atlas_ibd_source_artifacts_20261019_v1/msv000097610_veoibd_response_artifact.tsv.gz",
+      "identity_sep": "\t",
+      "identity_entity_column": "ms2_join_id",
+      "identity_status_column": "identity_status",
+      "identity_status_map": {
+        "library_supported": "library_supported",
+        "unresolved_entity": "unresolved_entity"
+      },
+      "identity_partition_boundary": "legacy IBD local library-hit rule; not eligible for a unified unknown-increment claim until repartitioned",
+      "contrasts": {
+        "pediatric_veoibd_vs_healthy": {
+          "design": "pediatric VEO-IBD minus healthy",
+          "condition_family": "inflammatory_bowel_disease",
+          "independent_units": 48
+        }
+      }
+    },
+    {
+      "study_id": "IBD200_GROUP",
+      "source_family": "IBD200_MSV000084775_MSV000084908_MSV000086509",
+      "source_accessions": ["MSV000084775", "MSV000084908", "MSV000086509"],
+      "species": "Homo sapiens",
+      "biospecimen": "feces",
+      "biological_units": 177,
+      "effect_adapter": "flat_csv",
+      "effects_path": "data/validation/contrast_atlas_ibd_source_artifacts_20261019_v1/ibd200_merged_source_response_artifact.tsv.gz",
+      "effects_sep": "\t",
+      "effect_report_path": "data/validation/contrast_atlas_ibd_source_artifacts_20261019_v1/report.json",
+      "expected_effect_status": "DEVELOPMENT_CONSUMED_IBD_SOURCE_ARTIFACTS_COMPLETE",
+      "entity_column": "ms2_join_id",
+      "beta_column": "beta",
+      "se_column": "se",
+      "effect_model_column": "effect_model",
+      "mgf_path": "data/reference/contrast_atlas_ibd_cross_study_20261014/adult_ibd200_consensus.mgf",
+      "mgf_report_path": "data/validation/contrast_atlas_ibd_source_artifacts_20261019_v1/report.json",
+      "expected_mgf_status": "DEVELOPMENT_CONSUMED_IBD_SOURCE_ARTIFACTS_COMPLETE",
+      "nonempty_ms2_spectra": 1249,
+      "identity_path": "data/validation/contrast_atlas_ibd_source_artifacts_20261019_v1/ibd200_merged_source_response_artifact.tsv.gz",
+      "identity_sep": "\t",
+      "identity_entity_column": "ms2_join_id",
+      "identity_status_column": "identity_status",
+      "identity_status_map": {
+        "library_supported": "library_supported",
+        "unresolved_entity": "unresolved_entity"
+      },
+      "identity_partition_boundary": "legacy IBD local library-hit rule; not eligible for a unified unknown-increment claim until repartitioned",
+      "contrasts": {
+        "adult_all_ibd_vs_healthy": {
+          "design": "adult Crohn disease or ulcerative colitis minus healthy",
+          "condition_family": "inflammatory_bowel_disease",
+          "independent_units": 177
+        }
+      }
+    }
+  ],
+  "registered_relations": [
+    {
+      "left_study_id": "MSV000097610",
+      "left_contrast_id": "pediatric_veoibd_vs_healthy",
+      "right_study_id": "IBD200_GROUP",
+      "right_contrast_id": "adult_all_ibd_vs_healthy",
+      "relation_class": "prespecified_near_exact_condition_family",
+      "expected_signed_direction": "unspecified",
+      "eligible_primary_relevance": true,
+      "signed_truth_claimed": false,
+      "evidence_boundary": "independent human fecal IBD-versus-healthy studies, but pediatric VEO-IBD differs from adult CD/UC in age, subtype and treatment exposure"
+    }
+  ]
+}

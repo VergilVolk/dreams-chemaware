@@ -193,7 +193,8 @@ def main() -> None:
             "total_anchors": len(effects),
         })
     combined = pd.concat(effect_tables, ignore_index=True) if effect_tables else pd.DataFrame()
-    combined.to_csv(args.output_dir / "contrast_effects.tsv.gz", sep="\t", index=False, compression="gzip")
+    effect_path = args.output_dir / "contrast_effects.tsv.gz"
+    combined.to_csv(effect_path, sep="\t", index=False, compression="gzip")
     pd.DataFrame({"sample_id": sample_ids, "positive_log2_median_offset": offsets}).to_csv(
         args.output_dir / "sample_normalization.tsv", sep="\t", index=False
     )
@@ -233,6 +234,7 @@ def main() -> None:
             "sample_manifest": sha256(args.panel_object / "sample_manifest.tsv"),
             "sealed_memberships": sha256(args.memberships),
         },
+        "output_sha256": {"contrast_effects": sha256(effect_path)},
     }
     (args.output_dir / "report.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(report, indent=2))

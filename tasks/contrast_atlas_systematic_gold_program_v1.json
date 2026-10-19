@@ -1,0 +1,402 @@
+{
+  "schema": "contrast_atlas_systematic_exact_axis_gold_program_v3_source_adjudicated",
+  "frozen_on": "2026-10-19",
+  "objective": "Evaluate source-held-out directed contrast retrieval and unresolved-MS2 incremental utility on exact biological axes, not ontology label similarity.",
+  "unit_of_inference": "independent source family within an exact biological-axis family",
+  "systematic_development_wave": {
+    "evaluation_role": "development_pretruth_not_biological_gold",
+    "positive_mode_compute_boundary": {
+      "panels": 22,
+      "accessions": 20,
+      "biological_units_across_panel_namespaces": 2837,
+      "raw_files": 3823,
+      "raw_bytes": 156083244261,
+      "raw_gib": 145.36
+    },
+    "topology_safe_retrieval_boundary": {
+      "panels": 20,
+      "preliminary_source_families": 18,
+      "contrasts": 37,
+      "source_disjoint_panel_pairs": 188,
+      "ordered_contrast_queries": 1258
+    },
+    "selection_boundary": "All counts were frozen from metadata, polarity, subject topology and source provenance before abundance effects or transport scores; scale does not convert an ontology label into biological truth."
+  },
+  "pan_redu_design_adjudication_20261019": {
+    "status": "all_repeated_ontology_axes_rejected_as_exact_axis_gold_before_abundance_opening",
+    "evaluation_role": "development_pretruth_only",
+    "leakage_status": "sample design, subject topology and source records reviewed; abundance, effects and transport scores remain unopened",
+    "rejected_gold_axes": [
+      {
+        "axis": "human_feces_female_minus_male",
+        "nominal_source_families": 4,
+        "reason": "sex is entangled with infant-versus-mother role, age, country or population, paediatric age, active ulcerative colitis and repeated visits; the studies were not design-native replications of a sex effect"
+      },
+      {
+        "axis": "human_feces_early_minus_middle_adulthood",
+        "nominal_source_families": 4,
+        "reason": "diet intervention and visits, twin or family dependence, NAFLD background, ulcerative-colitis treatment and population differ with age; no design-native repeated age contrast exists"
+      },
+      {
+        "axis": "human_urine_female_minus_male",
+        "nominal_accessions": 4,
+        "independent_source_families": 2,
+        "reason": "MSV000083538 and MSV000083539 are opposite-polarity acquisitions of the same 22 participants; MSV000083538 and MSV000083540 are different subsets of the same MREC 06/MRE00/106 parent cohort; the remaining cohorts contain age, hypertension, stroke, medication, renal-function and lifestyle confounding"
+      },
+      {
+        "axis": "human_urine_later_minus_middle_adulthood",
+        "nominal_accessions": 4,
+        "independent_source_families": 2,
+        "reason": "MSV000083538 and MSV000083540 share the MREC 06/MRE00/106 parent cohort, and middle-adulthood participants in those panels are all male, creating a structural age-by-sex positivity failure"
+      }
+    ],
+    "highest_roi_pretruth_axis": {
+      "axis": "female_minus_male_within_later_adulthood",
+      "species": "Homo sapiens",
+      "biospecimen": "urine",
+      "chromatography": "HILIC",
+      "polarity": "positive",
+      "source_panels": [
+        {
+          "source_id": "MSV000083538",
+          "panel_id": "498de29a8ab1f968",
+          "source_family": "source:glasgow_mrec_06_mre00_106",
+          "analysis_role": "primary_source_view",
+          "participants": 17,
+          "female": 9,
+          "male": 8
+        },
+        {
+          "source_id": "MSV000083540",
+          "panel_id": "d2c0b701d29c535d",
+          "source_family": "source:glasgow_mrec_06_mre00_106",
+          "analysis_role": "same_cohort_sensitivity_view",
+          "participants": 17,
+          "female": 11,
+          "male": 6
+        },
+        {
+          "source_id": "MSV000088255",
+          "panel_id": "18d984665bd41c39",
+          "source_family": "source:glasgow_rec_14_lo_1887",
+          "analysis_role": "primary_source_view",
+          "participants": 58,
+          "female": 30,
+          "male": 28
+        }
+      ],
+      "denominators": {
+        "independent_source_families": 2,
+        "participants": 92,
+        "female": 50,
+        "male": 42,
+        "primary_participants": 75,
+        "primary_female": 39,
+        "primary_male": 36
+      },
+      "primary_adjustment": "continuous age within each source; source is the independent inference stratum and is never pooled as a pseudo-covariate",
+      "unavailable_primary_covariates": "SmokingStatus is missing for all 92 retained participants in the frozen Pan-ReDU snapshot and therefore cannot be adjusted; this limitation must be reported rather than imputed",
+      "source_specific_sensitivities": "diabetes, medication class or count, GFR or urine creatinine only where design-native fields can be joined without outcome-based selection",
+      "frozen_design_artifact": {
+        "path": "data/validation/pan_redu_later_adult_urine_sex_pretruth_design_v2_20261019/design_table.tsv",
+        "sha256": "441b7e2c3d784c6d423083fa950d3a464e154342e436dbff08adf9e93f50092d",
+        "status": "development_pretruth_design_frozen_no_abundance_opened"
+      },
+      "direction_contract": "effect order female-minus-male is frozen, but cross-source same-direction response is not assumed as truth",
+      "claim_boundary": "pretruth calibration only; MSV000083539 is a same-participant negative-polarity technical replication, while MSV000083540 is a different-subset view of the MSV000083538 parent cohort; neither increases the independent-source denominator"
+    },
+    "reciprocal_registry_contract": "Every query and target must independently freeze parent cohort, source family, participant IDs, matrix, chromatography, polarity, group definition, effect order, covariates, exclusions, source hashes, data role and participant/source overlap keys. A query axis label cannot certify a target axis. Reciprocal A-to-B and B-to-A retrieval is development-only; primary source inference uses globally disjoint query and frozen-reference roles."
+  },
+  "systematic_development_substrates": [
+    {
+      "substrate_id": "kidney_disease_intervention_counterresponse_2026",
+      "evidence_role": "development_consumed_not_gold_not_external_validation",
+      "resource": "Zenodo 20506874 v0.19 and 16 Metabolomics Workbench accessions",
+      "denominators": {
+        "accessions": 16,
+        "mwb_parent_project_source_families": 13,
+        "arm_assigned_accession_records": 383,
+        "maximum_specimens_after_one_proven_22_specimen_duplicate_fold": 361,
+        "sample_level_ms2_primary_representatives": 6,
+        "ms1_or_annotation_pressure_representatives": 7,
+        "same_source_sensitivity_accessions": 3
+      },
+      "scientific_operation": "shared-arm-debiased annotation-open disease-response versus intervention-counter-response, plus source-family-held-out directed-response transport",
+      "primary_statistic": "off-diagonal disease-arm U-statistic for <mu_D-mu_C,mu_D-mu_I> in a frozen phenotype-blind PSD spectral sample kernel",
+      "companion_statistic": "unbiased MMD2(D,C)-MMD2(I,C) distance contraction; projection and contraction are non-substitutable",
+      "point_correction_gate": "positive shared-arm-debiased direction, positive distance contraction and 0<theta/unbiased_MMD2(D,C)<=1; formal interpretation additionally requires biological-unit uncertainty",
+      "independence_boundary": "independent biological units only; technical replicates are collapsed and paired, longitudinal, litter, cage or other clustered designs require a separate clustered estimator",
+      "evaluation_worlds": [
+        "all",
+        "known_only",
+        "measurement_matched_known",
+        "all_identity_field",
+        "unresolved_shuffled_ms2"
+      ],
+      "outer_independence_unit": "MWB parent project_id",
+      "truth_forbidden": [
+        "kidney injury class as automatic positive relation",
+        "published phase labels",
+        "published uric acid or AICAR findings",
+        "published H4 candidates",
+        "polarity slices or sister accessions as independent replication"
+      ],
+      "known_provenance_failures": [
+        "ST001855 is official UIR day 21 and must be chronic rather than transition",
+        "deposited H4 code omits the stated between-control-and-disease and 40 percent attenuation rules",
+        "H4 code counts cohort-by-polarity slices rather than independent source families",
+        "ST003458 and ST003465 are two chemistry layers over the same 22 specimens"
+      ],
+      "claim_gate": "No protection or rescue language until an independent renal endpoint is frozen. No unknown-information claim unless all beats both known comparators on identical denominators. No learned-chemistry claim unless all also beats all_identity_field on the same entities and capacities. The increment must fail under acquisition-blocked unresolved-MS2 shuffling.",
+      "contract": "tasks/contrast_atlas_kidney_counterresponse_contract_v1.json",
+      "audit": "docs/KIDNEY_16_COHORT_COUNTER_RESPONSE_AUDIT_20261019.md",
+      "estimator": "tasks/contrast_counter_response.py"
+    }
+  ],
+  "orthogonal_falsification_boundaries": [
+    {
+      "boundary_id": "GSE130588_randomized_transcript_response",
+      "evidence_role": "development_consumed_orthogonal_intervention_not_metabolomic_gold",
+      "denominators": "baseline geometry: 42 paired AD participants, 20 healthy participants and 20848 genes; randomized primary: 14 dupilumab and 7 placebo complete four-state participants; secondary lesion-only: 17 dupilumab and 11 placebo",
+      "result": "baseline local-versus-field cosine -0.046821 with participant-bootstrap 95% interval [-0.201728, 0.083972], strict reversal FAIL; randomized primary interaction -0.493992 with HC3 95% interval [-1.262010, 0.274026] and fixed-margin randomization p=0.154188, FAIL; secondary lesion-only treatment effect -0.458913 with HC3 95% interval [-0.835864, -0.081962], supportive PASS",
+      "claim_boundary": "Supports pharmacodynamic retraction of an externally frozen local lesion transcript program but neither transcriptomic reproduction of metabolomic reversal nor causal local-versus-field separability.",
+      "report": "data/validation/gse130588_randomized_response_axes_20261019_v1/report.json"
+    },
+    {
+      "boundary_id": "PXD025431_whole_epidermis_proteome_geometry",
+      "evidence_role": "development_consumed_cross_omics_falsification_not_metabolomic_gold",
+      "denominators": "10 paired AD participants, 10 independent healthy participants, 2435 protein groups complete in all 30 samples",
+      "result": "local-versus-field cosine +0.406372; 20000-replicate biological-unit bootstrap 95% interval [-0.003417, 0.390073]; top-1-percent-contributor deletion +0.320040; biological-unit delete-one range [0.329593, 0.430938]",
+      "claim_boundary": "Refutes universal cross-omic reversal language; does not negate the replicated metabolomic geometry and does not establish pathway activity, flux or mechanism.",
+      "report": "data/validation/PXD025431_AD_proteome_falsification_boundary_20261019_v1/report.json"
+    }
+  ],
+  "families": [
+    {
+      "family_id": "human_ad_skin",
+      "species": "Homo sapiens",
+      "biospecimen": "stratum corneum or skin swab",
+      "axes": [
+        {
+          "axis_id": "local_lesion",
+          "direction": "lesional_minus_nonlesional",
+          "mismatch_axis": "field_state"
+        },
+        {
+          "axis_id": "field_state",
+          "direction": "nonlesional_minus_healthy",
+          "mismatch_axis": "local_lesion"
+        }
+      ],
+      "truth_status": "design_exact_development_consumed",
+      "sources": [
+        {
+          "source_id": "MSV000090788",
+          "source_family": "public_fbmn_ad_2022",
+          "biological_units": "30 healthy and 30 paired AD participants",
+          "platform": "LC-MS/MS",
+          "response_state": "full 9541-entity development effects opened",
+          "role": "development_consumed",
+          "url": "https://massive.ucsd.edu/ProteoSAFe/dataset.jsp?task=292f96da19c947dcad53c378d4b6d169"
+        },
+        {
+          "source_id": "ZENODO20365907",
+          "source_family": "independent_timsqtof_ad_2026",
+          "biological_units": "19 healthy and 22 complete paired AD participants",
+          "platform": "UPLC-TIMS-QTOF",
+          "response_state": "195 annotated effects opened; 61.2-GiB full-feature route unopened",
+          "role": "development_replication_raw_unknown_increment_pending",
+          "url": "https://zenodo.org/records/20365907"
+        }
+      ],
+      "claim_boundary": "The two axes must never be pooled; only local-to-local and field-to-field are positive relations."
+    },
+    {
+      "family_id": "mouse_circulating_hfd",
+      "species": "Mus musculus",
+      "biospecimen": "plasma or serum",
+      "axes": [
+        {
+          "axis_id": "hfd",
+          "direction": "high_fat_diet_minus_chow_or_normal"
+        }
+      ],
+      "truth_status": "design_exact_development_consumed",
+      "sources": [
+        {
+          "source_id": "ST002956",
+          "source_family": "calico_repeated_time_hfd",
+          "biological_units": "10 HFD and 10 chow mice measured repeatedly",
+          "platform": "mouse plasma LC-MS",
+          "response_state": "reported-chemistry response opened",
+          "role": "development_consumed_correlated_timepoints",
+          "url": "https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?StudyID=ST002956"
+        },
+        {
+          "source_id": "ST001336",
+          "source_family": "qimr_factorial_hfd_dca",
+          "biological_units": "2 by 2 HFD or normal by DCA or water, 11 mice per cell",
+          "platform": "mouse serum LC-MS",
+          "response_state": "reported-chemistry response opened",
+          "role": "development_consumed_factorial_target_and_distractor",
+          "url": "https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?StudyID=ST001336"
+        },
+        {
+          "source_id": "MSV000088023",
+          "source_family": "independent_mouse_plasma_hfd",
+          "biological_units": "39 mapped mice in a 2 by 2 sex by diet design",
+          "platform": "plasma MS1 with pooled-DDA MS/MS",
+          "response_state": "212-feature structure-hidden within-study effects opened",
+          "role": "development_consumed_unknown_response_component",
+          "url": "https://massive.ucsd.edu/ProteoSAFe/dataset.jsp?task=6551a7ea3e9c453ea46d6366dd17a9d0"
+        }
+      ],
+      "qualification_candidates": [
+        {
+          "source_id": "MSV000101772",
+          "source_family": "independent_orbitrap_idx_mouse_plasma_hfd",
+          "candidate_axis": "HFD_minus_normal_chow_at_40_weeks",
+          "observable_files": "46 positive-mode RAW files: 22 HFD and 24 normal chow across two acquisition blocks; approximately 7.78 GiB",
+          "sample_level_ms2": "Orbitrap ID-X DDA-MS2 is documented for every sample",
+          "role": "qualification_pending_not_gold_do_not_download_full_wave_yet",
+          "blocking_evidence": [
+            "MassIVE deposition is marked Partial",
+            "public filenames recover block, diet, time and within-block index but not a stable animal-to-sex key",
+            "the paper reports 63 animals whereas at most 51 longitudinal animal indices are visible in the current archive",
+            "only the positive C30 acquisition is currently visible, so missingness cannot be shown independent of diet, sex or survival"
+          ],
+          "next_gate": "obtain the filename-to-animal, sex, genotype, cohort, diet and timepoint key and reconcile missing animals and negative-mode files before raw acquisition or gold admission",
+          "url": "https://massive.ucsd.edu/ProteoSAFe/dataset.jsp?accession=MSV000101772"
+        }
+      ],
+      "claim_boundary": "Repeated time points and analytical panels are views of the same animals or source, not independent confirmations."
+    },
+    {
+      "family_id": "human_ibd_stool",
+      "species": "Homo sapiens",
+      "biospecimen": "feces",
+      "axes": [
+        {
+          "axis_id": "ibd_case_control",
+          "direction": "ibd_minus_matched_healthy",
+          "required_strata": "adult CD, adult UC and VEO-IBD remain separate"
+        }
+      ],
+      "truth_status": "qualification_pending_not_gold",
+      "sources": [
+        {
+          "source_id": "MSV000097610",
+          "source_family": "veo_ibd_case_control",
+          "biological_units": "26 VEO-IBD and 28 matched healthy",
+          "role": "candidate_exact_axis",
+          "url": "https://massive.ucsd.edu/ProteoSAFe/dataset.jsp?accession=MSV000097610"
+        },
+        {
+          "source_id": "IBD200_GROUP",
+          "source_family": "adult_ibd200_deduplication_pending",
+          "member_accessions": ["MSV000084775", "MSV000084908", "MSV000086509"],
+          "role": "candidate_exact_axis_count_as_one_until_subject_and_file_deduplication",
+          "url": "https://massive.ucsd.edu/ProteoSAFe/dataset.jsp?task=efdd20c7820046d78dc91a1353478eb0"
+        },
+        {
+          "source_id": "MSV000082221",
+          "source_family": "independent_ibd_candidate",
+          "biological_units": "qualification pending",
+          "role": "candidate_exact_axis_pending_raw_and_design_audit",
+          "url": "https://massive.ucsd.edu/ProteoSAFe/QueryMSV?id=MSV000082221"
+        }
+      ],
+      "excluded_from_exact_axis": [
+        {
+          "source_id": "MSV000082094",
+          "reason": "UC severity and medication cohort without a matched healthy case-control axis; prior VEO-to-adult and 5-ASA routes are consumed negative or confounded evidence."
+        }
+      ],
+      "claim_boundary": "Disease name alone is not exact truth; age, subtype, medication and shared-cohort provenance must be adjudicated before eligibility."
+    },
+    {
+      "family_id": "mouse_fecal_aging",
+      "species": "Mus musculus",
+      "biospecimen": "feces",
+      "axes": [
+        {
+          "axis_id": "old_age",
+          "direction": "old_minus_young",
+          "young_definition": "16 weeks in MSV000099387",
+          "old_definition": "90 to 96 weeks in MSV000099387",
+          "required_strata": "estimate female and male old-minus-young effects separately before a preregistered combined estimate"
+        }
+      ],
+      "truth_status": "one_qualification_ready_source_only_family_not_yet_gold",
+      "second_source_search_status": "no qualifying independent public mouse-fecal aging sample-level LC-MS/MS source found in the 2026-10-18 official-record audit",
+      "sources": [
+        {
+          "source_id": "MSV000099387",
+          "source_family": "independent_multi_tissue_aging_atlas",
+          "biological_units": "32 independent mice: 8 female old, 8 male old, 8 female young and 8 male young",
+          "files": "64 fecal Thermo RAW files: one HILIC positive and one HILIC negative acquisition per mouse; pooled QC and every non-fecal tissue excluded",
+          "raw_bytes": 1218981791,
+          "sample_level_ms2": "DDA MS/MS documented in the primary study; RAW-to-mzML conversion required",
+          "role": "prospective_qualification_ready_unopened_feces_only",
+          "effect_scores_opened": false,
+          "same_animal_nonindependent_accession": "MSV000099388",
+          "url": "https://massive.ucsd.edu/ProteoSAFe/dataset.jsp?task=d88064578c8949099b212cc026187d78"
+        }
+      ],
+      "blocked_sources": [
+        {
+          "source_id": "MSV000094436",
+          "source_family": "incomplete_public_age_gradient_subset",
+          "role": "blocked_not_gold",
+          "blocking_evidence": [
+            "only 24 public biological mzML files versus the approximately 81-subject fecal cohort reported by the study",
+            "no event-level sex, cohort or batch metadata are deposited with the files",
+            "the public 3M.N12.mzML names an internal 2M source file, leaving age provenance unresolved"
+          ],
+          "url": "https://massive.ucsd.edu/ProteoSAFe/dataset.jsp?task=5fdc194ebb014958b1024c881af61e12"
+        },
+        {
+          "source_id": "MTBLS10085",
+          "source_family": "female_mouse_fecal_aging_microbiome",
+          "role": "blocked_not_gold_do_not_download_for_current_program",
+          "biological_units": "natural-aging subset has 4 aged and 4 young female mice; antibiotic, germ-free and pooled-QC samples excluded",
+          "blocking_evidence": [
+            "public biological mzXML files could not be verified to contain precursor-resolved sample-level MS2 despite protocol-level MS/MS language",
+            "aged and young public filenames are ordered by group and injection randomization or biological batch is not deposited",
+            "n=4 per natural-aging arm is below the desired source-level robustness target"
+          ],
+          "url": "https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS10085/"
+        },
+        {
+          "source_id": "MTBLS10321",
+          "source_family": "male_mouse_fecal_aging_full_scan",
+          "role": "blocked_not_gold",
+          "blocking_evidence": [
+            "the primary study describes full-scan TOF-MS and the public NetCDF files do not provide sample-level precursor-resolved MS2"
+          ],
+          "url": "https://www.ebi.ac.uk/metabolights/editor/MTBLS10321"
+        }
+      ],
+      "claim_boundary": "MSV000099387 is executable but is only one independent source. Organs and MSV000099388 are same-animal views, not replication. The official-data search did not find a qualifying second public source, so aging is a prospective single-source application and cannot enter the four-family source-generalization gate."
+    }
+  ],
+  "non_gold_boundaries": [
+    "Pan-ReDU sex, age and generic health ontology matches remain pretruth and unlabeled.",
+    "ChemProp batches are one technical project, not independent biological sources.",
+    "MorPhiC TT7, TT4, ST003325 and ST003940 are one source system, not independent gold families.",
+    "A missing exact-family label is unknown, never an automatic negative relation."
+  ],
+  "primary_unknown_information_gate": {
+    "predictive_model_comparison": "all versus known_only and all versus measurement_matched_known are two separate preregistered predictive comparisons; both must pass. The per-query stronger-known oracle is descriptive only and has no p-value, LOFO result or PASS status.",
+    "common_face_unknown_estimand": "the lower and upper unknown_involving_on_all_common_face bounds on full-universe, phenotype-blind fixed capacities and the common chemical optimal face; these are not called an exact plan-wise decomposition unless the face is unique",
+    "specificity_control": "the primary unknown-involving common-face endpoint is tested by preregistered complete-response-profile permutations with chemistry, graph and fixed capacities unchanged. A formal p-value requires exchangeability blocks with a frozen nearest-neighbour diameter caliper; otherwise the permutation is sensitivity-only. Endpoint-by-world maxT is confined within each permutation family and family-level omnibus p-values use Holm, never a cross-family global maxT.",
+    "deterministic_reassignment_status": "sensitivity stress only, not a calibrated null and not a claim gate",
+    "equal_capacity_control": "measurement_matched_unresolved versus measurement_matched_known uses the same number of full-universe pairs and unavailable response values contribute zero rather than deleting a pair; a pairwise-common-availability sensitivity zeros both members whenever either response is unavailable",
+    "source_risk": "for each preregistered comparator separately and every held-out source-axis, utility is correct minus two times wrong with abstention zero; all-minus-comparator utility is averaged over axes within source, sources within family and then families equally",
+    "source_inference": "primary query sources and their provenance families must be globally disjoint from a score-blind frozen reference atlas; reciprocal source reuse is development-only. Conditional on that atlas, enumerate all 2^S query-source sign vectors when S is at most 20, or use a plus-one Monte Carlo sign-flip otherwise. Exhaustive enumeration is computationally exact, but inferential validity still requires independent query sources and paired-label exchangeability or source-delta sign symmetry. Participant bootstrap is restricted to within-source uncertainty.",
+    "primary_pass": "intersection-union gate: both all-versus-known_only and all-versus-measurement_matched_known must independently have positive family-equal mean utility, one-sided p<=0.05, at least three quarters of exact-axis families positive, every other family non-harmful and every leave-one-family-out mean positive; all preregistered unknown-specificity gates must also pass",
+    "family_specific_claims": "tested with Holm correction only after the primary gate; two or three sources in a family cannot support an individually significant family claim",
+    "coverage": "all endpoints are unconditional on a fixed candidate universe; abstentions count as zero retrieval credit",
+    "minimum_generalization": "at least four exact-axis families and eight independent held-out query sources, plus independently frozen reference sources supplying every exact target and mismatch, before a general method claim"
+  }
+}

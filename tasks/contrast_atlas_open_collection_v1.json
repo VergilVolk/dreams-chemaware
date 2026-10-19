@@ -1,0 +1,168 @@
+{
+  "schema": "contrast_atlas_open_collection_contract_v1",
+  "data_role": "development_consumed",
+  "sources": [
+    {
+      "study_id": "MSV000097426",
+      "source_family": "MSV000097426",
+      "species": "Mus musculus",
+      "biospecimen": "urine",
+      "biological_units": 12,
+      "effect_adapter": "flat_csv",
+      "effects_path": "data/validation/msv000097426_hfd_contrast_effects_20261014_v1/contrast_effects.csv",
+      "effect_report_path": "data/validation/msv000097426_hfd_contrast_effects_20261014_v1/report.json",
+      "expected_effect_status": "development_consumed_real_study_response_object",
+      "entity_column": "anchor_id",
+      "beta_column": "beta_log2",
+      "se_column": "se",
+      "reliability_column": "reliability",
+      "mgf_path": "data/validation/msv000097426_hfd_ms2_anchored_20261014_v1/representative_spectra.mgf",
+      "mgf_report_path": "data/validation/msv000097426_hfd_ms2_anchored_20261014_v1/report.json",
+      "expected_mgf_status": "development_consumed_ms2_anchored_response_object",
+      "identity_path": "data/validation/msv097426_to_msv084112_hfd_obesity_query_20261014_v2/library_partition.csv.gz",
+      "identity_entity_column": "anchor_id",
+      "identity_filter": {"study": "mouse"},
+      "identity_supported_column": "library_supported",
+      "contrasts": {
+        "mouse_hfd_vs_nfd": {
+          "design": "HFD minus NFD",
+          "condition_family": "high_fat_diet",
+          "independent_units": 12
+        }
+      }
+    },
+    {
+      "study_id": "MSV000084112",
+      "source_family": "MSV000084112",
+      "species": "Homo sapiens",
+      "biospecimen": "urine",
+      "biological_units": 48,
+      "effect_adapter": "flat_csv",
+      "effects_path": "data/validation/msv000084112_matched_contrast_effects_20261014_v1/contrast_effects.csv",
+      "effect_report_path": "data/validation/msv000084112_matched_contrast_effects_20261014_v1/report.json",
+      "expected_effect_status": "development_consumed_real_study_response_object",
+      "entity_column": "anchor_id",
+      "beta_column": "beta_log2",
+      "se_column": "se",
+      "reliability_column": "reliability",
+      "mgf_path": "data/validation/msv000084112_matched_ms2_anchored_20261014_v1/representative_spectra.mgf",
+      "mgf_report_path": "data/validation/msv000084112_matched_ms2_anchored_20261014_v1/report.json",
+      "expected_mgf_status": "development_consumed_ms2_anchored_response_object",
+      "identity_path": "data/validation/msv097426_to_msv084112_hfd_obesity_query_20261014_v2/library_partition.csv.gz",
+      "identity_entity_column": "anchor_id",
+      "identity_filter": {"study": "human"},
+      "identity_supported_column": "library_supported",
+      "contrasts": {
+        "diabetes_normal_weight": {"design": "T1D minus healthy within normal weight", "condition_family": "type_1_diabetes", "independent_units": 24},
+        "diabetes_obese": {"design": "T1D minus healthy within obesity", "condition_family": "type_1_diabetes", "independent_units": 24},
+        "obesity_with_diabetes": {"design": "obese minus normal weight within T1D", "condition_family": "obesity", "independent_units": 24},
+        "obesity_without_diabetes": {"design": "obese minus normal weight without T1D", "condition_family": "obesity", "independent_units": 24}
+      }
+    },
+    {
+      "study_id": "MSV000083077",
+      "source_family": "MSV000083077",
+      "species": "Homo sapiens",
+      "biospecimen": "saliva",
+      "biological_units": 62,
+      "effect_adapter": "flat_csv",
+      "effects_path": "data/validation/msv000083077_saliva_contrast_effects_20261014_v1/contrast_effects.csv",
+      "effect_report_path": "data/validation/msv000083077_saliva_contrast_effects_20261014_v1/report.json",
+      "expected_effect_status": "development_consumed_real_study_response_object",
+      "entity_column": "anchor_id",
+      "beta_column": "beta_log2",
+      "se_column": "se",
+      "reliability_column": "reliability",
+      "mgf_path": "data/validation/msv000083077_saliva_ms2_anchored_20261014_v4/representative_spectra.mgf",
+      "mgf_report_path": "data/validation/msv000083077_saliva_ms2_anchored_20261014_v4/report.json",
+      "expected_mgf_status": "development_consumed_ms2_anchored_response_object",
+      "identity_path": "data/validation/msv084112_to_msv083077_obesity_query_20261014_v1/library_partition.csv.gz",
+      "identity_entity_column": "anchor_id",
+      "identity_filter": {"study": "candidate"},
+      "identity_supported_column": "library_supported",
+      "contrasts": {
+        "depression_nonobese": {"design": "higher minus lower depressive symptoms without obesity", "condition_family": "depressive_symptoms", "independent_units": 39},
+        "depression_obese": {"design": "higher minus lower depressive symptoms with obesity", "condition_family": "depressive_symptoms", "independent_units": 23},
+        "obesity_high_depression": {"design": "obese minus nonobese within higher depressive symptoms", "condition_family": "obesity", "independent_units": 32},
+        "obesity_low_depression": {"design": "obese minus nonobese within lower depressive symptoms", "condition_family": "obesity", "independent_units": 30}
+      }
+    },
+    {
+      "study_id": "MSV000088023",
+      "source_family": "MSV000088023",
+      "species": "Mus musculus",
+      "biospecimen": "plasma",
+      "biological_units": 39,
+      "effect_adapter": "flat_csv",
+      "effects_path": "data/validation/msv000088023_hfd_unknown_response_20261014_v3/contrast_effects.csv",
+      "effect_report_path": "data/validation/msv000088023_hfd_unknown_response_20261014_v3/report.json",
+      "expected_effect_status": "development_consumed_within_study_structure_hidden_response_qualification",
+      "entity_column": "feature_id",
+      "beta_column": "beta",
+      "se_column": "se",
+      "mgf_path": "data/reference/msv000088023_hfd_response/ms2spectra_maxTic.mgf",
+      "mgf_report_path": "data/validation/msv000088023_hfd_unknown_response_20261014_v3/report.json",
+      "expected_mgf_status": "development_consumed_within_study_structure_hidden_response_qualification",
+      "identity_path": "data/validation/msv000088023_hfd_unknown_response_20261014_v3/library_partition.csv",
+      "identity_entity_column": "feature_id",
+      "identity_supported_column": "library_supported",
+      "contrasts": {
+        "female_hfd_vs_normal": {"design": "female HFD minus female normal diet", "condition_family": "high_fat_diet", "independent_units": 20},
+        "male_hfd_vs_normal": {"design": "male HFD minus male normal diet", "condition_family": "high_fat_diet", "independent_units": 19},
+        "female_vs_male_hfd": {"design": "female minus male within HFD", "condition_family": "biological_sex", "independent_units": 20},
+        "female_vs_male_normal": {"design": "female minus male within normal diet", "condition_family": "biological_sex", "independent_units": 19}
+      }
+    },
+    {
+      "study_id": "MSV000090788",
+      "source_family": "MSV000090788",
+      "species": "Homo sapiens",
+      "biospecimen": "skin",
+      "biological_units": 60,
+      "effect_adapter": "response_directories",
+      "response_root": "data/validation/public_fbmn_ad_response_objects_20261016_v2",
+      "effect_report_path": "data/validation/public_fbmn_ad_response_objects_20261016_v2/report.json",
+      "expected_effect_status": "three_single_study_development_response_objects_built",
+      "entity_column": "entity_id",
+      "beta_column": "beta",
+      "se_column": "se",
+      "prevalence_column": "prevalence",
+      "qc_column": "qc_pass",
+      "mgf_path": "data/reference/public_fbmn/a36305db40414b6ea9c5b9a5de380bea/representative.mgf",
+      "mgf_report_path": "data/validation/public_fbmn_ad_response_objects_20261016_v2/report.json",
+      "expected_mgf_status": "three_single_study_development_response_objects_built",
+      "identity_path": "data/validation/public_fbmn_ad_identity_partition_20261017_v1/identity_partition.tsv.gz",
+      "identity_sep": "\t",
+      "identity_entity_column": "entity_id",
+      "identity_status_column": "identity_partition",
+      "identity_status_map": {"library_supported": "library_supported", "unresolved": "unresolved_entity"},
+      "contrasts": {
+        "lesion_vs_nonlesion_paired": {"design": "lesional minus nonlesional paired skin", "condition_family": "atopic_dermatitis_local", "independent_units": 30},
+        "lesion_vs_healthy": {"design": "lesional AD minus healthy skin", "condition_family": "atopic_dermatitis", "independent_units": 60},
+        "nonlesion_vs_healthy": {"design": "nonlesional AD minus healthy skin", "condition_family": "atopic_dermatitis_field", "independent_units": 60}
+      }
+    }
+  ],
+  "registered_relations": [
+    {
+      "left_study_id": "MSV000097426",
+      "left_contrast_id": "mouse_hfd_vs_nfd",
+      "right_study_id": "MSV000088023",
+      "right_contrast_id": "female_hfd_vs_normal",
+      "relation_class": "prespecified_exact_intervention_family",
+      "expected_signed_direction": "unspecified",
+      "eligible_primary_relevance": true,
+      "evidence_boundary": "same HFD-versus-control intervention family across independent accessions, sex stratum and biofluid; not a guarantee of concordant metabolite directions"
+    },
+    {
+      "left_study_id": "MSV000097426",
+      "left_contrast_id": "mouse_hfd_vs_nfd",
+      "right_study_id": "MSV000088023",
+      "right_contrast_id": "male_hfd_vs_normal",
+      "relation_class": "prespecified_exact_intervention_family",
+      "expected_signed_direction": "unspecified",
+      "eligible_primary_relevance": true,
+      "evidence_boundary": "same HFD-versus-control intervention family across independent accessions, sex stratum and biofluid; not a guarantee of concordant metabolite directions"
+    }
+  ]
+}

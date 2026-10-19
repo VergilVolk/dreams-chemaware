@@ -1,5 +1,7 @@
 # 生物学应用方法科学决策：从可观测化学空间到多场景发现
 
+> **SUPERSEDED 2026-10-12：** 本文撤回 Contrast Atlas 的独立研究地位，现已被明确否决。Contrast Atlas 已恢复为生物学应用总纲；response transport 是其中一个算子，不是唯一主线。以 `METABOLOMIC_CONTRAST_ATLAS_MASTER_CONTRACT_20261012.md` 为准。
+
 日期：2026-10-11  
 状态：研究方向裁决；不是阳性结果，不改变算法 coder 的训练、冻结或外测计划
 

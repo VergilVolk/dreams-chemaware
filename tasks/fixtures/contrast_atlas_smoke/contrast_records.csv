@@ -1,0 +1,14 @@
+study_id,source_family,contrast_id,entity_id,independent_unit_id,identity_status,beta,se,qc_pass,detectable,data_role
+Q,source_q,q,Q0,Qu0,library_supported,2.0,0.2,true,true,synthetic_contract_smoke
+Q,source_q,q,Q1,Qu1,library_supported,1.0,0.2,true,true,synthetic_contract_smoke
+Q,source_q,q,Q2,Qu2,unresolved_entity,-1.0,0.2,true,true,synthetic_contract_smoke
+Q,source_q,q,Q3,Qu3,unresolved_entity,-2.0,0.2,true,true,synthetic_contract_smoke
+S,source_s,s,S0,Su0,library_supported,1.8,0.2,true,true,synthetic_contract_smoke
+S,source_s,s,S1,Su1,library_supported,0.8,0.2,true,true,synthetic_contract_smoke
+S,source_s,s,S2,Su2,unresolved_entity,-0.9,0.2,true,true,synthetic_contract_smoke
+S,source_s,s,S3,Su3,unresolved_entity,-1.7,0.2,true,true,synthetic_contract_smoke
+O,source_o,o,O0,Ou0,library_supported,-1.8,0.2,true,true,synthetic_contract_smoke
+O,source_o,o,O1,Ou1,library_supported,-0.8,0.2,true,true,synthetic_contract_smoke
+O,source_o,o,O2,Ou2,unresolved_entity,0.9,0.2,true,true,synthetic_contract_smoke
+O,source_o,o,O3,Ou3,unresolved_entity,1.7,0.2,true,true,synthetic_contract_smoke
+L,source_l,l,L0,Lu0,library_supported,1.5,0.2,true,true,synthetic_contract_smoke

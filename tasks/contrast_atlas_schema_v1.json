@@ -1,0 +1,141 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Metabolomic Contrast Atlas tabular contract v1",
+  "version": "contrast_atlas_schema_v1",
+  "status": "development/consumed",
+  "scientific_unit": "A frozen within-study contrast over independent chemical units",
+  "tables": {
+    "contrast_records": {
+      "primary_key": ["study_id", "contrast_id", "entity_id"],
+      "independent_unit_key": ["study_id", "contrast_id", "independent_unit_id"],
+      "required_columns": {
+        "study_id": "string",
+        "source_family": "string",
+        "contrast_id": "string",
+        "entity_id": "string",
+        "independent_unit_id": "string",
+        "identity_status": "confirmed_known|library_supported|unresolved_entity",
+        "beta": "finite number; frozen within-study effect",
+        "se": "finite number > 0",
+        "qc_pass": "boolean",
+        "detectable": "boolean",
+        "data_role": "string; development/consumed or sealed role"
+      },
+      "constraints": [
+        "one source_family per study_id plus contrast_id",
+        "one eligible entity per independent_unit_id",
+        "raw intensities must not be pooled across studies"
+      ]
+    },
+    "pattern_loadings": {
+      "primary_key": ["study_id", "contrast_id", "entity_id", "pattern_id"],
+      "required_columns": {
+        "study_id": "string",
+        "contrast_id": "string",
+        "entity_id": "string",
+        "pattern_id": "string",
+        "weight": "number in (0,1]",
+        "calibrated": "boolean",
+        "phenotype_blind": "boolean and always true"
+      },
+      "forbidden_columns": [
+        "beta", "se", "effect", "effect_size", "p_value", "phenotype",
+        "outcome", "group_label", "case_control", "validation_label"
+      ],
+      "derived_pattern_response_uncertainty": "Use synchronized biological-unit resampling when available; otherwise use the marginal-SE perfect-positive-dependence upper bound, never the independence square-sum formula."
+    },
+    "strict_entity_links": {
+      "primary_key": [
+        "query_study_id", "query_contrast_id", "query_entity_id",
+        "target_study_id", "target_contrast_id", "target_entity_id"
+      ],
+      "required_columns": {
+        "query_study_id": "string",
+        "query_contrast_id": "string",
+        "query_entity_id": "string",
+        "target_study_id": "string",
+        "target_contrast_id": "string",
+        "target_entity_id": "string",
+        "match_probability": "number in [0,1]",
+        "claim_level": "strict_entity",
+        "phenotype_blind": "boolean and always true"
+      },
+      "constraints": [
+        "one-to-one within every query-target contrast pair",
+        "both endpoints must be present and QC eligible in contrast_records"
+      ],
+      "forbidden_columns": [
+        "beta", "se", "effect", "effect_size", "p_value", "phenotype",
+        "outcome", "group_label", "case_control", "validation_label"
+      ]
+    },
+    "query_registry": {
+      "primary_key": ["query_id"],
+      "required_columns": {
+        "query_id": "string",
+        "query_study_id": "string",
+        "query_contrast_id": "string",
+        "cluster_id": "predeclared biological resampling unit",
+        "source_holdout": "predeclared source family",
+        "instrument_holdout": "predeclared instrument family",
+        "data_role": "development/consumed or sealed role"
+      },
+      "constraints": [
+        "registered before truth opening",
+        "one query_id per study plus contrast",
+        "all evidence-control worlds use the same registry"
+      ]
+    },
+    "calibrated_candidates": {
+      "primary_key": ["query_id", "world", "target_study_id", "target_contrast_id"],
+      "required_columns": {
+        "world": "all|known_only|measurement_matched_known|unresolved_shuffled_ms2",
+        "observed_score": "shared-pattern response similarity",
+        "calibration_status": "inner phenotype-blind pattern-permutation status",
+        "p_similar": "empirical one-sided p value",
+        "p_opposite": "empirical one-sided p value",
+        "q_similar": "query-world BH adjusted p value",
+        "q_opposite": "query-world BH adjusted p value"
+      },
+      "constraints": [
+        "identical query-target candidate denominator in every evidence-control world",
+        "no biological relevance truth read before this table and thresholds are frozen"
+      ]
+    },
+    "query_outcomes": {
+      "primary_key": ["query_id", "world"],
+      "required_columns": {
+        "truth_type": "match|no_match",
+        "answered": "boolean",
+        "correct": "boolean",
+        "rank": "positive rank for answered match queries; missing otherwise"
+      },
+      "constraints": [
+        "constructed only after frozen candidate scores are joined to sealed truth",
+        "all four evidence-control worlds are present for every query",
+        "no-match correctness equals abstention"
+      ]
+    },
+    "truth_ledger": {
+      "primary_key": ["query_id", "target_study_id", "target_contrast_id"],
+      "required_columns": {
+        "expected_association": "similar_response|opposite_response|irrelevant",
+        "truth_basis": "independent replication, designed reversal or rescue, orthogonal functional replication, prespecified decoy/no-match, or synthetic smoke",
+        "truth_data_role": "development/consumed, sealed, or synthetic",
+        "truth_frozen_before_scoring": "boolean and always true",
+        "selection_blind_to_atlas_score": "boolean and always true"
+      },
+      "constraints": [
+        "every candidate pair has an explicit row; missing rows are not negatives",
+        "the ledger is inaccessible to evidence construction, retrieval, and inner calibration",
+        "synthetic_smoke truth cannot support a scientific claim"
+      ]
+    }
+  },
+  "diagnostic_identity_worlds": ["all", "known_only", "unresolved_only"],
+  "paired_evaluation_control_worlds": [
+    "all", "known_only", "measurement_matched_known", "unresolved_shuffled_ms2"
+  ],
+  "fixed_candidate_universe": "All paired evaluation worlds retain the same query-target graph; absent evidence causes abstention, never candidate deletion.",
+  "claim_limit": "This schema constrains inputs and leakage. It does not validate biological correctness, cross-study generalization, or unknown-entity increment."
+}
