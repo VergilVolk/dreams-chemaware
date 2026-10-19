@@ -46,6 +46,10 @@ from spectrum_parser import SpectrumParser
 
 SUPPORTED_FORMATS = [".mgf", ".mzml", ".mzxml", ".hdf5", ".h5", ".hd5", ".json"]
 DEFAULT_SPECTRUM = "[[100.5, 0.8], [200.3, 1.0], [301.2, 0.5], [402.1, 0.6], [500.0, 0.9]]"
+BATCH_COLUMNS = [
+    "spectrum_id", "precursor_mz", "charge", "embedding_dim", "top_similarity",
+    "candidate_count", "status", "error",
+]
 
 
 def parse_spectrum_input(text: str) -> np.ndarray:
@@ -532,6 +536,7 @@ class DreaMSInterface:
                 chem_aware=False,
             )
             rows, complete = [], []
+            success_count = 0
             for record, (embedding, metadata) in zip(records, embeddings):
                 if embedding is None:
                     errors.append(record["spectrum_id"] + ": embedding 失败")
@@ -543,12 +548,17 @@ class DreaMSInterface:
                 )
                 candidate_records = candidates.to_dict("records") if candidates is not None and not candidates.empty else []
                 candidate_records = deduplicate_candidates(candidate_records, int(max_results))
-                rows.append({
-                    "spectrum_id": record["spectrum_id"], "precursor_mz": record["precursor_mz"],
-                    "charge": record["charge"], "embedding_dim": len(embedding),
-                    "top_similarity": candidate_records[0].get("Embedding similarity") if candidate_records else None,
-                    "candidate_count": len(candidate_records),
-                })
+                row_status = "候选检索失败（embedding 已生成）" if error else "完成"
+                if error:
+                    errors.append(f"{record['spectrum_id']}: {row_status}，{error}")
+                else:
+                    success_count += 1
+                rows.append([
+                    record["spectrum_id"], record["precursor_mz"],
+                    record["charge"], len(embedding),
+                    candidate_records[0].get("Embedding similarity") if candidate_records else None,
+                    len(candidate_records), row_status, error or "",
+                ])
                 complete.append({
                     "input": {
                         "spectrum_id": record["spectrum_id"],
@@ -559,6 +569,7 @@ class DreaMSInterface:
                     "metadata": metadata,
                     "embedding": embedding.tolist(),
                     "candidates": candidate_records,
+                    "status": row_status,
                     "candidate_error": error, "retrieval": retrieval_report,
                 })
             csv_path = self._write_csv(embeddings)
@@ -567,9 +578,12 @@ class DreaMSInterface:
                 "schema_version": 1, "model_type": model_type, "backend": backend,
                 "records": complete, "errors": errors,
             })
-            status = f"✅ 批量完成: {len(rows)} 成功，{len(errors)} 失败。"
+            status_icon = "✅" if not errors else ("⚠️" if success_count else "❌")
+            status = f"{status_icon} 批量完成: {success_count} 成功，{len(errors)} 失败。"
             if errors:
                 status += "\n\n" + "\n".join(f"- {error}" for error in errors)
+            if any(item["candidate_error"] for item in complete):
+                status += "\n\n候选检索失败的谱图已保留 embedding，可下载 CSV 和 JSON 查看。"
             return rows, csv_path, json_path, status
         except ImportError as exc:
             return [], None, None, f"❌ 文件格式依赖缺失: {str(exc)}"
@@ -717,7 +731,7 @@ def build_app():
                 batch_tolerance = gr.Number(label="候选 m/z 容差（Da）", value=0.05, minimum=0.0001)
                 batch_k = gr.Slider(label="候选数量", minimum=1, maximum=50, step=1, value=10)
             batch_btn = gr.Button("运行批量分析", variant="primary")
-            batch_table = gr.Dataframe(label="批量汇总", interactive=False)
+            batch_table = gr.Dataframe(headers=BATCH_COLUMNS, label="批量汇总", interactive=False)
             batch_csv = gr.File(label="下载批量 embedding CSV", interactive=False)
             batch_json = gr.File(label="下载批量 JSON", interactive=False)
             batch_status = gr.Markdown()
