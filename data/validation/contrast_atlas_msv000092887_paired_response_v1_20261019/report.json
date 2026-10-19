@@ -1,0 +1,63 @@
+{
+  "schema": "contrast_atlas_msv000092887_paired_response_v1",
+  "status": "PAIRED_RESPONSE_BUILT_RAW_MS2_LINK_PENDING",
+  "evidence_role": {
+    "dataset_status": "development_consumed",
+    "leakage_state": "outcome_open_public_study",
+    "cross_study_discovery_claim": false,
+    "external_validation_claim": false
+  },
+  "denominators": {
+    "features": 3041,
+    "mztab_assays": 129,
+    "biological_assays": 78,
+    "matched_pairs": 39,
+    "covid": 39,
+    "control": 39,
+    "reference_spectrum_hits": 175,
+    "without_reference_spectrum_hit": 2866,
+    "abundance_qc_pass": 2598,
+    "detection_qc_pass": 804,
+    "either_response_channel_qc_pass": 3020
+  },
+  "published_aggregate_ms2_denominators": {
+    "features_with_ms2": 1982,
+    "features_with_reference_spectrum": 175,
+    "implied_ms2_without_reference_spectrum": 1807,
+    "feature_level_membership_available_in_mztab": false
+  },
+  "response_contract": {
+    "abundance": "mean paired log2(COVID/control) among pairs positive in both; no zero imputation",
+    "abundance_se": "standard error across observed within-pair log2 differences",
+    "abundance_minimum_pairs": 20,
+    "detection": "Haldane-corrected log odds of COVID-only versus control-only paired detections",
+    "detection_se": "sqrt(1/(COVID-only+0.5)+1/(control-only+0.5))",
+    "detection_minimum_discordant_pairs": 6,
+    "channel_collapse": "forbidden_before_cross_source_calibration"
+  },
+  "metadata_corrections": [
+    {
+      "biological_unit_id": "C43",
+      "pair_id": "24",
+      "field": "MS_ID_metabolomics",
+      "deposited": "21FP",
+      "corrected": "24FP",
+      "independent_support": [
+        "same-row MS_ID_lipidomics=24FL",
+        "same-row Pairs_MS=24",
+        "21FP already maps to C31",
+        "mzTab assay inventory contains 24FP"
+      ]
+    }
+  ],
+  "provenance": {
+    "mztab_sha256": "e79652095a9942bf3a0609bb930d39797f7c28ce9978b91740ef0f8b04640cdf",
+    "clinical_workbook_sha256": "9a0b5d266420f038f13cf0f0b85f50629f56bf42bc69a1f479c295fa21baef00"
+  },
+  "claim_boundary": [
+    "This is one real study-level response object, not a cross-study discovery.",
+    "The 2,866 features without a reference-spectrum SME link are not automatically called MS2-bearing.",
+    "Unresolved-MS2 status requires phenotype-blind raw mzXML linkage.",
+    "The public outcome is open; this study is development/consumed, never unopened external validation."
+  ]
+}

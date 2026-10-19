@@ -1,0 +1,148 @@
+{
+  "schema": "contrast_atlas_covid_three_source_replication_v1",
+  "frozen_at": "2026-10-19",
+  "scientific_question": "Can phenotype-blind MS/MS links identify unresolved chemical response families in two independent COVID-plasma studies that reproduce, with direction and uncertainty, in a third independent study?",
+  "evidence_role": {
+    "dataset_status": "development_consumed",
+    "leakage_state": "all_three_public_outcomes_open",
+    "external_confirmation_claim": false,
+    "same_disease_label_is_truth": false,
+    "allowed_claim": "method development and cross-source replication within consumed public data"
+  },
+  "primary_object": "feature_or_ion_family_level_directed_response_with_standard_error",
+  "forbidden_primary_objects": [
+    "whole_study_label_match",
+    "spectrum_occurrence_without_response",
+    "posthoc_pathway_story",
+    "disease_name_as_signed_relation_truth"
+  ],
+  "sources": [
+    {
+      "study_id": "MSV000085505",
+      "country": "Brazil",
+      "biospecimen": "plasma",
+      "design": "hospitalized_COVID_under_observed_2020_treatment_mix_vs_external_healthy",
+      "biological_units": {"covid": 33, "control": 13},
+      "all_feature_ms2_asset": {"features": 1031, "mgf_spectra": 1031, "exact_feature_id_match": true},
+      "response_status": "blocked_by_subject_and_treatment_crosswalk",
+      "signed_truth_status": "not_truth"
+    },
+    {
+      "study_id": "MTBLS1866",
+      "country": "Italy",
+      "biospecimen": "plasma",
+      "design": "noncritical_COVID_vs_healthy",
+      "biological_units": {"covid_positive_dda_files": 83, "control_positive_dda_files": 26},
+      "all_feature_ms2_asset": {"positive_dda_ms2_spectra": 1110010, "all_feature_matrix_ready": false},
+      "response_status": "blocked_by_all_feature_matrix_or_frozen_raw_reprocessing",
+      "signed_truth_status": "not_truth"
+    },
+    {
+      "study_id": "MSV000092887",
+      "country": "Austria",
+      "biospecimen": "plasma",
+      "design": "COVID_vs_age_sex_matched_control",
+      "biological_units": {"matched_pairs": 39, "covid": 39, "control": 39},
+      "response_asset": "data/validation/contrast_atlas_msv000092887_paired_response_v1_20261019",
+      "response_denominators": {
+        "features": 3041,
+        "abundance_qc_pass": 2598,
+        "detection_qc_pass": 804,
+        "either_channel_qc_pass": 3020
+      },
+      "published_ms2_denominators": {
+        "features_with_ms2": 1982,
+        "reference_spectrum_hits": 175,
+        "implied_ms2_without_reference_hit": 1807,
+        "feature_level_ms2_membership_ready": false
+      },
+      "response_status": "built_raw_ms2_link_pending",
+      "signed_truth_status": "not_truth"
+    }
+  ],
+  "excluded_or_deferred_sources": [
+    {
+      "study_id": "MTBLS3852",
+      "decision": "exclude",
+      "reason": "targeted_full_MS_panel_of_51_metabolites_not_unbiased_DDA"
+    },
+    {
+      "study_id": "MTBLS2542",
+      "decision": "defer",
+      "reason": "raw_DDA_exists_but_deposited_positive_MAFs_do_not_provide_an_all_feature_unknown_MS2_response_object"
+    }
+  ],
+  "phenotype_blind_linkage": {
+    "inputs_allowed": [
+      "precursor_mz",
+      "fragment_mz_and_intensity",
+      "acquisition_metadata",
+      "frozen_algorithm_scores",
+      "within_source_ion_family_evidence"
+    ],
+    "inputs_forbidden": [
+      "case_control_label",
+      "effect_direction",
+      "effect_size",
+      "p_value",
+      "candidate_study_label"
+    ],
+    "identity_calibration": "strict_planar_identity_edges_only",
+    "unresolved_definition": "no_reference_spectrum_identity_support_and_feature_level_raw_MS2_link_confirmed"
+  },
+  "leave_one_source_out_program": {
+    "rotations": [
+      {"discovery_sources": ["MSV000085505", "MTBLS1866"], "held_out_source": "MSV000092887"},
+      {"discovery_sources": ["MSV000085505", "MSV000092887"], "held_out_source": "MTBLS1866"},
+      {"discovery_sources": ["MTBLS1866", "MSV000092887"], "held_out_source": "MSV000085505"}
+    ],
+    "discovery_rule": "nominate linked response families using only the two discovery sources after the phenotype-blind graph is frozen",
+    "validation_rule": "open the held-out source only after family membership, response channel, direction, aggregation, and multiplicity procedure are frozen",
+    "no_match": "allowed_and_counted_in_coverage"
+  },
+  "response_channels": {
+    "abundance": "continuous within-study effect and standard error; matched within-pair log2 ratio for MSV000092887",
+    "detection": "paired or group-compatible differential-detection effect and standard error",
+    "collapse_before_calibration": "forbidden"
+  },
+  "primary_endpoints": [
+    "number_and_fraction_of_discovery_nominated_unresolved_response_families_replicated_in_the_held_out_source",
+    "held_out_directional_concordance_with_confidence_intervals_and_multiplicity_control",
+    "correct_answer_coverage_at_a_fixed_false_link_risk",
+    "increment_over_measurement_matched_known_only_on_the_same_candidate_and_feature_universe"
+  ],
+  "required_controls": [
+    "measurement_matched_known_only",
+    "all_identity_field_without_spectral_similarity",
+    "precursor_mass_only",
+    "raw_cosine_or_WSE_on_the_same_graph",
+    "frozen_algorithm_score_on_the_same_graph",
+    "within_source_response_reassignment",
+    "unresolved_MS2_shuffle_preserving_mass_and_measurement_support",
+    "strict_identity_positive_calibration",
+    "sourcewise_effect_and_heterogeneity_report"
+  ],
+  "success_gate": {
+    "unit": "held_out_response_family_not_study_label",
+    "requirements": [
+      "at_least_one_unresolved_family_replicates_in_a_held_out_source_after_frozen_multiplicity_control",
+      "the_family_is_not_recoverable_by_measurement_matched_known_only",
+      "the_gain_disappears_or_materially_weakens_under_unresolved_MS2_shuffle",
+      "the_result_is_not_driven_by_one_source_or_one_redundant_ion_family",
+      "the_biological_relation_is_traceable_to_study_design_and_effects_without_asserting_structure"
+    ]
+  },
+  "failure_gate": [
+    "no_unresolved_family_replicates_in_any_rotation",
+    "known_only_recovers_the_same_conclusion",
+    "identity_field_or_mass_only_recovers_the_same_gain",
+    "shuffle_controls_preserve_the_gain",
+    "feature_level_MS2_membership_or_independent_biological_units_cannot_be_reconstructed"
+  ],
+  "next_actions": [
+    "link_MSV000092887_HILIC_positive_raw_mzXML_MS2_to_the_3041_features_without_using_case_control_labels",
+    "recover_MSV000085505_subject_treatment_crosswalk",
+    "recover_or_rebuild_MTBLS1866_positive_all_feature_matrix_with_feature_MS2_links",
+    "freeze_cross_source_graph_before_opening_any_response_effects"
+  ]
+}
