@@ -1,5 +1,6 @@
 #!/bin/bash
-# Build the genuinely new MultiMS2 external benchmark without model scoring.
+# Build the MultiMS2 external cross-condition confirmation panels without
+# model scoring.  This is not represented as the sole large final benchmark.
 # Primary: CID 60 eV -> CID 40 eV.  EAD -> CID is a separate OOD stress test.
 #SBATCH --job-name=multims2_ext
 #SBATCH --partition=gpu
@@ -67,4 +68,4 @@ python -u tasks/build_multims2_external_benchmark.py \
   --precursor-ppm 30 \
   --candidate-ppm 10
 
-echo "MULTIMS2_EXTERNAL_SCOREBLIND_READY_NO_MODEL_SCORES: $OUT"
+echo "MULTIMS2_CROSS_CONDITION_CONFIRMATION_READY_NO_MODEL_SCORES: $OUT"

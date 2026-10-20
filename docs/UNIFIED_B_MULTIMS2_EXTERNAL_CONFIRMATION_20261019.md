@@ -2,9 +2,10 @@
 
 Date: 2026-10-19
 
-Status: benchmark builder implemented; full six-source exclusion not yet run
+Status: benchmark builder implemented; full six-source exclusion not yet run;
+not sufficient as the sole large final benchmark
 
-Dataset role: genuinely new external confirmation candidate, not model development
+Dataset role: independent cross-condition confirmation candidate, not model development and not the sole large final benchmark
 
 ## Fixed algorithm entering external confirmation
 
@@ -29,9 +30,10 @@ will be changed after this point.
 
 ## Why MultiMS2
 
-MultiMS2 is an independent standards library deposited as MSV000099369 and
-released separately from the consumed MassSpecGym, GNPS, MoNA, MassBank,
-MSnLib, and Enveda assets.  The pinned source is commit
+MultiMS2 is a separately released standards library deposited as MSV000099369.
+Its independence from the consumed MassSpecGym, GNPS, MoNA, MassBank and
+MSnLib namespaces is not assumed: it is tested identity-by-identity,
+formula-by-formula and by available exact spectrum hashes.  The pinned source is commit
 `659bd9b608408a75ecbb4b03295ed4c03ba52539`; the Linux checkout of
 `data/multims2_spectra.mgf` must have SHA-256
 `4ef86f75a12ad2fdadbd63732e2d6690f4e506a6ff08f171758c1808d1249673`.
@@ -40,6 +42,13 @@ The source contains 43,728 validated spectra from 2,899 compounds, including
 CID at 20/40/60 eV and EAD at 12/16/24 eV.  This permits a fixed-condition
 test of the exact problem the unified system is intended to address:
 condition change plus local candidate competition.
+
+It does **not** provide a sufficiently large hard-query denominator by itself.
+After requiring a fixed query/reference condition pair and at least one real
+10-ppm competitor, the preliminary panels contain hundreds rather than tens
+of thousands of independent queries.  MultiMS2 is therefore a focused
+cross-condition confirmation and OOD stress source, not the sole final SOTA
+benchmark.  A separate large, genuinely unused source is still required.
 
 ## Frozen benchmark definition
 
@@ -74,6 +83,13 @@ The builder writes sanitized spectra and observable candidate panels under
 under `sealed_truth_do_not_open_during_scoring/`.  Model scoring must finish
 for WSE, A, B, C, and the old four-module system before the sealed directory
 is opened once for paired evaluation.
+
+This is procedural filesystem separation, not cryptographic or third-party
+blinding, because MultiMS2 labels are public and both directories are produced
+by the same job.  The result must be described accordingly.  Query and
+candidate collection labels (NEXUS, Selleck, MSMLS) are retained so confidence
+intervals and error exchange can be clustered or stratified by acquisition
+source rather than treating repeated spectra as independent.
 
 ## Pre-score feasibility only
 
@@ -110,4 +126,6 @@ This job downloads the exact pinned source if needed, validates its hash,
 loads every required consumed source, builds the observable and sealed
 artifacts, and stops.  It does not load B, compute method scores, read Enveda,
 or open external truth.  The next implementation is authorized only after the
-full report shows a viable primary denominator.
+full report shows a viable primary denominator.  Even a viable result makes
+MultiMS2 a cross-condition confirmation panel; it does not remove the need for
+a separate large external benchmark.

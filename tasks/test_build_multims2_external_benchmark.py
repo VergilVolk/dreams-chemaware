@@ -22,6 +22,7 @@ def fixture() -> pd.DataFrame:
                 "source_row": source_row,
                 "ik14": ik14,
                 "formula": formula,
+                "source_collection": "NEXUS" if ik14 != "AAAAAAAAAAAAAA" else "SELLECK",
                 "smiles": "CCO",
                 "precursor_mz": mz,
                 "fragmentation_method": method,
@@ -41,6 +42,8 @@ def main() -> None:
     assert "query_ik14" not in observable
     assert "candidate_label" not in observable
     assert "near_query" not in observable
+    assert set(truth["query_source_collection"]) == {"NEXUS", "SELLECK"}
+    assert set(observable["candidate_source_collection"]) == {"NEXUS", "SELLECK"}
     assert np.array_equal(observable["query_token"], truth["query_token"])
     assert len(observable["query_ptr"]) == 3
     positive_positions = []

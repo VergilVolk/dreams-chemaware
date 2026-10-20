@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Build a score-blind MultiMS2 external retrieval benchmark.
+"""Build a score-blind MultiMS2 cross-condition confirmation benchmark.
 
 The primary endpoint is positive-mode [M+H]+ CID 60 eV query retrieval
 against a fixed CID 40 eV reference library in a complete 10-ppm mass
@@ -9,6 +9,10 @@ required source in the consumed-source registry before any model is scored.
 
 Observable panels deliberately omit query identities and labels.  Truth is
 written to separate files for a later, one-time evaluation step.
+
+This source is not represented as a sole large final benchmark: the number of
+independent identities with both fixed conditions and a genuine 10-ppm
+competitor is expected to be in the hundreds, not tens of thousands.
 """
 from __future__ import annotations
 
@@ -148,6 +152,7 @@ def source_records(
             "inchikey": inchikey,
             "smiles": smiles,
             "formula": formula,
+            "source_collection": clean(fields.get("DESCRIPTION")) or "UNKNOWN",
             "precursor_mz": precursor_mz,
             "precursor_structure_ppm": ppm_error,
             "adduct": adduct,
@@ -219,10 +224,12 @@ def build_panel(
     candidate_ids = []
     candidate_formulas = []
     candidate_smiles = []
+    candidate_collections = []
     candidate_mz = []
     query_ptr = [0]
     truth_ids = []
     truth_formulas = []
+    query_collections = []
     labels = []
     near = []
 
@@ -241,6 +248,7 @@ def build_panel(
         query_mz.append(float(row.precursor_mz))
         truth_ids.append(str(row.ik14))
         truth_formulas.append(str(row.formula))
+        query_collections.append(str(row.source_collection))
         local_labels = (candidates.ik14 == row.ik14).to_numpy(bool)
         labels.extend(local_labels.tolist())
         near.append(bool(np.any((candidates.formula == row.formula).to_numpy(bool) & ~local_labels)))
@@ -248,6 +256,7 @@ def build_panel(
         candidate_ids.extend(candidates.ik14.astype(str).tolist())
         candidate_formulas.extend(candidates.formula.astype(str).tolist())
         candidate_smiles.extend(candidates.smiles.astype(str).tolist())
+        candidate_collections.extend(candidates.source_collection.astype(str).tolist())
         candidate_mz.extend(candidates.precursor_mz.astype(float).tolist())
         query_ptr.append(len(candidate_rows))
 
@@ -261,6 +270,7 @@ def build_panel(
         "candidate_ik14": np.asarray(candidate_ids, dtype=np.str_),
         "candidate_formula": np.asarray(candidate_formulas, dtype=np.str_),
         "candidate_smiles": np.asarray(candidate_smiles, dtype=np.str_),
+        "candidate_source_collection": np.asarray(candidate_collections, dtype=np.str_),
         "candidate_precursor_mz": np.asarray(candidate_mz, dtype=np.float64),
         "query_fragmentation_method": np.asarray(query_method),
         "query_collision_energy": np.asarray(query_energy, dtype=np.float64),
@@ -274,6 +284,7 @@ def build_panel(
         "query_token": np.asarray(query_tokens, dtype=np.str_),
         "query_ik14": np.asarray(truth_ids, dtype=np.str_),
         "query_formula": np.asarray(truth_formulas, dtype=np.str_),
+        "query_source_collection": np.asarray(query_collections, dtype=np.str_),
         "query_ptr": np.asarray(query_ptr, dtype=np.int64),
         "candidate_label": np.asarray(labels, dtype=np.int8),
         "near_query": np.asarray(near, dtype=bool),
@@ -295,6 +306,7 @@ def build_panel(
         "competitive_queries": len(query_rows),
         "candidate_identities": len(candidate_rows),
         "near_queries": int(np.sum(near)),
+        "query_source_collections": dict(Counter(query_collections)),
     }
     return observable, truth, report
 
@@ -417,12 +429,14 @@ def main() -> None:
                 "mgf_sha256": actual_source_hash,
             },
             "scientific_role": {
-                "evaluation_role": "new_external_confirmation",
+                "evaluation_role": "independent_cross_condition_confirmation_candidate",
                 "primary_endpoint": "CID 60 eV query -> CID 40 eV reference; positive [M+H]+; complete 10-ppm candidate window",
                 "secondary_endpoint": "EAD 16 eV query -> CID 40 eV reference; prespecified OOD stress test",
                 "selection_scores_opened": False,
                 "model_loaded": False,
                 "enveda_accessed": False,
+                "sufficient_as_sole_large_final_benchmark": False,
+                "boundary": "valuable for fixed-condition transfer and source-clustered error exchange; expected competitive identity count is too small to replace a separate large external benchmark",
             },
             "exclusion_registry": str(args.exclusion_registry),
             "exclusion_registry_sha256": sha256_file(args.exclusion_registry),
@@ -452,6 +466,7 @@ def main() -> None:
                 "scoring_input_directory": "observable",
                 "sealed_directory": "sealed_truth_do_not_open_during_scoring",
                 "required_scoring_behavior": "score observable artifacts first; open sealed truth once only after all method outputs are complete",
+                "separation_strength": "procedural filesystem separation, not cryptographic or third-party blinding",
             },
         }
         (staging / "report.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
