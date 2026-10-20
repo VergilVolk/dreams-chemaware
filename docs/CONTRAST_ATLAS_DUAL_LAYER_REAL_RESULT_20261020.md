@@ -95,6 +95,34 @@ Metabolomic Contrast Atlas 的核心对象是研究级、有方向、有幅度�
 
 这些是非校准 sensitivity，不是随机化 p 值。它说明 known IBD 信号最强，unresolved 有提示性但尚不充分；HFD 关系没有稳定改善。centered kernel 因而是值得保留的关系层候选算子，但尚未通过 unknown-information gate。
 
+### 4.2 IBD200 板次混杂否证
+
+成人 IBD200 元数据进一步显示，19 个健康对照全部位于 Plate3，而 158 个 CD/UC 病例分布于 Plate1、Plate2、Plate3 和未标注板次。原始 `adult_all_ibd_vs_healthy` 响应因此与板次完美混杂，不能作为纯疾病效应。
+
+在唯一同时包含病例和健康对照的 Plate3 内重算 36 个 CD/UC 与 19 个 HC：
+
+- 固定 QC+MS/MS 候选仍为 746 个；
+- 662 个实体获得有限且正的 SE，其中 library-supported 135、unresolved 527；
+- 84 个 Plate3 内效应不可估计的实体明确弃权；
+- 原始与 Plate3 beta 的 Pearson 相关为 0.859；
+- 不确定性收缩响应权重相关为 0.782；
+- beta 符号一致率为 81.72%。
+
+使用 Plate3 响应重跑 centered kernel 后：
+
+| Direction / world | 原 alignment-strength rank | Plate3 rank |
+|---|---:|---:|
+| pediatric → adult, all | 5 | 5 |
+| pediatric → adult, known | 1 | 6 |
+| pediatric → adult, unresolved | 6 | 5 |
+| adult → pediatric, all | 1 | 7 |
+| adult → pediatric, known | 1 | 1 |
+| adult → pediatric, unresolved | 3 | 5 |
+
+最醒目的成人→儿童 `all` Top-1 消失，儿童→成人 `known` 也从 1 降到 6。Plate3 的 unresolved signed-similar 排名仍为 3/4，但 alignment-strength 仅为 5/5，且 31 次分层响应重排中同样好或更好的比例为 0.194/0.290。
+
+因此，原 IBD Top-1 不能继续作为关系层成功证据。更严格的结论是：IBD 跨研究响应存在提示性的正向谱学关系，但当前排名对成人效应估计和板次混杂敏感，尚未形成稳健、可裁决的 biological-response retrieval。
+
 ## 5. 中心裁决
 
 当前七来源资产是真实的公共响应底座，但还没有证明 Metabolomic Contrast Atlas 的中心命题：
@@ -127,4 +155,7 @@ Metabolomic Contrast Atlas 的核心对象是研究级、有方向、有幅度�
 - 开放 Top-1（含并列）：`open_relation_top_hits.tsv`
 - 组成中心化响应核：`tasks/run_contrast_atlas_centered_response_kernel.py`
 - 中心化结果：`data/validation/contrast_atlas_centered_response_kernel_v2_20261020/report.json`
+- IBD200 板次审计：`tasks/audit_ibd200_plate_confounding_response.py`
+- Plate3 重算集合：`data/validation/contrast_atlas_open_response_collection_ibd200_plate3_v2_20261020/report.json`
+- Plate3 centered-kernel 结果：`data/validation/contrast_atlas_centered_response_kernel_ibd200_plate3_v2_20261020/report.json`
 

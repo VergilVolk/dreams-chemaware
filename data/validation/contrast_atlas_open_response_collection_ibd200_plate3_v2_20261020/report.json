@@ -1,0 +1,66 @@
+{
+  "schema": "contrast_atlas_ibd200_plate3_response_sensitivity_v1",
+  "status": "DEVELOPMENT_CONSUMED_PLATE_CONFOUNDING_SENSITIVITY_COMPLETE",
+  "confounding_audit": {
+    "diagnosis_by_plate": {
+      "Plate1": {
+        "CD": 31,
+        "HC": 0,
+        "UC": 14
+      },
+      "Plate2": {
+        "CD": 49,
+        "HC": 0,
+        "UC": 26
+      },
+      "Plate3": {
+        "CD": 19,
+        "HC": 19,
+        "UC": 17
+      },
+      "not applicable": {
+        "CD": 2,
+        "HC": 0,
+        "UC": 0
+      }
+    },
+    "all_healthy_controls_on_plate3": true,
+    "primary_effect_denominators": {
+      "ibd": 158,
+      "healthy": 19
+    },
+    "plate3_effect_denominators": {
+      "ibd": 36,
+      "healthy": 19
+    },
+    "fixed_qc_ms2_entities": 746,
+    "plate3_response_estimable_entities": 662,
+    "plate3_response_unestimable_abstained": 84,
+    "plate3_library_supported_entities": 135,
+    "plate3_unresolved_entities": 527
+  },
+  "effect_change": {
+    "pearson_beta": 0.8588750032195105,
+    "pearson_uncertainty_shrunk_weight": 0.7819691138446465,
+    "sign_concordance": 0.8172205438066465,
+    "median_absolute_beta_change": 0.0695048044114511
+  },
+  "claim_boundary": [
+    "Plate3 restriction removes perfect healthy-control/plate confounding but is not an independent cohort.",
+    "The 746 QC+MS2 candidate boundary and frozen identity labels are retained; 84 entities with unestimable Plate3 response are explicitly excluded.",
+    "This sensitivity can invalidate a biological interpretation but cannot externally confirm one.",
+    "All inputs are development/consumed."
+  ],
+  "input_sha256": {
+    "data\\reference\\contrast_atlas_ibd_cross_study_20261014\\adult_ibd200_gnps_quant.csv": "515c4821d9b0b86322cd7d6493ae9a5345a4541babbf189214e97719ed1e05fb",
+    "data\\reference\\contrast_atlas_ibd_cross_study_20261014\\adult_ibd200_metadata.tsv": "8b5ab6e63dbb55f059ee3e14fe2d200c8e3040d6a9646d79cb4b9441d07dae03",
+    "data\\reference\\contrast_atlas_ibd_cross_study_20261014\\adult_ibd200_consensus.mgf": "6aeba8b4c1e9cc94e127985cc18bde9a4d1df8c99030d470d4cec888bc5465e6",
+    "data\\validation\\contrast_atlas_open_response_collection_v3_ibd_20261019\\response_entities.tsv.gz": "e8c4cf916199bd1e4c6aa8428dc048f742b412ce7a54e8c5a360013592c1a501"
+  },
+  "output_sha256": {
+    "response_entities.tsv.gz": "1be14dcf162be1a0f1269892c05e48e28b9246174be7fdf6b9c09c1a83bd8409",
+    "contrast_manifest.tsv": "ecd69255838ea7f26c2631b1a3a0140bc5d0122b91e910c4492520b8e60ce542",
+    "source_manifest.tsv": "44c95ccfedb1c1f4cf8a501929377e54c0011595b932d645c975ab6315c8711d",
+    "registered_relations.tsv": "90124b6821adf6155ecbe668e2628004e9883a0602c9603f5fc68617a588cf3d"
+  }
+}

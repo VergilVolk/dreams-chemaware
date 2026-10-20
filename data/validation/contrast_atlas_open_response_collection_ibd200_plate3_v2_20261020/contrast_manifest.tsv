@@ -1,0 +1,19 @@
+study_id	source_family	contrast_id	species	biospecimen	design	condition_family	independent_units	eligible_response_entities	library_supported_response_entities	unresolved_response_entities	source_disjoint_candidate_contrasts
+MSV000097426	MSV000097426	mouse_hfd_vs_nfd	Mus musculus	urine	HFD minus NFD	high_fat_diet	12	2163	50	2113	17
+MSV000084112	MSV000084112	diabetes_normal_weight	Homo sapiens	urine	T1D minus healthy within normal weight	type_1_diabetes	24	5501	111	5390	14
+MSV000084112	MSV000084112	diabetes_obese	Homo sapiens	urine	T1D minus healthy within obesity	type_1_diabetes	24	5501	111	5390	14
+MSV000084112	MSV000084112	obesity_with_diabetes	Homo sapiens	urine	obese minus normal weight within T1D	obesity	24	5501	111	5390	14
+MSV000084112	MSV000084112	obesity_without_diabetes	Homo sapiens	urine	obese minus normal weight without T1D	obesity	24	5501	111	5390	14
+MSV000083077	MSV000083077	depression_nonobese	Homo sapiens	saliva	higher minus lower depressive symptoms without obesity	depressive_symptoms	39	7132	77	7055	14
+MSV000083077	MSV000083077	depression_obese	Homo sapiens	saliva	higher minus lower depressive symptoms with obesity	depressive_symptoms	23	7132	77	7055	14
+MSV000083077	MSV000083077	obesity_high_depression	Homo sapiens	saliva	obese minus nonobese within higher depressive symptoms	obesity	32	7132	77	7055	14
+MSV000083077	MSV000083077	obesity_low_depression	Homo sapiens	saliva	obese minus nonobese within lower depressive symptoms	obesity	30	7132	77	7055	14
+MSV000088023	MSV000088023	female_hfd_vs_normal	Mus musculus	plasma	female HFD minus female normal diet	high_fat_diet	20	212	5	207	14
+MSV000088023	MSV000088023	male_hfd_vs_normal	Mus musculus	plasma	male HFD minus male normal diet	high_fat_diet	19	212	5	207	14
+MSV000088023	MSV000088023	female_vs_male_hfd	Mus musculus	plasma	female minus male within HFD	biological_sex	20	212	5	207	14
+MSV000088023	MSV000088023	female_vs_male_normal	Mus musculus	plasma	female minus male within normal diet	biological_sex	19	212	5	207	14
+MSV000090788	MSV000090788	lesion_vs_nonlesion_paired	Homo sapiens	skin	lesional minus nonlesional paired skin	atopic_dermatitis_local	30	1711	37	1674	15
+MSV000090788	MSV000090788	lesion_vs_healthy	Homo sapiens	skin	lesional AD minus healthy skin	atopic_dermatitis	60	2276	51	2225	15
+MSV000090788	MSV000090788	nonlesion_vs_healthy	Homo sapiens	skin	nonlesional AD minus healthy skin	atopic_dermatitis_field	60	2259	50	2209	15
+MSV000097610	MSV000097610_veo_ibd_case_control	pediatric_veoibd_vs_healthy	Homo sapiens	feces	pediatric VEO-IBD minus healthy	inflammatory_bowel_disease	48	6081	480	5601	17
+IBD200_GROUP	IBD200_MSV000084775_MSV000084908_MSV000086509	adult_all_ibd_vs_healthy	Homo sapiens	feces	adult Crohn disease or ulcerative colitis minus healthy	inflammatory_bowel_disease	55	662	135	527	17
