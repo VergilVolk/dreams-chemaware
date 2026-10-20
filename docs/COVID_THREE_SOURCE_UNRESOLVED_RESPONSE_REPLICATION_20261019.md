@@ -6,17 +6,17 @@ Role: biology-method development
 
 Evidence status: all sources are public, outcome-open, development/consumed; none is unopened external confirmation
 
-## The experiment we actually need
+## A necessary calibration experiment, not the whole method
 
 This is not a contest to recognize that three datasets all carry the label `COVID-19`. It is not a two-candidate study matcher, and it does not treat disease-name agreement as biological truth.
 
-The claim-bearing unit is a chemical response family: phenotype-blind MS/MS evidence links features before case-control effects are opened; effects are then estimated independently within each study with direction and uncertainty. Two sources may nominate a response family. Its membership, response channel, direction, aggregation rule, and multiplicity procedure are frozen before the third source is opened. The third source either reproduces that family-level response, contradicts it, lacks measurement support, or yields no match.
+The claim-bearing unit is an identity-calibrated unresolved ion entity: phenotype-blind MS/MS evidence and precursor/adduct compatibility link features before case-control effects are opened; effects are then estimated independently within each study with direction and uncertainty. Two sources may nominate the entity. Its linkage rule, response channel, direction, aggregation rule, and multiplicity procedure are frozen before the third source is opened. The third source either reproduces that entity-level response, contradicts it, lacks measurement support, or yields no match. Spectrally related analogues are reported on a separate hypothesis track and never counted as replication of the same entity.
 
 The primary falsifiable question is:
 
-> Can unresolved MS/MS-linked chemical response families discovered in two independent plasma studies reproduce in a third independent plasma study, and can they add a correct conclusion that a measurement-matched known-only analysis cannot provide?
+> Can identity-calibrated unresolved MS/MS entities discovered in two independent plasma studies reproduce in a third independent plasma study, and can they add a correct conclusion that a measurement-matched known-only analysis cannot provide?
 
-This is the minimum experiment that tests whether public biological responses can become accumulable knowledge units. Whole-study retrieval remains a downstream use, not the truth definition.
+This is one minimum calibration that tests whether public biological responses can become accumulable knowledge units. It cannot by itself establish a general Atlas method because all three studies concern one disease and all outcomes are already public. Whole-study retrieval remains a downstream use, not the truth definition.
 
 ## Three independent public sources
 
@@ -64,9 +64,9 @@ There are three rotations. In each, two sources are discovery sources and the th
 2. `MSV000085505 + MSV000092887 -> MTBLS1866`;
 3. `MTBLS1866 + MSV000092887 -> MSV000085505`.
 
-Spectral edges may use precursor and fragment evidence, acquisition metadata, within-source ion-family evidence, and a frozen algorithm score. They may not use case-control labels, beta, standard errors, p-values or candidate condition names. Exact planar identities calibrate whether cross-source chemical linking works; they are not biological-response truth.
+Identity edges may use precursor/neutral-mass and adduct compatibility, fragment evidence, acquisition metadata, within-source ion-family evidence, and a frozen algorithm score. They may not use case-control labels, beta, standard errors, p-values or candidate condition names. Exact planar identities calibrate whether cross-source entity linking works; they are not biological-response truth. Cross-mass spectral neighbours belong to the separate chemical-relation track.
 
-After the graph is frozen, the two discovery sources nominate same-direction or explicitly heterogeneous response families. The held-out source is then opened once. A family is counted as replicated only under the frozen direction, confidence-interval and multiplicity rules. No match and inadequate measurement support remain visible denominators rather than being removed.
+After the graph is frozen, the two discovery sources nominate same-direction or explicitly heterogeneous entity responses. The held-out source is then opened once. An entity is counted as replicated only under the frozen direction, confidence-interval and multiplicity rules. No match and inadequate measurement support remain visible denominators rather than being removed.
 
 ## Controls that distinguish science from more coverage
 
@@ -81,7 +81,7 @@ Every conclusion must be compared on the same measurement and candidate universe
 7. strict-identity positive calibration;
 8. source-wise effects, heterogeneity and leave-one-ion-family sensitivity.
 
-The unknown-information claim passes only if at least one held-out response family survives frozen multiplicity control, is not recoverable by measurement-matched known-only, weakens under unresolved-MS2 shuffling, and is not driven by one source or redundant ions. Structure need not be asserted. The biological output must instead state the exact studies, response directions, uncertainty, evidence level, and a falsifiable follow-up.
+The unknown-information claim passes only if at least one held-out, identity-calibrated unresolved entity response survives frozen multiplicity control, is not recoverable by measurement-matched known-only, weakens under unresolved-MS2 shuffling, and is not driven by one source or redundant ions. Structure need not be asserted. The biological output must instead state the exact studies, response directions, uncertainty, evidence level, and a falsifiable follow-up.
 
 If no unresolved family replicates in any rotation, or known-only/identity-field/mass-only produces the same result, the central biological-method claim fails. That negative result must not be rescued by retuning a disease-specific score.
 

@@ -1,0 +1,87 @@
+{
+  "schema": "contrast_atlas_identity_relation_boundary_audit_v1",
+  "status": "DEVELOPMENT_CONSUMED_IDENTITY_RELATION_BOUNDARY_AUDITED",
+  "evidence_role": {
+    "dataset_status": "development_consumed",
+    "leakage_state": "strict_identity_truth_opened_post_graph_for_diagnostic_calibration",
+    "external_confirmation_claim": false,
+    "threshold_selection_claim": false
+  },
+  "frozen_graph": {
+    "all_world_directional_edges": 5695,
+    "edges_with_both_precursor_masses": 5695,
+    "precursor_mass_coverage": 1.0,
+    "median_absolute_delta_da": 1.982155980000016,
+    "within_5ppm": 2347,
+    "within_10ppm": 2379,
+    "within_20ppm": 2395
+  },
+  "strict_identity_calibration": {
+    "truth_query_target_source_groups": 124,
+    "previous_answered_groups": 100,
+    "previous_correct_groups": 87,
+    "previous_precision_among_answered": 0.87,
+    "correct_edges_within_5ppm": 87,
+    "incorrect_edges_within_5ppm": 4,
+    "incorrect_edges_beyond_5ppm": 9,
+    "mass_compatibility_sensitivity": {
+      "5ppm": {
+        "answered_groups": 91,
+        "correct_groups": 87,
+        "precision_among_answered": 0.9560439560439561,
+        "coverage_of_all_truth_groups": 0.7338709677419355,
+        "coverage_of_previous_answered_groups": 0.91
+      },
+      "10ppm": {
+        "answered_groups": 91,
+        "correct_groups": 87,
+        "precision_among_answered": 0.9560439560439561,
+        "coverage_of_all_truth_groups": 0.7338709677419355,
+        "coverage_of_previous_answered_groups": 0.91
+      },
+      "20ppm": {
+        "answered_groups": 91,
+        "correct_groups": 87,
+        "precision_among_answered": 0.9560439560439561,
+        "coverage_of_all_truth_groups": 0.7338709677419355,
+        "coverage_of_previous_answered_groups": 0.91
+      }
+    }
+  },
+  "transitive_component_diagnostic": {
+    "mutual_unordered_edges": 990,
+    "transitive_components": 750,
+    "calibratable_components_with_at_least_two_strict_identities": 20,
+    "identity_pure_calibratable_components": 14,
+    "identity_pure_component_fraction": 0.7,
+    "known_member_pairs_in_calibratable_components": 54,
+    "known_member_pairs_belonging_to_pure_components": 28,
+    "pure_component_pair_fraction": 0.5185185185185185
+  },
+  "scientific_decision": {
+    "identity_track": "Quantitative effects may be combined only across precursor/adduct-compatible, identity-calibrated links; a calibrated no-match option is mandatory.",
+    "relation_track": "Cross-mass spectral neighbours remain chemical-analogy hypotheses and may not count as replication of one entity or be meta-analysed as one effect.",
+    "transitive_family_closure": "forbidden_for_claim_bearing_identity_evidence"
+  },
+  "claim_boundary": [
+    "The 5/10/20 ppm rows are a posttruth development sensitivity grid, not a selected production threshold.",
+    "Planar identity is used only to diagnose the already-frozen graph.",
+    "Mass compatibility alone does not establish identity, especially across adducts and isomers.",
+    "No unresolved entity, cross-study response, or biological mechanism is validated by this audit."
+  ],
+  "provenance": {
+    "collection_contract_sha256": "259b7fe26841501ce2c82ac4b61becb6ee8657491f3417fb483cd385bf267a98",
+    "frozen_edges_sha256": "5a7a9f83bd0f3cbf2244e4afce5eb8e870786b44b9186642b0f1043d2e581424",
+    "strict_truth_audit_sha256": "a1d30711a45e14da311376353c237d4a9c27fd6d78a5bd831adf0efff26db09d",
+    "strict_identity_ledger_sha256": "ceda6ad6570f93a80f9d4a2929b996b07b8dae7af3f1fc6105c871e560fc5a05",
+    "mgf_sha256": {
+      "MSV000097426": "eb6b4517c2ad70b718c5384ff7378e24e650a4ef8333669df84de95a436f8b42",
+      "MSV000084112": "5831e21a5e519903802aab5ae29da92e363ebb674e4a27142193260627443a8f",
+      "MSV000083077": "8833c9a4a80b2ac508875395ff9e3750075e2616dc42532d55875a63ce33a8c8",
+      "MSV000088023": "59ceb4d533b480760bf93c47dc9213de44e271d0fd521b7e8ecdf67615d5fada",
+      "MSV000090788": "57cc380fac1563bfdf736c3208a4cad09f6ce39b991bbd4363b083bb1b93c659"
+    },
+    "edge_output_sha256": "fc7dfb7d520aff79d118b3f80ca9fbc6c431da0d6f2d3d06b4a5bc5f38acdf9c",
+    "truth_output_sha256": "e8b5b5cce1cd70d7b6c85021db913d7ea777122967b12a580cb67475a378528f"
+  }
+}

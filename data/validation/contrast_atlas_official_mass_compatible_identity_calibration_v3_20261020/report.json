@@ -1,0 +1,56 @@
+{
+  "schema": "contrast_atlas_mass_compatible_identity_calibration_v1",
+  "status": "DEVELOPMENT_CONSUMED_POSTTRUTH_MASS_COMPATIBLE_IDENTITY_CALIBRATION_COMPLETE",
+  "evidence_role": {
+    "dataset_status": "development_consumed",
+    "leakage_state": "strict_identity_opened_only_after_graph_was_written",
+    "external_confirmation_claim": false
+  },
+  "primary_all_world_result": {
+    "truth_query_target_source_groups": 124,
+    "answered": 95,
+    "coverage": 0.7661290322580645,
+    "correct": 91,
+    "precision_among_answered": 0.9578947368421052
+  },
+  "world_summary": [
+    {
+      "evidence_world": "all",
+      "strict_truth_query_target_source_groups": 124,
+      "frozen_top1_edge_available": 95,
+      "frozen_top1_edge_coverage": 0.7661290322580645,
+      "top1_exact_identity_correct": 91,
+      "top1_exact_identity_accuracy_conditional_on_edge": 0.9578947368421052
+    },
+    {
+      "evidence_world": "known",
+      "strict_truth_query_target_source_groups": 124,
+      "frozen_top1_edge_available": 94,
+      "frozen_top1_edge_coverage": 0.7580645161290323,
+      "top1_exact_identity_correct": 93,
+      "top1_exact_identity_accuracy_conditional_on_edge": 0.9893617021276596
+    },
+    {
+      "evidence_world": "unresolved",
+      "strict_truth_query_target_source_groups": 124,
+      "frozen_top1_edge_available": 0,
+      "frozen_top1_edge_coverage": 0.0,
+      "top1_exact_identity_correct": 0,
+      "top1_exact_identity_accuracy_conditional_on_edge": null
+    }
+  ],
+  "claim_boundary": [
+    "This calibrates known exact planar identities, not unresolved entities.",
+    "It validates neither a biological response nor an unknown-information increment.",
+    "The graph uses official DreaMS only; frozen Noise/P2b/unified comparisons remain required.",
+    "All studies are development/consumed."
+  ],
+  "provenance": {
+    "graph_report_sha256": "9dffb30272ed342bdc04a9e573c943fa68c0cbe13a4cc3caddb03a679494a960",
+    "graph_edges_sha256": "0305bcc72f93383bd38af5be12edf98bf87a6c42503bc45a9e2f741dc87dd2d6",
+    "truth_report_sha256": "b44b7337308c3790baa35fd565a2b2b75447917dc9ad54218b1e56f51daadb4e",
+    "truth_pairs_sha256": "365c6dfc18062e78d45ac922412dab31b5828885c12fabc002e0ee34d335bdf0",
+    "world_summary_sha256": "b1768f7905d9cd2f81e8e0878c3d8a9314a0c39b64a90189a208256609b3a6c2",
+    "detail_sha256": "760aef8ae05710c2836ab834b92c544c8a5ac345e30e65016798cb80d99bbe47"
+  }
+}

@@ -1,0 +1,4 @@
+evidence_world	strict_truth_query_target_source_groups	frozen_top1_edge_available	frozen_top1_edge_coverage	top1_exact_identity_correct	top1_exact_identity_accuracy_conditional_on_edge
+all	124	95	0.7661290322580645	91	0.9578947368421052
+known	124	94	0.7580645161290323	93	0.9893617021276596
+unresolved	124	0	0.0	0	NA

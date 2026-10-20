@@ -1,0 +1,43 @@
+{
+  "schema": "contrast_atlas_mass_compatible_identity_graph_v1",
+  "status": "DEVELOPMENT_CONSUMED_MASS_COMPATIBLE_IDENTITY_GRAPH_FROZEN",
+  "data_role": "development_consumed",
+  "method_id": "official",
+  "parameters": {
+    "precursor_tolerance_ppm": 10.0,
+    "minimum_cosine": 0.7,
+    "neighbors_per_query_target_source": 1,
+    "selection": "maximum frozen-embedding cosine among precursor-compatible candidates"
+  },
+  "leakage_status": "graph reads only entity IDs, frozen identity partitions, precursor masses, and frozen embeddings; no beta, SE, contrast, phenotype, relation label, or strict identity truth",
+  "denominators": {
+    "studies": 5,
+    "entities": 17358,
+    "source_pair_world_graphs": 30,
+    "directional_edges": 4884,
+    "all_world_directional_edges": 2516
+  },
+  "claim_boundary": [
+    "The 10 ppm default is frozen for this post-audit development build, not an external validation choice.",
+    "Precursor compatibility and spectral similarity do not by themselves prove identity.",
+    "Known and unresolved worlds are controls; unresolved does not mean a unique novel metabolite.",
+    "This graph contains no biological-response result."
+  ],
+  "provenance": {
+    "collection_contract_sha256": "259b7fe26841501ce2c82ac4b61becb6ee8657491f3417fb483cd385bf267a98",
+    "response_entities_sha256": "b88a311ee92190477aaaa5b14a179aa1471777b780aca8de21d871b39605bafe",
+    "embedding_manifest_sha256": "1567b033837430f17d4728752100bb532e41e2d41f2ab0a08cbe0f817091a3ed",
+    "embedding_MSV000097426_sha256": "3b05b3257619ce15c5db2508cfd34409dc9cb0450291b98ef97dc0e6087d6268",
+    "mgf_MSV000097426_sha256": "eb6b4517c2ad70b718c5384ff7378e24e650a4ef8333669df84de95a436f8b42",
+    "embedding_MSV000084112_sha256": "96dc33ed05937bdac3f259aa494e22ec884aec411102421b1fbe835aeb468f35",
+    "mgf_MSV000084112_sha256": "5831e21a5e519903802aab5ae29da92e363ebb674e4a27142193260627443a8f",
+    "embedding_MSV000083077_sha256": "86719f24dbdd59b2081c3e91c590a890a4337a74c4fef848b19e5c6cb2e9f89d",
+    "mgf_MSV000083077_sha256": "8833c9a4a80b2ac508875395ff9e3750075e2616dc42532d55875a63ce33a8c8",
+    "embedding_MSV000088023_sha256": "770a8720e03d4c3d0fb9e40bb51760df2da6fb56029da45b10f7e49d2e36f717",
+    "mgf_MSV000088023_sha256": "59ceb4d533b480760bf93c47dc9213de44e271d0fd521b7e8ecdf67615d5fada",
+    "embedding_MSV000090788_sha256": "9540acec433a6cf50b843acc0bbf8d015770e5ac36b54d4bbfe778f415f55174",
+    "mgf_MSV000090788_sha256": "57cc380fac1563bfdf736c3208a4cad09f6ce39b991bbd4363b083bb1b93c659",
+    "edges_sha256": "0305bcc72f93383bd38af5be12edf98bf87a6c42503bc45a9e2f741dc87dd2d6",
+    "graph_summary_sha256": "360e39456ebc1dae286e6ecdc7b47d34c9f29c4becb21673d2440388a3af4f45"
+  }
+}
