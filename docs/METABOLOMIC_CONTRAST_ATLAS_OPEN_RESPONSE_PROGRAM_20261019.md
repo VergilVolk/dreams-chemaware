@@ -222,3 +222,5 @@ Every open query must yield one of:
 Metabolomic Contrast Atlas 的总目标冻结为**研究级、有方向、有幅度和不确定性的公共生物学响应检索**。身份层回答同一实体复现，化学关系层回答不同但相关实体的可验证响应关联；后者不能合并同一分子的 beta/SE，但不得被降级为普通谱图邻居查询。后续算子失败只修改算子，不再重定义课题。
 
 现有 7 来源、18 对比的真实双层结果已经集中复算。严格身份层在 6 条登记关系中仅回答 2 条、弃权 4 条；关系层 `all` 与 `unresolved` 对 6 条登记关系的四类评分均为 0/6 Top-1。集合没有 signed-direction truth，因此正确/错误开放检索均不可裁决，unknown 增量尚未证明。完整数字与产物见 `docs/CONTRAST_ATLAS_DUAL_LAYER_REAL_RESULT_20261020.md`。所有结果均为 development / consumed。
+
+同日新增的组成中心化响应核把 IBD 双向 signed-similar 排名从 `all` 5/4 改善到 3/1、从 `unresolved` 5/7 改善到 3/3；composition 排名并未同步改善，说明算子开始捕获响应特异信号。但 31 次分层响应重排尚未给出充分的 unresolved 证据，HFD 仍失败，因此该结果只晋级为关系层候选算子，不改变 unknown 增量未证明的中心裁决。

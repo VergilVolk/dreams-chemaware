@@ -72,6 +72,29 @@ Metabolomic Contrast Atlas 的核心对象是研究级、有方向、有幅度�
 
 更关键的是，`all` 和 `unresolved` 没有让任何登记关系达到任一指标的 Top-1。因此当前关系算子没有显示 unresolved MS/MS 相对 known-only 的新增正确知识。
 
+### 4.1 组成中心化的响应核：真实开发结果
+
+为直接分离“研究的化学组成相似”和“MS/MS 碎片证据随有向响应共同变化”，新增了一个真值盲算子。每个 study × contrast × evidence world 内先计算 `beta/sqrt(beta^2+SE^2)`，再减去该研究内均值，将中心化响应权重作用于单位谱图，最后对所得 signed fragment vector 做 L2 标准化并跨研究比较。登记关系仍在完整候选表写出之后打开。
+
+相对未中心化 fragment-measure baseline，IBD 双向关系的 signed-similar 排名发生如下变化：
+
+| Evidence world | VEO-IBD → adult IBD200 | adult IBD200 → VEO-IBD |
+|---|---:|---:|
+| all，旧基线 | 5/17 | 4/17 |
+| all，centered kernel | 3/17 | 1/17 |
+| unresolved，旧基线 | 5/17 | 7/17 |
+| unresolved，centered kernel | 3/17 | 3/17 |
+| known，centered kernel | 1/17 | 1/17 |
+
+相应的 composition 排名为：`all` 13/17 与 8/17，`unresolved` 17/17 与 8/17，`known` 双向 1/17。由此可见，centered kernel 的 `all/unresolved` 排名改善不是简单复制 composition 排名；但 `known` 世界仍无法区分响应核增量和强烈的来源组成相似性。
+
+采用固定种子 `20261020` 做 31 次 study × contrast × identity-stratum 内响应权重重排。对 direction-agnostic alignment-strength 排名，真实 IBD 关系取得同样好或更好 null 排名的比例为：
+
+- VEO-IBD → adult IBD200：all 0.387、known 0.065、unresolved 0.194；
+- adult IBD200 → VEO-IBD：all 0.129、known 0.097、unresolved 0.161。
+
+这些是非校准 sensitivity，不是随机化 p 值。它说明 known IBD 信号最强，unresolved 有提示性但尚不充分；HFD 关系没有稳定改善。centered kernel 因而是值得保留的关系层候选算子，但尚未通过 unknown-information gate。
+
 ## 5. 中心裁决
 
 当前七来源资产是真实的公共响应底座，但还没有证明 Metabolomic Contrast Atlas 的中心命题：
@@ -102,4 +125,6 @@ Metabolomic Contrast Atlas 的核心对象是研究级、有方向、有幅度�
 - 身份层登记关系：`registered_identity_layer_results.tsv`
 - 关系层登记关系：`registered_relation_layer_results.tsv`
 - 开放 Top-1（含并列）：`open_relation_top_hits.tsv`
+- 组成中心化响应核：`tasks/run_contrast_atlas_centered_response_kernel.py`
+- 中心化结果：`data/validation/contrast_atlas_centered_response_kernel_v2_20261020/report.json`
 
