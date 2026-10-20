@@ -1,0 +1,146 @@
+{
+  "schema": "contrast_atlas_dual_layer_real_result_v1",
+  "status": "DEVELOPMENT_CONSUMED_CENTRAL_GATE_NOT_PASSED",
+  "scientific_target": "study-level directed quantitative biological-response retrieval; identity replication and chemically related response association are distinct, co-equal evidence layers",
+  "collection_denominators": {
+    "independent_studies": 7,
+    "source_families": 7,
+    "study_level_contrasts": 18,
+    "biological_units_across_sources": 446,
+    "representative_ms2_spectra": 54142,
+    "identity_partitioned_feature_entities": 31376,
+    "identity_partitioned_library_supported_entities": 1023,
+    "identity_partitioned_unresolved_entities": 30353,
+    "response_eligible_unique_feature_entities": 24185,
+    "response_eligible_library_supported_entity_union": 936,
+    "response_eligible_unresolved_entity_union": 23249,
+    "eligible_response_rows": 66616,
+    "library_supported_response_rows": 1602,
+    "unresolved_response_rows": 65014,
+    "source_disjoint_candidates_per_query_min": 14,
+    "source_disjoint_candidates_per_query_max": 17,
+    "registered_directed_relevance_relations": 6,
+    "registered_signed_direction_truth_relations": 0
+  },
+  "identity_layer": {
+    "role": "same-entity cross-study response replication; beta/SE may align only here",
+    "registered_relation_results": {
+      "registered_directed_relations": 6,
+      "score_available": 2,
+      "unavailable": 4,
+      "similar_top1": 1,
+      "unsigned_top1": 2,
+      "zero_shared_identity": 4
+    },
+    "all_fixed_candidate_pairs": 264,
+    "available_fixed_candidate_pairs": 56,
+    "unavailable_fixed_candidate_pairs": 208,
+    "identity_calibration_subset": {
+      "scope": "known-identity positive groups only; not open-set FDR",
+      "primary_all_world_result": {
+        "truth_query_target_source_groups": 124,
+        "answered": 95,
+        "coverage": 0.7661290322580645,
+        "correct": 91,
+        "precision_among_answered": 0.9578947368421052
+      },
+      "world_summary": [
+        {
+          "evidence_world": "all",
+          "strict_truth_query_target_source_groups": 124,
+          "frozen_top1_edge_available": 95,
+          "frozen_top1_edge_coverage": 0.7661290322580645,
+          "top1_exact_identity_correct": 91,
+          "top1_exact_identity_accuracy_conditional_on_edge": 0.9578947368421052
+        },
+        {
+          "evidence_world": "known",
+          "strict_truth_query_target_source_groups": 124,
+          "frozen_top1_edge_available": 94,
+          "frozen_top1_edge_coverage": 0.7580645161290323,
+          "top1_exact_identity_correct": 93,
+          "top1_exact_identity_accuracy_conditional_on_edge": 0.9893617021276596
+        },
+        {
+          "evidence_world": "unresolved",
+          "strict_truth_query_target_source_groups": 124,
+          "frozen_top1_edge_available": 0,
+          "frozen_top1_edge_coverage": 0.0,
+          "top1_exact_identity_correct": 0,
+          "top1_exact_identity_accuracy_conditional_on_edge": null
+        }
+      ]
+    },
+    "unknown_identity_increment": "NOT_ESTABLISHED"
+  },
+  "chemical_relation_layer": {
+    "role": "different chemically related entities may support response-pattern retrieval; their beta/SE are never pooled as the same molecule",
+    "method": "transparent sparse fragment-measure baseline",
+    "fixed_candidate_rows_per_world": 264,
+    "registered_relation_results_by_world": {
+      "all": {
+        "registered_directed_relations": 6,
+        "score_available": 6,
+        "top1_counts": {
+          "signed_similar": 0,
+          "signed_opposite": 0,
+          "unsigned_response": 0,
+          "composition": 0
+        }
+      },
+      "known": {
+        "registered_directed_relations": 6,
+        "score_available": 6,
+        "top1_counts": {
+          "signed_similar": 0,
+          "signed_opposite": 1,
+          "unsigned_response": 1,
+          "composition": 2
+        }
+      },
+      "unresolved": {
+        "registered_directed_relations": 6,
+        "score_available": 6,
+        "top1_counts": {
+          "signed_similar": 0,
+          "signed_opposite": 0,
+          "unsigned_response": 0,
+          "composition": 0
+        }
+      }
+    },
+    "open_top_hit_rows": 267,
+    "registered_design_relation_top_hit_rows_including_ties": 4,
+    "open_top_hit_truth_status": "UNADJUDICATED; unregistered pairs are not negatives"
+  },
+  "central_gate": {
+    "registered_design_relevance_relations": 6,
+    "registered_signed_direction_truth_relations": 0,
+    "adjudicated_correct_open_retrievals": 0,
+    "adjudicated_incorrect_open_retrievals": 0,
+    "reason": "No signed-direction biological truth was registered. The registered HFD and IBD relations permit descriptive ranking only, and open top hits are unadjudicated.",
+    "unknown_information_increment": "NOT_DEMONSTRATED",
+    "verdict": "The seven-source substrate is real, but neither a correct open biological discovery nor an unresolved-MS/MS increment over known-only is established."
+  },
+  "leakage_and_claim_status": {
+    "data_role": "development_consumed",
+    "collection_leakage_status": "within-study phenotype labels were used only to estimate frozen beta/SE; spectral registries and identity partitions are phenotype blind; no cross-study score or result was used to construct the collection",
+    "external_validation": false,
+    "unresolved_definition": "not library-supported under the frozen partition; not a unique metabolite"
+  },
+  "input_sha256": {
+    "data\\validation\\contrast_atlas_open_response_collection_v3_ibd_20261019\\report.json": "38df58bacd8a78abe1c5ee0595dbe9d881f53c93c1c5bc1dc88e0f5d2da104c4",
+    "data\\validation\\contrast_atlas_sparse_fragment_measure_baseline_v2_ibd_20261019\\report.json": "4fc52f51e9094bef1e7d7439f3e8b9ca30e05d2d5475998222338836b22cca66",
+    "data\\validation\\contrast_atlas_sparse_fragment_measure_baseline_v2_ibd_20261019\\fixed_candidate_scores.tsv.gz": "601fc6ffbf572407ac933fe039d52eb43309011e3621e14aec6db4b85ed112cd",
+    "data\\validation\\contrast_atlas_sparse_fragment_measure_baseline_v2_ibd_20261019\\registered_relation_absolute_ranks.tsv": "826e3897da7f1b364b0db6a52635c13bcf054d248355630e9f9369bcd2e7dea0",
+    "data\\validation\\contrast_atlas_strict_identity_known_response_baseline_v1_20261019\\report.json": "7f1df1e08e55529b62eb553ed9866d715db9dd4fd56146b659a2ccb221da43db",
+    "data\\validation\\contrast_atlas_strict_identity_known_response_baseline_v1_20261019\\registered_relation_absolute_ranks.tsv": "4ee4378710c75d11f38d5da4537f253c41d8be90b353e3dbcab94a55dd654747",
+    "data\\validation\\contrast_atlas_official_mass_compatible_identity_calibration_v3_20261020\\report.json": "7274cd8c5b04f5519dd917237d9f7b672d63bdf5d19c95d153002f376cfcb558",
+    "data\\validation\\contrast_atlas_open_response_collection_v3_ibd_20261019\\registered_relations.tsv": "633bf33e5c0ab1813779914dfa1bf91bc6437d78b0c7e0a94c0801eb8c9c600b"
+  },
+  "output_sha256": {
+    "open_relation_top_hits.tsv": "4deb3d03603e6e79f2fecf81ee1969a68c05d34290af7ad83ea3cf90acbd7257",
+    "registered_relation_layer_results.tsv": "1b1c271a1bce5cb47d9768d942ca934eaba89d232d1456cd71c63f2ef1848eba",
+    "registered_identity_layer_results.tsv": "59b0ed9251ce18a91ac9e6ac0e000abe879faf31c8919ccc47cd25dc568f02cc"
+  }
+}

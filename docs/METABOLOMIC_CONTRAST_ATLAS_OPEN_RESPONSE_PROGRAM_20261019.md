@@ -51,8 +51,8 @@ A new phenotype-blind identity graph was frozen before strict identity truth was
 
 The method now has two non-interchangeable outputs:
 
-1. **identity track** — precursor/neutral-mass and adduct-compatible, identity-calibrated links with a no-match option; only this track may accumulate beta/SE for the same unresolved entity across studies;
-2. **relation track** — cross-mass or analogue spectral neighbours; these may generate chemical-family hypotheses but cannot count as entity replication or share a meta-analytic effect.
+1. **identity track** — intended to use precursor/neutral-mass and adduct-compatible, identity-calibrated links with a no-match option; only this track may accumulate beta/SE for the same unresolved entity across studies. The current implementation is narrower: same observed precursor within 10 ppm, without full neutral-mass/adduct resolution;
+2. **relation track** — cross-mass or analogue spectral relations used to test whether distinct entities support a reproducible biological-response association. These relations cannot count as entity replication or share a same-molecule meta-analytic effect, but they are a claim-bearing scientific layer when independently calibrated and biologically verified, not merely a neighbour lookup.
 
 This correction tightens the novelty boundary. PAIRUP-MS already matches unknown signals across studies and performs meta-analysis; iDMET+ already retrieves differential profiles; reverse metabolomics and StructureMASST already connect spectra or structures to public context. A defensible advance must jointly demonstrate MS/MS-conditioned unresolved **entity** recovery across heterogeneous acquisition, uncertainty-aware response accumulation, calibrated abstention, and a held-out biological conclusion unavailable to measurement-matched known-only analysis.
 
@@ -216,3 +216,9 @@ Every open query must yield one of:
 - ChemProp drug matching, TT7 genetics, IBD, HFD, and obesity are shards or controls, not replacement project definitions.
 - File volume, test count, schema count, and web-platform features are not scientific endpoints.
 - The next claim-bearing milestone is a completed multi-source open response matrix plus at least one independently adjudicated relation for which unresolved MS/MS changes the correct scientific answer.
+
+## 2026-10-20 科学目标冻结与七来源双层裁决
+
+Metabolomic Contrast Atlas 的总目标冻结为**研究级、有方向、有幅度和不确定性的公共生物学响应检索**。身份层回答同一实体复现，化学关系层回答不同但相关实体的可验证响应关联；后者不能合并同一分子的 beta/SE，但不得被降级为普通谱图邻居查询。后续算子失败只修改算子，不再重定义课题。
+
+现有 7 来源、18 对比的真实双层结果已经集中复算。严格身份层在 6 条登记关系中仅回答 2 条、弃权 4 条；关系层 `all` 与 `unresolved` 对 6 条登记关系的四类评分均为 0/6 Top-1。集合没有 signed-direction truth，因此正确/错误开放检索均不可裁决，unknown 增量尚未证明。完整数字与产物见 `docs/CONTRAST_ATLAS_DUAL_LAYER_REAL_RESULT_20261020.md`。所有结果均为 development / consumed。
