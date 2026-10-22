@@ -1,0 +1,82 @@
+{
+  "schema": "contrast_atlas_mtbls1866_raw_response_contract_v1",
+  "frozen_on": "2026-10-22",
+  "evidence_role": "development_consumed",
+  "scientific_role": {
+    "primary": "second independent plasma COVID-versus-healthy all-feature DDA response source",
+    "not_yet": [
+      "cross-study COVID response replication",
+      "signed molecular-response truth",
+      "unknown-information increment",
+      "causal SARS-CoV-2 effect"
+    ]
+  },
+  "source_universe": {
+    "accession": "MTBLS1866",
+    "polarity": "positive",
+    "mode": "reverse-phase DDA",
+    "primary_biological_units": 109,
+    "noncritical_covid": 83,
+    "healthy": 26,
+    "mzml_files": 109,
+    "mzml_bytes": 10485233845,
+    "excluded_groups": {
+      "ICU-COVID-19": 18,
+      "NON-COVID-19": 16,
+      "ICU": 12
+    }
+  },
+  "frozen_sequence": [
+    "stage and checksum the 109-file phenotype-blind acquisition manifest",
+    "construct MS1 features, cross-sample consensus entities, acquisition timestamps and MS2 links without reading the design ledger",
+    "abstain from MS2 links with multiple precursor/retention-time candidates and require at least six product-ion peaks",
+    "hash the phenotype-blind measurement object",
+    "open the design ledger and estimate continuous abundance and differential-detection responses separately",
+    "apply a frozen library search before any known-only or source-local-unresolved comparison",
+    "register only design relevance to other COVID plasma studies; do not assume signed molecular truth"
+  ],
+  "measurement_parameters": {
+    "feature_noise_threshold": 10000.0,
+    "feature_mass_error_ppm": 5.0,
+    "minimum_trace_seconds": 5.0,
+    "maximum_trace_seconds": 120.0,
+    "consensus_mz_ppm": 5.0,
+    "consensus_rt_seconds": 15.0,
+    "ms2_link_ppm": 10.0,
+    "ms2_link_rt_seconds": 15.0,
+    "minimum_ms2_peaks": 6,
+    "multiple_candidate_policy": "abstain"
+  },
+  "response_channels": {
+    "primary_abundance": {
+      "effect": "median-normalized log2 COVID-minus-healthy mean difference",
+      "uncertainty": "Welch standard error among detected observations",
+      "minimum_prevalence_each_group": 0.5
+    },
+    "secondary_detection": {
+      "effect": "Haldane-corrected COVID-versus-healthy detection log odds",
+      "policy": "freeze separately; do not collapse into abundance before cross-source channel calibration"
+    }
+  },
+  "technical_confounding_gate": {
+    "inputs": "phenotype-blind mzML acquisition start timestamps joined to group only after measurement freeze",
+    "exclusion_from_positive_biological_truth": [
+      "perfect temporal separation of COVID and healthy files",
+      "near-separation without a defensible batch adjustment or interleaved QC support",
+      "unresolved sample duplication or non-independent biological units"
+    ]
+  },
+  "pre_registered_cross_source_semantics": {
+    "candidate_source": "MSV000092887",
+    "relation": "same broad disease label and plasma biospecimen",
+    "level": "design_relevance_only",
+    "signed_direction_truth": false,
+    "activation": "only after MTBLS1866 passes measurement, response and technical-confounding gates"
+  },
+  "claim_boundary": [
+    "The official positive assay topology contains 83 non-critical COVID and 26 healthy files even though the article reports 84 non-critical participants overall.",
+    "The assay deposit organizes COVID and healthy mzML files in separate directories; directory separation alone is not acquisition order, so mzML timestamps must be audited.",
+    "An MS2-linked LC-MS feature is not automatically one metabolite, and a source-local library non-hit is not a novel molecule.",
+    "All results from this source and the existing public response collection are development/consumed."
+  ]
+}

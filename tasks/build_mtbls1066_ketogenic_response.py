@@ -281,6 +281,9 @@ def link_representative_ms2(
     manifest: pd.DataFrame,
     precursor_ppm: float,
     rt_window_sec: float,
+    *,
+    require_unique_candidate: bool = False,
+    minimum_ms2_peaks: int = 3,
 ) -> tuple[pd.DataFrame, dict[int, dict[str, object]], pd.DataFrame]:
     order = np.argsort(metadata.mz.to_numpy(float))
     sorted_mz = metadata.mz.to_numpy(float)[order]
@@ -297,6 +300,8 @@ def link_representative_ms2(
         loader.setOptions(options)
         loader.load(str(source), experiment)
         linked = 0
+        ambiguous = 0
+        low_peak_count = 0
         for spectrum in experiment:
             precursors = spectrum.getPrecursors()
             if not precursors:
@@ -313,6 +318,9 @@ def link_representative_ms2(
             candidates = candidates[np.abs(feature_rt[candidates] - rt) <= rt_window_sec]
             if not len(candidates):
                 continue
+            if require_unique_candidate and len(candidates) != 1:
+                ambiguous += 1
+                continue
             ppm_error = (metadata.mz.to_numpy(float)[candidates] - precursor_mz) / precursor_mz * 1e6
             rt_error = feature_rt[candidates] - rt
             distance = np.abs(ppm_error) / precursor_ppm + np.abs(rt_error) / rt_window_sec
@@ -321,7 +329,8 @@ def link_representative_ms2(
             mzs, intensities = spectrum.get_peaks()
             mzs = np.asarray(mzs, dtype=float)
             intensities = np.asarray(intensities, dtype=float)
-            if len(mzs) < 3 or not np.isfinite(intensities).all():
+            if len(mzs) < minimum_ms2_peaks or not np.isfinite(intensities).all():
+                low_peak_count += 1
                 continue
             record = {
                 "feature_id": feature_id,
@@ -356,6 +365,8 @@ def link_representative_ms2(
                 "group": row.group,
                 "ms2_spectra": int(experiment.size()),
                 "linked_ms2_spectra": linked,
+                "ambiguous_candidate_ms2_spectra": ambiguous,
+                "low_peak_count_ms2_spectra": low_peak_count,
             }
         )
         print(

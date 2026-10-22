@@ -1,0 +1,110 @@
+assay_name	relative_path	official_url	expected_bytes	linkage_visibility
+1	FILES/Lipidomic_COVID-19_ESI Positive/1_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/1_p.mzML	95807099	phenotype_blind
+101	FILES/Lipidomic_COVID-19_ESI Positive/101_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/101_p.mzML	96212012	phenotype_blind
+104	FILES/Lipidomic_COVID-19_ESI Positive/104_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/104_p.mzML	94819234	phenotype_blind
+106	FILES/Lipidomic_COVID-19_ESI Positive/106_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/106_p.mzML	94899606	phenotype_blind
+108	FILES/Lipidomic_COVID-19_ESI Positive/108_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/108_p.mzML	94994571	phenotype_blind
+109	FILES/Lipidomic_COVID-19_ESI Positive/109_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/109_p.mzML	95291079	phenotype_blind
+111	FILES/Lipidomic_COVID-19_ESI Positive/111_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/111_p.mzML	94785976	phenotype_blind
+12	FILES/Lipidomic_COVID-19_ESI Positive/12_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/12_p.mzML	95373470	phenotype_blind
+125	FILES/Lipidomic_COVID-19_ESI Positive/125_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/125_p.mzML	96763118	phenotype_blind
+126	FILES/Lipidomic_COVID-19_ESI Positive/126_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/126_p.mzML	97634673	phenotype_blind
+127	FILES/Lipidomic_COVID-19_ESI Positive/127_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/127_p.mzML	96108248	phenotype_blind
+129	FILES/Lipidomic_COVID-19_ESI Positive/129_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/129_p.mzML	96842309	phenotype_blind
+130	FILES/Lipidomic_COVID-19_ESI Positive/130_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/130_p.mzML	96700476	phenotype_blind
+132	FILES/Lipidomic_COVID-19_ESI Positive/132_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/132_p.mzML	97322694	phenotype_blind
+134	FILES/Lipidomic_COVID-19_ESI Positive/134_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/134_p.mzML	98111557	phenotype_blind
+136	FILES/Lipidomic_COVID-19_ESI Positive/136_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/136_p.mzML	96401914	phenotype_blind
+138	FILES/Lipidomic_COVID-19_ESI Positive/138_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/138_p.mzML	96952923	phenotype_blind
+139	FILES/Lipidomic_COVID-19_ESI Positive/139_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/139_p.mzML	97364867	phenotype_blind
+14	FILES/Lipidomic_COVID-19_ESI Positive/14_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/14_p.mzML	94695352	phenotype_blind
+18	FILES/Lipidomic_COVID-19_ESI Positive/18_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/18_p.mzML	96591838	phenotype_blind
+2 POS	FILES/Lipidomic_COVID-19_ESI Positive/2POS_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/2POS_p.mzML	96839403	phenotype_blind
+20	FILES/Lipidomic_COVID-19_ESI Positive/20_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/20_p.mzML	98464395	phenotype_blind
+24	FILES/Lipidomic_COVID-19_ESI Positive/24_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/24_p.mzML	96571002	phenotype_blind
+26	FILES/Lipidomic_COVID-19_ESI Positive/26_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/26_p.mzML	94428333	phenotype_blind
+27	FILES/Lipidomic_COVID-19_ESI Positive/27_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/27_p.mzML	97663210	phenotype_blind
+3 POS	FILES/Lipidomic_COVID-19_ESI Positive/3POS_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/3POS_p.mzML	98403568	phenotype_blind
+31	FILES/Lipidomic_COVID-19_ESI Positive/31_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/31_p.mzML	94721508	phenotype_blind
+34	FILES/Lipidomic_COVID-19_ESI Positive/34_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/34_p.mzML	95441148	phenotype_blind
+36	FILES/Lipidomic_COVID-19_ESI Positive/36_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/36_p.mzML	95304832	phenotype_blind
+38	FILES/Lipidomic_COVID-19_ESI Positive/38_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/38_p.mzML	97784068	phenotype_blind
+39	FILES/Lipidomic_COVID-19_ESI Positive/39_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/39_p.mzML	97680656	phenotype_blind
+4	FILES/Lipidomic_COVID-19_ESI Positive/4_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/4_p.mzML	95873031	phenotype_blind
+40	FILES/Lipidomic_COVID-19_ESI Positive/40_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/40_p.mzML	98519692	phenotype_blind
+41	FILES/Lipidomic_COVID-19_ESI Positive/41_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/41_p.mzML	94576861	phenotype_blind
+42	FILES/Lipidomic_COVID-19_ESI Positive/42_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/42_p.mzML	97662407	phenotype_blind
+43	FILES/Lipidomic_COVID-19_ESI Positive/43_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/43_p.mzML	95081551	phenotype_blind
+44	FILES/Lipidomic_COVID-19_ESI Positive/44_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/44_p.mzML	94499266	phenotype_blind
+45	FILES/Lipidomic_COVID-19_ESI Positive/45_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/45_p.mzML	96577828	phenotype_blind
+46	FILES/Lipidomic_COVID-19_ESI Positive/46_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/46_p.mzML	99449876	phenotype_blind
+47	FILES/Lipidomic_COVID-19_ESI Positive/47_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/47_p.mzML	94471834	phenotype_blind
+48	FILES/Lipidomic_COVID-19_ESI Positive/48_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/48_p.mzML	95950241	phenotype_blind
+56	FILES/Lipidomic_COVID-19_ESI Positive/56_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/56_p.mzML	98599576	phenotype_blind
+61	FILES/Lipidomic_COVID-19_ESI Positive/61_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/61_p.mzML	99367810	phenotype_blind
+62	FILES/Lipidomic_COVID-19_ESI Positive/62_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/62_p.mzML	96564562	phenotype_blind
+63	FILES/Lipidomic_COVID-19_ESI Positive/63_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/63_p.mzML	99345477	phenotype_blind
+64	FILES/Lipidomic_COVID-19_ESI Positive/64_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/64_p.mzML	100758006	phenotype_blind
+66	FILES/Lipidomic_COVID-19_ESI Positive/66_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/66_p.mzML	98253923	phenotype_blind
+67	FILES/Lipidomic_COVID-19_ESI Positive/67_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/67_p.mzML	100732145	phenotype_blind
+68	FILES/Lipidomic_COVID-19_ESI Positive/68_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/68_p.mzML	98713591	phenotype_blind
+69	FILES/Lipidomic_COVID-19_ESI Positive/69_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/69_p.mzML	100464216	phenotype_blind
+70	FILES/Lipidomic_COVID-19_ESI Positive/70_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/70_p.mzML	100726709	phenotype_blind
+71	FILES/Lipidomic_COVID-19_ESI Positive/71_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/71_p.mzML	101088860	phenotype_blind
+72	FILES/Lipidomic_COVID-19_ESI Positive/72_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/72_p.mzML	101532233	phenotype_blind
+74	FILES/Lipidomic_COVID-19_ESI Positive/74_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/74_p.mzML	99421132	phenotype_blind
+78	FILES/Lipidomic_COVID-19_ESI Positive/78_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/78_p.mzML	100164374	phenotype_blind
+79	FILES/Lipidomic_COVID-19_ESI Positive/79_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/79_p.mzML	101588272	phenotype_blind
+80	FILES/Lipidomic_COVID-19_ESI Positive/80_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/80_p.mzML	95799777	phenotype_blind
+82	FILES/Lipidomic_COVID-19_ESI Positive/82_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/82_p.mzML	95885602	phenotype_blind
+83	FILES/Lipidomic_COVID-19_ESI Positive/83_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/83_p.mzML	100646138	phenotype_blind
+84	FILES/Lipidomic_COVID-19_ESI Positive/84_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/84_p.mzML	95579107	phenotype_blind
+89	FILES/Lipidomic_COVID-19_ESI Positive/89_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/89_p.mzML	95809381	phenotype_blind
+9	FILES/Lipidomic_COVID-19_ESI Positive/9_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/9_p.mzML	94953375	phenotype_blind
+93	FILES/Lipidomic_COVID-19_ESI Positive/93DLMC_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/93DLMC_p.mzML	95587924	phenotype_blind
+94	FILES/Lipidomic_COVID-19_ESI Positive/94_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/94_p.mzML	96408672	phenotype_blind
+95	FILES/Lipidomic_COVID-19_ESI Positive/95_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/95_p.mzML	95716022	phenotype_blind
+97	FILES/Lipidomic_COVID-19_ESI Positive/97_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/97_p.mzML	95654413	phenotype_blind
+98	FILES/Lipidomic_COVID-19_ESI Positive/98_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/98_p.mzML	94717560	phenotype_blind
+99	FILES/Lipidomic_COVID-19_ESI Positive/99_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/99_p.mzML	95970211	phenotype_blind
+AA	FILES/Lipidomic_HEALTHY_ESI Positive/A_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_HEALTHY_ESI%20Positive/A_p.mzML	97877913	phenotype_blind
+AA POS	FILES/Lipidomic_COVID-19_ESI Positive/AA_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/AA_p.mzML	94593508	phenotype_blind
+AI	FILES/Lipidomic_HEALTHY_ESI Positive/AI_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_HEALTHY_ESI%20Positive/AI_p.mzML	95324637	phenotype_blind
+BA	FILES/Lipidomic_HEALTHY_ESI Positive/B_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_HEALTHY_ESI%20Positive/B_p.mzML	94884499	phenotype_blind
+CA	FILES/Lipidomic_HEALTHY_ESI Positive/C_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_HEALTHY_ESI%20Positive/C_p.mzML	96729752	phenotype_blind
+CE A	FILES/Lipidomic_COVID-19_ESI Positive/CE_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/CE_p.mzML	95664234	phenotype_blind
+CM POS	FILES/Lipidomic_COVID-19_ESI Positive/CM_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/CM_p.mzML	95406525	phenotype_blind
+DA	FILES/Lipidomic_HEALTHY_ESI Positive/D_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_HEALTHY_ESI%20Positive/D_p.mzML	95995083	phenotype_blind
+EA	FILES/Lipidomic_HEALTHY_ESI Positive/EA_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_HEALTHY_ESI%20Positive/EA_p.mzML	94814407	phenotype_blind
+EB	FILES/Lipidomic_HEALTHY_ESI Positive/EB_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_HEALTHY_ESI%20Positive/EB_p.mzML	94965520	phenotype_blind
+EM	FILES/Lipidomic_HEALTHY_ESI Positive/EM_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_HEALTHY_ESI%20Positive/EM_p.mzML	94829162	phenotype_blind
+IRA POS	FILES/Lipidomic_COVID-19_ESI Positive/IRA_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/IRA_p.mzML	95856474	phenotype_blind
+MC	FILES/Lipidomic_HEALTHY_ESI Positive/MC_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_HEALTHY_ESI%20Positive/MC_p.mzML	94336178	phenotype_blind
+MM	FILES/Lipidomic_HEALTHY_ESI Positive/MM_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_HEALTHY_ESI%20Positive/MM_p.mzML	94749698	phenotype_blind
+NC	FILES/Lipidomic_HEALTHY_ESI Positive/NC_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_HEALTHY_ESI%20Positive/NC_p.mzML	94968043	phenotype_blind
+POS 12	FILES/Lipidomic_COVID-19_ESI Positive/12POS_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/12POS_p.mzML	96368066	phenotype_blind
+POS 13	FILES/Lipidomic_COVID-19_ESI Positive/13POS_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/13POS_p.mzML	96396558	phenotype_blind
+POS 14	FILES/Lipidomic_COVID-19_ESI Positive/14POS_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/14POS_p.mzML	96493160	phenotype_blind
+POS 15	FILES/Lipidomic_COVID-19_ESI Positive/15POS_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/15POS_p.mzML	97478188	phenotype_blind
+POS 16	FILES/Lipidomic_COVID-19_ESI Positive/16POS_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/16POS_p.mzML	96709974	phenotype_blind
+POS 4	FILES/Lipidomic_COVID-19_ESI Positive/4POS_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/4POS_p.mzML	95273931	phenotype_blind
+POS 6	FILES/Lipidomic_COVID-19_ESI Positive/6POS_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/6POS_p.mzML	96324736	phenotype_blind
+POS 8	FILES/Lipidomic_COVID-19_ESI Positive/8POS_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/8POS_p.mzML	96717113	phenotype_blind
+POS 9	FILES/Lipidomic_COVID-19_ESI Positive/9POS_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/9POS_p.mzML	97424692	phenotype_blind
+RI POS	FILES/Lipidomic_COVID-19_ESI Positive/RI_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/RI_p.mzML	94350393	phenotype_blind
+SA 1	FILES/Lipidomic_HEALTHY_ESI Positive/1SA_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_HEALTHY_ESI%20Positive/1SA_p.mzML	92730159	phenotype_blind
+SA 10	FILES/Lipidomic_HEALTHY_ESI Positive/10SA_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_HEALTHY_ESI%20Positive/10SA_p.mzML	93163101	phenotype_blind
+SA 11	FILES/Lipidomic_HEALTHY_ESI Positive/11SA_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_HEALTHY_ESI%20Positive/11SA_p.mzML	92790918	phenotype_blind
+SA 12	FILES/Lipidomic_HEALTHY_ESI Positive/12SA_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_HEALTHY_ESI%20Positive/12SA_p.mzML	92148056	phenotype_blind
+SA 13	FILES/Lipidomic_HEALTHY_ESI Positive/13SA_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_HEALTHY_ESI%20Positive/13SA_p.mzML	92841376	phenotype_blind
+SA 2	FILES/Lipidomic_HEALTHY_ESI Positive/2SA_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_HEALTHY_ESI%20Positive/2SA_p.mzML	92726842	phenotype_blind
+SA 3	FILES/Lipidomic_HEALTHY_ESI Positive/3SA_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_HEALTHY_ESI%20Positive/3SA_p.mzML	92548182	phenotype_blind
+SA 4	FILES/Lipidomic_HEALTHY_ESI Positive/4SA_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_HEALTHY_ESI%20Positive/4SA_p.mzML	92561812	phenotype_blind
+SA 5	FILES/Lipidomic_HEALTHY_ESI Positive/5SA_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_HEALTHY_ESI%20Positive/5SA_p.mzML	93080056	phenotype_blind
+SA 6	FILES/Lipidomic_HEALTHY_ESI Positive/6SA_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_HEALTHY_ESI%20Positive/6SA_p.mzML	92754154	phenotype_blind
+SA 7	FILES/Lipidomic_HEALTHY_ESI Positive/7SA_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_HEALTHY_ESI%20Positive/7SA_p.mzML	92677171	phenotype_blind
+SA 8	FILES/Lipidomic_HEALTHY_ESI Positive/8SA_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_HEALTHY_ESI%20Positive/8SA_p.mzML	92738481	phenotype_blind
+SA 9	FILES/Lipidomic_HEALTHY_ESI Positive/9SA_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_HEALTHY_ESI%20Positive/9SA_p.mzML	92456099	phenotype_blind
+SC	FILES/Lipidomic_HEALTHY_ESI Positive/SC_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_HEALTHY_ESI%20Positive/SC_p.mzML	94908941	phenotype_blind
+SG POS	FILES/Lipidomic_COVID-19_ESI Positive/SG_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_COVID-19_ESI%20Positive/SG_p.mzML	96257112	phenotype_blind
+ST	FILES/Lipidomic_HEALTHY_ESI Positive/ST_p.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/FILES/Lipidomic_HEALTHY_ESI%20Positive/ST_p.mzML	94632147	phenotype_blind

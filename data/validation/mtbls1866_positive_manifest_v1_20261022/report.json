@@ -1,0 +1,29 @@
+{
+  "claim_boundary": [
+    "The frozen contrast is non-critical COVID versus healthy plasma, not ICU severity or treatment response.",
+    "File presence does not establish an all-feature response until phenotype-blind feature processing and QC complete.",
+    "Shared COVID naming with another study is not signed response truth."
+  ],
+  "denominators": {
+    "healthy": 26,
+    "noncritical_covid": 83,
+    "official_positive_assays": 155,
+    "official_samples": 157,
+    "primary_biological_units": 109,
+    "primary_mzml_bytes": 10485233845,
+    "primary_mzml_files": 109
+  },
+  "evidence_role": "development_consumed_acquisition_only",
+  "excluded_groups": {
+    "ICU": 12,
+    "ICU-COVID-19": 18,
+    "NON-COVID-19": 16
+  },
+  "leakage_status": "ISA design and file sizes only; no mzML payload, abundance matrix, response effect, identity result, or retrieval score opened",
+  "provenance": {
+    "positive_assay_table_sha256": "b937f7def17832a6ae2ef9b5ef53b680f0722a2be11cfb3d3e02ace4e155f7ec",
+    "sample_table_sha256": "f77930b9ec5512e9357db8d9ab83a8c27a5fc6655298b8a23d456598d301aa04"
+  },
+  "schema": "mtbls1866_positive_primary_manifest_v1",
+  "status": "PRIMARY_POSITIVE_DDA_UNIVERSE_FROZEN"
+}

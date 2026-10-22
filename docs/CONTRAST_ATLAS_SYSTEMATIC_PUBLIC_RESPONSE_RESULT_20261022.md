@@ -222,3 +222,22 @@ MSV000090804 的原论文表明 methylolanthanin 产生对正常镧积累是必�
 本次没有重跑已判退的 centered kernel 或 signed fragment/loss programs，也没有把共享 `COVID-19` 名称注册成真值。下一项 claim-bearing 工作是获得第二个独立、样本拓扑可复核、带 all-feature MS2 的 COVID plasma response；若必须从 `MTBLS1866` 的 109 个正离子 DDA 文件重建，也应作为一次冻结的 raw-processing wave，而不能退回已知物 MAF 冒充 unbiased 分析。
 
 公开依据：[MSV000092887 MassIVE record](https://massive.ucsd.edu/ProteoSAFe/dataset.jsp?accession=MSV000092887)、[Scientific Data study](https://www.nature.com/articles/s41597-024-03822-y)。
+
+## MTBLS1866：第二个 COVID plasma 来源的冻结原始重建波次
+
+为避免把 477 行作者 MAF 当成 unbiased 全空间，第二个 COVID 来源 `MTBLS1866` 只按官方 ISA 设计冻结原始正离子 DDA 波次：109 名唯一生物单位、109 个唯一 mzML，其中 83 名 non-critical COVID、26 名 healthy，总计 10,485,233,845 bytes。另有 ICU-COVID 18、symptomatic non-COVID 16 和 ICU non-COVID 12 个正离子 assay，全部不进入本次固定对比。该来源及其与 `MSV000092887` 的任何关系均为 `development/consumed`。
+
+在打开任何 mzML payload、丰度、效应或检索分数前，已经冻结：
+
+1. 下载清单只含 assay、路径、URL、字节数和 `phenotype_blind` 标记，不含病例标签；
+2. MS1 feature discovery、跨样本 consensus、采集时间提取与 MS2 linkage 不得读取 design ledger；
+3. MS2 必须落入 10-ppm/15-s 的唯一候选，多个候选时弃权，代表谱至少 6 个 product-ion peaks；
+4. 冻结 measurement hashes 后才打开 83/26 分组；连续 abundance 与 differential-detection log odds 分开估计，后者不能为增加覆盖而拼入主分数；
+5. 完整冻结 library search 前，所有实体保持 `unpartitioned`，禁止称作 unknown metabolite 或报告 unknown increment；
+6. 与 `MSV000092887` 只预登记为“同一广义疾病标签 + plasma”的 design relevance，不预设 signed molecular response truth。
+
+还增加了一个高价值停止门：官方 assay 将病例与健康文件放在不同目录，论文说明研究跨较长时间采集且 pooled QC 位于批次前、始、末，但没有据此证明样本注射顺序随机化。因此将在表型盲 measurement 阶段从 mzML 提取 acquisition start time，再在冻结后审计组别与顺序是否完全或近乎分离。若不能排除技术批次混杂，该来源可以保留为测量/压力测试资产，但不得作为 COVID 生物学正真值。
+
+机器合同为 `tasks/contrast_atlas_mtbls1866_raw_response_contract_v1.json`；获取与两阶段分析实现分别为 `tasks/stage_mtbls1866_positive_mzml.py`、`tasks/build_mtbls1866_phenotype_blind_measurement.py` 和 `tasks/estimate_mtbls1866_covid_response.py`。当前冻结清单已经完成，原始 109-file wave 正在断点续传；尚无 response、cross-study retrieval 或 unknown-information gain 结果。
+
+公开依据：[MTBLS1866 论文与设计](https://pmc.ncbi.nlm.nih.gov/articles/PMC7696386/)、[MetaboLights 数据记录](https://www.omicsdi.org/dataset/metabolights_dataset/MTBLS1866)。
