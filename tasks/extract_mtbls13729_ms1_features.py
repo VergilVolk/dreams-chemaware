@@ -69,7 +69,6 @@ def detect_features(
     """Run the frozen OpenMS metabolomics feature-detection recipe."""
 
     started = time.time()
-    mass_traces: list[Any] = []
     detector = oms.MassTraceDetection()
     detector.setLogType(oms.LogType.NONE)
     params = detector.getDefaults()
@@ -80,20 +79,31 @@ def detect_features(
     params.setValue("trace_termination_criterion", "outlier")
     params.setValue("trace_termination_outliers", 5)
     detector.setParameters(params)
-    detector.run(experiment, mass_traces, 0)
+    try:
+        # pyOpenMS >=3.6 returns the extracted traces.
+        mass_traces = list(detector.run(experiment, 0))
+    except TypeError:
+        # Older builds use an output argument.
+        mass_traces = []
+        detector.run(experiment, mass_traces, 0)
 
-    split_traces: list[Any] = []
     peak_detector = oms.ElutionPeakDetection()
     peak_detector.setLogType(oms.LogType.NONE)
     epd_params = peak_detector.getDefaults()
     epd_params.setValue("width_filtering", "auto")
     peak_detector.setParameters(epd_params)
-    peak_detector.detectPeaks(mass_traces, split_traces)
-    final_traces: list[Any] = []
-    peak_detector.filterByPeakWidth(split_traces, final_traces)
+    try:
+        split_traces = list(peak_detector.detectPeaks(mass_traces))
+    except TypeError:
+        split_traces = []
+        peak_detector.detectPeaks(mass_traces, split_traces)
+    try:
+        final_traces = list(peak_detector.filterByPeakWidth(split_traces))
+    except TypeError:
+        final_traces = []
+        peak_detector.filterByPeakWidth(split_traces, final_traces)
 
     feature_map = oms.FeatureMap()
-    feature_chromatograms: list[Any] = []
     finder = oms.FeatureFindingMetabo()
     finder.setLogType(oms.LogType.NONE)
     ffm_params = finder.getDefaults()
@@ -103,7 +113,11 @@ def detect_features(
     ffm_params.setValue("report_convex_hulls", "false")
     ffm_params.setValue("report_summed_ints", "false")
     finder.setParameters(ffm_params)
-    finder.run(final_traces, feature_map, feature_chromatograms)
+    try:
+        finder.run(final_traces, feature_map)
+    except TypeError:
+        feature_chromatograms: list[Any] = []
+        finder.run(final_traces, feature_map, feature_chromatograms)
     feature_map.setUniqueIds()
 
     rows = [
