@@ -1,0 +1,34 @@
+{
+  "schema": "ibd200_plate3_candidate_context_specificity_audit_v1",
+  "status": "REAL_CONTEXT_TREND_NOT_QUALIFIED",
+  "data_role": "development_consumed_posthoc_diagnostic",
+  "denominators": {
+    "paired_policy_match_fold_edges": 31,
+    "unique_query_entities": 18,
+    "independent_candidate_structure_clusters": 6,
+    "outer_folds": 2
+  },
+  "results": {
+    "median_fold_edge_real_minus_wrong": 0.08034631982445717,
+    "mean_fold_edge_real_minus_wrong": 0.14450465300450882,
+    "positive_fold_edges": 22,
+    "negative_fold_edges": 9,
+    "median_query_mean_delta": 0.09365831920877099,
+    "positive_structure_clusters": 5,
+    "one_sided_exact_structure_cluster_signflip_p": 0.140625
+  },
+  "interpretation": "Real context is directionally stronger than the degree-preserving wrong context, but only a handful of candidate structures contribute and the exact structure-cluster test is not significant. BioAware is therefore not qualified by this slice.",
+  "leakage_status": "no phenotype, beta, SE, held-out effect or retrieval truth was loaded",
+  "provenance": {
+    "context_evidence_sha256": "463a6cdd8a7910cf3567193f68f665b6285066a1c349bc011982b57f58bc64ba",
+    "identity_partition_sha256": "8fdfdbeb0013e79db462955a0758943668cc2cfc56450d3ae64b07dad17703f1",
+    "edge_ledger_sha256": "43eebd82b088bf1228b3b99244bd7991cfdfc671b72db5f02529d5e165eca818",
+    "cluster_summary_sha256": "94bcdce4d86ddbdb0a87ce86cceb57676145a8bd4a6ef3d12fb57422305e3206",
+    "implementation_sha256": "1d1346d29ecc83240cca70e162db1912f6af90647964fc76d046ed11eaf33e50"
+  },
+  "claim_boundary": [
+    "The strict library policy supplies both anchors and policy-match labels, so this is not independent identity validation.",
+    "The result does not establish BioAware ranking gain or biological-response gain.",
+    "Context-unavailable candidate edges remain abstentions and stay in the full 662-query denominator."
+  ]
+}
