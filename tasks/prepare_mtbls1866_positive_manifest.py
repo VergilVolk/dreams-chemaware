@@ -23,7 +23,16 @@ import pandas as pd
 BASE = "https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1866/"
 SAMPLE_FILE = "s_MTBLS1866.txt"
 ASSAY_FILE = "a_MTBLS1866_LC-MS_positive_reverse-phase_metabolite_profiling.txt"
-PRIMARY_GROUPS = {"COVID-19": 83, "HEALTHY": 26}
+UNIVERSES = {
+    "primary": {"COVID-19": 83, "HEALTHY": 26},
+    "icu_covid_extension": {"ICU-COVID-19": 18},
+}
+DEFAULT_OUTPUTS = {
+    "primary": Path("data/validation/mtbls1866_positive_manifest_v1_20261022"),
+    "icu_covid_extension": Path(
+        "data/validation/mtbls1866_positive_icu_covid_manifest_v1_20261022"
+    ),
+}
 
 
 def sha256_bytes(value: bytes) -> str:
@@ -64,10 +73,13 @@ def main() -> None:
     parser.add_argument(
         "--output-dir",
         type=Path,
-        default=Path("data/validation/mtbls1866_positive_manifest_v1_20261022"),
+        default=None,
     )
+    parser.add_argument("--universe", choices=tuple(UNIVERSES), default="primary")
     parser.add_argument("--workers", type=int, default=4)
     args = parser.parse_args()
+    if args.output_dir is None:
+        args.output_dir = DEFAULT_OUTPUTS[args.universe]
     if args.output_dir.exists():
         raise FileExistsError(args.output_dir)
     if not 1 <= args.workers <= 4:
@@ -91,33 +103,38 @@ def main() -> None:
         how="inner",
         validate="one_to_one",
     )
-    primary = design.loc[
-        design["Factor Value[Medical case]"].isin(PRIMARY_GROUPS)
+    expected_groups = UNIVERSES[args.universe]
+    selected = design.loc[
+        design["Factor Value[Medical case]"].isin(expected_groups)
     ].copy()
-    observed = primary.groupby("Factor Value[Medical case]").size().astype(int).to_dict()
-    if observed != PRIMARY_GROUPS or len(primary) != 109:
-        raise RuntimeError(f"primary topology drift: {observed}")
-    if primary["Source Name"].nunique() != 109 or primary["Sample Name"].nunique() != 109:
-        raise RuntimeError("primary source/sample names are not one-to-one biological units")
-    if primary["Derived Spectral Data File"].duplicated().any():
-        raise RuntimeError("primary positive mzML paths are not unique")
+    expected_total = sum(expected_groups.values())
+    observed = selected.groupby("Factor Value[Medical case]").size().astype(int).to_dict()
+    if observed != expected_groups or len(selected) != expected_total:
+        raise RuntimeError(f"selected topology drift: {observed}")
+    if (
+        selected["Source Name"].nunique() != expected_total
+        or selected["Sample Name"].nunique() != expected_total
+    ):
+        raise RuntimeError("selected source/sample names are not one-to-one biological units")
+    if selected["Derived Spectral Data File"].duplicated().any():
+        raise RuntimeError("selected positive mzML paths are not unique")
 
-    primary["official_url"] = primary["Derived Spectral Data File"].map(
+    selected["official_url"] = selected["Derived Spectral Data File"].map(
         lambda value: BASE + quote(str(value), safe="/")
     )
     sizes: dict[str, int] = {}
     with ThreadPoolExecutor(max_workers=args.workers) as pool:
-        futures = {pool.submit(remote_size, url): url for url in primary.official_url}
+        futures = {pool.submit(remote_size, url): url for url in selected.official_url}
         for number, future in enumerate(as_completed(futures), start=1):
             url = futures[future]
             sizes[url] = future.result()
             if number % 10 == 0 or number == len(futures):
                 print(f"[size {number}/{len(futures)}]", flush=True)
-    primary["expected_bytes"] = primary.official_url.map(sizes).astype("int64")
-    if (primary.expected_bytes <= 0).any():
+    selected["expected_bytes"] = selected.official_url.map(sizes).astype("int64")
+    if (selected.expected_bytes <= 0).any():
         raise RuntimeError("non-positive official mzML size")
 
-    design_ledger = primary.rename(
+    design_ledger = selected.rename(
         columns={
             "Factor Value[Medical case]": "group",
             "Comment[Patient status]": "patient_status",
@@ -139,23 +156,38 @@ def main() -> None:
     acquisition_path = args.output_dir / "phenotype_blind_acquisition_manifest.tsv"
     design_ledger.to_csv(design_path, sep="\t", index=False)
     acquisition.to_csv(acquisition_path, sep="\t", index=False)
+    all_counts = design.groupby("Factor Value[Medical case]").size().astype(int).to_dict()
     report = {
-        "schema": "mtbls1866_positive_primary_manifest_v1",
-        "status": "PRIMARY_POSITIVE_DDA_UNIVERSE_FROZEN",
+        "schema": (
+            "mtbls1866_positive_primary_manifest_v1"
+            if args.universe == "primary"
+            else "mtbls1866_positive_icu_covid_extension_manifest_v1"
+        ),
+        "status": (
+            "PRIMARY_POSITIVE_DDA_UNIVERSE_FROZEN"
+            if args.universe == "primary"
+            else "ICU_COVID_POSITIVE_DDA_EXTENSION_FROZEN"
+        ),
         "evidence_role": "development_consumed_acquisition_only",
-        "denominators": {
+        "denominators": ({
             "official_samples": len(samples),
             "official_positive_assays": len(assays),
-            "primary_biological_units": len(primary),
+            "primary_biological_units": len(selected),
             "noncritical_covid": int(observed["COVID-19"]),
             "healthy": int(observed["HEALTHY"]),
             "primary_mzml_files": len(acquisition),
             "primary_mzml_bytes": int(acquisition.expected_bytes.sum()),
-        },
+        } if args.universe == "primary" else {
+            "official_samples": len(samples),
+            "official_positive_assays": len(assays),
+            "selected_biological_units": len(selected),
+            "units_by_group": observed,
+            "selected_mzml_files": len(acquisition),
+            "selected_mzml_bytes": int(acquisition.expected_bytes.sum()),
+        }),
         "excluded_groups": {
-            "ICU-COVID-19": 18,
-            "NON-COVID-19": 16,
-            "ICU": 12,
+            group: count for group, count in all_counts.items()
+            if group not in expected_groups
         },
         "provenance": {
             "sample_table_sha256": sha256_bytes(sample_bytes),
@@ -165,11 +197,15 @@ def main() -> None:
             "ISA design and file sizes only; no mzML payload, abundance matrix, "
             "response effect, identity result, or retrieval score opened"
         ),
-        "claim_boundary": [
+        "claim_boundary": ([
             "The frozen contrast is non-critical COVID versus healthy plasma, not ICU severity or treatment response.",
             "File presence does not establish an all-feature response until phenotype-blind feature processing and QC complete.",
             "Shared COVID naming with another study is not signed response truth.",
-        ],
+        ] if args.universe == "primary" else [
+            "This append-only acquisition wave contains ICU-COVID files only; it does not modify the frozen 109-file primary universe.",
+            "ICU-versus-noncritical severity effects may be estimated only after a joint phenotype-blind measurement universe is frozen.",
+            "A shared COVID-severity design across studies is relevance semantics, not signed molecular-response truth.",
+        ]),
     }
     (args.output_dir / "report.json").write_text(
         json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8"

@@ -84,14 +84,20 @@ def main() -> None:
         "--output-dir", type=Path, default=Path("data/mtbls1866/positive_primary_mzml")
     )
     parser.add_argument("--workers", type=int, default=3)
+    parser.add_argument("--expected-files", type=int, default=109)
     args = parser.parse_args()
     if not 1 <= args.workers <= 4:
         raise ValueError("workers must be between one and four")
     with args.manifest.open(encoding="utf-8", newline="") as handle:
         rows = list(csv.DictReader(handle, delimiter="\t"))
-    if len(rows) != 109 or any(row["linkage_visibility"] != "phenotype_blind" for row in rows):
-        raise RuntimeError("manifest is not the frozen 109-file phenotype-blind universe")
-    if len({row["assay_name"] for row in rows}) != 109 or len({row["relative_path"] for row in rows}) != 109:
+    if len(rows) != args.expected_files or any(
+        row["linkage_visibility"] != "phenotype_blind" for row in rows
+    ):
+        raise RuntimeError("manifest does not match the frozen phenotype-blind universe")
+    if (
+        len({row["assay_name"] for row in rows}) != args.expected_files
+        or len({row["relative_path"] for row in rows}) != args.expected_files
+    ):
         raise RuntimeError("duplicate assay or mzML path in manifest")
     args.output_dir.mkdir(parents=True, exist_ok=True)
 

@@ -241,3 +241,11 @@ MSV000090804 的原论文表明 methylolanthanin 产生对正常镧积累是必�
 机器合同为 `tasks/contrast_atlas_mtbls1866_raw_response_contract_v1.json`；获取与两阶段分析实现分别为 `tasks/stage_mtbls1866_positive_mzml.py`、`tasks/build_mtbls1866_phenotype_blind_measurement.py` 和 `tasks/estimate_mtbls1866_covid_response.py`。当前冻结清单已经完成，原始 109-file wave 正在断点续传；尚无 response、cross-study retrieval 或 unknown-information gain 结果。
 
 公开依据：[MTBLS1866 论文与设计](https://pmc.ncbi.nlm.nih.gov/articles/PMC7696386/)、[MetaboLights 数据记录](https://www.omicsdi.org/dataset/metabolights_dataset/MTBLS1866)。
+
+### 预登记的独立 COVID severity 关系
+
+在任何严重度效应或检索分数产生前，又冻结了一对来源独立的严重度设计：`MTBLS1866` 的 18 名 ICU-COVID minus 83 名 non-critical COVID，与 `MTBLS2542` 正离子脂质 DDA 模态的 54 名 severe/critical/death minus 107 名 mild/asymptomatic。后者是 161 个 blood-serum RAW、22,051,117,659 bytes；本机仓库已有固定 SHA-256 的 ThermoRawFileParser，因此不是格式上不可执行的候选。
+
+两条查询方向只登记为 `related COVID severity design`，不登记 signed molecular truth；plasma/serum、年龄、性别、采集日期、治疗和住院状态差异全部保留。检索必须在完整来源独立候选池中允许错误和弃权，并与 measurement-matched known-only、unresolved-MS2 reassignment 和 response reassignment 比较，不能退回两候选强迫选择。合同见 `tasks/contrast_atlas_covid_severity_pair_contract_v1.json`。
+
+`MTBLS1866` 的追加 ICU 波次为 18/18 个唯一文件、1,731,083,534 bytes，已在不改变 109-file primary universe 的前提下单独冻结并开始表型盲获取。只有两个来源分别通过生物单位、采集顺序/批次、全空间响应和冻结 library partition 门，预登记关系才允许激活。

@@ -1,0 +1,81 @@
+{
+  "schema": "contrast_atlas_covid_severity_pair_contract_v1",
+  "frozen_on": "2026-10-22",
+  "evidence_role": "development_consumed",
+  "scientific_question": "Can an open response query retrieve an independent COVID severity design from a source-disjoint candidate collection, and does unresolved MS2 add correct coverage beyond measurement-matched known-only evidence?",
+  "source_axes": [
+    {
+      "accession": "MTBLS1866",
+      "biospecimen": "plasma",
+      "platform": "positive reverse-phase DDA",
+      "contrast": "ICU-COVID-19 minus non-critical COVID-19",
+      "positive_units": 18,
+      "negative_units": 83,
+      "extension_mzml_files": 18,
+      "extension_mzml_bytes": 1731083534,
+      "qualification": "the 18-file extension is append-only and must be combined with the already frozen 83 non-critical files through a joint phenotype-blind measurement stage"
+    },
+    {
+      "accession": "MTBLS2542",
+      "biospecimen": "blood serum",
+      "platform": "positive reverse-phase lipid DDA",
+      "contrast": "severe, critical illness or death minus mild or asymptomatic COVID-19",
+      "positive_units": 54,
+      "negative_units": 107,
+      "raw_files": 161,
+      "raw_bytes": 22051117659,
+      "official_group_counts": {
+        "Asymptomatic": 53,
+        "Mild": 54,
+        "severe": 33,
+        "Critical Illness": 5,
+        "Death": 16
+      },
+      "metadata_provenance": {
+        "sample_table_sha256": "44993b67afd8a5b4b717c8e1917b7045b92190510eb8d57bc132cefc1797bfc2",
+        "positive_lipid_assay_sha256": "b1107a607d0d1bd0da2d334e3bb403be498e35cddc68fe3d4fda38da7c06d14e"
+      }
+    }
+  ],
+  "pre_registered_relations": [
+    {
+      "query": "MTBLS1866:ICU-COVID-19_minus_non-critical_COVID-19",
+      "candidate": "MTBLS2542:severe_or_worse_minus_mild_or_asymptomatic",
+      "relevance": "related COVID severity design",
+      "signed_molecular_direction_truth": false
+    },
+    {
+      "query": "MTBLS2542:severe_or_worse_minus_mild_or_asymptomatic",
+      "candidate": "MTBLS1866:ICU-COVID-19_minus_non-critical_COVID-19",
+      "relevance": "related COVID severity design",
+      "signed_molecular_direction_truth": false
+    }
+  ],
+  "fixed_controls": [
+    "all MS2-linked response entities",
+    "frozen direct-library-supported entities only",
+    "measurement-matched known-only entities",
+    "source-local unresolved entities with MS2",
+    "unresolved MS2 reassigned within measurement strata",
+    "response labels reassigned while preserving source composition"
+  ],
+  "gates_before_activation": [
+    "one-to-one biological-unit topology in each source",
+    "phenotype-blind measurement construction and hashed MS2 links",
+    "acquisition-order and batch-confounding audit",
+    "age and sex adjustment or explicit residual-confounding boundary when metadata permit",
+    "frozen library search before known versus unresolved comparison",
+    "open candidate retrieval with incorrect and abstain outcomes, not a two-candidate forced choice"
+  ],
+  "conversion_provenance": {
+    "thermo_raw_file_parser": "tools/external/ThermoRawFileParser-v2dev/app/ThermoRawFileParser.exe",
+    "thermo_raw_file_parser_sha256": "8129c5c8d249662631128bfe41984fb283e7c0705c48a083bc9cbe21ec4dd9ce"
+  },
+  "claim_boundary": [
+    "This is a pre-effect development contract, not a positive retrieval result.",
+    "Plasma and serum are related but non-identical matrices; their relation is design relevance, not exact replication.",
+    "Disease severity labels are observational and may include treatment, age, sex, collection-date and hospitalization confounding.",
+    "No shared disease label or chemical similarity is sufficient to merge beta and SE across different entities.",
+    "Failure of this pair falsifies this registered relation or implementation; it does not redefine the Metabolomic Contrast Atlas objective."
+  ]
+}
