@@ -7,6 +7,7 @@ import hashlib
 import json
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 from analyze_msv000088023_hfd_unknown_response import library_partition
@@ -23,6 +24,23 @@ def sha256(path: Path) -> str:
         for block in iter(lambda: handle.read(8 << 20), b""):
             digest.update(block)
     return digest.hexdigest()
+
+
+def encoder_records_to_wse_spectra(
+    raw_ids: list[str], records: list[dict[str, object]]
+) -> dict[str, dict[str, object]]:
+    if len(raw_ids) != len(records):
+        raise ValueError("encoder record IDs and spectra differ in length")
+    output: dict[str, dict[str, object]] = {}
+    for raw_id, record in zip(raw_ids, records):
+        peaks = np.asarray(record["peaks"], dtype=np.float32)
+        if peaks.ndim != 2 or peaks.shape[0] != 2:
+            raise ValueError(f"encoder spectrum must be 2 x N: {raw_id} {peaks.shape}")
+        output[raw_id] = {
+            "precursor_mz": float(record["precursor_mz"]),
+            "peaks": peaks.T,
+        }
+    return output
 
 
 def main() -> None:
@@ -83,7 +101,11 @@ def main() -> None:
     )
     if len(raw_ids) != len(keys) or not eligibility["embedding_eligible"].astype(bool).all():
         raise RuntimeError("identity partition loader failed to retain the complete spectrum registry")
-    query_spectra = dict(zip(raw_ids, records))
+    # The encoder contract stores spectra as 2 x N arrays, whereas the frozen
+    # WSE library matcher consumes N x 2 peak rows.  Passing the encoder layout
+    # through can terminate inside the native entropy cleaner for queries that
+    # actually have mass-compatible candidates.
+    query_spectra = encoder_records_to_wse_spectra(raw_ids, records)
     partition = library_partition(
         query_spectra,
         raw_ids,
