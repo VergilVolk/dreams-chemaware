@@ -1,0 +1,55 @@
+{
+  "schema": "contrast_atlas_source_qualification_v1",
+  "frozen_at": "2026-10-22",
+  "study_id": "MSV000089518",
+  "title": "GNPS_Zarrinpar_Anand_BSH_diet_mouse_fecal_QE",
+  "evidence_role": "development_design_audit_only",
+  "public_record": "https://massive.ucsd.edu/ProteoSAFe/dataset.jsp?task=5190a4b29bae456b90293ab50afaddc3",
+  "scientific_axis_considered": "HFD_minus_NCD within vehicle, BSH-positive, and BSH-negative strata",
+  "deposited_assets": {
+    "metadata": {
+      "descriptor": "f.MSV000089518/metadata/Metadata_Zarrinpar_Anand_QE.tsv",
+      "bytes": 2516,
+      "rows": 39
+    },
+    "quantification": {
+      "descriptor": "f.MSV000089518/other/03242021_Zarrinpar_Anand_QE_quant.csv",
+      "bytes": 320857,
+      "features": 769,
+      "biological_file_columns": 35,
+      "blank_file_columns": 7
+    },
+    "representative_ms2": {
+      "descriptor": "f.MSV000089518/other/03242021_Zarrinpar_Anand_QE.mgf",
+      "bytes": 599532,
+      "spectra": 769,
+      "feature_id_lines": 769
+    }
+  },
+  "metadata_topology": {
+    "annotated_files": 39,
+    "groups": {
+      "BSHneg_NCD": 8,
+      "BSHneg_HFD": 8,
+      "BSHpos_NCD": 8,
+      "BSHpos_HFD": 7,
+      "Veh_NCD": 5,
+      "Veh_HFD": 3
+    },
+    "repeated_numeric_clusters": 12,
+    "numeric_cluster_range": "15-26",
+    "clusters_per_factorial_cell": 2,
+    "within_cluster_suffixes": "one to four of N, L, R, B",
+    "independence_status": "unresolved: the deposit does not state whether suffixes are repeated samples from one mouse or mice nested within one cage; either interpretation forbids treating all files as independent randomized units"
+  },
+  "qualification_decision": "FAIL_INDEPENDENT_BIOLOGICAL_UNIT_GATE",
+  "decision_reasons": [
+    "Every BSH-by-diet cell contains only two repeated numeric clusters, so the effective subject or randomization-cluster denominator is at most two per cell.",
+    "The public metadata has no BioReplicate, cage, animal, or repeated-measure field that resolves the N/L/R/B suffixes.",
+    "The quantitative table contains only 35 of the 39 annotated biological files, so missing-file handling would also need a prospectively documented rule.",
+    "Treating the 35 file columns as independent mice would risk pseudoreplication and anti-conservative feature-level standard errors."
+  ],
+  "action": "Do not build beta/SE response objects, do not register an HFD relation, and do not download the 2.3-GB raw/open-format archive unless an official animal-and-cage crosswalk is obtained.",
+  "leakage_status": "metadata and deposited table schemas opened; no feature abundances, biological effects, response scores, or retrieval ranks evaluated",
+  "claim_boundary": "This is a source-qualification failure, not evidence against HFD biology or the Metabolomic Contrast Atlas."
+}

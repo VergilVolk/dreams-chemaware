@@ -4,3 +4,7 @@
 *.sbatch text eol=lf
 *.sh     text eol=lf
 *.py     text eol=lf
+
+# MGF files are provenance-bearing numeric artifacts; newline conversion would
+# invalidate their recorded SHA-256 even though the payload is line-oriented.
+*.mgf    -text

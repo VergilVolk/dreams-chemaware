@@ -1,0 +1,45 @@
+{
+  "schema": "contrast_atlas_open_collection_extension_v1",
+  "base_contract": "tasks/contrast_atlas_open_collection_ibd3_extension_v1.json",
+  "data_role": "development_consumed",
+  "sources": [
+    {
+      "study_id": "MSV000092887",
+      "source_family": "independent_Austrian_COVID_plasma_matched_pairs",
+      "species": "Homo sapiens",
+      "biospecimen": "plasma",
+      "biological_units": 78,
+      "effect_adapter": "response_directories",
+      "response_root": "data/validation/contrast_atlas_msv000092887_open_source_v1_20261022",
+      "effect_report_path": "data/validation/contrast_atlas_msv000092887_open_source_v1_20261022/report.json",
+      "expected_effect_status": "DEVELOPMENT_CONSUMED_COVID_RESPONSE_SOURCE_PREPARED",
+      "entity_column": "entity_id",
+      "beta_column": "beta",
+      "se_column": "se",
+      "prevalence_column": "prevalence",
+      "qc_column": "analysis_eligible",
+      "effect_model_column": "effect_model",
+      "mgf_path": "data/validation/contrast_atlas_msv000092887_raw_ms2_link_v1_20261022/representative_ms2.mgf",
+      "mgf_report_path": "data/validation/contrast_atlas_msv000092887_raw_ms2_link_v1_20261022/report.json",
+      "expected_mgf_status": "PHENOTYPE_BLIND_RAW_MS2_LINK_COMPLETE",
+      "nonempty_ms2_spectra": 1616,
+      "identity_path": "data/validation/contrast_atlas_msv000092887_open_source_v1_20261022/identity_partition.tsv.gz",
+      "identity_sep": "\t",
+      "identity_entity_column": "entity_id",
+      "identity_status_column": "identity_status",
+      "identity_status_map": {
+        "library_supported": "library_supported",
+        "unresolved_entity": "unresolved_entity"
+      },
+      "identity_partition_boundary": "deposited reference-spectrum support versus phenotype-blind unique raw-MS2 linkage; source-local partition not yet a cross-source entity identity",
+      "contrasts": {
+        "covid_vs_age_sex_matched_control_abundance": {
+          "design": "paired plasma COVID minus age/sex-matched control; continuous abundance channel only",
+          "condition_family": "human_plasma_covid_case_control",
+          "independent_units": 39
+        }
+      }
+    }
+  ],
+  "registered_relations": []
+}

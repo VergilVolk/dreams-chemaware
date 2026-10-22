@@ -181,3 +181,44 @@ MSV000090804 的原论文表明 methylolanthanin 产生对正常镧积累是必�
 5. 新增的第三个 IBD 来源不是小候选池：它在 22–25 个来源独立候选中对冻结算子提供了新的负证据。
 
 所以现在可以继续开发 Contrast Atlas，但不能写“unbiased 方法已经成功”。下一阶段优先把跨来源真值扩到多个独立生物学家族及明确 no-match 查询；新的局部 relation-layer 方法只能在尚未参与算子选择的来源上检验。最终成败标准仍是：响应特异的关系证据能否在固定错误风险下提供 measurement-matched known-only 没有的正确答案，并能对无对应查询可靠弃权。
+
+## 高通量来源资格审计：MSV000089518 在效应开启前判退
+
+为避免继续在小而破损的数据集上消耗研发时间，对公开鼠粪 HFD/BSH 数据 `MSV000089518` 只读取了 2,516-byte metadata、320,857-byte 定量表 schema 和 599,532-byte MGF，不读取 feature abundance、beta/SE 或检索得分。公开记录把它描述为 BSH-positive、BSH-negative 与 vehicle 在 NCD/HFD 下的六个组。
+
+该来源虽然具有 769 个定量 features 与 769 个逐 feature MGF blocks，但不满足独立生物单位门：
+
+- metadata 有 39 个标注文件，定量表实际只有 35 个生物文件列与 7 个 blank 列；
+- 文件名中的第二段数字只覆盖 15–26，共 12 个重复 cluster；每个 `BSH status × diet` cell 恰有 2 个 cluster；
+- 每个 cluster 下出现 1–4 个 `N/L/R/B` suffix，但 deposit 没有说明它们是同一动物的重复样本，还是同一 cage 内的多只动物；
+- 无论是哪一种解释，都不能把 35 个文件列当作 35 个独立随机化单位：前者是重复测量，后者至少有 cage clustering，而每个 cell 的 cluster 数仍只有 2。
+
+因此资格裁决为 `FAIL_INDEPENDENT_BIOLOGICAL_UNIT_GATE`。不构建该来源的 beta/SE，不把它登记为第三个 HFD 来源，也不下载约 2.3 GB 的完整 open-format 档案；只有获得官方 animal/cage/repeated-measure crosswalk 才允许重开。这是来源资格失败，不是 HFD 生物学或 Contrast Atlas 总目标的负证据。机器可复核边界见 `tasks/msv000089518_hfd_qualification_v1.json`。
+
+## 第十二来源：39 对 COVID plasma 的表型盲 raw-MS2 联结
+
+来源 `MSV000092887` 是 39 名 COVID 与 39 名年龄/性别匹配 control 的独立奥地利 plasma 研究。此前已经冻结 3,041 个 paired response features，但只有论文级 MS2 总数，不能逐 feature 判断哪些未解析响应真正具有 MS2。现已在不读取 group、beta、SE 的 linkage manifest 上完成全部 129 个 HILIC-positive mzXML 的联结：
+
+- 129/129 files，838,574,158 bytes；78 biological、11 pooled-QC、40 blank；
+- 921,688 raw MS2；81,761 进入固定 0.005-Da/3-s feature window；
+- 81,037 unique links，724 ambiguous links 弃权；
+- 1,616/3,041 features 具有 biological 或 pooled-QC usable MS2；
+- 155/1,616 有 deposited reference-spectrum support；1,461/1,616 为 source-local unresolved；
+- 98 个 feature 只有 blank MS2，全部排除；
+- abundance channel 有 1,411 个 QC-pass usable-MS2 responses，其中 1,265 unresolved；differential-detection channel 有 386 个，其中 363 unresolved；二者 187 个重叠，但不合并效应。
+
+先冻结 spectrum-link table 与 representative MGF，之后才重新打开已存在的 response object。link table 的 pre-response SHA-256 为 `05f27250f002c1f3b14894fb26b9eb8893e8eddfd3d1684aa196aad0977314a0`。这提供了真实的大样本未知响应底座，但还没有第二个合格 COVID 来源，因此不能声称跨研究 COVID 复现或 unknown-information gain。
+
+只把 paired abundance channel append 到开放集合；detection log-odds 作为独立 secondary channel 冻结，不为增加覆盖而与 abundance 混合。新集合 `data/validation/contrast_atlas_open_response_collection_v7_covid_20261022` 为：
+
+- 12 个独立 source families；
+- 27 个 study-level contrasts；
+- 751 个 biological units；
+- 108,148 张 representative MS2；
+- 91,379 条 eligible response rows，其中 2,087 library-supported、89,292 unresolved；
+- 每个 query 有 23–26 个 source-disjoint candidate contrasts；
+- 仍只有 10 条预登记 directed relevance relations，0 条 signed-direction truths。
+
+本次没有重跑已判退的 centered kernel 或 signed fragment/loss programs，也没有把共享 `COVID-19` 名称注册成真值。下一项 claim-bearing 工作是获得第二个独立、样本拓扑可复核、带 all-feature MS2 的 COVID plasma response；若必须从 `MTBLS1866` 的 109 个正离子 DDA 文件重建，也应作为一次冻结的 raw-processing wave，而不能退回已知物 MAF 冒充 unbiased 分析。
+
+公开依据：[MSV000092887 MassIVE record](https://massive.ucsd.edu/ProteoSAFe/dataset.jsp?accession=MSV000092887)、[Scientific Data study](https://www.nature.com/articles/s41597-024-03822-y)。

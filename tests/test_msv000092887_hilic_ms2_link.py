@@ -5,6 +5,7 @@ from pathlib import Path
 import pandas as pd
 
 from tasks.link_msv000092887_hilic_ms2 import assay_role, summarize_features
+from tasks.prepare_msv000092887_open_response_source import response_channel
 from tasks.stage_msv000092887_hilic_mzxml import download_candidates
 
 
@@ -94,3 +95,40 @@ def test_ambiguous_and_blank_only_ms2_do_not_enter_usable_partition() -> None:
     assert not bool(result.loc["blank", "has_usable_raw_ms2"])
     assert not bool(result.loc["ambiguous", "has_usable_raw_ms2"])
     assert int(result.loc["ambiguous", "ambiguous_candidate_spectra"]) == 1
+
+
+def test_abundance_and_detection_channels_are_filtered_without_collapsing() -> None:
+    frame = pd.DataFrame(
+        {
+            "entity_id": ["both", "abundance", "detection", "no_ms2"],
+            "has_usable_raw_ms2": [True, True, True, False],
+            "abundance_qc_pass": [True, True, False, True],
+            "abundance_beta": [1.0, 2.0, 3.0, 4.0],
+            "abundance_se": [0.5, 0.5, 0.5, 0.5],
+            "detection_qc_pass": [True, False, True, True],
+            "detection_beta": [-1.0, -2.0, -3.0, -4.0],
+            "detection_se": [0.4, 0.4, 0.4, 0.4],
+        }
+    )
+    prevalence = pd.Series([1.0, 0.9, 0.8, 0.7])
+    abundance = response_channel(
+        frame,
+        qc_column="abundance_qc_pass",
+        beta_column="abundance_beta",
+        se_column="abundance_se",
+        prevalence=prevalence,
+        model="abundance",
+    )
+    detection = response_channel(
+        frame,
+        qc_column="detection_qc_pass",
+        beta_column="detection_beta",
+        se_column="detection_se",
+        prevalence=prevalence,
+        model="detection",
+    )
+
+    assert set(abundance.entity_id) == {"both", "abundance"}
+    assert set(detection.entity_id) == {"both", "detection"}
+    assert abundance.set_index("entity_id").loc["both", "beta"] == 1.0
+    assert detection.set_index("entity_id").loc["both", "beta"] == -1.0

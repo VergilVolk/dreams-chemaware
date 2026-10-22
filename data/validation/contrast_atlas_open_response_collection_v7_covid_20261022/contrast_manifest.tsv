@@ -1,0 +1,28 @@
+study_id	source_family	contrast_id	species	biospecimen	design	condition_family	independent_units	eligible_response_entities	library_supported_response_entities	unresolved_response_entities	source_disjoint_candidate_contrasts
+MSV000097426	MSV000097426	mouse_hfd_vs_nfd	Mus musculus	urine	HFD minus NFD	high_fat_diet	12	2163	50	2113	26
+MSV000084112	MSV000084112	diabetes_normal_weight	Homo sapiens	urine	T1D minus healthy within normal weight	type_1_diabetes	24	5501	111	5390	23
+MSV000084112	MSV000084112	diabetes_obese	Homo sapiens	urine	T1D minus healthy within obesity	type_1_diabetes	24	5501	111	5390	23
+MSV000084112	MSV000084112	obesity_with_diabetes	Homo sapiens	urine	obese minus normal weight within T1D	obesity	24	5501	111	5390	23
+MSV000084112	MSV000084112	obesity_without_diabetes	Homo sapiens	urine	obese minus normal weight without T1D	obesity	24	5501	111	5390	23
+MSV000083077	MSV000083077	depression_nonobese	Homo sapiens	saliva	higher minus lower depressive symptoms without obesity	depressive_symptoms	39	7132	77	7055	23
+MSV000083077	MSV000083077	depression_obese	Homo sapiens	saliva	higher minus lower depressive symptoms with obesity	depressive_symptoms	23	7132	77	7055	23
+MSV000083077	MSV000083077	obesity_high_depression	Homo sapiens	saliva	obese minus nonobese within higher depressive symptoms	obesity	32	7132	77	7055	23
+MSV000083077	MSV000083077	obesity_low_depression	Homo sapiens	saliva	obese minus nonobese within lower depressive symptoms	obesity	30	7132	77	7055	23
+MSV000088023	MSV000088023	female_hfd_vs_normal	Mus musculus	plasma	female HFD minus female normal diet	high_fat_diet	20	212	5	207	23
+MSV000088023	MSV000088023	male_hfd_vs_normal	Mus musculus	plasma	male HFD minus male normal diet	high_fat_diet	19	212	5	207	23
+MSV000088023	MSV000088023	female_vs_male_hfd	Mus musculus	plasma	female minus male within HFD	biological_sex	20	212	5	207	23
+MSV000088023	MSV000088023	female_vs_male_normal	Mus musculus	plasma	female minus male within normal diet	biological_sex	19	212	5	207	23
+MSV000090788	MSV000090788	lesion_vs_nonlesion_paired	Homo sapiens	skin	lesional minus nonlesional paired skin	atopic_dermatitis_local	30	1711	37	1674	24
+MSV000090788	MSV000090788	lesion_vs_healthy	Homo sapiens	skin	lesional AD minus healthy skin	atopic_dermatitis	60	2276	51	2225	24
+MSV000090788	MSV000090788	nonlesion_vs_healthy	Homo sapiens	skin	nonlesional AD minus healthy skin	atopic_dermatitis_field	60	2259	50	2209	24
+MSV000097610	MSV000097610_veo_ibd_case_control	pediatric_veoibd_vs_healthy	Homo sapiens	feces	pediatric VEO-IBD minus healthy	inflammatory_bowel_disease	48	6081	480	5601	26
+IBD200_GROUP	IBD200_MSV000084775_MSV000084908_MSV000086509	adult_all_ibd_vs_healthy	Homo sapiens	feces	adult Crohn disease or ulcerative colitis minus healthy	inflammatory_bowel_disease	177	746	162	584	26
+MSV000090804	MSV000090804_lanthanide_genetic_nutrient	lanthanophore_cluster_ko_vs_wt	Methylorubrum extorquens AM1	bacterial culture extract	lanthanophore-cluster knockout minus wild type under 2 uM Nd2O3	lanthanide_metabolism_genetic_perturbation	10	4247	29	4218	24
+MSV000090804	MSV000090804_lanthanide_genetic_nutrient	lanthanophore_overexpression_vs_wt	Methylorubrum extorquens AM1	bacterial culture extract	lanthanophore overexpression minus wild type under 2 uM Nd2O3	lanthanide_metabolism_genetic_perturbation	10	3466	27	3439	24
+MSV000090804	MSV000090804_lanthanide_genetic_nutrient	lanthanide_limited_vs_replete_wt	Methylorubrum extorquens AM1	bacterial culture extract	50 nM minus 2 uM Nd2O3 in the wild-type background	lanthanide_availability	9	4140	27	4113	24
+MSV000086360	MSV000086360_melon_bsubtilis_intervention	bsubtilis_3610_vs_control_root	Cucumis melo	root, stem and leaf tissue	B. subtilis 3610 treatment minus control within root	bacterial_growth_promotion_root	28	1462	48	1414	24
+MSV000086360	MSV000086360_melon_bsubtilis_intervention	bsubtilis_3610_vs_control_stem	Cucumis melo	root, stem and leaf tissue	B. subtilis 3610 treatment minus control within stem	bacterial_growth_promotion_stem	30	2285	56	2229	24
+MSV000086360	MSV000086360_melon_bsubtilis_intervention	bsubtilis_3610_vs_control_leaf	Cucumis melo	root, stem and leaf tissue	B. subtilis 3610 treatment minus control within leaf	bacterial_growth_promotion_leaf	38	2734	63	2671	24
+MSV000084794	MSV000084794_human_industrialization_context	industrialized_vs_traditional_context	Homo sapiens	feces	industrialized-population context minus traditional-population context; descriptive, not causal	human_industrialization_context	90	2201	89	2112	26
+MSV000096564	CCFA_800805_mediterranean_diet_trial	baseline_ibd_vs_control	Homo sapiens	feces	pre-intervention T1 active-or-remission Crohn's disease minus control; observational condition contrast	human_fecal_ibd_case_control	22	2817	0	2817	26
+MSV000092887	independent_Austrian_COVID_plasma_matched_pairs	covid_vs_age_sex_matched_control_abundance	Homo sapiens	plasma	paired plasma COVID minus age/sex-matched control; continuous abundance channel only	human_plasma_covid_case_control	39	1411	146	1265	26

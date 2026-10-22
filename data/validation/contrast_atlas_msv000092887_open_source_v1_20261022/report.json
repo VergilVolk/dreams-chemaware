@@ -1,0 +1,39 @@
+{
+  "claim_boundary": [
+    "Source-local unresolved means no deposited reference-spectrum support plus a usable raw-MS2 link; it is not a unique molecule or a harmonized cross-source identity.",
+    "The abundance channel is an observational COVID-versus-matched-control response, not a treatment effect.",
+    "Preparing this source does not establish a cross-study COVID relation, response replication, or unknown-information increment."
+  ],
+  "collection_policy": {
+    "primary_open_collection_channel": "paired_abundance",
+    "reason": "the current public collection contains continuous abundance effects; mixing detection log odds into the same candidate score before cross-source channel calibration is forbidden",
+    "secondary_channel": "paired_differential_detection_frozen_not_collapsed"
+  },
+  "denominators": {
+    "abundance_library_supported": 146,
+    "abundance_response_entities": 1411,
+    "abundance_unresolved": 1265,
+    "all_features": 3041,
+    "detection_library_supported": 23,
+    "detection_response_entities": 386,
+    "detection_unresolved": 363,
+    "features_with_usable_raw_ms2": 1616,
+    "library_supported_usable_ms2": 155,
+    "matched_pairs": 39,
+    "participants": 78,
+    "response_channel_overlap": 187,
+    "unresolved_usable_ms2": 1461
+  },
+  "evidence_role": "development_consumed",
+  "leakage_status": "raw MS2 membership was frozen phenotype-blind before response effects were joined; the public disease outcome is open and this is not external validation",
+  "provenance": {
+    "abundance_response_sha256": "0183ad40ea1e23cb01f9c12b3092ab596ab7832d8104c1cdd2f4dc94aad51a43",
+    "detection_response_sha256": "3480d73ddcec7de14997ff1ef78bd7cd2ce30978eb7a1fe8f4c40b3ad07f1fa9",
+    "identity_partition_sha256": "347c68623154f0bf3e6c8c08cbafc6c528076171c0c0a1530f0cd77fb7cc2ccd",
+    "link_report_sha256": "8c35d4e1fb4491e01486dd7161d58424bde5091c3f5f1dcff6570077b3c75ee1",
+    "linked_response_sha256": "f2c3be0afad8566b7a9080a1757df0ddeff47cb0d459b58490f5045ba3716574",
+    "representative_mgf_sha256": "b3e8b5c40d70ee17739310d4268b08aa33bc9720fc91aafd1985a290f1cc71e3"
+  },
+  "schema": "contrast_atlas_msv000092887_open_source_v1",
+  "status": "DEVELOPMENT_CONSUMED_COVID_RESPONSE_SOURCE_PREPARED"
+}

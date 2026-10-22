@@ -104,4 +104,23 @@ The phenotype-blind linkage implementation is now executable rather than only sp
 - The linker freezes the full spectrum-link table, feature membership and representative MGF before reopening the response object. Its source-local partition distinguishes deposited library support, unresolved MS2 evidence, blank-only evidence and absence of a unique raw-MS2 link. `unresolved_source_local` is not a cross-source unknown identity and cannot yet support an unknown-information increment claim.
 - `tasks/run_msv000092887_hilic_ms2_link.sbatch` is the single CPU execution route. Results are first written to a job-specific directory and moved into the frozen result path only after denominator assertions pass, so an interrupted batch job cannot masquerade as a completed result.
 
-A one-file development smoke test used biological assay `10CP` without reading its phenotype. The 6,548,777-byte file had 7,045 MS2 spectra, all with precursor metadata. Under the frozen window, 783 spectra reached the response feature universe: 776 had a unique feature candidate, 7 had multiple candidates and were abstained, and the unique links represented 351 of 3,041 features. This is a parser/linkage execution check on one consumed file, not a biological result, coverage estimate, cross-study replication or unknown-information gain. The temporary file was deleted after the check. The full 129-file job has not yet been executed.
+A one-file development smoke test first used biological assay `10CP` without reading its phenotype. The 6,548,777-byte file had 7,045 MS2 spectra, all with precursor metadata. Under the frozen window, 783 spectra reached the response feature universe: 776 had a unique feature candidate and 7 had multiple candidates and were abstained.
+
+The complete phenotype-blind linkage has now been executed on the frozen 129-file universe:
+
+- 129/129 files and 838,574,158 bytes were staged; 78 biological, 11 pooled-QC and 40 blank files were all retained;
+- 921,688 raw MS2 spectra were parsed;
+- 81,761 spectra entered the 0.005-Da/3-s feature window; 81,037 had exactly one feature candidate and 724 ambiguous spectra were abstained;
+- 1,714/3,041 features had at least one unique raw-MS2 link, but 98 were blank-only and therefore excluded;
+- 1,616 features had usable biological or pooled-QC MS2: 155 with deposited reference-spectrum support and 1,461 source-local unresolved;
+- among the pre-frozen response channels, abundance contained 1,411 usable-MS2 features (146 library-supported, 1,265 unresolved), while differential detection contained 386 (23 library-supported, 363 unresolved); 187 entities passed both channels, which remain separate.
+
+The 1,461 unresolved entities are feature-level MS2-supported responses, not 1,461 unique metabolites. Raw precursor/RT linkage does not establish chemical identity; source-local absence of a reference-spectrum hit is not yet a harmonized cross-source unknown partition. The public outcome is open, so this is development/consumed evidence.
+
+Artifacts:
+
+- raw linkage: `data/validation/contrast_atlas_msv000092887_raw_ms2_link_v1_20261022`;
+- channel-preserving source object: `data/validation/contrast_atlas_msv000092887_open_source_v1_20261022`;
+- executable preparation: `tasks/prepare_msv000092887_open_response_source.py`.
+
+Only the continuous paired-abundance channel enters the current open collection. The differential-detection log-odds channel is frozen beside it and cannot be numerically collapsed into abundance before cross-source channel calibration. This decision prevents a larger feature denominator from masquerading as stronger evidence.

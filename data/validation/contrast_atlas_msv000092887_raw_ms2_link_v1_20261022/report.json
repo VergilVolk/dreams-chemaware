@@ -1,0 +1,48 @@
+{
+  "claim_boundary": [
+    "Raw precursor/RT linkage establishes feature-level MS2 evidence, not molecular identity.",
+    "unresolved_source_local means no deposited reference-spectrum hit in this source; it is not yet a harmonized cross-source unknown partition.",
+    "This result alone is not a replicated COVID response and not an unknown-information increment.",
+    "Ambiguous multi-feature spectra and blank-only links are excluded from usable representative spectra."
+  ],
+  "denominators": {
+    "abundance_qc_pass_with_usable_raw_ms2": 1411,
+    "ambiguous_link_spectra": 724,
+    "biological_files": 78,
+    "blank_files": 40,
+    "detection_qc_pass_with_usable_raw_ms2": 386,
+    "features": 3041,
+    "features_blank_only": 98,
+    "features_with_any_unique_raw_ms2": 1714,
+    "features_with_usable_raw_ms2": 1616,
+    "matched_spectra": 81761,
+    "mzxml_files": 129,
+    "pooled_qc_files": 11,
+    "raw_ms2_spectra": 921688,
+    "reference_spectrum_features_with_usable_raw_ms2": 155,
+    "source_local_unresolved_features_with_usable_raw_ms2": 1461,
+    "unique_link_spectra": 81037
+  },
+  "evidence_role": "development_consumed",
+  "leakage_status": "feature links were frozen using only m/z, RT, existing reference-spectrum status, and a phenotype-blind acquisition manifest; response effects were joined afterward",
+  "parameters": {
+    "ambiguous_spectrum_policy": "not assigned to any feature",
+    "mass_tolerance_da": 0.005,
+    "rt_tolerance_seconds": 3.0,
+    "usable_ms2": "at least one unique biological or pooled-QC link; blank-only excluded"
+  },
+  "provenance": {
+    "link_table_sha256_before_response_join": "05f27250f002c1f3b14894fb26b9eb8893e8eddfd3d1684aa196aad0977314a0",
+    "representative_mgf_sha256": "b3e8b5c40d70ee17739310d4268b08aa33bc9720fc91aafd1985a290f1cc71e3",
+    "response_object_sha256": "488eec0de5e7ac145d0467d5e94790708399ed2382b7760f253dcec1e3be9625",
+    "staged_manifest_sha256": "2a435c83463c9aee88e3ca8f3b4ac8cce04ccfd0a046d2d012020d44eafd9e0f"
+  },
+  "published_aggregate_reference": {
+    "interpretation": "The published count is an audit reference, not a target to tune toward; raw linkage may differ because this implementation requires unique 0.005-Da/3-s feature assignment.",
+    "observed_usable_raw_ms2_minus_reported": -366,
+    "reported_features_with_ms2": 1982,
+    "reported_features_with_reference_spectrum": 175
+  },
+  "schema": "contrast_atlas_msv000092887_raw_ms2_link_v1",
+  "status": "PHENOTYPE_BLIND_RAW_MS2_LINK_COMPLETE"
+}
