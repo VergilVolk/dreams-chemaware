@@ -73,8 +73,11 @@ The server command is:
 sbatch tasks/run_b_anchored_dual_encoder_multireranker_gnps.sbatch
 ```
 
-If more than one historical MSG cache exists, discovery stops rather than
-silently selecting one.  Supply the intended frozen cache explicitly:
+The ordinary command automatically finds the single directory containing the
+frozen MSG `report.json`; files inside that directory are not counted as
+separate caches.  If genuinely multiple historical MSG cache directories
+exist, discovery stops rather than silently selecting one.  An explicit cache
+can then be supplied where the cluster permits exported variables:
 
 ```bash
 sbatch --export=ALL,MSG_FUSION_GNPS=data/validation/noise_msg_fusion_run_<job>/gnps_fusion_scores \

@@ -35,24 +35,21 @@ mkdir -p "$OUT" "$SCRATCH"
 cleanup() { rm -rf -- "$SCRATCH"; }
 trap cleanup EXIT
 
-resolve_one() {
-  local label="$1"; shift
-  local -a hits=()
-  while IFS= read -r hit; do [[ -n "$hit" ]] && hits+=("$hit"); done < <(find "$@" 2>/dev/null | sort)
-  if (( ${#hits[@]} != 1 )); then
-    echo "B_DUAL_MULTI_${label}: expected exactly one reusable artifact, found ${#hits[@]}" >&2
-    printf '  %s\n' "${hits[@]:-}" >&2
-    exit 4
-  fi
-  printf '%s' "${hits[0]}"
-}
-
 # MSG is a frozen parent model trained formula-OOF before GNPS application.
 # Ambiguous discovery fails closed; an explicit MSG_FUSION_GNPS overrides it.
 if [[ -n "${MSG_FUSION_GNPS:-}" ]]; then
   MSG_CACHE="$MSG_FUSION_GNPS"
 else
-  MSG_CACHE="$(resolve_one MSG_CACHE data/validation/noise_msg_fusion_run_*/gnps_fusion_scores)"
+  msg_hits=()
+  for candidate in data/validation/noise_msg_fusion_run_*/gnps_fusion_scores; do
+    [[ -d "$candidate" && -s "$candidate/report.json" ]] && msg_hits+=("$candidate")
+  done
+  if (( ${#msg_hits[@]} != 1 )); then
+    echo "B_DUAL_MULTI_MSG_CACHE: expected exactly one reusable cache directory, found ${#msg_hits[@]}" >&2
+    printf '  %s\n' "${msg_hits[@]:-}" >&2
+    exit 4
+  fi
+  MSG_CACHE="${msg_hits[0]}"
 fi
 
 required=(
