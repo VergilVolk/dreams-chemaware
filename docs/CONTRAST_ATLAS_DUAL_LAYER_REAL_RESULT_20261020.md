@@ -210,3 +210,24 @@ Noise V1 在本地没有冻结 checkpoint，不能伪造比较。已准备唯一
 为避免继续围绕单一 HFD 正控优化算子，新增 `MTBLS1066` ketogenic-diet 来源的 metadata/acquisition-only 资格审计。官方目录证明该研究有 20 个生物个体、四种 LC-MS/MS 模式和 168 个 mzML；第一轮冻结为 15 个正离子 RP 生物文件，分别构建健康背景 `H_MCT-H_C`（4 对 4）和 breast-cancer + cyclophosphamide 背景 `BC_MCT-BC_C`（3 对 4）两条有向响应。真实健康对照文件的前 2 MiB 已出现 43 个 MS2 标签，故该来源具备 sample-level DDA，而不是 pooled-QC-only 碎裂。
 
 `H_LCT` 因官方文件名与 ISA diet label 发生语义冲突而在开效应前排除。新来源目前只是合格的 within-source response substrate；尚无实际 beta/SE、开放检索结果或 unknown 增量。完整设计、停止条件和执行入口见 `docs/CONTRAST_ATLAS_SYSTEMATIC_INTERVENTION_EXPANSION_20261022.md`。
+
+## 9. 协方差校正响应场：冻结负结果
+
+为检验 centered mean 是否因来源内高频化学方向而失真，在五来源、16 个对比、冻结 official DreaMS embedding 上预先固定了一个 response-field 算子。每个查询对比以 `beta/sqrt(beta^2+SE^2)` 为目标，用固定 `alpha=10` 的 ridge 学习谱图坐标到响应权重的映射；查询内部五折 OOF R2 必须严格为正，才允许将该函数投到 source-disjoint 候选研究。候选得分是预测响应与真实候选响应的中心化相关，null 在候选研究的 identity stratum 内重排完整响应权重。目标响应没有参与正则化或资格门选择。
+
+查询内部并非完全没有可学习信号：48 个 query-world 中 40 个通过 OOF R2 门，完整固定候选表含 594 行，其中 459 行可回答。但预先保留的 HFD 来源内正控失败：
+
+- `all`：Top-2 为 `male_hfd_vs_normal` 与 `female_vs_male_hfd`，不是两个 HFD-vs-normal；最弱 HFD 减最强 sex 的边际为 -0.026294，31 次候选响应重排中 10 次边际同样大或更大；
+- `unresolved`：同样错误地保留一个 sex contrast，边际 -0.052156，重排中 25/31 同样大或更大；
+- `known`：目标来源只有 5 个 known entities，按预设门弃权。
+
+Post-hoc obesity 检查中 `all` 与 `unresolved` 各有 2/4 查询把两个 obesity 对比排入 Top-2，`known` 为 0/4；相应 null exact-Top2 比例为 0.210、0.145 和 0.194。由于主 HFD 正控已经失败，而且 obesity 不是确认性终点，这些结果不能晋级该算子。
+
+因此 response field 被封存为**开发期负结果**：它说明谱图坐标可以在多数研究内拟合部分响应结构，但该结构不能可靠地区分干预轴与 sex 轴。不得依据本次 HFD/obesity 结果调整 alpha、OOF 门或得分定义。下一项算子判定必须使用新增的、效应尚未打开的独立干预来源，而不是继续在现有 consumed HFD/obesity 结果上迭代。
+
+可复算产物：
+
+- `tasks/audit_contrast_atlas_response_field.py`
+- `data/validation/contrast_atlas_response_field_official_v1_20261022/`
+- `data/validation/contrast_atlas_hfd_response_field_official_v1_20261022/`
+- `data/validation/contrast_atlas_obesity_response_field_official_v1_20261022/`

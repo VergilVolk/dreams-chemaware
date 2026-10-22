@@ -1,0 +1,97 @@
+{
+  "schema": "contrast_atlas_hfd_source_conditioned_axis_v1",
+  "status": "DEVELOPMENT_CONSUMED_POSITIVE_CONTROL_SENSITIVITY_COMPLETE",
+  "question": "Within MSV000088023 only, does the mouse HFD query rank both HFD-vs-normal contrasts above both sex contrasts by direction-agnostic response alignment?",
+  "denominators": {
+    "query_contrasts": 1,
+    "target_source_families": 1,
+    "target_contrasts": 4,
+    "relevant_hfd_contrasts": 2,
+    "sex_contrast_decoys": 2,
+    "response_reassignment_replicates": 31,
+    "uniform_random_exact_top2_probability": 0.16666666666666666
+  },
+  "observed": [
+    {
+      "evidence_world": "all",
+      "score_available": true,
+      "exact_hfd_top2": false,
+      "top2_contrasts": [
+        "female_vs_male_hfd",
+        "male_hfd_vs_normal"
+      ],
+      "weakest_hfd_minus_strongest_sex_margin": -0.0262940085990405,
+      "reason": "available"
+    },
+    {
+      "evidence_world": "known",
+      "score_available": false,
+      "exact_hfd_top2": null,
+      "top2_contrasts": null,
+      "weakest_hfd_minus_strongest_sex_margin": null,
+      "reason": "at least one within-source contrast lacks a score"
+    },
+    {
+      "evidence_world": "unresolved",
+      "score_available": true,
+      "exact_hfd_top2": false,
+      "top2_contrasts": [
+        "female_vs_male_hfd",
+        "male_hfd_vs_normal"
+      ],
+      "weakest_hfd_minus_strongest_sex_margin": -0.0521555158253396,
+      "reason": "available"
+    }
+  ],
+  "sensitivity": [
+    {
+      "evidence_world": "all",
+      "score_available": true,
+      "observed_exact_hfd_top2": false,
+      "observed_separation_margin": -0.0262940085990405,
+      "null_replicates_available": 31,
+      "null_exact_hfd_top2_count": 4,
+      "null_exact_hfd_top2_fraction": 0.12903225806451613,
+      "null_margin_as_large_or_larger_count": 10,
+      "null_margin_as_large_or_larger_fraction": 0.3225806451612903,
+      "claim_status": "NONCALIBRATED_RESPONSE_REASSIGNMENT_SENSITIVITY"
+    },
+    {
+      "evidence_world": "known",
+      "score_available": false,
+      "claim_status": "ABSTAIN_INSUFFICIENT_KNOWN_RESPONSE_EVIDENCE"
+    },
+    {
+      "evidence_world": "unresolved",
+      "score_available": true,
+      "observed_exact_hfd_top2": false,
+      "observed_separation_margin": -0.0521555158253396,
+      "null_replicates_available": 31,
+      "null_exact_hfd_top2_count": 6,
+      "null_exact_hfd_top2_fraction": 0.1935483870967742,
+      "null_margin_as_large_or_larger_count": 25,
+      "null_margin_as_large_or_larger_fraction": 0.8064516129032258,
+      "claim_status": "NONCALIBRATED_RESPONSE_REASSIGNMENT_SENSITIVITY"
+    }
+  ],
+  "interpretation": {
+    "source_identity_confounding": "controlled by ranking only within one target source",
+    "composition_control": "all four candidate contrasts share the same target spectra and composition score; composition cannot determine their within-source order",
+    "known_only": "abstains because target HFD/sex contrasts contain only five known entities and effective response support is below the frozen threshold",
+    "unknown_increment": "not established: unresolved-only answers the control, but no measurement-matched known-only accuracy comparison is available"
+  },
+  "claim_boundary": [
+    "This is an exact-intervention response-axis positive control, not an open biological discovery.",
+    "Alignment strength is direction-agnostic because sex and biofluid differ across studies.",
+    "Feature-level response reassignment is a sensitivity, not a calibrated randomisation p-value.",
+    "All inputs are development/consumed."
+  ],
+  "input_sha256": {
+    "data\\validation\\contrast_atlas_response_field_official_v1_20261022\\fixed_candidate_scores.tsv.gz": "6db6f94796c15ce6a1f5a3a1dc5bf1ceaa59bb1b7b567c0f70ed977656b110af",
+    "data\\validation\\contrast_atlas_response_field_official_v1_20261022\\stratified_response_reassignment_scores.tsv.gz": "ffa9bb1c91dcde7e881eebc24424c06421a4a405ef1adf043960179dd1553558"
+  },
+  "output_sha256": {
+    "source_conditioned_candidate_detail.tsv": "f29047dddfc79ddfc1bb1cc2b53099c612f45a892fd08c95e34be01c1f27bd6d",
+    "response_reassignment_summary.tsv": "172a98647e89cdfcb0255547301332014347b849538518b6be49c3979c16d5df"
+  }
+}

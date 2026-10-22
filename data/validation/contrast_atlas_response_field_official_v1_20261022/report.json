@@ -1,0 +1,74 @@
+{
+  "schema": "contrast_atlas_covariance_corrected_response_field_v1",
+  "status": "DEVELOPMENT_CONSUMED_FALSIFICATION_RESULT",
+  "method": {
+    "response_weight": "beta/sqrt(beta^2+se^2)",
+    "field": "ridge mapping from frozen unit spectrum embedding to response weight",
+    "ridge_alpha": 10.0,
+    "ridge_alpha_selection": "fixed before execution; no target outcome used",
+    "query_identifiability": "five-fold out-of-fold R2 strictly greater than zero",
+    "candidate_score": "centred cosine of transferred prediction and candidate response weight",
+    "null": "candidate response weights reassigned within identity stratum",
+    "null_replicates": 31,
+    "minimum_entities": 20
+  },
+  "denominators": {
+    "source_families": 5,
+    "study_level_contrasts": 16,
+    "query_worlds": 48,
+    "identifiable_query_worlds": 40,
+    "fixed_candidate_rows": 594,
+    "available_candidate_rows": 459,
+    "null_candidate_rows": 18414
+  },
+  "input_sha256": {
+    "data\\validation\\contrast_atlas_open_response_collection_v2_20261019\\response_entities.tsv.gz": "b88a311ee92190477aaaa5b14a179aa1471777b780aca8de21d871b39605bafe",
+    "data\\validation\\contrast_atlas_open_response_collection_v2_20261019\\contrast_manifest.tsv": "3a4104242fed78b346027bcd048fa8853120486c979e835efb43b9d6b37bbd00",
+    "data\\validation\\contrast_atlas_open_response_embeddings_official_v1_20261019\\embedding_manifest.tsv": "1567b033837430f17d4728752100bb532e41e2d41f2ab0a08cbe0f817091a3ed"
+  },
+  "embedding_reports": [
+    {
+      "study_id": "MSV000097426",
+      "entities": 2163,
+      "dimensions": 1024,
+      "embedding_sha256": "3b05b3257619ce15c5db2508cfd34409dc9cb0450291b98ef97dc0e6087d6268"
+    },
+    {
+      "study_id": "MSV000084112",
+      "entities": 5501,
+      "dimensions": 1024,
+      "embedding_sha256": "96dc33ed05937bdac3f259aa494e22ec884aec411102421b1fbe835aeb468f35"
+    },
+    {
+      "study_id": "MSV000083077",
+      "entities": 7132,
+      "dimensions": 1024,
+      "embedding_sha256": "86719f24dbdd59b2081c3e91c590a890a4337a74c4fef848b19e5c6cb2e9f89d"
+    },
+    {
+      "study_id": "MSV000088023",
+      "entities": 212,
+      "dimensions": 1024,
+      "embedding_sha256": "770a8720e03d4c3d0fb9e40bb51760df2da6fb56029da45b10f7e49d2e36f717"
+    },
+    {
+      "study_id": "MSV000090788",
+      "entities": 2350,
+      "dimensions": 1024,
+      "embedding_sha256": "9540acec433a6cf50b843acc0bbf8d015770e5ac36b54d4bbfe778f415f55174"
+    }
+  ],
+  "claim_boundary": [
+    "All sources and response labels are development/consumed.",
+    "This relation-layer field does not identify molecules or merge beta/SE across ions.",
+    "Unresolved means not library-supported, not a unique metabolite.",
+    "Feature-level cross-validation may share ion families and is an identifiability screen, not external evidence.",
+    "HFD and obesity family results are audited only after the complete fixed score table exists.",
+    "A positive source-conditioned control cannot by itself establish open biological discovery or unknown increment."
+  ],
+  "output_sha256": {
+    "fixed_candidate_scores.tsv.gz": "6db6f94796c15ce6a1f5a3a1dc5bf1ceaa59bb1b7b567c0f70ed977656b110af",
+    "stratified_response_reassignment_scores.tsv.gz": "ffa9bb1c91dcde7e881eebc24424c06421a4a405ef1adf043960179dd1553558",
+    "query_field_diagnostics.tsv": "42220ddc882c5e8051aa26cc78759283808d0c9e6fe5640b5dc708f6d11d23a4"
+  }
+}
