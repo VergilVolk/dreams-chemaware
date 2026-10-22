@@ -1,7 +1,11 @@
 {
   "schema": "ibd200_plate3_algorithm_application_slice_v1",
-  "status": "DEVELOPMENT_CONSUMED_ALGORITHM_BIOLOGY_HANDOFF_COMPLETE",
+  "status": "DEVELOPMENT_ALGORITHM_HANDOFF_COMPLETE_BIOLOGY_ADDUCT_FILTER_REQUIRED",
   "data_role": "development_consumed",
+  "biology_application_update": {
+    "audit": "data/validation/contrast_atlas_ibd200_candidate_adduct_audit_v1_20261022/report.json",
+    "boundary": "the full score axis is retained for identical-condition algorithm comparison, but strict biological identity links may use only explicit neutral-mass-compatible candidates"
+  },
   "denominators": {
     "plate3_participants": 55,
     "plate3_ibd": 36,

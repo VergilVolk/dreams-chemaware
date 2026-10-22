@@ -1,0 +1,38 @@
+{
+  "schema": "ibd200_candidate_adduct_compatibility_audit_v1",
+  "status": "ADDUCT_AWARE_CANDIDATE_UNIVERSE_VERIFIED",
+  "data_role": "development_consumed",
+  "denominators": {
+    "queries": 662,
+    "algorithm_answerable_queries_original": 38,
+    "queries_with_explicit_ion_and_neutral_mass": 58,
+    "queries_with_unresolved_adduct": 604,
+    "queries_with_any_explicit_neutral_compatible_candidate": 45,
+    "candidate_edges": 509,
+    "explicit_neutral_compatible_edges": 509,
+    "explicit_neutral_incompatible_edges": 0,
+    "adduct_unresolved_edges": 0,
+    "WSE_answered_queries": 38,
+    "WSE_top1_explicit_neutral_compatible": 38,
+    "WSE_top1_explicit_neutral_incompatible": 0,
+    "WSE_top1_adduct_unresolved": 0
+  },
+  "parameters": {
+    "neutral_mass_ppm": 10.0
+  },
+  "interpretation": "Every candidate-bearing edge is explicitly neutral-mass compatible; queries without an ion assignment remain zero-candidate abstentions.",
+  "provenance": {
+    "query_entities_sha256": "1f3e6fa424d07c75bdc9551116c4b9a428b3377909582c17822b3b7e17f55fd4",
+    "candidate_structures_sha256": "40ff15406619f8f1b969d0fe327137ace3e59a461db674ffd07cd06ca300cbc3",
+    "WSE_score_bundle_sha256": "f7f836ee659bf5cb713f5ab71dac8fb28bb9999455e18eacef3201f2d6b88b1a",
+    "GNPS_quant_sha256": "515c4821d9b0b86322cd7d6493ae9a5345a4541babbf189214e97719ed1e05fb",
+    "candidate_audit_sha256": "7984bf07828fec4a1f5e5608e1586648a11ddb0552c865e0b7f3603c0014825d",
+    "query_audit_sha256": "50a4503c9919fce58d0be119f182e60201e1ca0a00691ab77a587b8a5d7db739",
+    "implementation_sha256": "a7b60b3fdd0d066d535409b407a35ff092ce6588313482eef0106e467c07878a"
+  },
+  "claim_boundary": [
+    "FBMN best-ion and neutral-mass fields are phenotype-blind annotations, not definitive adduct truth.",
+    "Adduct-unresolved queries are abstentions for strict identity use, not proven incompatible.",
+    "This audit invalidates strict biological interpretation of the original candidate universe; it does not invalidate spectrum-only benchmarking on its stated [M+H]+ task."
+  ]
+}

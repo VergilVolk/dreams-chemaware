@@ -131,9 +131,16 @@ def main() -> None:
     query_summary.to_csv(query_path, sep="\t", index=False, compression=compression)
 
     explicit_query = query_summary["neutral M mass"].notna()
+    incompatible_edges = int(candidates["adduct_compatibility_status"].eq("explicit_neutral_incompatible").sum())
+    unresolved_edges = int(candidates["adduct_compatibility_status"].eq("adduct_unresolved").sum())
+    candidate_axis_verified = incompatible_edges == 0 and unresolved_edges == 0
     report = {
         "schema": "ibd200_candidate_adduct_compatibility_audit_v1",
-        "status": "ORIGINAL_PROTONATED_CANDIDATE_UNIVERSE_NOT_APPLICATION_SAFE",
+        "status": (
+            "ADDUCT_AWARE_CANDIDATE_UNIVERSE_VERIFIED"
+            if candidate_axis_verified
+            else "ORIGINAL_PROTONATED_CANDIDATE_UNIVERSE_NOT_APPLICATION_SAFE"
+        ),
         "data_role": "development_consumed",
         "denominators": {
             "queries": int(len(query_summary)),
@@ -143,8 +150,8 @@ def main() -> None:
             "queries_with_any_explicit_neutral_compatible_candidate": int(query_summary["strict_adduct_evaluable"].sum()),
             "candidate_edges": int(len(candidates)),
             "explicit_neutral_compatible_edges": int(candidates["adduct_compatibility_status"].eq("explicit_neutral_compatible").sum()),
-            "explicit_neutral_incompatible_edges": int(candidates["adduct_compatibility_status"].eq("explicit_neutral_incompatible").sum()),
-            "adduct_unresolved_edges": int(candidates["adduct_compatibility_status"].eq("adduct_unresolved").sum()),
+            "explicit_neutral_incompatible_edges": incompatible_edges,
+            "adduct_unresolved_edges": unresolved_edges,
             "WSE_answered_queries": int(len(top_rows)),
             "WSE_top1_explicit_neutral_compatible": int(top_status.eq("explicit_neutral_compatible").sum()),
             "WSE_top1_explicit_neutral_incompatible": int(top_status.eq("explicit_neutral_incompatible").sum()),
@@ -152,6 +159,9 @@ def main() -> None:
         },
         "parameters": {"neutral_mass_ppm": float(args.neutral_ppm)},
         "interpretation": (
+            "Every candidate-bearing edge is explicitly neutral-mass compatible; queries without an ion "
+            "assignment remain zero-candidate abstentions."
+            if candidate_axis_verified else
             "The existing candidate axis assumes protonated precursors. Explicit FBMN neutral masses show "
             "that most annotated-query candidates are chemically incompatible; missing ion annotations "
             "cannot be silently treated as [M+H]+. Strict biological identity links must therefore use "

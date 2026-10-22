@@ -1,0 +1,32 @@
+{
+  "schema": "ibd200_plate3_candidate_score_bundle_report_v1",
+  "status": "DEVELOPMENT_CONSUMED_WSE_CANDIDATE_BUNDLE_COMPLETE",
+  "labels_accessed": false,
+  "method_id": "weighted_spectral_entropy",
+  "parameters": {
+    "fragment_da": 0.02
+  },
+  "denominators": {
+    "queries": 662,
+    "candidate_structures": 509,
+    "candidate_library_spectrum_edges": 865,
+    "scored_library_spectrum_edges": 805,
+    "available_candidate_scores": 461,
+    "queries_with_available_score": 38,
+    "queries_abstained": 624,
+    "query_mgf_spectra": 2498,
+    "library_mgf_spectra": 329607,
+    "selected_library_spectra": 353
+  },
+  "input_sha256": {
+    "data\\validation\\contrast_atlas_ibd200_plate3_adduct_aware_slice_v2_20261022\\query_entities.tsv.gz": "1f3e6fa424d07c75bdc9551116c4b9a428b3377909582c17822b3b7e17f55fd4",
+    "data\\validation\\contrast_atlas_ibd200_plate3_adduct_aware_slice_v2_20261022\\candidate_library_spectra.tsv.gz": "097bc10d152095beae3a90f88c76f212a3dfa5fd5a50a72e224a7b4c239fa62b",
+    "data\\validation\\contrast_atlas_ibd200_plate3_adduct_aware_slice_v2_20261022\\candidate_structures.tsv.gz": "40ff15406619f8f1b969d0fe327137ace3e59a461db674ffd07cd06ca300cbc3",
+    "data\\validation\\contrast_atlas_ibd200_plate3_adduct_aware_slice_v2_20261022\\report.json": "3601079af7efad64b7f44a3524773027e344dcb121d680e1349944560dc1e515",
+    "data\\validation\\contrast_atlas_ibd200_precursor_repair_v1_20261022\\representative_spectra.mgf": "602222d161cede44eed6406656e3a8fb81dc0a49b7a78c0c04fae3b722f672be",
+    "data\\validation\\gnps_gold_silver_10ppm_benchmark_v1\\spectra.mgf": "b813c9e85cdfa4c85d0c6585ffa0f6ffa03e74fa4ce5f12af861d219bd95afae"
+  },
+  "output_sha256": "f7f836ee659bf5cb713f5ab71dac8fb28bb9999455e18eacef3201f2d6b88b1a",
+  "handoff": "query_ptr/query_ids/candidate_ids is the immutable biology candidate axis; B, integrated spectral and BioAware scores must preserve it exactly",
+  "claim_boundary": "This phenotype-blind bundle is a baseline score artifact, not an identification, biological result, or unknown-information increment."
+}

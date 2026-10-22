@@ -1,0 +1,81 @@
+{
+  "schema": "ibd200_algorithm_public_response_link_evaluation_v1",
+  "status": "DESCRIPTIVE_ALGORITHM_TO_PUBLIC_RESPONSE_LINKS_COMPLETE",
+  "data_role": "development_consumed",
+  "fixed_denominators": {
+    "ibd200_queries": 662,
+    "candidate_edges": 509,
+    "prespecified_independent_ibd_target_studies": 2,
+    "public_response_anchor_entities": 228,
+    "public_response_anchor_structures": 210,
+    "candidate_edges_with_public_response_anchor": 13,
+    "queries_with_public_response_anchor_opportunity": 10
+  },
+  "method_results": {
+    "WSE": {
+      "score_path": "data\\validation\\contrast_atlas_ibd200_plate3_adduct_aware_slice_v2_20261022\\wse_candidate_scores.npz",
+      "score_field": "WSE_score",
+      "score_sha256": "f7f836ee659bf5cb713f5ab71dac8fb28bb9999455e18eacef3201f2d6b88b1a",
+      "answered_queries": 38,
+      "queries_with_public_response_opportunity": 10,
+      "selected_public_response_anchor_queries": 9,
+      "selected_public_response_anchor_queries_by_identity_status": {
+        "library_supported": 2,
+        "unresolved_entity": 7
+      },
+      "heldout_fold_response_links": 22,
+      "candidate_structure_target_clusters": 6,
+      "descriptive_direction_concordance": 0.5454545454545454,
+      "structure_target_weighted_direction_concordance": 0.5,
+      "descriptive_effect_compatible_95": 0.9545454545454546,
+      "response_links_by_query_identity_status": {
+        "library_supported": {
+          "heldout_fold_response_links": 6,
+          "descriptive_direction_concordance": 0.6666666666666666,
+          "descriptive_effect_compatible_95": 1.0
+        },
+        "unresolved_entity": {
+          "heldout_fold_response_links": 16,
+          "descriptive_direction_concordance": 0.5,
+          "descriptive_effect_compatible_95": 0.9375
+        }
+      }
+    }
+  },
+  "development_unresolved_response_candidates": {},
+  "scientific_contract": {
+    "candidate_selection": "scores only; no response effect is available to the ranker",
+    "candidate_chemistry": "only explicit FBMN neutral-mass-compatible candidates; unresolved adduct is abstention",
+    "target_selection": "two prespecified registered independent IBD-versus-control study relations",
+    "response_evaluation": "IBD200 effects are estimated in held-out participant folds; public effects are fixed",
+    "candidate_response_gate": "Plate3 BH q<=0.05 across 662 entities, at least one public target |z|>=1.96, both target studies represented, and all held-out directions concordant",
+    "future_comparison": "B and integrated scores must preserve the exact query_ptr/query_ids/candidate_ids axis"
+  },
+  "provenance": {
+    "reference_score_bundle_sha256": "f7f836ee659bf5cb713f5ab71dac8fb28bb9999455e18eacef3201f2d6b88b1a",
+    "candidate_structures_sha256": "40ff15406619f8f1b969d0fe327137ace3e59a461db674ffd07cd06ca300cbc3",
+    "candidate_adduct_audit_sha256": "7984bf07828fec4a1f5e5608e1586648a11ddb0552c865e0b7f3603c0014825d",
+    "sealed_heldout_effects_sha256": "f25e2f21ee0bb5228ec41acd37959be9a9063ed7387c1673d27d0e15281fbf45",
+    "response_collection_sha256": "6610987fe472a195e2fcf40ee6f7b7aae0477c063901436f2d05a9f0557f2330",
+    "registered_relations_sha256": "61c4473d200e29a4210dd18b55c3b222dd9819c8a7a63a0d0c71e1289be720fc",
+    "query_identity_partition_sha256": "8fdfdbeb0013e79db462955a0758943668cc2cfc56450d3ae64b07dad17703f1",
+    "identity_partition_sha256": {
+      "MSV000097610": "f85f4d244eaee9728dfeece01e1c4f18bee4eafac059148266ab75dd3c1f68cf",
+      "MSV000096564": "4754308a54c38175c525b019b3b0f86b5cd1fc753e9e0313cf3e43e353b524a5"
+    },
+    "anchors_sha256": "c75d98f70ab4013504ea69ae23bc3339154d4cceb7305bc6880d604219d4ac04",
+    "candidate_links_sha256": "4a89c54f86dd25ca62c41e06de49d4b94772b0771369a8d428f9366a39ab67b5",
+    "method_top_candidates_sha256": "630b80d372cf0f079805e6985ac747e2918cd6d960bfbfd777cd376756e368d5",
+    "method_response_links_sha256": "5c749ee4b88f8f6b3764de59afd638e4ed781d14272d4051297d3f8a00669d62",
+    "development_unresolved_candidates_sha256": "d672a5b02f3c25f51e9d8a5d716cd73da804847cc67ae4b5c313598fd3fda62a",
+    "implementation_sha256": "9da15c9cfd853a791ab59524835526b22416f6e7dc723ff96708526f811e6df0"
+  },
+  "claim_boundary": [
+    "Direction concordance is a descriptive response-support endpoint, not identity truth.",
+    "The target studies differ in age and IBD subtype; discordance is not automatically an algorithm error.",
+    "Strict library support is not MSI level-1 identity, and unresolved query predictions are not metabolite identifications.",
+    "Unregistered public studies are neither positives nor negatives and are excluded from the primary response-support summary.",
+    "Development unresolved-response candidates are post-hoc leads and require orthogonal identity and prospective biological confirmation.",
+    "Queries without an explicit neutral-mass-compatible candidate are strict chemistry abstentions, not negative results."
+  ]
+}

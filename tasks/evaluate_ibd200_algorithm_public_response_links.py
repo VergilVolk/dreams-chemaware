@@ -15,6 +15,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 from pathlib import Path
 
 import numpy as np
@@ -65,6 +66,19 @@ def bool_column(series: pd.Series) -> pd.Series:
     return series.astype(str).str.lower().eq("true")
 
 
+def benjamini_hochberg(p_values: np.ndarray) -> np.ndarray:
+    values = np.asarray(p_values, dtype=np.float64)
+    if values.ndim != 1 or not np.isfinite(values).all():
+        raise ValueError("BH input must be one-dimensional and finite")
+    order = np.argsort(values, kind="mergesort")
+    ranked = values[order]
+    adjusted = ranked * len(values) / np.arange(1, len(values) + 1)
+    adjusted = np.minimum.accumulate(adjusted[::-1])[::-1]
+    output = np.empty_like(adjusted)
+    output[order] = np.minimum(adjusted, 1.0)
+    return output
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--slice-dir", required=True, type=Path)
@@ -110,6 +124,24 @@ def main() -> None:
         raise RuntimeError("this evaluator expects unsigned design relevance, not signed truth")
 
     responses = pd.read_csv(responses_path, sep="\t", low_memory=False)
+    query_full = responses.loc[
+        responses["study_id"].astype(str).eq("IBD200_GROUP")
+        & responses["contrast_id"].astype(str).eq("adult_all_ibd_vs_healthy"),
+        ["entity_id", "beta", "se"],
+    ].copy()
+    if len(query_full) != len(query_ids) or query_full["entity_id"].duplicated().any():
+        raise RuntimeError("full Plate3 response does not match the candidate query denominator")
+    query_full["query_full_z"] = query_full["beta"] / query_full["se"]
+    query_full["query_full_p"] = [
+        math.erfc(abs(float(value)) / math.sqrt(2.0))
+        for value in query_full["query_full_z"]
+    ]
+    query_full["query_full_bh_q"] = benjamini_hochberg(
+        query_full["query_full_p"].to_numpy(float)
+    )
+    query_full = query_full.rename(columns={
+        "beta": "query_full_beta", "se": "query_full_se",
+    })
     query_identity_path = args.identity_shards_root / "IBD200_GROUP" / "identity_partition.tsv.gz"
     if not query_identity_path.is_file():
         raise FileNotFoundError(query_identity_path)
@@ -171,10 +203,15 @@ def main() -> None:
         "query_identity_status": [query_identity_map[str(query_id)] for query_id in edge_queries],
     })
     candidate_structures = pd.read_csv(candidate_structures_path, sep="\t")
+    mass_error_column = (
+        "minimum_neutral_mass_ppm"
+        if "minimum_neutral_mass_ppm" in candidate_structures.columns
+        else "minimum_precursor_ppm"
+    )
     candidate_structures = candidate_structures[[
         "entity_id", "candidate_id", "smiles", "formula", "exact_mass",
-        "query_precursor_mz", "minimum_precursor_ppm",
-    ]].copy()
+        "query_precursor_mz", mass_error_column,
+    ]].copy().rename(columns={mass_error_column: "candidate_mass_error_ppm"})
     if candidate_structures.duplicated(["entity_id", "candidate_id"]).any():
         raise RuntimeError("candidate structure table has duplicate query-candidate pairs")
     edge_axis = edge_axis.merge(
@@ -251,6 +288,9 @@ def main() -> None:
             effects[["outer_fold", "entity_id", "query_beta", "query_se", "n_positive", "n_negative"]],
             on="entity_id", how="left", validate="many_to_many",
         )
+        method_links = method_links.merge(
+            query_full, on="entity_id", how="left", validate="many_to_one",
+        )
         method_links["direction_concordant"] = (
             method_links["query_beta"] * method_links["target_beta"] > 0
         )
@@ -259,6 +299,9 @@ def main() -> None:
             (method_links["query_beta"] - method_links["target_beta"]) / total_se
         )
         method_links["effect_compatible_95"] = method_links["standardized_effect_difference"].abs() <= 1.96
+        method_links["target_abs_z"] = (
+            method_links["target_beta"] / method_links["target_se"]
+        ).abs()
         response_link_parts.append(method_links)
 
         unresolved = method_links.loc[
@@ -279,6 +322,10 @@ def main() -> None:
                     mean_absolute_standardized_difference=(
                         "standardized_effect_difference", lambda values: float(values.abs().mean())
                     ),
+                    query_full_beta=("query_full_beta", "first"),
+                    query_full_se=("query_full_se", "first"),
+                    query_full_bh_q=("query_full_bh_q", "first"),
+                    maximum_target_abs_z=("target_abs_z", "max"),
                 )
             )
             robust = robust.loc[
@@ -288,6 +335,8 @@ def main() -> None:
                 )
                 & robust["all_direction_concordant"]
                 & robust["all_effect_compatible_95"]
+                & robust["query_full_bh_q"].le(0.05)
+                & robust["maximum_target_abs_z"].ge(1.96)
             ].copy()
             robust_candidate_parts.append(robust)
 
@@ -374,6 +423,7 @@ def main() -> None:
             "candidate_chemistry": "only explicit FBMN neutral-mass-compatible candidates; unresolved adduct is abstention",
             "target_selection": "two prespecified registered independent IBD-versus-control study relations",
             "response_evaluation": "IBD200 effects are estimated in held-out participant folds; public effects are fixed",
+            "candidate_response_gate": "Plate3 BH q<=0.05 across 662 entities, at least one public target |z|>=1.96, both target studies represented, and all held-out directions concordant",
             "future_comparison": "B and integrated scores must preserve the exact query_ptr/query_ids/candidate_ids axis",
         },
         "provenance": {

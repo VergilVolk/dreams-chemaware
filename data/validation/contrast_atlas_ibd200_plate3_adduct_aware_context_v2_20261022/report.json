@@ -1,0 +1,54 @@
+{
+  "schema": "ibd200_plate3_candidate_context_evidence_v1",
+  "status": "PHENOTYPE_BLIND_CANDIDATE_SPECIFIC_CONTEXT_EVIDENCE_COMPLETE",
+  "data_role": "development_consumed",
+  "denominators": {
+    "samples": 55,
+    "query_entities": 662,
+    "candidate_edges": 509,
+    "strict_anchor_entities": 40,
+    "strict_anchor_structures": 22,
+    "outer_folds": 2,
+    "real_available_edges_by_fold": [
+      7,
+      10
+    ],
+    "wrong_available_edges_by_fold": [
+      9,
+      11
+    ],
+    "paired_available_edges_by_fold": [
+      7,
+      10
+    ],
+    "paired_available_queries_by_fold": [
+      5,
+      8
+    ]
+  },
+  "method": {
+    "training_samples": "participants outside the evaluated outer fold only",
+    "candidate_anchor": "independent IBD entity with frozen strict GNPS Gold/Silver library support for candidate InChIKey",
+    "self_anchor": "forbidden",
+    "features": "median detection Jaccard, joint-detection Spearman correlation, and their signed product",
+    "minimum_joint_detections": 5,
+    "wrong_context": "frozen whole-profile permutation within exact training detection degree",
+    "fair_evaluation_subset": "paired_context_available only; all other candidate edges remain explicit context abstentions"
+  },
+  "leakage_status": "diagnosis, beta, SE, contrast label, held-out effects and retrieval truth were not loaded; only complementary-fold sample profiles and frozen phenotype-blind library anchors were used",
+  "provenance": {
+    "score_bundle_sha256": "f7f836ee659bf5cb713f5ab71dac8fb28bb9999455e18eacef3201f2d6b88b1a",
+    "sample_context_sha256": "c215c3ca17d2221fe7dead1420b0eb00926368548318467b8985a649baf38845",
+    "wrong_context_sha256": "c108cca9ce7873581d002ae3c4dfb7ff43b62577f5884d8a320b4c38b290d857",
+    "identity_partition_sha256": "8fdfdbeb0013e79db462955a0758943668cc2cfc56450d3ae64b07dad17703f1",
+    "evidence_npz_sha256": "72cd99c3354e4508ec8dba2b1fca33719c34154b1b687f9f92c0dbcc0b59e513",
+    "ledger_sha256": "30575ecf46e0efbf20cf4386ef96eb30250bddfe82c60acea3b2aa572c666c42",
+    "implementation_sha256": "8cba9f72de74892f2f6d810fb52990eba5064a7e868440208f29540647816091"
+  },
+  "claim_boundary": [
+    "This is candidate-specific event evidence, not a validated BioAware performance gain.",
+    "Strict library support is an anchor policy, not MSI level-1 identity.",
+    "Missing candidate context is abstention and must never be converted to negative evidence.",
+    "Promotion requires real context to outperform degree-preserving wrong context on downstream held-out biological answers."
+  ]
+}

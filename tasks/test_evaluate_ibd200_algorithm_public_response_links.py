@@ -2,7 +2,7 @@ from pathlib import Path
 
 import numpy as np
 
-from evaluate_ibd200_algorithm_public_response_links import parse_score_spec
+from evaluate_ibd200_algorithm_public_response_links import benjamini_hochberg, parse_score_spec
 
 
 def test_parse_score_spec_preserves_windows_drive_path():
@@ -18,3 +18,8 @@ def test_top1_tie_contract_is_candidate_id_order():
     indices = np.flatnonzero(np.isfinite(scores))
     order = np.lexsort((candidates[indices], -scores[indices]))
     assert candidates[indices[order[0]]] == "A"
+
+
+def test_benjamini_hochberg_is_monotone_in_rank():
+    adjusted = benjamini_hochberg(np.asarray([0.04, 0.001, 0.03]))
+    np.testing.assert_allclose(adjusted, [0.04, 0.003, 0.04])

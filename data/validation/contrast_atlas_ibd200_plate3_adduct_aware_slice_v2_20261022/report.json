@@ -1,0 +1,45 @@
+{
+  "schema": "ibd200_plate3_adduct_aware_algorithm_application_slice_v1",
+  "status": "PHENOTYPE_BLIND_ADDUCT_AWARE_APPLICATION_SLICE_COMPLETE",
+  "data_role": "development_consumed",
+  "denominators": {
+    "queries": 662,
+    "queries_with_explicit_ion_and_neutral_mass": 58,
+    "queries_with_unresolved_adduct": 604,
+    "queries_with_candidates": 45,
+    "spectral_and_candidate_answerable": 38,
+    "candidate_structures": 509,
+    "candidate_library_spectrum_edges": 865,
+    "candidate_structures_cross_adduct": 353,
+    "queries_with_cross_adduct_candidates": 34
+  },
+  "candidate_contract": {
+    "mass_axis": "candidate exact neutral mass within 10 ppm of explicit FBMN neutral mass",
+    "reference_spectra": "frozen GNPS Gold/Silver positive protonated library",
+    "cross_adduct_task": "queries whose best ion is not [M+H]+ are scored against the same protonated reference candidates",
+    "unresolved_adduct": "zero candidates and explicit abstention",
+    "query_denominator": "all 662 corrected Plate3 response entities"
+  },
+  "leakage_status": "candidate construction read only feature identifiers, precursor/retention/ion annotations, representative spectral eligibility and the frozen library; phenotype and effect files were not read",
+  "provenance": {
+    "parent_query_entities_sha256": "f8f2f13bd027daa675e10b0cb96709f7a41a0bb48077c58cfb23958772af56f1",
+    "parent_report_sha256": "f5cac5bf8ab31bbe6d8f86b9816da67f5dcc8483a2bf35a76393d36eadfd7ed9",
+    "GNPS_quant_sha256": "515c4821d9b0b86322cd7d6493ae9a5345a4541babbf189214e97719ed1e05fb",
+    "library_manifest_sha256": "ab1d04418c89a5fc163d706c8fd79023c8f0e8c6957db99a302e98e9eac6de80",
+    "query_entities_sha256": "1f3e6fa424d07c75bdc9551116c4b9a428b3377909582c17822b3b7e17f55fd4",
+    "candidate_spectra_sha256": "097bc10d152095beae3a90f88c76f212a3dfa5fd5a50a72e224a7b4c239fa62b",
+    "candidate_structures_sha256": "40ff15406619f8f1b969d0fe327137ace3e59a461db674ffd07cd06ca300cbc3",
+    "passthrough_sha256": {
+      "phenotype_blind_context_folds.tsv": "13bd9244b81029edf5ba4d95c53675557a96f58b914f81c87682ba73f56e556f",
+      "phenotype_blind_sample_context.npz": "c215c3ca17d2221fe7dead1420b0eb00926368548318467b8985a649baf38845",
+      "degree_preserving_wrong_context.tsv.gz": "c108cca9ce7873581d002ae3c4dfb7ff43b62577f5884d8a320b4c38b290d857",
+      "sealed_heldout_effects.tsv.gz": "f25e2f21ee0bb5228ec41acd37959be9a9063ed7387c1673d27d0e15281fbf45"
+    },
+    "implementation_sha256": "57dead2a761b70711bf1d7d95c5d7762d0206ab6964e71b3bc040750f572663e"
+  },
+  "claim_boundary": [
+    "FBMN best-ion and neutral-mass assignments are phenotype-blind hypotheses, not definitive adduct identities.",
+    "Cross-adduct spectrum scoring is a harder real-application task and must be reported separately from [M+H]+ scoring.",
+    "This slice creates a fair candidate axis but does not establish any structure identification or biological gain."
+  ]
+}
