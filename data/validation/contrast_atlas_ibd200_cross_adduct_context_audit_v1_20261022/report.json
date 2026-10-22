@@ -1,7 +1,10 @@
 {
   "schema": "ibd200_cross_adduct_context_audit_v1",
-  "status": "REAL_CONTEXT_DIRECTIONAL_SIGNAL_NOT_QUALIFIED",
+  "status": "SUPERSEDED_LABEL_IS_POLICY_ANCHOR_NOT_STRUCTURE_TRUTH",
   "data_role": "development_consumed_posthoc_diagnostic",
+  "superseded_by": {
+    "replacement": "data/validation/contrast_atlas_ibd200_cross_adduct_context_audit_v2_policy_anchor_20261022/report.json"
+  },
   "denominators": {
     "ion_families": 2,
     "queries_with_paired_truth_context": 4,

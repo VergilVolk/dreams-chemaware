@@ -1,0 +1,57 @@
+{
+  "schema": "ibd200_cross_adduct_hidden_truth_benchmark_v1",
+  "status": "DEVELOPMENT_CONSUMED_POLICY_ANCHOR_CONSISTENCY_ONLY",
+  "data_role": "development_consumed",
+  "denominators": {
+    "ion_families": 2,
+    "nonprotonated_queries": 4,
+    "adduct_classes": [
+      "[M+Na]+",
+      "[M-2H2O+H]+",
+      "[M-H2O+H]+"
+    ],
+    "policy_anchor_entities": 2,
+    "policy_anchors_with_qualified_author_annotation": 2,
+    "policy_anchors_exactly_agreeing_with_author_annotation": 0
+  },
+  "method_results": {
+    "WSE": {
+      "queries": 4,
+      "ion_families": 2,
+      "truth_score_available": 4,
+      "unique_correct_top1": 1,
+      "truth_in_top_tie": 3,
+      "deterministic_top1_correct": 3,
+      "mean_optimistic_reciprocal_rank": 0.7916666666666667,
+      "mean_conservative_reciprocal_rank": 0.4583333333333333
+    }
+  },
+  "metric_contract": {
+    "primary": "unique frozen-policy InChIKey Top-1; arbitrary candidate-ID tie breaking is not credited",
+    "secondary": "policy-anchor membership in the top tie set and optimistic/conservative reciprocal rank",
+    "policy_anchor": "one strict [M+H]+ library-supported member within the same FBMN ion family"
+  },
+  "leakage_status": "ion annotations, neutral masses, spectra and strict library anchors only; no phenotype or response effect was read",
+  "provenance": {
+    "query_entities_sha256": "1f3e6fa424d07c75bdc9551116c4b9a428b3377909582c17822b3b7e17f55fd4",
+    "candidate_structures_sha256": "40ff15406619f8f1b969d0fe327137ace3e59a461db674ffd07cd06ca300cbc3",
+    "identity_partition_sha256": "8fdfdbeb0013e79db462955a0758943668cc2cfc56450d3ae64b07dad17703f1",
+    "author_annotations_sha256": "61a7325e9c7b224970b224247170c8447003954a84216aafd447b0766109c869",
+    "score_bundles": {
+      "WSE": {
+        "path": "data\\validation\\contrast_atlas_ibd200_plate3_adduct_aware_slice_v2_20261022\\wse_candidate_scores.npz",
+        "field": "WSE_score",
+        "sha256": "f7f836ee659bf5cb713f5ab71dac8fb28bb9999455e18eacef3201f2d6b88b1a"
+      }
+    },
+    "truth_ledger_sha256": "eef227f535264012032167daae33a30688dee4fc28a5b431b1454a5fb953e83b",
+    "results_sha256": "80fc176d50b56b0a9e0619d884d297089e204741643b2e492e4917799b14fb85",
+    "implementation_sha256": "3f69051e76f7a016cb1a504ede396e990b8de2e7dde9bd4b3e365287d85270df"
+  },
+  "claim_boundary": [
+    "The benchmark has only two ion families and cannot establish general cross-adduct superiority.",
+    "The frozen policy anchors conflict with qualified author-library InChIKeys and are not exact structure truth.",
+    "This evaluates reproduction of a frozen candidate policy across adducts, not chemical identity correctness.",
+    "This does not establish biological-response retrieval or unknown-information increment."
+  ]
+}

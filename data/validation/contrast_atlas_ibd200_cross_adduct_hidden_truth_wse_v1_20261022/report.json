@@ -1,7 +1,11 @@
 {
   "schema": "ibd200_cross_adduct_hidden_truth_benchmark_v1",
-  "status": "DEVELOPMENT_CONSUMED_CROSS_ADDUCT_POSITIVE_CONTROL_COMPLETE",
+  "status": "SUPERSEDED_EXACT_STRUCTURE_TRUTH_NOT_SUPPORTED",
   "data_role": "development_consumed",
+  "superseded_by": {
+    "reason": "qualified author annotations disagreed with both frozen InChIKey anchors",
+    "replacement": "data/validation/contrast_atlas_ibd200_cross_adduct_policy_anchor_wse_v2_20261022/report.json"
+  },
   "denominators": {
     "ion_families": 2,
     "nonprotonated_queries": 4,

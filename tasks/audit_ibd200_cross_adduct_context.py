@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compare real and degree-preserving wrong context on cross-adduct truth."""
+"""Compare real and degree-preserving wrong context on cross-adduct policy anchors."""
 from __future__ import annotations
 
 import argparse
@@ -92,7 +92,7 @@ def main() -> None:
     ranking.to_csv(ranking_path, sep="\t", index=False)
     report = {
         "schema": "ibd200_cross_adduct_context_audit_v1",
-        "status": "REAL_CONTEXT_DIRECTIONAL_SIGNAL_NOT_QUALIFIED",
+        "status": "REAL_CONTEXT_POLICY_ANCHOR_SIGNAL_NOT_QUALIFIED",
         "data_role": "development_consumed_posthoc_diagnostic",
         "denominators": {
             "ion_families": int(ledger["ion_family_id"].nunique()),
@@ -110,7 +110,7 @@ def main() -> None:
             "wrong_context_coverage_matched_truth_top1": int(ranking["wrong_context_truth_top1"].sum()) if len(ranking) else 0,
         },
         "interpretation": (
-            "Real sample context consistently favors the cross-adduct truth over the degree-preserving "
+            "Real sample context consistently favors the frozen cross-adduct policy anchor over the degree-preserving "
             "wrong context, including a nontrivial sodium-adduct comparison, but only two ion families "
             "exist and BioAware is not statistically qualified."
         ),
@@ -123,7 +123,7 @@ def main() -> None:
             "implementation_sha256": sha256(Path(__file__)),
         },
         "claim_boundary": [
-            "The ion-family truth is library-policy anchored, not authentic-standard confirmation.",
+            "The ion-family label is a conflicting library-policy anchor, not authentic-standard confirmation.",
             "Candidate context is sparse and missing context is not negative evidence.",
             "Two ion families cannot support a general BioAware performance claim.",
         ],

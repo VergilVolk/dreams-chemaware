@@ -4,7 +4,8 @@
 An ion family qualifies when an explicit [M+H]+ member has a single strict
 library-supported InChIKey and one or more non-protonated members share its
 FBMN correlation group, annotation network and neutral mass.  The anchored
-InChIKey is hidden truth for the non-protonated query candidate ranking.
+InChIKey is a frozen policy anchor for the non-protonated query candidate
+ranking.  It is not treated as exact chemical truth.
 
 The benchmark is small and development-consumed.  It is a chemically grounded
 algorithm-to-application positive control, not external biological validation.
@@ -70,6 +71,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--slice-dir", required=True, type=Path)
     parser.add_argument("--identity-partition", required=True, type=Path)
+    parser.add_argument("--author-annotations", required=True, type=Path)
     parser.add_argument("--output-dir", required=True, type=Path)
     parser.add_argument("--score", action="append", required=True, help="METHOD=PATH:FIELD")
     args = parser.parse_args()
@@ -79,7 +81,10 @@ def main() -> None:
     queries_path = args.slice_dir / "query_entities.tsv.gz"
     reference_score = args.slice_dir / "wse_candidate_scores.npz"
     candidates_path = args.slice_dir / "candidate_structures.tsv.gz"
-    for path in (queries_path, reference_score, candidates_path, args.identity_partition):
+    for path in (
+        queries_path, reference_score, candidates_path, args.identity_partition,
+        args.author_annotations,
+    ):
         if not path.is_file():
             raise FileNotFoundError(path)
     query_ptr, query_ids, candidate_ids = candidate_axis(reference_score)
@@ -119,6 +124,7 @@ def main() -> None:
                 "query_best_ion": str(query.best_ion),
                 "query_neutral_mass": float(query.neutral_mass),
                 "anchor_entity_id": str(anchor["entity_id"]),
+                "anchor_raw_entity_id": str(anchor["raw_entity_id"]),
                 "truth_candidate_id": truth,
                 "anchor_wse": float(anchor["wse"]),
                 "anchor_matched_peaks": int(anchor["matched_peaks"]),
@@ -127,6 +133,28 @@ def main() -> None:
     truth = pd.DataFrame(truth_rows)
     if truth.empty:
         raise RuntimeError("no qualified cross-adduct hidden-truth queries")
+
+    annotations = pd.read_csv(args.author_annotations, sep="\t")
+    annotations["anchor_raw_entity_id"] = annotations["#Scan#"].astype(str)
+    annotations = annotations.loc[
+        annotations["InChIKey"].notna()
+        & (pd.to_numeric(annotations["MQScore"], errors="coerce") >= 0.70)
+        & (pd.to_numeric(annotations["SharedPeaks"], errors="coerce") >= 6)
+        & (pd.to_numeric(annotations["MZErrorPPM"], errors="coerce").abs() <= 10.0)
+    ].sort_values(
+        ["anchor_raw_entity_id", "MQScore", "SharedPeaks"],
+        ascending=[True, False, False], kind="mergesort",
+    ).drop_duplicates("anchor_raw_entity_id")
+    annotation_map = dict(zip(
+        annotations["anchor_raw_entity_id"].astype(str),
+        annotations["InChIKey"].astype(str),
+    ))
+    truth["author_annotation_inchikey"] = truth["anchor_raw_entity_id"].map(annotation_map).fillna("")
+    truth["author_annotation_available"] = truth["author_annotation_inchikey"].ne("")
+    truth["author_annotation_exact_agreement"] = (
+        truth["author_annotation_available"]
+        & truth["author_annotation_inchikey"].eq(truth["truth_candidate_id"])
+    )
 
     score_specs = [parse_score_spec(spec) for spec in args.score]
     result_rows: list[dict[str, object]] = []
@@ -173,24 +201,32 @@ def main() -> None:
     results.to_csv(results_path, sep="\t", index=False)
     report = {
         "schema": "ibd200_cross_adduct_hidden_truth_benchmark_v1",
-        "status": "DEVELOPMENT_CONSUMED_CROSS_ADDUCT_POSITIVE_CONTROL_COMPLETE",
+        "status": "DEVELOPMENT_CONSUMED_POLICY_ANCHOR_CONSISTENCY_ONLY",
         "data_role": "development_consumed",
         "denominators": {
             "ion_families": int(truth["ion_family_id"].nunique()),
             "nonprotonated_queries": int(len(truth)),
             "adduct_classes": sorted(truth["query_best_ion"].unique().tolist()),
+            "policy_anchor_entities": int(truth["anchor_entity_id"].nunique()),
+            "policy_anchors_with_qualified_author_annotation": int(
+                truth.loc[truth["author_annotation_available"], "anchor_entity_id"].nunique()
+            ),
+            "policy_anchors_exactly_agreeing_with_author_annotation": int(
+                truth.loc[truth["author_annotation_exact_agreement"], "anchor_entity_id"].nunique()
+            ),
         },
         "method_results": method_summaries,
         "metric_contract": {
-            "primary": "unique exact-InChIKey Top-1; arbitrary candidate-ID tie breaking is not credited",
-            "secondary": "truth membership in the top tie set and optimistic/conservative reciprocal rank",
-            "truth": "one strict [M+H]+ library-supported member within the same FBMN ion family",
+            "primary": "unique frozen-policy InChIKey Top-1; arbitrary candidate-ID tie breaking is not credited",
+            "secondary": "policy-anchor membership in the top tie set and optimistic/conservative reciprocal rank",
+            "policy_anchor": "one strict [M+H]+ library-supported member within the same FBMN ion family",
         },
         "leakage_status": "ion annotations, neutral masses, spectra and strict library anchors only; no phenotype or response effect was read",
         "provenance": {
             "query_entities_sha256": sha256(queries_path),
             "candidate_structures_sha256": sha256(candidates_path),
             "identity_partition_sha256": sha256(args.identity_partition),
+            "author_annotations_sha256": sha256(args.author_annotations),
             "score_bundles": score_provenance,
             "truth_ledger_sha256": sha256(truth_path),
             "results_sha256": sha256(results_path),
@@ -198,8 +234,9 @@ def main() -> None:
         },
         "claim_boundary": [
             "The benchmark has only two ion families and cannot establish general cross-adduct superiority.",
-            "Strict library-supported anchors are not MSI level-1 standard confirmation.",
-            "This evaluates chemical entity recovery, not biological-response retrieval or unknown-information increment.",
+            "The frozen policy anchors conflict with qualified author-library InChIKeys and are not exact structure truth.",
+            "This evaluates reproduction of a frozen candidate policy across adducts, not chemical identity correctness.",
+            "This does not establish biological-response retrieval or unknown-information increment.",
         ],
     }
     (args.output_dir / "report.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
