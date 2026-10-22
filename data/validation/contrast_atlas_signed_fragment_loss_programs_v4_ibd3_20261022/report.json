@@ -1,0 +1,304 @@
+{
+  "schema": "contrast_atlas_signed_fragment_loss_programs_v1",
+  "status": "DEVELOPMENT_CONSUMED_TRUTH_BLIND_RESULT",
+  "method": {
+    "response_weight": "beta/sqrt(beta^2+se^2), centred within contrast and evidence world",
+    "programs": "positive and negative centred weights aggregated separately; no beta/SE merging across entities",
+    "fragment_view": "sqrt-intensity 0.1-Da absolute fragment bins, spectrum L2-normalised",
+    "fragment_loss_view": "equal-norm concatenation of absolute fragment and precursor-minus-fragment bins",
+    "similar": "mean(up-up, down-down)",
+    "opposite": "mean(up-down, down-up)",
+    "parameter_selection": "fixed before registered relations were opened"
+  },
+  "denominators": {
+    "source_families": 11,
+    "study_level_contrasts": 26,
+    "fixed_candidate_rows": 3576,
+    "score_available_rows": 3140,
+    "registered_directed_relations": 10,
+    "fragment_dimensions": 59682,
+    "neutral_loss_dimensions": 16221
+  },
+  "registered_relation_descriptive_top1": {
+    "fragment": {
+      "all": {
+        "registered_relations": 10,
+        "score_available": 10,
+        "similar_top1": 1,
+        "opposite_top1": 1,
+        "alignment_top1": 1,
+        "composition_top1": 0
+      },
+      "known": {
+        "registered_relations": 10,
+        "score_available": 2,
+        "similar_top1": 1,
+        "opposite_top1": 1,
+        "alignment_top1": 1,
+        "composition_top1": 2
+      },
+      "unresolved": {
+        "registered_relations": 10,
+        "score_available": 10,
+        "similar_top1": 2,
+        "opposite_top1": 2,
+        "alignment_top1": 2,
+        "composition_top1": 0
+      }
+    },
+    "fragment_loss": {
+      "all": {
+        "registered_relations": 10,
+        "score_available": 10,
+        "similar_top1": 2,
+        "opposite_top1": 3,
+        "alignment_top1": 3,
+        "composition_top1": 0
+      },
+      "known": {
+        "registered_relations": 10,
+        "score_available": 2,
+        "similar_top1": 1,
+        "opposite_top1": 1,
+        "alignment_top1": 1,
+        "composition_top1": 2
+      },
+      "unresolved": {
+        "registered_relations": 10,
+        "score_available": 10,
+        "similar_top1": 2,
+        "opposite_top1": 3,
+        "alignment_top1": 3,
+        "composition_top1": 0
+      }
+    }
+  },
+  "registered_relation_response_reassignment_top1": {
+    "fragment": {
+      "all": {
+        "observed_alignment_top1": 1,
+        "null_replicates": 31,
+        "null_top1_min": 1,
+        "null_top1_median": 1.0,
+        "null_top1_max": 1,
+        "null_top1_mean": 1.0,
+        "plus_one_fraction_null_at_least_observed": 1.0,
+        "specificity_gate": "FAIL_RESPONSE_REASSIGNMENT_SPECIFICITY"
+      },
+      "known": {
+        "observed_alignment_top1": 1,
+        "null_replicates": 31,
+        "null_top1_min": 1,
+        "null_top1_median": 1.0,
+        "null_top1_max": 1,
+        "null_top1_mean": 1.0,
+        "plus_one_fraction_null_at_least_observed": 1.0,
+        "specificity_gate": "FAIL_RESPONSE_REASSIGNMENT_SPECIFICITY"
+      },
+      "unresolved": {
+        "observed_alignment_top1": 2,
+        "null_replicates": 31,
+        "null_top1_min": 1,
+        "null_top1_median": 2.0,
+        "null_top1_max": 3,
+        "null_top1_mean": 2.0,
+        "plus_one_fraction_null_at_least_observed": 0.875,
+        "specificity_gate": "FAIL_RESPONSE_REASSIGNMENT_SPECIFICITY"
+      }
+    },
+    "fragment_loss": {
+      "all": {
+        "observed_alignment_top1": 3,
+        "null_replicates": 31,
+        "null_top1_min": 3,
+        "null_top1_median": 3.0,
+        "null_top1_max": 3,
+        "null_top1_mean": 3.0,
+        "plus_one_fraction_null_at_least_observed": 1.0,
+        "specificity_gate": "FAIL_RESPONSE_REASSIGNMENT_SPECIFICITY"
+      },
+      "known": {
+        "observed_alignment_top1": 1,
+        "null_replicates": 31,
+        "null_top1_min": 1,
+        "null_top1_median": 1.0,
+        "null_top1_max": 2,
+        "null_top1_mean": 1.032258064516129,
+        "plus_one_fraction_null_at_least_observed": 1.0,
+        "specificity_gate": "FAIL_RESPONSE_REASSIGNMENT_SPECIFICITY"
+      },
+      "unresolved": {
+        "observed_alignment_top1": 3,
+        "null_replicates": 31,
+        "null_top1_min": 3,
+        "null_top1_median": 3.0,
+        "null_top1_max": 3,
+        "null_top1_mean": 3.0,
+        "plus_one_fraction_null_at_least_observed": 1.0,
+        "specificity_gate": "FAIL_RESPONSE_REASSIGNMENT_SPECIFICITY"
+      }
+    }
+  },
+  "primary_development_gate": {
+    "representation": "fragment_loss",
+    "evidence_world": "unresolved",
+    "observed_alignment_top1": 3,
+    "null_replicates": 31,
+    "null_top1_min": 3,
+    "null_top1_median": 3.0,
+    "null_top1_max": 3,
+    "null_top1_mean": 3.0,
+    "plus_one_fraction_null_at_least_observed": 1.0,
+    "specificity_gate": "FAIL_RESPONSE_REASSIGNMENT_SPECIFICITY",
+    "decision": "FAIL_UNKNOWN_RESPONSE_SPECIFICITY"
+  },
+  "truth_boundary": {
+    "score_sha256_before_registered_relations": "76cd6725e02ef28bdb1698ab8013d0793c1e616506da6c4ae3ba650a1a221601",
+    "signed_direction_truth": "absent for all registered relations",
+    "unregistered_pairs": "unadjudicated, never negative",
+    "unknown_increment": "requires a prespecified correct-answer and abstention gate; descriptive rank alone is insufficient"
+  },
+  "source_reports": [
+    {
+      "study_id": "MSV000097426",
+      "mgf_sha256": "eb6b4517c2ad70b718c5384ff7378e24e650a4ef8333669df84de95a436f8b42",
+      "mgf_spectra_total": 4635,
+      "response_spectra_nonempty": 2163,
+      "response_spectra_with_neutral_loss": 2163,
+      "fragment_nonzero_bins": 67992,
+      "loss_nonzero_bins": 52252,
+      "maximum_fragment_bin": 28357,
+      "maximum_loss_bin": 8875
+    },
+    {
+      "study_id": "MSV000084112",
+      "mgf_sha256": "5831e21a5e519903802aab5ae29da92e363ebb674e4a27142193260627443a8f",
+      "mgf_spectra_total": 12116,
+      "response_spectra_nonempty": 5501,
+      "response_spectra_with_neutral_loss": 5501,
+      "fragment_nonzero_bins": 235835,
+      "loss_nonzero_bins": 226545,
+      "maximum_fragment_bin": 39254,
+      "maximum_loss_bin": 9885
+    },
+    {
+      "study_id": "MSV000083077",
+      "mgf_sha256": "8833c9a4a80b2ac508875395ff9e3750075e2616dc42532d55875a63ce33a8c8",
+      "mgf_spectra_total": 15184,
+      "response_spectra_nonempty": 7132,
+      "response_spectra_with_neutral_loss": 7132,
+      "fragment_nonzero_bins": 213434,
+      "loss_nonzero_bins": 199403,
+      "maximum_fragment_bin": 59681,
+      "maximum_loss_bin": 13950
+    },
+    {
+      "study_id": "MSV000088023",
+      "mgf_sha256": "59ceb4d533b480760bf93c47dc9213de44e271d0fd521b7e8ecdf67615d5fada",
+      "mgf_spectra_total": 971,
+      "response_spectra_nonempty": 212,
+      "response_spectra_with_neutral_loss": 212,
+      "fragment_nonzero_bins": 7356,
+      "loss_nonzero_bins": 6822,
+      "maximum_fragment_bin": 16627,
+      "maximum_loss_bin": 8234
+    },
+    {
+      "study_id": "MSV000090788",
+      "mgf_sha256": "57cc380fac1563bfdf736c3208a4cad09f6ce39b991bbd4363b083bb1b93c659",
+      "mgf_spectra_total": 9541,
+      "response_spectra_nonempty": 2350,
+      "response_spectra_with_neutral_loss": 2350,
+      "fragment_nonzero_bins": 101223,
+      "loss_nonzero_bins": 98177,
+      "maximum_fragment_bin": 20705,
+      "maximum_loss_bin": 9904
+    },
+    {
+      "study_id": "MSV000097610",
+      "mgf_sha256": "c628ce08fc8215942469ec8fb193c6b3c189484032f83cc9ba9b190281c64fd1",
+      "mgf_spectra_total": 43697,
+      "response_spectra_nonempty": 6081,
+      "response_spectra_with_neutral_loss": 6081,
+      "fragment_nonzero_bins": 244383,
+      "loss_nonzero_bins": 236641,
+      "maximum_fragment_bin": 53685,
+      "maximum_loss_bin": 9440
+    },
+    {
+      "study_id": "IBD200_GROUP",
+      "mgf_sha256": "6aeba8b4c1e9cc94e127985cc18bde9a4d1df8c99030d470d4cec888bc5465e6",
+      "mgf_spectra_total": 2498,
+      "response_spectra_nonempty": 746,
+      "response_spectra_with_neutral_loss": 737,
+      "fragment_nonzero_bins": 19324,
+      "loss_nonzero_bins": 17908,
+      "maximum_fragment_bin": 13161,
+      "maximum_loss_bin": 10567
+    },
+    {
+      "study_id": "MSV000090804",
+      "mgf_sha256": "37e8cf36f37b9a0cc9fc25f1dee1bbe718c04f6f4b8cae9cbf9a43b7c6fdd9e6",
+      "mgf_spectra_total": 4612,
+      "response_spectra_nonempty": 4349,
+      "response_spectra_with_neutral_loss": 4349,
+      "fragment_nonzero_bins": 275248,
+      "loss_nonzero_bins": 229686,
+      "maximum_fragment_bin": 9999,
+      "maximum_loss_bin": 16220
+    },
+    {
+      "study_id": "MSV000086360",
+      "mgf_sha256": "4295507c6fe553ec73e3b301002e06d8c9a5efcaba52b3016bae81bff9cf543f",
+      "mgf_spectra_total": 4316,
+      "response_spectra_nonempty": 3368,
+      "response_spectra_with_neutral_loss": 3368,
+      "fragment_nonzero_bins": 111593,
+      "loss_nonzero_bins": 107910,
+      "maximum_fragment_bin": 25335,
+      "maximum_loss_bin": 13890
+    },
+    {
+      "study_id": "MSV000084794",
+      "mgf_sha256": "8792840ee815c63028047cede2d646edc79529eebb0b9e9d81e0f3bc382afb91",
+      "mgf_spectra_total": 36234,
+      "response_spectra_nonempty": 2201,
+      "response_spectra_with_neutral_loss": 2193,
+      "fragment_nonzero_bins": 109822,
+      "loss_nonzero_bins": 100581,
+      "maximum_fragment_bin": 21738,
+      "maximum_loss_bin": 12607
+    },
+    {
+      "study_id": "MSV000096564",
+      "mgf_sha256": "2b8892c89650f774704c556f1fc0287afcfed38879488cdf9b959b65e4ec1e46",
+      "mgf_spectra_total": 7267,
+      "response_spectra_nonempty": 2817,
+      "response_spectra_with_neutral_loss": 2809,
+      "fragment_nonzero_bins": 52963,
+      "loss_nonzero_bins": 50570,
+      "maximum_fragment_bin": 7724,
+      "maximum_loss_bin": 8616
+    }
+  ],
+  "input_sha256": {
+    "tasks\\contrast_atlas_open_collection_ibd3_extension_v1.json": "8f27a301dace04fcc42adba7e66093735b3a895b7d7f6b48c57f48560515ec1e",
+    "contract_lineage::tasks\\contrast_atlas_open_collection_v1.json": "259b7fe26841501ce2c82ac4b61becb6ee8657491f3417fb483cd385bf267a98",
+    "contract_lineage::tasks\\contrast_atlas_open_collection_ibd_extension_v1.json": "b4e08b9df7796e02515574942d331724b3cc929543a4919ead624f10690de83a",
+    "contract_lineage::tasks\\contrast_atlas_open_collection_fbmn_systematic_extension_v1.json": "f07630c1327bffa8c6fd0398148bd09fddcc7ca6b39134a4dccb9f8b9de55c30",
+    "contract_lineage::tasks\\contrast_atlas_open_collection_ibd3_extension_v1.json": "8f27a301dace04fcc42adba7e66093735b3a895b7d7f6b48c57f48560515ec1e",
+    "data\\validation\\contrast_atlas_open_response_collection_v6_ibd3_20261022\\response_entities.tsv.gz": "df08b0fa805521dab6ac1efaef269cfd0ede6fe414cf0e0bd290294010a624f3",
+    "data\\validation\\contrast_atlas_open_response_collection_v6_ibd3_20261022\\contrast_manifest.tsv": "35937ad2e114d71910e37dcaf0d56761e26a7b3a2821587b4b352d08cdf289dc",
+    "data\\validation\\contrast_atlas_open_response_collection_v6_ibd3_20261022\\registered_relations.tsv": "9a66b634031df54456cf59fd22ba801e61c67cf165def1171318fd34c08b74f8"
+  },
+  "outputs_sha256": {
+    "fixed_candidate_scores.tsv.gz": "76cd6725e02ef28bdb1698ab8013d0793c1e616506da6c4ae3ba650a1a221601",
+    "response_reassignment_scores.tsv.gz": "19a6875d99b1cd232dbf6f3e6513fae60c0c8fd0682098498f07bdcabffb855f"
+  },
+  "claim_boundary": [
+    "All sources and registered relations are development/consumed.",
+    "This relation-layer score never asserts that related spectra are the same entity.",
+    "Unresolved means no strict direct library-supported control hit, not a unique metabolite.",
+    "A rank change is not a biological discovery without independent relation truth."
+  ]
+}

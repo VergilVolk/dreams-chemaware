@@ -1,0 +1,53 @@
+{
+  "schema": "msv000096564_baseline_ibd_response_contract_v1",
+  "frozen_on": "2026-10-22",
+  "data_role": "development_consumed",
+  "accession": "MSV000096564",
+  "source_family": "CCFA_800805_mediterranean_diet_trial",
+  "study_record": "NCT05973500",
+  "assets": {
+    "quantification": {
+      "remote_descriptor": "f.MSV000096564/updates/2025-04-08_JAGONGO_1994_97ed8ed8/raw/IBD_CCFA_fecal_03_30/mzmine/CCFA_stool_iimn_gnps_quant.csv",
+      "bytes": 25067892
+    },
+    "mgf": {
+      "remote_descriptor": "f.MSV000096564/updates/2025-04-08_JAGONGO_1994_97ed8ed8/raw/IBD_CCFA_fecal_03_30/mzmine/CCFA_stool_iimn_gnps.mgf",
+      "bytes": 3305469
+    },
+    "metadata": {
+      "remote_descriptor": "f.MSV000096564/metadata/Metadata_IBD.csv",
+      "bytes": 121094
+    },
+    "mzmine_annotations": {
+      "remote_descriptor": "f.MSV000096564/updates/2025-04-08_JAGONGO_1994_97ed8ed8/raw/IBD_CCFA_fecal_03_30/mzmine/CCFA_stool_annotations.csv",
+      "bytes": 1337
+    }
+  },
+  "contrast": {
+    "object_id": "baseline_ibd_vs_control",
+    "study_id": "MSV000096564",
+    "estimand": "pre-intervention T1 Crohn's disease active-or-remission minus control stool response",
+    "analysis": "independent_groups",
+    "level_coefficients": {
+      "ibd": 1.0,
+      "control": -1.0
+    },
+    "expected_biological_units": {
+      "ibd": 11,
+      "control": 11
+    },
+    "expected_technical_files_per_unit": 3,
+    "minimum_units_per_level": 8,
+    "minimum_prevalence": 0.2
+  },
+  "design_boundary": [
+    "Only T1 stool acquisitions enter; later Mediterranean-diet timepoints are excluded.",
+    "Three technical files are median-collapsed within each participant before inference.",
+    "Active and remission Crohn's disease are combined only for this broad IBD condition-family calibration.",
+    "The baseline case-control estimand is observational and has no diet-treatment causal interpretation."
+  ],
+  "identity_boundary": [
+    "No complete strict direct-library result is deposited for this MGF, so every entity remains unresolved for primary partitioning.",
+    "MZmine matched-lipid names are retained as provisional annotations only and never converted to library-supported identity."
+  ]
+}

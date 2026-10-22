@@ -1,0 +1,66 @@
+{
+  "schema": "contrast_atlas_open_collection_extension_v1",
+  "base_contract": "tasks/contrast_atlas_open_collection_fbmn_systematic_extension_v1.json",
+  "data_role": "development_consumed",
+  "sources": [
+    {
+      "study_id": "MSV000096564",
+      "source_family": "CCFA_800805_mediterranean_diet_trial",
+      "species": "Homo sapiens",
+      "biospecimen": "feces",
+      "biological_units": 22,
+      "effect_adapter": "response_directories",
+      "response_root": "data/validation/msv000096564_baseline_ibd_response_v1_20261022",
+      "effect_report_path": "data/validation/msv000096564_baseline_ibd_response_v1_20261022/report.json",
+      "expected_effect_status": "DEVELOPMENT_CONSUMED_RESPONSE_OBJECTS_BUILT_NO_CROSS_STUDY_RESULT",
+      "entity_column": "entity_id",
+      "beta_column": "beta",
+      "se_column": "se",
+      "prevalence_column": "prevalence",
+      "qc_column": "analysis_eligible",
+      "mgf_path": "data/reference/msv000096564_baseline_ibd_v1/mgf.mgf",
+      "mgf_report_path": "data/validation/msv000096564_baseline_ibd_response_v1_20261022/report.json",
+      "expected_mgf_status": "DEVELOPMENT_CONSUMED_RESPONSE_OBJECTS_BUILT_NO_CROSS_STUDY_RESULT",
+      "nonempty_ms2_spectra": 7267,
+      "identity_path": "data/validation/msv000096564_baseline_ibd_response_v1_20261022/identity_partition.tsv.gz",
+      "identity_sep": "\t",
+      "identity_entity_column": "entity_id",
+      "identity_status_column": "identity_status",
+      "identity_status_map": {
+        "unresolved_entity": "unresolved_entity"
+      },
+      "identity_partition_boundary": "no complete strict direct-library search deposited; all entities unresolved; 16 MZmine matched-lipid annotations remain provisional only",
+      "contrasts": {
+        "baseline_ibd_vs_control": {
+          "design": "pre-intervention T1 active-or-remission Crohn's disease minus control; observational condition contrast",
+          "condition_family": "human_fecal_ibd_case_control",
+          "independent_units": 22
+        }
+      }
+    }
+  ],
+  "registered_relations": [
+    {
+      "left_study_id": "MSV000096564",
+      "left_contrast_id": "baseline_ibd_vs_control",
+      "right_study_id": "IBD200_GROUP",
+      "right_contrast_id": "adult_all_ibd_vs_healthy",
+      "relation_class": "prespecified_near_exact_condition_family",
+      "expected_signed_direction": "unspecified",
+      "eligible_primary_relevance": true,
+      "evidence_boundary": "independent adult human fecal IBD-versus-control sources; CCFA is Crohn's active-or-remission whereas IBD200 combines adult Crohn's and ulcerative colitis",
+      "signed_truth_claimed": false
+    },
+    {
+      "left_study_id": "MSV000096564",
+      "left_contrast_id": "baseline_ibd_vs_control",
+      "right_study_id": "MSV000097610",
+      "right_contrast_id": "pediatric_veoibd_vs_healthy",
+      "relation_class": "prespecified_near_exact_condition_family",
+      "expected_signed_direction": "unspecified",
+      "eligible_primary_relevance": true,
+      "evidence_boundary": "independent human fecal IBD-versus-control sources, but adult Crohn's active-or-remission differs from pediatric very-early-onset IBD in age, subtype and treatment exposure",
+      "signed_truth_claimed": false
+    }
+  ]
+}

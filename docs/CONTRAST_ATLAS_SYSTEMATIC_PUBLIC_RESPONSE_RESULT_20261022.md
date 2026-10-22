@@ -127,13 +127,57 @@ MSV000090804 的原论文表明 methylolanthanin 产生对正常镧积累是必�
 
 下一阶段不再继续榨取这 6 个答案。最高性价比工作转为扩大**独立、预先成立、带明确方向语义的跨来源响应真值**：优先从 95 个具备定量表和代表 MS/MS 的 FBMN 任务中，寻找相同干预/宿主状态在独立项目中的复现，以及明确的 no-match 查询。新关系必须在看检索分数前登记；不同疾病名不自动作为阴性。只有扩大的真值集合冻结后，才能检验局部 relation edges 或 Noise/统一算法替代谱学接口，避免继续用 6 条已消耗关系选方法。
 
+## 第三个独立 IBD 来源：先扩真值，再检验冻结算子
+
+系统筛选 MassIVE 公开资产后，`MSV000096564` 提供了一个低成本而设计可恢复的新来源：公开 MZmine 定量表 25,067,892 bytes、代表 MGF 3,305,469 bytes 和参与者元数据 121,094 bytes。试验登记 `NCT05973500` 与公开研究资料表明，研究为 14 天地中海饮食干预；因此本次只取干预前 T1，完全排除后续时间点。
+
+冻结规则：
+
+1. T1 有 22 名独立参与者，11 IBD（活动期或缓解期 Crohn's）和 11 control；
+2. 每人恰有 3 个粪便 LC-MS 技术文件，先在参与者内取中位数，不把 66 个文件当独立样本；
+3. 正值 log2 后按技术文件中位数中心化，非正值保持缺失；
+4. beta 为参与者级 IBD-minus-control，SE 为独立组 Welch 标准误；
+5. baseline 疾病对比是观察性 condition contrast，不解释为饮食干预效应；
+6. deposited MZmine matched-lipid 仅有 16 条，全部保留为 provisional；因没有完整严格 direct-library search，不能将任何实体转为 known。
+
+冻结结果：`data/validation/msv000096564_baseline_ibd_response_v1_20261022`。
+
+- 7,561 个定量 features；
+- 7,267 个非空代表 MS/MS blocks；
+- 2,825 个 response-QC 合格 features；
+- 2,817 个同时有非空 MS/MS；
+- strict library-supported 0/7,561，故本来源在主分区中全部为 unresolved，而不是声称 7,561 个新代谢物。
+
+在读取检索分数前，登记了它与 adult IBD200 和 pediatric VEO-IBD 的两条近条件家族关系，并自动加入反向关系。两条关系都明确不预设 signed direction；年龄、IBD 亚型、治疗暴露差异保留在 evidence boundary 中。
+
+扩展集合 `data/validation/contrast_atlas_open_response_collection_v6_ibd3_20261022` 现包含：
+
+- 11 个独立 source families；
+- 26 个 study-level contrasts；
+- 673 个生物单位；
+- 106,532 张代表 MS/MS；
+- 89,968 条合格响应记录；
+- 1,941 条 library-supported 与 88,027 条 unresolved 响应记录；
+- 10 条登记的有向关系；每个查询面对 22–25 个来源独立候选。
+
+两个已经冻结的全局算子随后原样重跑，没有任何调参：
+
+- centered kernel 的 unresolved 仍为 0/10 Top-1；
+- signed fragment+loss 的 unresolved 为 3/10 Top-1，但 31/31 次响应重排仍全部恰为 3/10，主 gate 继续为 `FAIL_UNKNOWN_RESPONSE_SPECIFICITY`；
+- 新关系中，pediatric VEO-IBD → baseline IBD 的 fragment+loss/unresolved rank=2，但 31/31 次重排均达到同样好或更好排名；adult IBD200 → baseline IBD rank=8；反向分别 rank=9 和 14。
+
+因此新增来源不是为了“救活”旧方法，而是提供了真正的新反例：即使条件标签更接近，当前全局 fragment/loss programs 仍不能区分响应归属与来源化学组成。两类全局算子应正式退休，不再在这 10 条 development/consumed 关系上继续调参。
+
+公开依据：[MassIVE 数据记录](https://massive.ucsd.edu/ProteoSAFe/dataset.jsp?task=f6e02685d3904466a472aa0d22d3f195)、[NCT05973500](https://clinicaltrials.gov/ct2/show/NCT05973500?draw=2&rank=1)、[公开研究资料](https://pmc.ncbi.nlm.nih.gov/articles/PMC13409120/)。
+
 ## 当前科学结论
 
 已经完成的实质进展不是又一个数据集脚本，而是：
 
 1. 从 95 个具备定量+MS/MS 的公共 FBMN 任务中，实际建立了可扩展的、设计感知的响应对象入口；
-2. 将开放候选宇宙扩展到 10 来源、25 contrasts、651 生物单位和 99,265 张 MS/MS；
+2. 将开放候选宇宙扩展到 11 来源、26 contrasts、673 生物单位和 106,532 张 MS/MS；
 3. 证明大量 unresolved feature entities 可以进入合法研究级效应估计；
-4. 同时证伪了 centered kernel 和 signed fragment/loss programs 两种全局关系核的 unknown-information 增量；后者观察到的 3/6 Top-1 在 31/31 个响应重排零模型中原样出现。
+4. 同时证伪了 centered kernel 和 signed fragment/loss programs 两种全局关系核的 unknown-information 增量；后者在 10 条登记关系上观察到的 3/10 Top-1 在 31/31 个响应重排零模型中原样出现；
+5. 新增的第三个 IBD 来源不是小候选池：它在 22–25 个来源独立候选中对冻结算子提供了新的负证据。
 
-所以现在可以继续开发 Contrast Atlas，但不能写“unbiased 方法已经成功”。下一阶段的成败标准不再是旧 6 关系上的更高排名，而是：在看分数前冻结的、更大跨来源真值集合中，响应特异的 relation layer 是否在固定错误风险下提供 known-only 没有的正确答案，并能对无对应查询可靠弃权。
+所以现在可以继续开发 Contrast Atlas，但不能写“unbiased 方法已经成功”。下一阶段优先把跨来源真值扩到多个独立生物学家族及明确 no-match 查询；新的局部 relation-layer 方法只能在尚未参与算子选择的来源上检验。最终成败标准仍是：响应特异的关系证据能否在固定错误风险下提供 measurement-matched known-only 没有的正确答案，并能对无对应查询可靠弃权。

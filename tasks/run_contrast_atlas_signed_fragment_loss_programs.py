@@ -190,7 +190,21 @@ def row_l2_normalise(matrix: sparse.csr_matrix) -> sparse.csr_matrix:
 def signed_program(
     matrix: sparse.csr_matrix, weights: np.ndarray
 ) -> dict[str, object]:
-    centred = np.asarray(weights, dtype=float) - float(np.mean(weights))
+    weights = np.asarray(weights, dtype=float)
+    if len(weights) != matrix.shape[0]:
+        raise ValueError("response weights and spectrum rows differ")
+    if matrix.shape[0] == 0:
+        zero = sparse.csr_matrix((1, matrix.shape[1]), dtype=np.float32)
+        return {
+            "n_entities": 0,
+            "effective_n": 0.0,
+            "up": zero,
+            "down": zero.copy(),
+            "up_raw_norm": 0.0,
+            "down_raw_norm": 0.0,
+            "composition": zero.copy(),
+        }
+    centred = weights - float(np.mean(weights))
     sum_squares = float(np.dot(centred, centred))
     effective_n = (
         float(np.square(np.abs(centred).sum()) / sum_squares)

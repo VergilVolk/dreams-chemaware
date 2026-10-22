@@ -1,0 +1,50 @@
+{
+  "schema": "msv000096564_baseline_ibd_response_result_v1",
+  "status": "DEVELOPMENT_CONSUMED_RESPONSE_OBJECTS_BUILT_NO_CROSS_STUDY_RESULT",
+  "study_id": "MSV000096564",
+  "source_family": "CCFA_800805_mediterranean_diet_trial",
+  "contrast_id": "baseline_ibd_vs_control",
+  "estimand": "pre-intervention T1 Crohn's disease active-or-remission minus control stool response",
+  "denominators": {
+    "quantified_features": 7561,
+    "biological_units": 22,
+    "units_per_level": {
+      "control": 11,
+      "ibd": 11
+    },
+    "qc_eligible_features": 2825,
+    "qc_eligible_features_with_ms2": 2817,
+    "qc_eligible_features_by_identity": {
+      "unresolved_entity": 2825
+    },
+    "design_files": 66,
+    "mgf_blocks": 7267,
+    "mgf_blocks_without_id": 0,
+    "identity_partition_library_supported": 0,
+    "identity_partition_unresolved": 7561,
+    "provisional_mzmine_matchedlipid": 16
+  },
+  "measurement_contract": {
+    "timepoint": "T1 before the 14-day Mediterranean-diet intervention",
+    "normalization": "positive-only log2 then per-technical-file median centering",
+    "technical_replicates": "three T1 files median-collapsed within each participant",
+    "effect": "IBD active-or-remission minus control, independent-participant Welch SE",
+    "missingness": "zero/nonpositive remains missing; no imputation"
+  },
+  "provenance": {
+    "contract_sha256": "6a2a009f708504fd6cef960268562e631205b5fb336bb47259183a8311fb19ab",
+    "quantification_sha256": "583970319c7325269b13df8212e9c4022ba8e4e4a8ffdfef141851872635af72",
+    "mgf_sha256": "2b8892c89650f774704c556f1fc0287afcfed38879488cdf9b959b65e4ec1e46",
+    "metadata_sha256": "4eb6bc8b613ad4664ec10e49eb0356fa35f46b3f4314894d523414b225b4e72f",
+    "mzmine_annotations_sha256": "d4861218b82dcb0834b111b1d185eca0a91b8e38c509fb5f4ac61d6e62c6db36"
+  },
+  "claim_boundary": [
+    "Only T1 stool acquisitions enter; later Mediterranean-diet timepoints are excluded.",
+    "Three technical files are median-collapsed within each participant before inference.",
+    "Active and remission Crohn's disease are combined only for this broad IBD condition-family calibration.",
+    "The baseline case-control estimand is observational and has no diet-treatment causal interpretation.",
+    "No complete strict direct-library result is deposited for this MGF, so every entity remains unresolved for primary partitioning.",
+    "MZmine matched-lipid names are retained as provisional annotations only and never converted to library-supported identity.",
+    "This response object is development/consumed and is not cross-study biological validation."
+  ]
+}

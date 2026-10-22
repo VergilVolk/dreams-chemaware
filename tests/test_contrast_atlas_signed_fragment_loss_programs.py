@@ -47,3 +47,11 @@ def test_null_top1_summary_rejects_composition_preserved_hit() -> None:
     assert result["null_top1_max"] == 3
     assert result["plus_one_fraction_null_at_least_observed"] == 1.0
     assert result["specificity_gate"] == "FAIL_RESPONSE_REASSIGNMENT_SPECIFICITY"
+
+
+def test_signed_program_explicitly_abstains_for_empty_known_world() -> None:
+    program = signed_program(sparse.csr_matrix((0, 12)), np.asarray([]))
+    assert program["n_entities"] == 0
+    assert program["effective_n"] == 0.0
+    assert program["up"].shape == (1, 12)
+    assert program["composition"].nnz == 0
