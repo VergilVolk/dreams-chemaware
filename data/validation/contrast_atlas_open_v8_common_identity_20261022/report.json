@@ -1,0 +1,106 @@
+{
+  "schema": "contrast_atlas_open_common_identity_partitions_v1",
+  "status": "PHENOTYPE_BLIND_COMMON_STRICT_LIBRARY_PARTITIONS_COMPLETE",
+  "denominators": {
+    "independent_studies": 12,
+    "response_entities": 38247,
+    "identity_status": {
+      "unresolved_entity": 37495,
+      "library_supported": 752
+    },
+    "source_native_library_supported": 1249,
+    "common_library_supported": 752,
+    "identity_status_discordant": 1191
+  },
+  "parameters": {
+    "precursor_ppm": 10.0,
+    "fragment_da": 0.02,
+    "minimum_wse": 0.7,
+    "minimum_matched_peaks": 6,
+    "reference_library": "frozen GNPS Gold/Silver positive [M+H]+ development library"
+  },
+  "leakage_status": "mechanical phenotype-blind assembly; no effect or retrieval truth read",
+  "provenance": {
+    "source_manifest_sha256": "d14790782d06268e9926b3207e4caaf08032375b3a59db8c9159463d072265be",
+    "response_entities_sha256": "6610987fe472a195e2fcf40ee6f7b7aae0477c063901436f2d05a9f0557f2330",
+    "library_manifest_sha256": "ab1d04418c89a5fc163d706c8fd79023c8f0e8c6957db99a302e98e9eac6de80",
+    "library_mgf_sha256": "b813c9e85cdfa4c85d0c6585ffa0f6ffa03e74fa4ce5f12af861d219bd95afae",
+    "combined_partition_sha256": "8e61125587bb79aa10b0c5381f90a9bf8743b138997f287aeacf0f14332b0780",
+    "source_native_vs_common_identity_sha256": "416c101000492fc294af7016a4004aaddf7e7433db0cd33d3995d58f45bae957",
+    "sources": [
+      {
+        "study_id": "MSV000097426",
+        "report_sha256": "f1279a007296214222fa91fe9d21c4992bf8ad26ce369dc604c143974baff82e",
+        "partition_sha256": "a407da09fe2ecf267171254fdf8cad694be052d518b1609b435a9f79dff934d1",
+        "response_entities": 2163
+      },
+      {
+        "study_id": "MSV000084112",
+        "report_sha256": "efa8df63c512b17966c5e48d95cef5df1806fcd9aa02a2eae02adbb1d4a71400",
+        "partition_sha256": "ede25984abc333a2fa9687f1501f0bb3e3554b068729d11feaf1c23a0ed5265f",
+        "response_entities": 5501
+      },
+      {
+        "study_id": "MSV000083077",
+        "report_sha256": "34b5c27b730fa0203f0aefb7ddb9775aa8527eaa88f8e6d948c181890c5be5eb",
+        "partition_sha256": "25879473c082902d3a01dadd33694d12d7c306f9ad3a15e3c4c1410db61c2225",
+        "response_entities": 7132
+      },
+      {
+        "study_id": "MSV000088023",
+        "report_sha256": "53ae10b10babd7eeafe9fecdb5ae1907c44361ddd62374f313cd547b6d971db6",
+        "partition_sha256": "f128ff25ecf1e307f8f7d0e6ee4c2fd18f16db33bb460ca682a8aed2284ab872",
+        "response_entities": 212
+      },
+      {
+        "study_id": "MSV000090788",
+        "report_sha256": "8030e15d1733a9764d1a5d7f4d539e72ed2af2e3c526c9c8fa613fa18bcf6132",
+        "partition_sha256": "b3cacba664b994f8df262de8875e9bc2d518c1a2506e0cccbfe902556740f1d4",
+        "response_entities": 2350
+      },
+      {
+        "study_id": "MSV000097610",
+        "report_sha256": "8e55d1e9fd77a72311713083361985422a3f3a777a00825bb17a4ea4b1ee7ac8",
+        "partition_sha256": "f85f4d244eaee9728dfeece01e1c4f18bee4eafac059148266ab75dd3c1f68cf",
+        "response_entities": 6081
+      },
+      {
+        "study_id": "IBD200_GROUP",
+        "report_sha256": "f3586a47cd1961d0dbdcf74f0fd24dfd85797b2ece1561cb289d844648968175",
+        "partition_sha256": "8fdfdbeb0013e79db462955a0758943668cc2cfc56450d3ae64b07dad17703f1",
+        "response_entities": 662
+      },
+      {
+        "study_id": "MSV000090804",
+        "report_sha256": "646705444bf1eed470c02b73968be3920407efa5843a15b1c152dc1e57c70fd7",
+        "partition_sha256": "b6e598cd854615bbc50a9d9f90b3c23c1675d9e5a22240719012a15615fe42ef",
+        "response_entities": 4349
+      },
+      {
+        "study_id": "MSV000086360",
+        "report_sha256": "c9aecd5e35682d28f6c6e59ff3810120710983544f61a8bc59efb40819971ea1",
+        "partition_sha256": "0392ba96f9843c488c12de0f710e585e3e8e00e57ee4a1bb41794af3cb1c4f39",
+        "response_entities": 3368
+      },
+      {
+        "study_id": "MSV000084794",
+        "report_sha256": "c6f0486de2de1428296fc3dde6742450e69b33718d7af3bc1b84418e1e20da9f",
+        "partition_sha256": "833d59e8ccf7df44c960c9cc9de3d39a5cc8764020389ba70320bdda67bd9988",
+        "response_entities": 2201
+      },
+      {
+        "study_id": "MSV000096564",
+        "report_sha256": "bca8b8e4280724ccdb686cfd3197dd502b72e93eb5f6cee94bea81cee08191b9",
+        "partition_sha256": "4754308a54c38175c525b019b3b0f86b5cd1fc753e9e0313cf3e43e353b524a5",
+        "response_entities": 2817
+      },
+      {
+        "study_id": "MSV000092887",
+        "report_sha256": "3c89b65a3db13ddad7e51b6d29c5e9d74a83e924b1591ca2dda17edcd47cc1a8",
+        "partition_sha256": "f5fbc08da5bf66290e31c14bab62f5459d5e3d5d4812df31b2b1026f5744e877",
+        "response_entities": 1411
+      }
+    ]
+  },
+  "claim_boundary": "A common library partition permits a policy-consistent known control. It does not by itself create measurement-matched known controls or prove unknown increment."
+}

@@ -33,8 +33,14 @@ def main() -> None:
     entity_path = args.collection / "response_entities.tsv.gz"
     sources = pd.read_csv(source_path, sep="\t", usecols=["study_id"], dtype=str)
     required = pd.read_csv(
-        entity_path, sep="\t", usecols=["study_id", "entity_id"], dtype=str,
+        entity_path,
+        sep="\t",
+        usecols=["study_id", "entity_id", "identity_status"],
+        dtype=str,
     ).drop_duplicates()
+    if required.duplicated(["study_id", "entity_id"]).any():
+        raise RuntimeError("source-native identity status changes across contrasts")
+    required = required.rename(columns={"identity_status": "source_native_identity_status"})
     tables: list[pd.DataFrame] = []
     registry: list[dict[str, object]] = []
     invariant_parameters: dict[str, object] | None = None
@@ -88,11 +94,30 @@ def main() -> None:
 
     args.output_dir.mkdir(parents=True)
     output = args.output_dir / "identity_partition.tsv.gz"
-    merged.to_csv(
+    merged[["study_id", "entity_id", "identity_status", "common_identity_policy"]].to_csv(
         output, sep="\t", index=False,
         compression={"method": "gzip", "mtime": 0},
     )
     counts = merged["identity_status"].value_counts().astype(int).to_dict()
+    merged["identity_status_discordant"] = (
+        merged["source_native_identity_status"] != merged["identity_status"]
+    )
+    comparison = (
+        merged.groupby("study_id", sort=False)
+        .agg(
+            response_entities=("entity_id", "size"),
+            source_native_library_supported=(
+                "source_native_identity_status", lambda values: int((values == "library_supported").sum())
+            ),
+            common_library_supported=(
+                "identity_status", lambda values: int((values == "library_supported").sum())
+            ),
+            identity_status_discordant=("identity_status_discordant", "sum"),
+        )
+        .reset_index()
+    )
+    comparison_path = args.output_dir / "source_native_vs_common_identity.tsv"
+    comparison.to_csv(comparison_path, sep="\t", index=False)
     report = {
         "schema": "contrast_atlas_open_common_identity_partitions_v1",
         "status": "PHENOTYPE_BLIND_COMMON_STRICT_LIBRARY_PARTITIONS_COMPLETE",
@@ -100,6 +125,13 @@ def main() -> None:
             "independent_studies": int(merged["study_id"].nunique()),
             "response_entities": len(merged),
             "identity_status": counts,
+            "source_native_library_supported": int(
+                merged["source_native_identity_status"].eq("library_supported").sum()
+            ),
+            "common_library_supported": int(
+                merged["identity_status"].eq("library_supported").sum()
+            ),
+            "identity_status_discordant": int(merged["identity_status_discordant"].sum()),
         },
         "parameters": invariant_parameters,
         "leakage_status": "mechanical phenotype-blind assembly; no effect or retrieval truth read",
@@ -109,6 +141,7 @@ def main() -> None:
             "library_manifest_sha256": library_manifest_sha,
             "library_mgf_sha256": library_mgf_sha,
             "combined_partition_sha256": sha256(output),
+            "source_native_vs_common_identity_sha256": sha256(comparison_path),
             "sources": registry,
         },
         "claim_boundary": (
