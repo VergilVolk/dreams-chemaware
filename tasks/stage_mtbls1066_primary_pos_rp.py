@@ -8,6 +8,7 @@ import csv
 import hashlib
 import json
 import os
+import time
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
@@ -22,13 +23,20 @@ def sha256(path: Path) -> str:
 
 
 def remote_size(url: str) -> int:
-    request = urllib.request.Request(
-        url,
-        method="HEAD",
-        headers={"User-Agent": "DreaMS-Contrast-Atlas-stager/1.0"},
-    )
-    with urllib.request.urlopen(request, timeout=90) as response:
-        return int(response.headers["Content-Length"])
+    error: Exception | None = None
+    for attempt in range(5):
+        request = urllib.request.Request(
+            url,
+            method="HEAD",
+            headers={"User-Agent": "DreaMS-Contrast-Atlas-stager/1.0"},
+        )
+        try:
+            with urllib.request.urlopen(request, timeout=90) as response:
+                return int(response.headers["Content-Length"])
+        except Exception as exc:  # public repository occasionally drops TLS handshakes
+            error = exc
+            time.sleep(min(2 ** attempt, 8))
+    raise RuntimeError(f"HEAD failed after five attempts: {url}") from error
 
 
 def stage_one(row: dict[str, str], output: Path) -> dict[str, object]:
@@ -59,31 +67,48 @@ def stage_one(row: dict[str, str], output: Path) -> dict[str, object]:
             "sha256": sha256(target),
             "local_path": str(target),
         }
-    headers = {"User-Agent": "DreaMS-Contrast-Atlas-stager/1.0"}
-    mode = "wb"
-    if offset:
-        headers["Range"] = f"bytes={offset}-"
-        mode = "ab"
-    request = urllib.request.Request(url, headers=headers)
-    with urllib.request.urlopen(request, timeout=180) as response:
-        status = int(getattr(response, "status", 200))
-        if offset and status != 206:
-            # A server that ignores Range must not be appended to a partial file.
-            offset = 0
-            mode = "wb"
-        with partial.open(mode) as handle:
-            while True:
-                block = response.read(8 << 20)
-                if not block:
-                    break
-                handle.write(block)
-            handle.flush()
-            os.fsync(handle.fileno())
-    if partial.stat().st_size != expected:
-        raise RuntimeError(
-            f"incomplete download for {row['filename']}: "
-            f"{partial.stat().st_size} != {expected}"
+    error: Exception | None = None
+    for attempt in range(8):
+        offset = partial.stat().st_size if partial.exists() else 0
+        if offset == expected:
+            break
+        headers = {"User-Agent": "DreaMS-Contrast-Atlas-stager/1.0"}
+        mode = "wb"
+        if offset:
+            headers["Range"] = f"bytes={offset}-"
+            mode = "ab"
+        request = urllib.request.Request(url, headers=headers)
+        try:
+            with urllib.request.urlopen(request, timeout=180) as response:
+                status = int(getattr(response, "status", 200))
+                if offset and status != 206:
+                    # A server that ignores Range must not be appended to a partial file.
+                    offset = 0
+                    mode = "wb"
+                with partial.open(mode) as handle:
+                    while True:
+                        block = response.read(8 << 20)
+                        if not block:
+                            break
+                        handle.write(block)
+                    handle.flush()
+                    os.fsync(handle.fileno())
+        except Exception as exc:
+            error = exc
+            time.sleep(min(2 ** attempt, 8))
+            continue
+        if partial.stat().st_size == expected:
+            break
+        error = RuntimeError(
+            f"short response: {partial.stat().st_size} of {expected} bytes"
         )
+        time.sleep(min(2 ** attempt, 8))
+    actual = partial.stat().st_size if partial.exists() else 0
+    if actual != expected:
+        raise RuntimeError(
+            f"incomplete download after eight attempts for {row['filename']}: "
+            f"{actual} != {expected}"
+        ) from error
     partial.replace(target)
     return {
         **row,
@@ -107,7 +132,7 @@ def main() -> None:
     parser.add_argument(
         "--output-dir", type=Path, default=Path("data/mtbls1066/pos_rp_primary_mzml")
     )
-    parser.add_argument("--workers", type=int, default=4)
+    parser.add_argument("--workers", type=int, default=3)
     args = parser.parse_args()
     if not 1 <= args.workers <= 4:
         raise ValueError("workers must be between 1 and 4")

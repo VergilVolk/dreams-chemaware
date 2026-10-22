@@ -27,7 +27,7 @@ if [[ ! -s "$RAW/report.json" ]]; then
   python -u tasks/stage_mtbls1066_primary_pos_rp.py \
     --manifest "$QUAL/primary_pos_rp_manifest.tsv" \
     --output-dir "$RAW" \
-    --workers 4
+    --workers 3
 fi
 
 if [[ -e "$RESULT" ]]; then
