@@ -1,0 +1,32 @@
+{
+  "source_id": "msv000090804_lanthanide_positive",
+  "study_id": "MSV000090804",
+  "pmid": "39078674",
+  "object_id": "lanthanophore_overexpression_vs_wt",
+  "scientific_role": "controlled_genetic_and_nutrient_perturbation",
+  "estimand": "lanthanophore overexpression minus wild type under 2 uM Nd2O3",
+  "causal_claim_allowed": true,
+  "level_coefficients": {
+    "overexpression": 1.0,
+    "wt": -1.0
+  },
+  "denominators": {
+    "quantified_features": 4612,
+    "biological_units": 10,
+    "units_per_level": {
+      "overexpression": 5,
+      "wt": 5
+    },
+    "qc_eligible_features": 3466,
+    "qc_eligible_features_with_ms2": 3466,
+    "qc_eligible_features_by_identity": {
+      "unresolved_entity": 3439,
+      "library_supported": 27
+    }
+  },
+  "provenance": {
+    "design_sha256": "556980d4423f6217f3e5e8298b5ddfa34e6396d6e59435d0a1c5aa0ad3266f7f",
+    "response_object_sha256": "753128a3c30b4380a21686f63354d49fc6c7b4622a19e88faeb36e876c98376a",
+    "sample_normalization_sha256": "ec50bcaacf21d73ca624a517e46603f300d596c7af8c8d70e5a17afa3d38cf9d"
+  }
+}

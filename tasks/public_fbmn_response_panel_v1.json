@@ -1,0 +1,145 @@
+{
+  "schema": "public_fbmn_response_panel_manifest_v1",
+  "frozen_on": "2026-10-22",
+  "sources": [
+    {
+      "source_id": "msv000090804_lanthanide_positive",
+      "task_id": "def58641630e488985bfbe5a15c94e32",
+      "accession": "MSV000090804",
+      "pmid": "39078674",
+      "scientific_role": "controlled_genetic_and_nutrient_perturbation",
+      "filename_column": "filename",
+      "biological_unit_column": "samplename",
+      "expected_metadata_rows": 80,
+      "contrasts": [
+        {
+          "object_id": "lanthanophore_cluster_ko_vs_wt",
+          "estimand": "lanthanophore-cluster knockout minus wild type under 2 uM Nd2O3",
+          "causal_claim_allowed": true,
+          "levels": {
+            "ko": {"column": "ATTRIBUTE_shorthand", "values": ["KO"]},
+            "wt": {"column": "ATTRIBUTE_shorthand", "values": ["WT"]}
+          },
+          "level_coefficients": {"ko": 1.0, "wt": -1.0},
+          "expected_units_per_level": {"ko": 5, "wt": 5},
+          "minimum_units_per_level": 4
+        },
+        {
+          "object_id": "lanthanophore_overexpression_vs_wt",
+          "estimand": "lanthanophore overexpression minus wild type under 2 uM Nd2O3",
+          "causal_claim_allowed": true,
+          "levels": {
+            "overexpression": {"column": "ATTRIBUTE_shorthand", "values": ["overexpression"]},
+            "wt": {"column": "ATTRIBUTE_shorthand", "values": ["WT"]}
+          },
+          "level_coefficients": {"overexpression": 1.0, "wt": -1.0},
+          "expected_units_per_level": {"overexpression": 5, "wt": 5},
+          "minimum_units_per_level": 4
+        },
+        {
+          "object_id": "lanthanide_limited_vs_replete_wt",
+          "estimand": "50 nM minus 2 uM Nd2O3 in the wild-type background",
+          "causal_claim_allowed": true,
+          "levels": {
+            "limited": {"column": "ATTRIBUTE_shorthand", "values": ["WT_limited"]},
+            "replete": {"column": "ATTRIBUTE_shorthand", "values": ["WT"]}
+          },
+          "level_coefficients": {"limited": 1.0, "replete": -1.0},
+          "expected_units_per_level": {"limited": 4, "replete": 5},
+          "minimum_units_per_level": 4
+        }
+      ]
+    },
+    {
+      "source_id": "msv000086360_melon_bsubtilis",
+      "task_id": "63d6d0c95b3e4d8d846d376499bb544e",
+      "accession": "MSV000086360",
+      "pmid": "35668112",
+      "scientific_role": "balanced_plant_bacterial_intervention_by_tissue",
+      "filename_column": "filename",
+      "biological_unit_column": "__filename__",
+      "expected_metadata_rows": 97,
+      "contrasts": [
+        {
+          "object_id": "bsubtilis_3610_vs_control_root",
+          "estimand": "B. subtilis 3610 treatment minus control within root",
+          "causal_claim_allowed": true,
+          "filters": [{"column": "ATTRIBUTE_SampleTypeSub1", "values": ["root"]}],
+          "levels": {
+            "treated": {"column": "ATTRIBUTE_treatment", "values": ["3610"]},
+            "control": {"column": "ATTRIBUTE_treatment", "values": ["control"]}
+          },
+          "level_coefficients": {"treated": 1.0, "control": -1.0},
+          "expected_units_per_level": {"control": 14, "treated": 14},
+          "minimum_units_per_level": 10
+        },
+        {
+          "object_id": "bsubtilis_3610_vs_control_stem",
+          "estimand": "B. subtilis 3610 treatment minus control within stem",
+          "causal_claim_allowed": true,
+          "filters": [{"column": "ATTRIBUTE_SampleTypeSub1", "values": ["stem"]}],
+          "levels": {
+            "treated": {"column": "ATTRIBUTE_treatment", "values": ["3610"]},
+            "control": {"column": "ATTRIBUTE_treatment", "values": ["control"]}
+          },
+          "level_coefficients": {"treated": 1.0, "control": -1.0},
+          "expected_units_per_level": {"control": 15, "treated": 15},
+          "minimum_units_per_level": 10
+        },
+        {
+          "object_id": "bsubtilis_3610_vs_control_leaf",
+          "estimand": "B. subtilis 3610 treatment minus control within leaf",
+          "causal_claim_allowed": true,
+          "filters": [{"column": "ATTRIBUTE_SampleTypeSub1", "values": ["leaf"]}],
+          "levels": {
+            "treated": {"column": "ATTRIBUTE_treatment", "values": ["3610"]},
+            "control": {"column": "ATTRIBUTE_treatment", "values": ["control"]}
+          },
+          "level_coefficients": {"treated": 1.0, "control": -1.0},
+          "expected_units_per_level": {"control": 19, "treated": 19},
+          "minimum_units_per_level": 10
+        }
+      ]
+    },
+    {
+      "source_id": "msv000084794_human_industrialization",
+      "task_id": "af7ec76b02ac482bbd2b7ee3a3ccbdc5",
+      "accession": "MSV000084794",
+      "pmid": "36416540",
+      "scientific_role": "observational_human_context_not_causal_intervention",
+      "filename_column": "filename",
+      "biological_unit_column": "__filename__",
+      "expected_metadata_rows": 90,
+      "contrasts": [
+        {
+          "object_id": "industrialized_vs_traditional_context",
+          "estimand": "industrialized-population context minus traditional-population context",
+          "causal_claim_allowed": false,
+          "levels": {
+            "industrialized": {
+              "column": "ATTRIBUTE_Urbanization_Score",
+              "values": ["Rural Industrial", "Urban Industrial"]
+            },
+            "traditional": {
+              "column": "ATTRIBUTE_Urbanization_Score",
+              "values": ["Isolated Traditional", "Rural Traditional"]
+            }
+          },
+          "level_coefficients": {"industrialized": 1.0, "traditional": -1.0},
+          "expected_units_per_level": {"industrialized": 44, "traditional": 46},
+          "minimum_units_per_level": 20
+        }
+      ]
+    }
+  ],
+  "preexcluded_candidates": [
+    {
+      "accession": "MSV000087364",
+      "reason": "78 sputum measurements represent 24 participants before/after ETI, but the public FBMN metadata lacks a frozen participant/pair identifier"
+    },
+    {
+      "accession": "MSV000083475",
+      "reason": "host-associated versus free-living status is nearly separated by LC-MS batch and extraction protocol; a naive 665-sample contrast is not identifiable"
+    }
+  ]
+}

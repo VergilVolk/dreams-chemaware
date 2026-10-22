@@ -1,0 +1,38 @@
+{
+  "schema": "public_fbmn_contrast_design_census_v1",
+  "status": "outcome_blind_metadata_census_no_effects_or_biological_result",
+  "parameters": {
+    "minimum_samples_per_level": 3,
+    "maximum_levels_per_field": 20,
+    "technical_fields_excluded_by_name": [
+      "batch",
+      "blank",
+      "chromatography",
+      "file_name",
+      "filename",
+      "injection",
+      "instrument",
+      "ionization",
+      "plate",
+      "polarity",
+      "qc",
+      "replicate",
+      "run_order",
+      "sample_id",
+      "sample_name",
+      "sampleid",
+      "well"
+    ]
+  },
+  "denominators": {
+    "metadata_qualified_tasks_requested": 42,
+    "metadata_tasks_readable": 42,
+    "tasks_with_candidate_design": 37,
+    "candidate_design_fields": 141
+  },
+  "claim_boundary": [
+    "Low-cardinality metadata is only a candidate design, not a biological contrast or truth label.",
+    "Replicates, batches, repeated measures, controls and intervention semantics require manual adjudication.",
+    "No abundance values, feature effects or retrieval outcomes were read."
+  ]
+}

@@ -1,0 +1,379 @@
+{
+  "schema": "public_fbmn_systematic_response_panel_v1",
+  "status": "DEVELOPMENT_CONSUMED_RESPONSE_OBJECTS_BUILT_NO_CROSS_STUDY_RESULT",
+  "denominators": {
+    "independent_sources": 3,
+    "response_objects": 7,
+    "metadata_files_across_sources": 267,
+    "biological_units_summed_over_response_objects": 215,
+    "unique_biological_units_within_sources": 205,
+    "eligible_response_rows": 20537,
+    "eligible_response_rows_with_ms2": 20535
+  },
+  "sources": [
+    {
+      "source_id": "msv000090804_lanthanide_positive",
+      "task_id": "def58641630e488985bfbe5a15c94e32",
+      "accession": "MSV000090804",
+      "pmid": "39078674",
+      "scientific_role": "controlled_genetic_and_nutrient_perturbation",
+      "metadata_rows": 80,
+      "quantified_features": 4612,
+      "representative_mgf_blocks": 4612,
+      "representative_mgf_nonempty_unique_feature_ids": 4612,
+      "mgf_blocks_without_feature_id": 0,
+      "identity_partition": {
+        "unresolved_entity": 4582,
+        "library_supported": 30
+      },
+      "identity_partition_sha256": "0cfcf77c787c0d3f1a41126a763f28ce3cc2201994126a75c33384e38eeecc2d",
+      "artifacts": {
+        "quantification": {
+          "path": "data\\reference\\public_fbmn_systematic_v1\\def58641630e488985bfbe5a15c94e32\\quantification.csv",
+          "bytes": 6076481,
+          "sha256": "d90da18d7c5443b7a29e49df23a63ad4afed541f86fe2af9e308cf46f8b8d476"
+        },
+        "metadata": {
+          "path": "data\\reference\\public_fbmn_systematic_v1\\def58641630e488985bfbe5a15c94e32\\metadata.tsv",
+          "bytes": 4796,
+          "sha256": "b70274fb0e428ebea1808025d651c289c3a8022d5572b90f3098d96d7f18ced5"
+        },
+        "mgf": {
+          "path": "data\\reference\\public_fbmn_systematic_v1\\def58641630e488985bfbe5a15c94e32\\representative.mgf",
+          "bytes": 5336665,
+          "sha256": "37e8cf36f37b9a0cc9fc25f1dee1bbe718c04f6f4b8cae9cbf9a43b7c6fdd9e6"
+        },
+        "library": {
+          "path": "data\\reference\\public_fbmn_systematic_v1\\def58641630e488985bfbe5a15c94e32\\db_result.tsv",
+          "bytes": 28963,
+          "sha256": "8733cea5ca470708218044bbbd1b40355d6bcae9935796a62ffc72dbf2315b9e"
+        }
+      },
+      "unique_biological_units_in_any_contrast": 19
+    },
+    {
+      "source_id": "msv000086360_melon_bsubtilis",
+      "task_id": "63d6d0c95b3e4d8d846d376499bb544e",
+      "accession": "MSV000086360",
+      "pmid": "35668112",
+      "scientific_role": "balanced_plant_bacterial_intervention_by_tissue",
+      "metadata_rows": 97,
+      "quantified_features": 4316,
+      "representative_mgf_blocks": 4316,
+      "representative_mgf_nonempty_unique_feature_ids": 4316,
+      "mgf_blocks_without_feature_id": 0,
+      "identity_partition": {
+        "unresolved_entity": 4227,
+        "library_supported": 89
+      },
+      "identity_partition_sha256": "1f7c8b3dd83c205be3b74459e52c91092afc20862229d8e1d2538c81a29d866d",
+      "artifacts": {
+        "quantification": {
+          "path": "data\\reference\\public_fbmn_systematic_v1\\63d6d0c95b3e4d8d846d376499bb544e\\quantification.csv",
+          "bytes": 5397379,
+          "sha256": "f259e0db797bac68c9a112993f6558eda77b29a825f7be421042229ad70f25b5"
+        },
+        "metadata": {
+          "path": "data\\reference\\public_fbmn_systematic_v1\\63d6d0c95b3e4d8d846d376499bb544e\\metadata.tsv",
+          "bytes": 49839,
+          "sha256": "dd56032d709da6ed5c12bcade22171029728214dc661b0729ce328a483c34006"
+        },
+        "mgf": {
+          "path": "data\\reference\\public_fbmn_systematic_v1\\63d6d0c95b3e4d8d846d376499bb544e\\representative.mgf",
+          "bytes": 2694996,
+          "sha256": "4295507c6fe553ec73e3b301002e06d8c9a5efcaba52b3016bae81bff9cf543f"
+        },
+        "library": {
+          "path": "data\\reference\\public_fbmn_systematic_v1\\63d6d0c95b3e4d8d846d376499bb544e\\db_result.tsv",
+          "bytes": 111254,
+          "sha256": "d2a19204e9b136b5d3d13d30297a564e04ac1c4bef17621be30d81d654c64e6d"
+        }
+      },
+      "unique_biological_units_in_any_contrast": 96
+    },
+    {
+      "source_id": "msv000084794_human_industrialization",
+      "task_id": "af7ec76b02ac482bbd2b7ee3a3ccbdc5",
+      "accession": "MSV000084794",
+      "pmid": "36416540",
+      "scientific_role": "observational_human_context_not_causal_intervention",
+      "metadata_rows": 90,
+      "quantified_features": 36234,
+      "representative_mgf_blocks": 36234,
+      "representative_mgf_nonempty_unique_feature_ids": 36195,
+      "mgf_blocks_without_feature_id": 0,
+      "identity_partition": {
+        "unresolved_entity": 34589,
+        "library_supported": 1645
+      },
+      "identity_partition_sha256": "4ab4fc1ef14dc3eb317eb16069a1edc84e7948b1ed8747009de67f520e915454",
+      "artifacts": {
+        "quantification": {
+          "path": "data\\reference\\public_fbmn_systematic_v1\\af7ec76b02ac482bbd2b7ee3a3ccbdc5\\quantification.csv",
+          "bytes": 18319060,
+          "sha256": "141341fb5bd157a8e13297626ed553063362c0da24c89e4f1a1f86e42321f3b9"
+        },
+        "metadata": {
+          "path": "data\\reference\\public_fbmn_systematic_v1\\af7ec76b02ac482bbd2b7ee3a3ccbdc5\\metadata.tsv",
+          "bytes": 6130,
+          "sha256": "41ea1ba3717f21b502c6c7be26a3f585242011a888c4ed1d7037dd210a6c35c8"
+        },
+        "mgf": {
+          "path": "data\\reference\\public_fbmn_systematic_v1\\af7ec76b02ac482bbd2b7ee3a3ccbdc5\\representative.mgf",
+          "bytes": 82569656,
+          "sha256": "8792840ee815c63028047cede2d646edc79529eebb0b9e9d81e0f3bc382afb91"
+        },
+        "library": {
+          "path": "data\\reference\\public_fbmn_systematic_v1\\af7ec76b02ac482bbd2b7ee3a3ccbdc5\\db_result.tsv",
+          "bytes": 1430295,
+          "sha256": "f1cf077d479f0ac369d35fbc25f17453cf972282565fe596868d2d855355ab01"
+        }
+      },
+      "unique_biological_units_in_any_contrast": 90
+    }
+  ],
+  "contrasts": [
+    {
+      "source_id": "msv000090804_lanthanide_positive",
+      "study_id": "MSV000090804",
+      "pmid": "39078674",
+      "object_id": "lanthanophore_cluster_ko_vs_wt",
+      "scientific_role": "controlled_genetic_and_nutrient_perturbation",
+      "estimand": "lanthanophore-cluster knockout minus wild type under 2 uM Nd2O3",
+      "causal_claim_allowed": true,
+      "level_coefficients": {
+        "ko": 1.0,
+        "wt": -1.0
+      },
+      "denominators": {
+        "quantified_features": 4612,
+        "biological_units": 10,
+        "units_per_level": {
+          "ko": 5,
+          "wt": 5
+        },
+        "qc_eligible_features": 4247,
+        "qc_eligible_features_with_ms2": 4247,
+        "qc_eligible_features_by_identity": {
+          "unresolved_entity": 4218,
+          "library_supported": 29
+        }
+      },
+      "provenance": {
+        "design_sha256": "165e270bc857261203844f050a4b1658e0935f3bbd6aba5a460152d6cf173601",
+        "response_object_sha256": "84c803f40aab326936b114a95c6743ef5f3ac2a3706e24b6341d84fcd5ce7511",
+        "sample_normalization_sha256": "2e2a7fc227ba21520f3448814640797ffef2afa6a3eb210137b85077aca3cbe7"
+      }
+    },
+    {
+      "source_id": "msv000090804_lanthanide_positive",
+      "study_id": "MSV000090804",
+      "pmid": "39078674",
+      "object_id": "lanthanophore_overexpression_vs_wt",
+      "scientific_role": "controlled_genetic_and_nutrient_perturbation",
+      "estimand": "lanthanophore overexpression minus wild type under 2 uM Nd2O3",
+      "causal_claim_allowed": true,
+      "level_coefficients": {
+        "overexpression": 1.0,
+        "wt": -1.0
+      },
+      "denominators": {
+        "quantified_features": 4612,
+        "biological_units": 10,
+        "units_per_level": {
+          "overexpression": 5,
+          "wt": 5
+        },
+        "qc_eligible_features": 3466,
+        "qc_eligible_features_with_ms2": 3466,
+        "qc_eligible_features_by_identity": {
+          "unresolved_entity": 3439,
+          "library_supported": 27
+        }
+      },
+      "provenance": {
+        "design_sha256": "556980d4423f6217f3e5e8298b5ddfa34e6396d6e59435d0a1c5aa0ad3266f7f",
+        "response_object_sha256": "753128a3c30b4380a21686f63354d49fc6c7b4622a19e88faeb36e876c98376a",
+        "sample_normalization_sha256": "ec50bcaacf21d73ca624a517e46603f300d596c7af8c8d70e5a17afa3d38cf9d"
+      }
+    },
+    {
+      "source_id": "msv000090804_lanthanide_positive",
+      "study_id": "MSV000090804",
+      "pmid": "39078674",
+      "object_id": "lanthanide_limited_vs_replete_wt",
+      "scientific_role": "controlled_genetic_and_nutrient_perturbation",
+      "estimand": "50 nM minus 2 uM Nd2O3 in the wild-type background",
+      "causal_claim_allowed": true,
+      "level_coefficients": {
+        "limited": 1.0,
+        "replete": -1.0
+      },
+      "denominators": {
+        "quantified_features": 4612,
+        "biological_units": 9,
+        "units_per_level": {
+          "limited": 4,
+          "replete": 5
+        },
+        "qc_eligible_features": 4140,
+        "qc_eligible_features_with_ms2": 4140,
+        "qc_eligible_features_by_identity": {
+          "unresolved_entity": 4113,
+          "library_supported": 27
+        }
+      },
+      "provenance": {
+        "design_sha256": "993b9cabd068c540b2a1b249cb4cef0895d767801c76254e352d3ceb7cbf734a",
+        "response_object_sha256": "97d79d54951195814ac1aeabe8a68cbbcecee428d5ddfe73f8a85736e17a7053",
+        "sample_normalization_sha256": "76dc9f798850136864719ae5a3d7198cb0af172ab024ed5bb186fc9014ab5a19"
+      }
+    },
+    {
+      "source_id": "msv000086360_melon_bsubtilis",
+      "study_id": "MSV000086360",
+      "pmid": "35668112",
+      "object_id": "bsubtilis_3610_vs_control_root",
+      "scientific_role": "balanced_plant_bacterial_intervention_by_tissue",
+      "estimand": "B. subtilis 3610 treatment minus control within root",
+      "causal_claim_allowed": true,
+      "level_coefficients": {
+        "treated": 1.0,
+        "control": -1.0
+      },
+      "denominators": {
+        "quantified_features": 4316,
+        "biological_units": 28,
+        "units_per_level": {
+          "control": 14,
+          "treated": 14
+        },
+        "qc_eligible_features": 1462,
+        "qc_eligible_features_with_ms2": 1462,
+        "qc_eligible_features_by_identity": {
+          "unresolved_entity": 1414,
+          "library_supported": 48
+        }
+      },
+      "provenance": {
+        "design_sha256": "c7a70187ba6474ab897b028585fd28d7aa2d4f027418cfea146ad46cc724fae0",
+        "response_object_sha256": "63ac23dffbd87a033a8c5552b922fb0e20073384957ed99bd781001236998257",
+        "sample_normalization_sha256": "5cff90c67c1293c2824688dbc8f66bf3b070071dcada447e0f4feb70e6923799"
+      }
+    },
+    {
+      "source_id": "msv000086360_melon_bsubtilis",
+      "study_id": "MSV000086360",
+      "pmid": "35668112",
+      "object_id": "bsubtilis_3610_vs_control_stem",
+      "scientific_role": "balanced_plant_bacterial_intervention_by_tissue",
+      "estimand": "B. subtilis 3610 treatment minus control within stem",
+      "causal_claim_allowed": true,
+      "level_coefficients": {
+        "treated": 1.0,
+        "control": -1.0
+      },
+      "denominators": {
+        "quantified_features": 4316,
+        "biological_units": 30,
+        "units_per_level": {
+          "control": 15,
+          "treated": 15
+        },
+        "qc_eligible_features": 2285,
+        "qc_eligible_features_with_ms2": 2285,
+        "qc_eligible_features_by_identity": {
+          "unresolved_entity": 2229,
+          "library_supported": 56
+        }
+      },
+      "provenance": {
+        "design_sha256": "6efe3b5adae398b7059f007188c95846e472eb2b5998e28b494bbd477cf1d0f2",
+        "response_object_sha256": "38ef550dfa9068333a47d861dd30d748563a855bc2737078d09bbae94913c941",
+        "sample_normalization_sha256": "1a165ddb0f35dc2a9d0934402787e69aba8dee972124d517798f5dcb1b4fca9f"
+      }
+    },
+    {
+      "source_id": "msv000086360_melon_bsubtilis",
+      "study_id": "MSV000086360",
+      "pmid": "35668112",
+      "object_id": "bsubtilis_3610_vs_control_leaf",
+      "scientific_role": "balanced_plant_bacterial_intervention_by_tissue",
+      "estimand": "B. subtilis 3610 treatment minus control within leaf",
+      "causal_claim_allowed": true,
+      "level_coefficients": {
+        "treated": 1.0,
+        "control": -1.0
+      },
+      "denominators": {
+        "quantified_features": 4316,
+        "biological_units": 38,
+        "units_per_level": {
+          "control": 19,
+          "treated": 19
+        },
+        "qc_eligible_features": 2734,
+        "qc_eligible_features_with_ms2": 2734,
+        "qc_eligible_features_by_identity": {
+          "unresolved_entity": 2671,
+          "library_supported": 63
+        }
+      },
+      "provenance": {
+        "design_sha256": "e36a86ee49159d20d68af2fa0d59e4e2f6ebd410f03a8b14f57d2215dd602e77",
+        "response_object_sha256": "360f3703253a9cb52e74d779630bcb88d03227c82925a7e6aa3b90f3b40259d5",
+        "sample_normalization_sha256": "1b958aceb9fc2b904b4e4c714021496f160450988f60ed93b0e2cf4d5b555be8"
+      }
+    },
+    {
+      "source_id": "msv000084794_human_industrialization",
+      "study_id": "MSV000084794",
+      "pmid": "36416540",
+      "object_id": "industrialized_vs_traditional_context",
+      "scientific_role": "observational_human_context_not_causal_intervention",
+      "estimand": "industrialized-population context minus traditional-population context",
+      "causal_claim_allowed": false,
+      "level_coefficients": {
+        "industrialized": 1.0,
+        "traditional": -1.0
+      },
+      "denominators": {
+        "quantified_features": 36234,
+        "biological_units": 90,
+        "units_per_level": {
+          "industrialized": 44,
+          "traditional": 46
+        },
+        "qc_eligible_features": 2203,
+        "qc_eligible_features_with_ms2": 2201,
+        "qc_eligible_features_by_identity": {
+          "unresolved_entity": 2114,
+          "library_supported": 89
+        }
+      },
+      "provenance": {
+        "design_sha256": "538c41b834974397499f079c77b92ec3babbf6b7ac575329558f6eba6512a7ae",
+        "response_object_sha256": "ad9698a0612d9a9851f90ec411f93ba86b2b6e4dead3168fcddbefcc3833efdf",
+        "sample_normalization_sha256": "8ed5779c36bc8ea55a9d2fac55e37151a311a9e7392001543166497a0d8533fd"
+      }
+    }
+  ],
+  "measurement_contract": {
+    "normalization": "positive-only log2 intensity followed by within-contrast sample-median centering",
+    "technical_files": "median within a manifest-frozen biological_unit_id before effect estimation",
+    "missingness": "zero and nonpositive values remain missing; no zero-as-abundance and no imputation",
+    "effect": "linear contrast of biological-unit means with independent-group Welch standard error",
+    "identity": "strict phenotype-blind GNPS Gold/Silver/Bronze direct-hit control with planar InChIKey; every other feature is unresolved_entity"
+  },
+  "leakage_status": "within-study labels used only after task, biological-unit, contrast and count contracts were frozen; no cross-study retrieval score read",
+  "provenance": {
+    "manifest_sha256": "6a92f5f922183229ac3f46611d2e2a187bce4c03c941fb029fe5f33a112e666f"
+  },
+  "claim_boundary": [
+    "Every source and result is development/consumed, not external validation.",
+    "Public FBMN feature tables reflect author preprocessing and are not uniform raw-data reprocessing.",
+    "Unresolved means lacking a direct strict GNPS library-supported control hit, not a unique unknown metabolite.",
+    "Response objects are research-level effect estimates, not validated cross-study biological relations.",
+    "Observational context contrasts are descriptive and cannot be promoted to intervention effects."
+  ]
+}

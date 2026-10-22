@@ -1,0 +1,41 @@
+filename	biological_unit_id	level
+01-HLB_221116_pos_iaMSMS_01.mzML	mxaF LCC 2uM Nd2O3 #1	ko
+01-HLB_221116_pos_iaMSMS_02.mzML	mxaF LCC 2uM Nd2O3 #1	ko
+01-HLB_221116_pos_iaMSMS_03.mzML	mxaF LCC 2uM Nd2O3 #1	ko
+01-HLB_221116_pos_iaMSMS_04.mzML	mxaF LCC 2uM Nd2O3 #1	ko
+03-HLB_221116_pos_iaMSMS_01.mzML	mxaF LCC 2uM Nd2O3 #2	ko
+03-HLB_221116_pos_iaMSMS_02.mzML	mxaF LCC 2uM Nd2O3 #2	ko
+03-HLB_221116_pos_iaMSMS_03.mzML	mxaF LCC 2uM Nd2O3 #2	ko
+03-HLB_221116_pos_iaMSMS_04.mzML	mxaF LCC 2uM Nd2O3 #2	ko
+04-HLB_221116_pos_iaMSMS_01.mzML	mxaF 2uM Nd2O3 #1	wt
+04-HLB_221116_pos_iaMSMS_02.mzML	mxaF 2uM Nd2O3 #1	wt
+04-HLB_221116_pos_iaMSMS_03.mzML	mxaF 2uM Nd2O3 #1	wt
+04-HLB_221116_pos_iaMSMS_04.mzML	mxaF 2uM Nd2O3 #1	wt
+05-HLB_221116_pos_iaMSMS_01.mzML	mxaF LCC 2uM Nd2O3 #4	ko
+05-HLB_221116_pos_iaMSMS_02.mzML	mxaF LCC 2uM Nd2O3 #4	ko
+05-HLB_221116_pos_iaMSMS_03.mzML	mxaF LCC 2uM Nd2O3 #4	ko
+05-HLB_221116_pos_iaMSMS_04.mzML	mxaF LCC 2uM Nd2O3 #4	ko
+06-HLB_221116_pos_iaMSMS_01.mzML	mxaF 2uM Nd2O3 #4	wt
+06-HLB_221116_pos_iaMSMS_02.mzML	mxaF 2uM Nd2O3 #4	wt
+06-HLB_221116_pos_iaMSMS_03.mzML	mxaF 2uM Nd2O3 #4	wt
+06-HLB_221116_pos_iaMSMS_04.mzML	mxaF 2uM Nd2O3 #4	wt
+07-HLB_221116_pos_iaMSMS_01.mzML	mxaF 2uM Nd2O3 #2	wt
+07-HLB_221116_pos_iaMSMS_02.mzML	mxaF 2uM Nd2O3 #2	wt
+07-HLB_221116_pos_iaMSMS_03.mzML	mxaF 2uM Nd2O3 #2	wt
+07-HLB_221116_pos_iaMSMS_04.mzML	mxaF 2uM Nd2O3 #2	wt
+08-HLB_221116_pos_iaMSMS_01.mzML	mxaF 2uM Nd2O3 #5	wt
+08-HLB_221116_pos_iaMSMS_02.mzML	mxaF 2uM Nd2O3 #5	wt
+08-HLB_221116_pos_iaMSMS_03.mzML	mxaF 2uM Nd2O3 #5	wt
+08-HLB_221116_pos_iaMSMS_04.mzML	mxaF 2uM Nd2O3 #5	wt
+09-HLB_221116_pos_iaMSMS_01.mzML	mxaF 2uM Nd2O3 #3	wt
+09-HLB_221116_pos_iaMSMS_02.mzML	mxaF 2uM Nd2O3 #3	wt
+09-HLB_221116_pos_iaMSMS_03.mzML	mxaF 2uM Nd2O3 #3	wt
+09-HLB_221116_pos_iaMSMS_04.mzML	mxaF 2uM Nd2O3 #3	wt
+10-HLB_221116_pos_iaMSMS_01.mzML	mxaF LCC 2uM Nd2O3 #5	ko
+10-HLB_221116_pos_iaMSMS_02.mzML	mxaF LCC 2uM Nd2O3 #5	ko
+10-HLB_221116_pos_iaMSMS_03.mzML	mxaF LCC 2uM Nd2O3 #5	ko
+10-HLB_221116_pos_iaMSMS_04.mzML	mxaF LCC 2uM Nd2O3 #5	ko
+12-HLB_221116_pos_iaMSMS_01.mzML	mxaF LCC 2uM Nd2O3 #3	ko
+12-HLB_221116_pos_iaMSMS_02.mzML	mxaF LCC 2uM Nd2O3 #3	ko
+12-HLB_221116_pos_iaMSMS_03.mzML	mxaF LCC 2uM Nd2O3 #3	ko
+12-HLB_221116_pos_iaMSMS_04.mzML	mxaF LCC 2uM Nd2O3 #3	ko

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Truth-blind centred spectral-response kernel for the seven-source collection.
+"""Truth-blind centred spectral-response kernel for an open response collection.
 
 The operator targets response-associated fragment evidence rather than chemical
 composition alone.  Within each study contrast and evidence world, uncertainty-
@@ -413,7 +413,7 @@ def main() -> None:
             str(relations_path): sha256(relations_path),
         },
         "claim_boundary": [
-            "All seven sources are development/consumed.",
+            f"All {contrasts['source_family'].nunique()} sources are development/consumed.",
             "Registered relations specify design relevance, not signed response truth.",
             "This is a relation-layer operator and never merges distinct entities as one molecule.",
             "Unresolved means not library-supported, not a unique metabolite.",

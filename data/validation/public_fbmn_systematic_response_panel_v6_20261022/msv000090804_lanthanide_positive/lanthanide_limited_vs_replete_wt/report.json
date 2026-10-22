@@ -1,0 +1,32 @@
+{
+  "source_id": "msv000090804_lanthanide_positive",
+  "study_id": "MSV000090804",
+  "pmid": "39078674",
+  "object_id": "lanthanide_limited_vs_replete_wt",
+  "scientific_role": "controlled_genetic_and_nutrient_perturbation",
+  "estimand": "50 nM minus 2 uM Nd2O3 in the wild-type background",
+  "causal_claim_allowed": true,
+  "level_coefficients": {
+    "limited": 1.0,
+    "replete": -1.0
+  },
+  "denominators": {
+    "quantified_features": 4612,
+    "biological_units": 9,
+    "units_per_level": {
+      "limited": 4,
+      "replete": 5
+    },
+    "qc_eligible_features": 4140,
+    "qc_eligible_features_with_ms2": 4140,
+    "qc_eligible_features_by_identity": {
+      "unresolved_entity": 4113,
+      "library_supported": 27
+    }
+  },
+  "provenance": {
+    "design_sha256": "993b9cabd068c540b2a1b249cb4cef0895d767801c76254e352d3ceb7cbf734a",
+    "response_object_sha256": "97d79d54951195814ac1aeabe8a68cbbcecee428d5ddfe73f8a85736e17a7053",
+    "sample_normalization_sha256": "76dc9f798850136864719ae5a3d7198cb0af172ab024ed5bb186fc9014ab5a19"
+  }
+}

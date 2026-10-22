@@ -1,0 +1,142 @@
+task_id	metadata_field	samples_with_value	eligible_levels	minimum_level_n	maximum_level_n	levels_and_n	role
+0478820eab694254b9eba0bbe4de2be6	ATTRIBUTE_shorthand	75	5	4	20	WT::20 | KO::19 | WT_limited::16 | overexpression::16 | media::4	candidate_design_requires_semantic_and_unit_adjudication
+058516efad8f4af081b763c52404a7f7	ATTRIBUTE_SampleOrigin	30	9	3	6	Blank::6 | SirtA::3 | SirtB::3 | SirtD::3 | SirtC::3 | SirtE::3 | HSTA::3 | SirtKO::3 | Wild-Type::3	candidate_design_requires_semantic_and_unit_adjudication
+0e5b5773845f47dfb518b61e7809ddf3	ATTRIBUTE_SampleType	12	2	3	9	environmental::9 | blank_extraction::3	candidate_design_requires_semantic_and_unit_adjudication
+0e5b5773845f47dfb518b61e7809ddf3	ATTRIBUTE_SampleTypeSub1	12	4	3	3	blank_extraction::3 | water_seawater::3 | water_ground::3 | water_surface::3	candidate_design_requires_semantic_and_unit_adjudication
+11af5682eedd4e9d950c3b9b14d9059c	SampleType	140	2	10	130	environmental::130 | blank::10	candidate_design_requires_semantic_and_unit_adjudication
+11af5682eedd4e9d950c3b9b14d9059c	SampleTypeSub1	140	2	10	130	marine_cyanobacteria_insitu::130 | blank::10	candidate_design_requires_semantic_and_unit_adjudication
+11af5682eedd4e9d950c3b9b14d9059c	SampleCollectionMethod	140	2	10	130	solid material, dried::130 | blank::10	candidate_design_requires_semantic_and_unit_adjudication
+11af5682eedd4e9d950c3b9b14d9059c	SampleCollectionDateandTime	140	4	5	68	11/10/18::68 | 11/9/18::57 | not applicable::10 | 2/20/19::5	candidate_design_requires_semantic_and_unit_adjudication
+11af5682eedd4e9d950c3b9b14d9059c	Country	140	3	5	125	South Africa::125 | not applicable::10 | United States of America::5	candidate_design_requires_semantic_and_unit_adjudication
+11af5682eedd4e9d950c3b9b14d9059c	HumanPopulationDensity	140	2	10	130	Urban::130 | not applicable::10	candidate_design_requires_semantic_and_unit_adjudication
+11af5682eedd4e9d950c3b9b14d9059c	LatitudeandLongitude	140	2	10	130	-34.041176; 25.538640::130 | not applicable::10	candidate_design_requires_semantic_and_unit_adjudication
+11af5682eedd4e9d950c3b9b14d9059c	DepthorAltitudeMeters	140	2	10	130	0::130 | not applicable::10	candidate_design_requires_semantic_and_unit_adjudication
+11af5682eedd4e9d950c3b9b14d9059c	Flag_Number	140	11	5	26	3::26 | 8::17 | 10::14 | 7::12 | 1::12 | 5::12 | 6::11 | 2::11 | 4::10 | not applicable::10 | SD::5	candidate_design_requires_semantic_and_unit_adjudication
+11af5682eedd4e9d950c3b9b14d9059c	Pool_region	140	5	5	71	Middle::71 | Lower::31 | Inflow::23 | not applicable::10 | SD::5	candidate_design_requires_semantic_and_unit_adjudication
+11af5682eedd4e9d950c3b9b14d9059c	Depth_Substrate_Sampling	140	9	3	41	Core-top::41 | Core-middle::38 | Core-bottom::36 | not applicable::10 | 0-1cm::3 | 1-2cm::3 | 2-3cm::3 | 3-4cm::3 | 4-5cm::3	candidate_design_requires_semantic_and_unit_adjudication
+11af5682eedd4e9d950c3b9b14d9059c	Corresponding_DOM_Site	140	10	10	26	3::26 | 8::17 | not applicable::15 | 10::14 | 1::12 | 5::12 | 7::12 | 2::11 | 6::11 | 4::10	candidate_design_requires_semantic_and_unit_adjudication
+11af5682eedd4e9d950c3b9b14d9059c	Spot_in_Site_for_Coring	140	5	15	39	2::39 | 1::38 | 4::24 | 3::24 | not applicable::15	candidate_design_requires_semantic_and_unit_adjudication
+11af5682eedd4e9d950c3b9b14d9059c	ATTRIBUTE_Location 	140	3	5	125	Schoenmakerskop::125 | blank::10 | Windansea::5	candidate_design_requires_semantic_and_unit_adjudication
+11af5682eedd4e9d950c3b9b14d9059c	DOM_Filter_LOT_number	140	3	5	110	6409030-04::110 | blank::10 | not applicable::5	candidate_design_requires_semantic_and_unit_adjudication
+11af5682eedd4e9d950c3b9b14d9059c	ATTRIBUTE_Pool_region	140	5	5	71	Middle::71 | Lower::31 | Inflow::23 | blank::10 | SD::5	candidate_design_requires_semantic_and_unit_adjudication
+15c14ac5a13c466db52068de85bc8894	ATTRIBUTE_sampletype	60	11	5	10	exctrl-na-na-na-12h::10 | rtexud-nh4-nfree-w5-12h::5 | rtexud-no3-nfree-w5-12h::5 | rtexud-nh4no3-nfree-w5-12h::5 | rtexud-no3-norig-w5-12h::5 | rtexud-nh4no3-norig-w5-12h::5 | rtexud-nh4-norig-w5-12h::5 | txctrl-no3-norig-w5-12h::5 | txctrl-nh4-norig-w5-12h::5 | txctrl-nh4no3-norig-w5-12h::5 | txctrl-nfree-nfree-w5-12h::5	candidate_design_requires_semantic_and_unit_adjudication
+246f05b912f54a96948c12ae41dca13f	ATTRIBUTE_source	18	2	9	9	SICRIT::9 | ESI::9	candidate_design_requires_semantic_and_unit_adjudication
+246f05b912f54a96948c12ae41dca13f	ATTRIBUTE_strain	18	3	6	6	BFdown::6 | BFup::6 | LBS::6	candidate_design_requires_semantic_and_unit_adjudication
+2c5f11403ac847a298e4d7866a491143	ATTRIBUTE_Group	197	2	57	140	Group_B::140 | Group_A::57	candidate_design_requires_semantic_and_unit_adjudication
+2c5f11403ac847a298e4d7866a491143	ATTRIBUTE_Clade	197	6	5	86	J::86 | H::61 | A::22 | I::11 | F::6 | G::5	candidate_design_requires_semantic_and_unit_adjudication
+2c5f11403ac847a298e4d7866a491143	ATTRIBUTE_BrazilianBiome	197	7	10	78	Atlantic forest::78 | Cerrado::38 | Amazon rainforest::20 | Atlantic forest/Cerrado::15 | Caatinga::13 | Cerrado/Caatinga::12 | not applicable::10	candidate_design_requires_semantic_and_unit_adjudication
+2c5f11403ac847a298e4d7866a491143	ATTRIBUTE_WorldwideBiome	197	5	14	98	Rainforest::98 | Savanna::40 | Seasonally Dry Forest::22 | Rainforest/Savanna::21 | Seasonally Dry Forest/Savanna::14	candidate_design_requires_semantic_and_unit_adjudication
+2c5f11403ac847a298e4d7866a491143	ATTRIBUTE_Humidity	197	3	24	98	Humid::98 | Dry::75 | Humid/Dry::24	candidate_design_requires_semantic_and_unit_adjudication
+2c5f11403ac847a298e4d7866a491143	ATTRIBUTE_CollectionSeason	197	4	41	54	Fall::54 | Winter::53 | Spring::49 | Summer::41	candidate_design_requires_semantic_and_unit_adjudication
+2c5f11403ac847a298e4d7866a491143	ATTRIBUTE_Habit	197	3	25	144	Liana::144 | Tree::28 | Shrub::25	candidate_design_requires_semantic_and_unit_adjudication
+2c5f11403ac847a298e4d7866a491143	ATTRIBUTE_PlantPart	197	2	4	193	Leaves::193 | Bark::4	candidate_design_requires_semantic_and_unit_adjudication
+2fcd5256e67c4b4c9f2ed256044b87d5	ATTRIBUTE_sampletype	24	8	3	3	1::3 | 2::3 | 8::3 | 32::3 | 60::3 | 100::3 | 140::3 | 220::3	candidate_design_requires_semantic_and_unit_adjudication
+345b589dcf84403489b04458cc94c40a	ATTRIBUTE_condition	114	16	6	24	meoh_h2o::24 | cca::6 | jb182::6 | cca_falcon50::6 | jb418::6 | jb5::6 | jb5_falcon50::6 | jb182_falcon50::6 | k12::6 | k12_falcon50::6 | pen12::6 | pen12_falcon50::6 | pen12_jb182::6 | pen12_jb418::6 | pen12_jb5::6 | pen12_k12::6	candidate_design_requires_semantic_and_unit_adjudication
+3bb61b8abb3f4356ae9ab7ed1330b785	ATTRIBUTE_Mutant 	18	6	3	3	lugOI::3 | lugOII::3 | lugOIII::3 | lugOIV::3 | lugOV::3 | QL37_wt::3	candidate_design_requires_semantic_and_unit_adjudication
+3f5258d734374246a452591f23763b9f	ATTRIBUTE_SampleType	512	6	12	360	Polyp::360 | Blank_Solvent::43 | Blank_Solvent_PheRed::43 | Blank::36 | Bag::18 | QC::12	candidate_design_requires_semantic_and_unit_adjudication
+3f5258d734374246a452591f23763b9f	ATTRIBUTE_Branch_Letter	512	7	12	126	A::126 | B::126 | C::126 | Blank_Solvent::43 | Blank_Solvent_PheRed::43 | Blank::36 | QC::12	candidate_design_requires_semantic_and_unit_adjudication
+501c16500476451f978311057266fbdf	ATTRIBUTE_Group	197	2	79	118	Group_A::118 | Group_B::79	candidate_design_requires_semantic_and_unit_adjudication
+501c16500476451f978311057266fbdf	ATTRIBUTE_Clade	197	6	5	86	J::86 | H::61 | A::22 | I::11 | F::6 | G::5	candidate_design_requires_semantic_and_unit_adjudication
+501c16500476451f978311057266fbdf	ATTRIBUTE_BrazilianBiome	197	7	10	78	Atlantic forest::78 | Cerrado::38 | Amazon rainforest::20 | Atlantic forest/Cerrado::15 | Caatinga::13 | Cerrado/Caatinga::12 | not applicable::10	candidate_design_requires_semantic_and_unit_adjudication
+501c16500476451f978311057266fbdf	ATTRIBUTE_WorldwideBiome	197	5	14	98	Rainforest::98 | Savanna::40 | Seasonally Dry Forest::22 | Rainforest/Savanna::21 | Seasonally Dry Forest/Savanna::14	candidate_design_requires_semantic_and_unit_adjudication
+501c16500476451f978311057266fbdf	ATTRIBUTE_Humidity	197	3	24	98	Humid::98 | Dry::75 | Humid/Dry::24	candidate_design_requires_semantic_and_unit_adjudication
+501c16500476451f978311057266fbdf	ATTRIBUTE_CollectionSeason	197	4	41	54	Fall::54 | Winter::53 | Spring::49 | Summer::41	candidate_design_requires_semantic_and_unit_adjudication
+501c16500476451f978311057266fbdf	ATTRIBUTE_Habit	197	3	25	144	Liana::144 | Tree::28 | Shrub::25	candidate_design_requires_semantic_and_unit_adjudication
+501c16500476451f978311057266fbdf	ATTRIBUTE_PlantPart	197	2	4	193	Leaves::193 | Bark::4	candidate_design_requires_semantic_and_unit_adjudication
+5e783c91e5e74ed9aee07cc59fc12830	ATTRIBUTE_Solvant	196	3	61	70	MeOH::70 | DCM::65 | stand::61	candidate_design_requires_semantic_and_unit_adjudication
+5e783c91e5e74ed9aee07cc59fc12830	ATTRIBUTE_Phylum	135	2	36	99	Mosses::99 | Liverworts::36	candidate_design_requires_semantic_and_unit_adjudication
+5e783c91e5e74ed9aee07cc59fc12830	ATTRIBUTE_Familly	129	10	4	39	Hypnales::39 | Dicranales::18 | Grimmiales::10 | Marchantiales::10 | Polytrichales::8 | Porellales::7 | Jungermanniales::7 | Bryales::6 | Bartramiales::6 | Pelliales::4	candidate_design_requires_semantic_and_unit_adjudication
+63d6d0c95b3e4d8d846d376499bb544e	SampleTypeSub1	96	3	28	38	leaf::38 | stem::30 | root::28	candidate_design_requires_semantic_and_unit_adjudication
+63d6d0c95b3e4d8d846d376499bb544e	ATTRIBUTE_SampleTypeSub1	96	3	28	38	leaf::38 | stem::30 | root::28	candidate_design_requires_semantic_and_unit_adjudication
+63d6d0c95b3e4d8d846d376499bb544e	ATTRIBUTE_treatment	96	2	48	48	control::48 | 3610::48	candidate_design_requires_semantic_and_unit_adjudication
+76115ecaad9c46e9aaa30413d0d435eb	ATTRIBUTE_metal	31	2	13	18	yes::18 | no::13	candidate_design_requires_semantic_and_unit_adjudication
+76115ecaad9c46e9aaa30413d0d435eb	ATTRIBUTE_Type	31	4	4	9	pure_nicotiflorin::9 | pure_rutin::9 | extract::8 | blank::4	candidate_design_requires_semantic_and_unit_adjudication
+7e8210b68fd049198579c2eff3068876	ATTRIBUTE_sampletype	60	11	5	10	exctrl-na-na-na-12h::10 | rtexud-nh4-nfree-w5-12h::5 | rtexud-no3-nfree-w5-12h::5 | rtexud-nh4no3-nfree-w5-12h::5 | rtexud-no3-norig-w5-12h::5 | rtexud-nh4no3-norig-w5-12h::5 | rtexud-nh4-norig-w5-12h::5 | txctrl-no3-norig-w5-12h::5 | txctrl-nh4-norig-w5-12h::5 | txctrl-nh4no3-norig-w5-12h::5 | txctrl-nfree-nfree-w5-12h::5	candidate_design_requires_semantic_and_unit_adjudication
+8106ee70142748e1a4beb93d6cab4f25	ATTRIBUTE_SampleType	12	2	3	9	environmental::9 | blank_extraction::3	candidate_design_requires_semantic_and_unit_adjudication
+8106ee70142748e1a4beb93d6cab4f25	ATTRIBUTE_SampleTypeSub1	12	4	3	3	blank_extraction::3 | water_seawater::3 | water_ground::3 | water_surface::3	candidate_design_requires_semantic_and_unit_adjudication
+8156bf469f1e4b8a8fe602b9b1d5c635	ATTRIBUTE_Genus	76	11	3	25	Euonymus::25 | Gymnosporia::9 | Salacia::8 | Maytenus::5 | Celastrus::5 | Catha::4 | Tripterygium::3 | Loeseneriella::3 | Evonymopsis::3 | Microtropis::3 | Pleurostylia::3	candidate_design_requires_semantic_and_unit_adjudication
+8156bf469f1e4b8a8fe602b9b1d5c635	ATTRIBUTE_Organe	76	7	3	25	Leaves::25 | Stems::19 | Roots::15 | Bark::5 | Aerial_parts::3 | Underground_parts::3 | Branche::3	candidate_design_requires_semantic_and_unit_adjudication
+8156bf469f1e4b8a8fe602b9b1d5c635	ATTRIBUTE_Broad_organ	76	4	7	27	woody vegetative::27 | photosynthetic::25 | roots::15 | multiple::7	candidate_design_requires_semantic_and_unit_adjudication
+8156bf469f1e4b8a8fe602b9b1d5c635	ATTRIBUTE_Tissue	76	4	7	27	green tissue::27 | woody tissue::27 | root tissue::15 | multiple::7	candidate_design_requires_semantic_and_unit_adjudication
+8156bf469f1e4b8a8fe602b9b1d5c635	ATTRIBUTE_Subsystem	76	2	18	57	aboveground::57 | belowground::18	candidate_design_requires_semantic_and_unit_adjudication
+8bcbb547ed734f88813ef84f13c7019c	ATTRIBUTE_Sample_Type	22	3	4	8	Colony::8 | Agar::8 | Medium_blank::4	candidate_design_requires_semantic_and_unit_adjudication
+8bcbb547ed734f88813ef84f13c7019c	ATTRIBUTE_Medium	22	4	5	5	PDA::5 | YES::5 | MEA-OX::5 | CYA::5	candidate_design_requires_semantic_and_unit_adjudication
+8bcbb547ed734f88813ef84f13c7019c	ATTRIBUTE_Strain	22	3	4	8	20602::8 | 11168::8 | Medium_blank::4	candidate_design_requires_semantic_and_unit_adjudication
+90288a3e0cb44704bb1df00b440acba1	SampleType	135	2	10	125	environmental::125 | blank::10	candidate_design_requires_semantic_and_unit_adjudication
+90288a3e0cb44704bb1df00b440acba1	SampleTypeSub1	135	2	10	125	marine_cyanobacteria_insitu::125 | blank::10	candidate_design_requires_semantic_and_unit_adjudication
+90288a3e0cb44704bb1df00b440acba1	SampleCollectionMethod	135	2	10	125	solid material, dried::125 | blank::10	candidate_design_requires_semantic_and_unit_adjudication
+90288a3e0cb44704bb1df00b440acba1	SampleCollectionDateandTime	135	3	10	68	11/10/18::68 | 11/9/18::57 | not applicable::10	candidate_design_requires_semantic_and_unit_adjudication
+90288a3e0cb44704bb1df00b440acba1	Country	135	2	10	125	South Africa::125 | not applicable::10	candidate_design_requires_semantic_and_unit_adjudication
+90288a3e0cb44704bb1df00b440acba1	HumanPopulationDensity	135	2	10	125	Urban::125 | not applicable::10	candidate_design_requires_semantic_and_unit_adjudication
+90288a3e0cb44704bb1df00b440acba1	LatitudeandLongitude	135	2	10	125	-34.041176; 25.538640::125 | not applicable::10	candidate_design_requires_semantic_and_unit_adjudication
+90288a3e0cb44704bb1df00b440acba1	DepthorAltitudeMeters	135	2	10	125	0::125 | not applicable::10	candidate_design_requires_semantic_and_unit_adjudication
+90288a3e0cb44704bb1df00b440acba1	Flag_Number	135	10	10	26	3::26 | 8::17 | 10::14 | 1::12 | 7::12 | 5::12 | 6::11 | 2::11 | 4::10 | not applicable::10	candidate_design_requires_semantic_and_unit_adjudication
+90288a3e0cb44704bb1df00b440acba1	Pool_region	135	4	10	71	Middle::71 | Lower::31 | Inflow::23 | not applicable::10	candidate_design_requires_semantic_and_unit_adjudication
+90288a3e0cb44704bb1df00b440acba1	Depth_Substrate_Sampling	135	9	3	38	Core-middle::38 | Core-top::36 | Core-bottom::36 | not applicable::10 | 0-1cm::3 | 1-2cm::3 | 2-3cm::3 | 3-4cm::3 | 4-5cm::3	candidate_design_requires_semantic_and_unit_adjudication
+90288a3e0cb44704bb1df00b440acba1	Corresponding_DOM_Site	135	10	10	26	3::26 | 8::17 | 10::14 | 1::12 | 7::12 | 5::12 | 6::11 | 2::11 | 4::10 | not applicable::10	candidate_design_requires_semantic_and_unit_adjudication
+90288a3e0cb44704bb1df00b440acba1	Spot_in_Site_for_Coring	135	5	10	39	2::39 | 1::38 | 4::24 | 3::24 | not applicable::10	candidate_design_requires_semantic_and_unit_adjudication
+90288a3e0cb44704bb1df00b440acba1	ATTRIBUTE_Location 	135	2	10	125	Schoenmakerskop::125 | blank::10	candidate_design_requires_semantic_and_unit_adjudication
+90288a3e0cb44704bb1df00b440acba1	ATTRIBUTE_linked_DOM_sample_number	135	20	5	15	S3-DOM-23-Sat-low::15 | S8-DOM-1-Fri-low::11 | blank::10 | S10-DOM-1-Fri-low::8 | S10-DOM-1-Sat-low::6 | S1-DOM-1-Sat-low::6 | S1-DOM-1-Fri-low::6 | S8-DOM-1-Sat-low::6 | S5-DOM-1-Sat-low::6 | S5-DOM-1-Fri-low::6 | S2-DOM-1-Sat-low::6 | S3-DOM-1-Sat-low::6 | S7-DOM-1-Sat-low::6 | S6-DOM-1-Sat-low::6 | S7-DOM-1-Fri-low::6 | S2-DOM-1-Fri-low::5 | S4-DOM-1-Sat-low::5 | S4-DOM-1-Fri-low::5 | S3-DOM-1-Fri-low::5 | S6-DOM-1-Fri-low::5	candidate_design_requires_semantic_and_unit_adjudication
+90288a3e0cb44704bb1df00b440acba1	DOM_Filter_LOT_number	135	2	10	110	6409030-04::110 | blank::10	candidate_design_requires_semantic_and_unit_adjudication
+90288a3e0cb44704bb1df00b440acba1	ATTRIBUTE_Pool_region	135	4	10	71	Middle::71 | Lower::31 | Inflow::23 | blank::10	candidate_design_requires_semantic_and_unit_adjudication
+90288a3e0cb44704bb1df00b440acba1	ATTRIBUTE_submerged	135	3	10	69	flowing::69 | submerged::56 | na::10	candidate_design_requires_semantic_and_unit_adjudication
+929ce9411f684cf8abd009670b293a33	ATTRIBUTE_lcms_extraction_protocol	850	5	39	539	Bulk_201901_UCSD::539 | Bulk_Seed_PNNL::105 | Swabs_201901_UCSD::95 | Filter_201901_UCSD::72 | not applicable::39	candidate_design_requires_semantic_and_unit_adjudication
+929ce9411f684cf8abd009670b293a33	ATTRIBUTE_lcms_sample_type	850	4	26	665	Sample::665 | Background_control::119 | QC::40 | Material_control::26	candidate_design_requires_semantic_and_unit_adjudication
+929ce9411f684cf8abd009670b293a33	ATTRIBUTE_lcms_sample_type_sub	850	8	15	523	Bulk::523 | Swabs::95 | Solvent::92 | Filter::60 | SPE::25 | Qcmix::21 | QC6mix::19 | Material_control::15	candidate_design_requires_semantic_and_unit_adjudication
+929ce9411f684cf8abd009670b293a33	ATTRIBUTE_lcms_sampling_material	850	3	3	835	not applicable::835 | CTAB::5 | WaterFilter_GPWP::3	candidate_design_requires_semantic_and_unit_adjudication
+929ce9411f684cf8abd009670b293a33	ATTRIBUTE_empo_1	850	3	185	344	Host-associated::344 | Free-living::321 | Control::185	candidate_design_requires_semantic_and_unit_adjudication
+929ce9411f684cf8abd009670b293a33	ATTRIBUTE_empo_2	850	6	12	268	Animal::268 | Non-saline::226 | Negative::185 | Saline::95 | Plant::64 | Fungus::12	candidate_design_requires_semantic_and_unit_adjudication
+929ce9411f684cf8abd009670b293a33	ATTRIBUTE_empo_3	850	14	9	185	Sterile water blank::185 | Soil (non-saline)::168 | Animal distal gut::164 | Sediment (saline)::63 | Animal corpus::59 | Sediment (non-saline)::37 | Plant surface::36 | Water (saline)::30 | Plant corpus::28 | Animal proximal gut::25 | Animal secretion::20 | Fungus corpus::12 | Subsurface (non-saline)::10 | Water (non-saline)::9	candidate_design_requires_semantic_and_unit_adjudication
+929ce9411f684cf8abd009670b293a33	ATTRIBUTE_env_package	850	7	3	323	host-associated::323 | misc environment::201 | soil::168 | sediment::100 | water::28 | plant-associated::25 | wastewater/sludge::3	candidate_design_requires_semantic_and_unit_adjudication
+936f6c81421447dc9e37a07e1fceb61a	SampleType	86	5	3	54	culture_bacterial::54 | food::15 | blank_analysis::7 | blank_QC::7 | blank_culturemedia::3	candidate_design_requires_semantic_and_unit_adjudication
+936f6c81421447dc9e37a07e1fceb61a	SampleTypeSub1	86	5	3	54	culture_bacterial::54 | food_source_plant::15 | blank_analysis::7 | blank_QC::7 | blank_culturemedia::3	candidate_design_requires_semantic_and_unit_adjudication
+936f6c81421447dc9e37a07e1fceb61a	NCBITaxonomy	86	4	18	32	not applicable::32 | 1206781|Paenibacillus alvei::18 | 1406|Paenibacillus polymyxa::18 | 1087481|Paenibacillus peoriae::18	candidate_design_requires_semantic_and_unit_adjudication
+936f6c81421447dc9e37a07e1fceb61a	SampleCollectionMethod	86	2	14	72	solid material, fresh::72 | not applicable::14	candidate_design_requires_semantic_and_unit_adjudication
+936f6c81421447dc9e37a07e1fceb61a	SampleExtractionMethod	86	2	19	67	methanol-water (1:1)::67 | methanol-water (4:1)::19	candidate_design_requires_semantic_and_unit_adjudication
+936f6c81421447dc9e37a07e1fceb61a	InternalStandardsUsed	86	2	7	79	amitryptiline::79 | sulfamethizole;sulfachloropyridazine;sulfadimethoxine;sulfamethazine;coumarin-314;amitryptiline::7	candidate_design_requires_semantic_and_unit_adjudication
+936f6c81421447dc9e37a07e1fceb61a	ATTRIBUTE_incubationtime	86	6	12	24	time_8d::24 | not applicable::14 | time_0d::12 | time_2d::12 | time_4d::12 | time_6d::12	candidate_design_requires_semantic_and_unit_adjudication
+936f6c81421447dc9e37a07e1fceb61a	ATTRIBUTE_NCBITaxonomy	86	4	18	32	not applicable::32 | 1206781|Paenibacillus alvei::18 | 1406|Paenibacillus polymyxa::18 | 1087481|Paenibacillus peoriae::18	candidate_design_requires_semantic_and_unit_adjudication
+936f6c81421447dc9e37a07e1fceb61a	ATTRIBUTE_sample_type	86	10	3	15	1206781|Paenibacillus alvei|coffee::15 | 1406|Paenibacillus polymyxa|coffee::15 | coffee::15 | 1087481|Paenibacillus peoriae|coffee::15 | blank_analysis::7 | not applicable::7 | 1206781|Paenibacillus alvei|media::3 | 1406|Paenibacillus polymyxa|media::3 | 1087481|Paenibacillus peoriae|media::3 | media::3	candidate_design_requires_semantic_and_unit_adjudication
+94d7974737ba4a4c82453f11a3ee1a41	ATTRIBUTE_SampleType	626	14	10	68	Blank::68 | SoilDeep::59 | Sediment::59 | SoilShallow::59 | WaterNonSaline::59 | PlantRoot::54 | PlantShoot::54 | Coral::45 | CCA::41 | Drosophila::41 | Mosquito::35 | Limu::26 | MarineSediment::14 | WaterSaline::10	candidate_design_requires_semantic_and_unit_adjudication
+94d7974737ba4a4c82453f11a3ee1a41	ATTRIBUTE_Site_code	556	14	22	79	1::79 | 5::78 | 9::56 | 6::46 | 8::40 | 2::37 | M4::32 | M3::32 | 4::28 | 7::28 | 3::28 | M6::26 | M7::24 | M5::22	candidate_design_requires_semantic_and_unit_adjudication
+94d7974737ba4a4c82453f11a3ee1a41	ATTRIBUTE_Habitat	556	12	5	302	Terrestrial::302 | Marine::136 | Riverine::59 | 0m::7 | 100m::7 | 200m::7 | 300m::7 | 400m::7 | 500m::7 | 600m::6 | 700m::6 | 800m::5	candidate_design_requires_semantic_and_unit_adjudication
+94d7974737ba4a4c82453f11a3ee1a41	ATTRIBUTE_Host	556	4	59	201	Nonhost::201 | Plant::175 | Animal::121 | Riverine::59	candidate_design_requires_semantic_and_unit_adjudication
+94d7974737ba4a4c82453f11a3ee1a41	ATTRIBUTE_Trophic	556	5	35	220	PrimaryProducer::220 | Environmental::201 | Nonhost::59 | Herbivore::41 | Carnivore::35	candidate_design_requires_semantic_and_unit_adjudication
+94d7974737ba4a4c82453f11a3ee1a41	ATTRIBUTE_Site_type	556	2	136	420	Transect::420 | Core Waimea::136	candidate_design_requires_semantic_and_unit_adjudication
+94d7974737ba4a4c82453f11a3ee1a41	ATTRIBUTE_shore_dist_Range	420	4	33	235	0to3km::235 | 5to6km::104 | 12km::48 | 5km::33	candidate_design_requires_semantic_and_unit_adjudication
+9a7b4f773d734045ae880cb5ebdd34e6	ATTRIBUTE_groups	12	3	4	4	CYE::4 | D4_CF::4 | WT_CF::4	candidate_design_requires_semantic_and_unit_adjudication
+a020b29ce4b04309928bd6b8b8f2af3f	ATTRIBUTE_medium_type	12	2	6	6	PDB::6 | MM::6	candidate_design_requires_semantic_and_unit_adjudication
+a020b29ce4b04309928bd6b8b8f2af3f	ATTRIBUTE_cultural mode	12	2	4	8	Mono::8 | Co::4	candidate_design_requires_semantic_and_unit_adjudication
+a020b29ce4b04309928bd6b8b8f2af3f	ATTRIBUTE_pH	12	2	6	6	7::6 | 5::6	candidate_design_requires_semantic_and_unit_adjudication
+a020b29ce4b04309928bd6b8b8f2af3f	ATTRIBUTE_strain	12	3	4	4	co::4 | 2::4 | 3::4	candidate_design_requires_semantic_and_unit_adjudication
+a36305db40414b6ea9c5b9a5de380bea	ATTRIBUTE_Group	90	3	30	30	AD non-lesion::30 | AD lesion::30 | heathly::30	candidate_design_requires_semantic_and_unit_adjudication
+a3dd5a7a459e475d8ca492ef7d05f3b7	ATTRIBUTE_Organism	36	2	6	30	Streptomyces P9-2B2::30 | blank::6	candidate_design_requires_semantic_and_unit_adjudication
+a3dd5a7a459e475d8ca492ef7d05f3b7	ATTRIBUTE_Day	36	11	3	6	blank::6 | Day 1::3 | Day 2::3 | Day 3::3 | Day 4::3 | Day 5::3 | Day 6::3 | Day 7::3 | Day 8::3 | Day 9::3 | Day 10::3	candidate_design_requires_semantic_and_unit_adjudication
+a41e05f0699e45328675aac49f667753	ATTRIBUTE_organ	146	6	3	63	SPL::63 | LIV::27 | GUT::27 | QC::14 | blank::12 | 6.mix::3	candidate_design_requires_semantic_and_unit_adjudication
+a41e05f0699e45328675aac49f667753	ATTRIBUTE_experiment	146	6	3	62	AB4::62 | AB5::47 | QC::14 | blank::12 | AB3::8 | 6.mix::3	candidate_design_requires_semantic_and_unit_adjudication
+a41e05f0699e45328675aac49f667753	ATTRIBUTE_group	146	7	3	44	Ld1s_plus ABX::44 | Ld1s::41 | Naive_plus ABX::16 | Naive::16 | QC::14 | blank::12 | 6.mix::3	candidate_design_requires_semantic_and_unit_adjudication
+a41e05f0699e45328675aac49f667753	ATTRIBUTE_endpoint-dpi	146	12	3	23	85::23 | 84::16 | 92::16 | 93::16 | 94::15 | 87::15 | QC::14 | blank::12 | 86::8 | 91::3 | 95::3 | 6.mix::3	candidate_design_requires_semantic_and_unit_adjudication
+a41e05f0699e45328675aac49f667753	ATTRIBUTE_organ.1	146	6	3	63	spleen::63 | liver::27 | gut::27 | QC::14 | blank::12 | 6.mix::3	candidate_design_requires_semantic_and_unit_adjudication
+ab35f43720344b748de2b92d35cd3109	ATTRIBUTE_Mutant 	18	6	3	3	lugOI_R5::3 | lugOII_R5::3 | lugOIII_R5::3 | lugOIV_R5::3 | lugOV_R5::3 | QL37_wt_R5::3	candidate_design_requires_semantic_and_unit_adjudication
+ae3692556f2649e1904cd23f0b04928c	ATTRIBUTE_species	29	4	4	11	Fungia::11 | Pocillopora::8 | Montipora::6 | Seriatopora::4	candidate_design_requires_semantic_and_unit_adjudication
+af7ec76b02ac482bbd2b7ee3a3ccbdc5	ATTRIBUTE_Population	90	6	11	24	Tunapuco::24 | Norman::18 | Tambo de Mora::14 | Guayabo::12 | Burkina Faso::11 | Matses::11	candidate_design_requires_semantic_and_unit_adjudication
+af7ec76b02ac482bbd2b7ee3a3ccbdc5	ATTRIBUTE_Sex	76	2	29	47	F::47 | M::29	candidate_design_requires_semantic_and_unit_adjudication
+af7ec76b02ac482bbd2b7ee3a3ccbdc5	ATTRIBUTE_Urbanization_Score	90	4	11	35	Rural Traditional::35 | Rural Industrial::26 | Urban Industrial::18 | Isolated Traditional::11	candidate_design_requires_semantic_and_unit_adjudication
+af7ec76b02ac482bbd2b7ee3a3ccbdc5	ATTRIBUTE_StorageLengthBeforeFrozen	90	2	29	61	Within 4 days::61 | Within 1 day::29	candidate_design_requires_semantic_and_unit_adjudication
+b56a28db5d8f4199b495e585c454a529	ATTRIBUTE_TypesOfFucus	216	3	72	72	FE::72 | FS::72 | FV::72	candidate_design_requires_semantic_and_unit_adjudication
+b56a28db5d8f4199b495e585c454a529	ATTRIBUTE_Extractiontype	216	5	12	60	SFA::60 | Whole::60 | SFD::60 | SD::24 | SA::12	candidate_design_requires_semantic_and_unit_adjudication
+b56a28db5d8f4199b495e585c454a529	ATTRIBUTE_specific	216	15	4	20	FE_SFA::20 | FE_W::20 | FE_SFD::20 | FV_SFA::20 | FS_W::20 | FS_SFD::20 | FS_SFA::20 | FV_W::20 | FV_SFD::20 | FE_SD::8 | FS_SD::8 | FV_SD::8 | FE_SA::4 | FS_SA::4 | FV_SA::4	candidate_design_requires_semantic_and_unit_adjudication
+b56a28db5d8f4199b495e585c454a529	ATTRIBUTE_gen	216	3	36	120	SF::120 | W::60 | S::36	candidate_design_requires_semantic_and_unit_adjudication
+c700397169ff447490f764c34abb5abd	ATTRIBUTE_Treatment	78	2	24	54	TKT::54 | N_TKT::24	candidate_design_requires_semantic_and_unit_adjudication
+c700397169ff447490f764c34abb5abd	ATTRIBUTE_Source	78	3	19	30	MSU::30 | SpectrumHealth::29 | SanDiego::19	candidate_design_requires_semantic_and_unit_adjudication
+c700397169ff447490f764c34abb5abd	ATTRIBUTE_SampleType	94	3	8	78	Sputum::78 | MeOH_PhenolRed::8 | MeOH::8	candidate_design_requires_semantic_and_unit_adjudication
+cd2673eb70ea47aa9561d6902ec36aee	ATTRIBUTE_groups	24	6	4	4	CTT::4 | CYE::4 | D4_CF::4 | D4_CTT::4 | WT_CF::4 | WT_CTT::4	candidate_design_requires_semantic_and_unit_adjudication
+def58641630e488985bfbe5a15c94e32	samplename	80	20	4	4	mxaF LCC 2uM Nd2O3 #1::4 | mxaF 50nM Nd2O3 #1::4 | mxaF LCC 2uM Nd2O3 #2::4 | mxaF 2uM Nd2O3 #1::4 | mxaF LCC 2uM Nd2O3 #4::4 | mxaF 2uM Nd2O3 #4::4 | mxaF 2uM Nd2O3 #2::4 | mxaF 2uM Nd2O3 #5::4 | mxaF 2uM Nd2O3 #3::4 | mxaF LCC 2uM Nd2O3 #5::4 | A7 2uM Nd2O3 #4::4 | mxaF LCC 2uM Nd2O3 #3::4 | mxaF 50nM Nd2O3 #3::4 | mxaF 50nM Nd2O3 #5::4 | media_blank::4 | A7 2uM Nd2O3 #1::4 | A7 2uM Nd2O3 #5::4 | A7 2uM Nd2O3 #3::4 | mxaF 50nM Nd2O3 #4::4 | A7 2uM Nd2O3 #2::4	candidate_design_requires_semantic_and_unit_adjudication
+def58641630e488985bfbe5a15c94e32	ATTRIBUTE_shorthand	80	5	4	20	KO::20 | WT::20 | overexpression::20 | WT_limited::16 | media::4	candidate_design_requires_semantic_and_unit_adjudication
+df71854c6e644b979228d96b521a490b	ATTRIBUTE_Genus	76	11	3	25	Euonymus::25 | Gymnosporia::9 | Salacia::8 | Maytenus::5 | Celastrus::5 | Catha::4 | Tripterygium::3 | Loeseneriella::3 | Evonymopsis::3 | Microtropis::3 | Pleurostylia::3	candidate_design_requires_semantic_and_unit_adjudication
+df71854c6e644b979228d96b521a490b	ATTRIBUTE_Organe	76	7	3	25	Leaves::25 | Stems::19 | Roots::15 | Bark::5 | Aerial_parts::3 | Underground_parts::3 | Branche::3	candidate_design_requires_semantic_and_unit_adjudication
+df71854c6e644b979228d96b521a490b	ATTRIBUTE_Broad_organ	76	4	7	27	woody vegetative::27 | photosynthetic::25 | roots::15 | multiple::7	candidate_design_requires_semantic_and_unit_adjudication
+df71854c6e644b979228d96b521a490b	ATTRIBUTE_Tissue	76	4	7	27	green tissue::27 | woody tissue::27 | root tissue::15 | multiple::7	candidate_design_requires_semantic_and_unit_adjudication
+df71854c6e644b979228d96b521a490b	ATTRIBUTE_Subsystem	76	2	18	57	aboveground::57 | belowground::18	candidate_design_requires_semantic_and_unit_adjudication
+f1032d7a75504d128e64363eb433efe4	ATTRIBUTE_SampleType	23	2	4	19	SAMPLE::19 | BLANK::4	candidate_design_requires_semantic_and_unit_adjudication
+f1032d7a75504d128e64363eb433efe4	ATTRIBUTE_Culture	23	3	4	13	Co_Culture::13 | Mono_Culture::6 | none::4	candidate_design_requires_semantic_and_unit_adjudication

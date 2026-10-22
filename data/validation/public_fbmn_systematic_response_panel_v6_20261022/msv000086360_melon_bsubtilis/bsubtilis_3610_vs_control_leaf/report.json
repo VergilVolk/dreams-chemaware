@@ -1,0 +1,32 @@
+{
+  "source_id": "msv000086360_melon_bsubtilis",
+  "study_id": "MSV000086360",
+  "pmid": "35668112",
+  "object_id": "bsubtilis_3610_vs_control_leaf",
+  "scientific_role": "balanced_plant_bacterial_intervention_by_tissue",
+  "estimand": "B. subtilis 3610 treatment minus control within leaf",
+  "causal_claim_allowed": true,
+  "level_coefficients": {
+    "treated": 1.0,
+    "control": -1.0
+  },
+  "denominators": {
+    "quantified_features": 4316,
+    "biological_units": 38,
+    "units_per_level": {
+      "control": 19,
+      "treated": 19
+    },
+    "qc_eligible_features": 2734,
+    "qc_eligible_features_with_ms2": 2734,
+    "qc_eligible_features_by_identity": {
+      "unresolved_entity": 2671,
+      "library_supported": 63
+    }
+  },
+  "provenance": {
+    "design_sha256": "e36a86ee49159d20d68af2fa0d59e4e2f6ebd410f03a8b14f57d2215dd602e77",
+    "response_object_sha256": "360f3703253a9cb52e74d779630bcb88d03227c82925a7e6aa3b90f3b40259d5",
+    "sample_normalization_sha256": "1b958aceb9fc2b904b4e4c714021496f160450988f60ed93b0e2cf4d5b555be8"
+  }
+}

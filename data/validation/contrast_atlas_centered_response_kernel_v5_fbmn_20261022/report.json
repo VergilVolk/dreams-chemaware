@@ -1,0 +1,413 @@
+{
+  "schema": "contrast_atlas_centered_response_kernel_v1",
+  "status": "DEVELOPMENT_CONSUMED_TRUTH_BLIND_RESULT",
+  "method": {
+    "response_weight": "beta/sqrt(beta^2+se^2)",
+    "centering": "subtract within-contrast/world mean response weight before spectral aggregation",
+    "kernel": "cosine between L2-normalised centred response-associated fragment vectors",
+    "signed_opposite": "negative signed-similar kernel",
+    "alignment_strength": "absolute signed kernel; direction-agnostic but response-dependent",
+    "composition_control": "dot product of unweighted spectrum centroids",
+    "bin_width_da": 0.1,
+    "minimum_entities": 10,
+    "minimum_effective_n": 5.0,
+    "parameter_selection": "fixed from statistical identifiability, not registered-relation ranks",
+    "response_reassignment": "deterministic seeded permutations within study, contrast and identity stratum; sensitivity only, not a randomisation p-value",
+    "null_replicates": 31,
+    "null_seed": 20261020
+  },
+  "denominators": {
+    "source_families": 10,
+    "study_level_contrasts": 25,
+    "fixed_candidate_rows_per_world": 546,
+    "score_available_rows": 1470,
+    "score_unavailable_rows": 168,
+    "registered_directed_relevance_relations": 6,
+    "registered_signed_direction_truth_relations": 0,
+    "fragment_dimensions": 59682
+  },
+  "registered_relation_descriptive_top1": {
+    "all": {
+      "registered_relations": 6,
+      "score_available": 6,
+      "signed_similar_top1": 1,
+      "signed_opposite_top1": 0,
+      "alignment_strength_top1": 1,
+      "composition_top1": 0
+    },
+    "known": {
+      "registered_relations": 6,
+      "score_available": 2,
+      "signed_similar_top1": 2,
+      "signed_opposite_top1": 0,
+      "alignment_strength_top1": 2,
+      "composition_top1": 2
+    },
+    "unresolved": {
+      "registered_relations": 6,
+      "score_available": 6,
+      "signed_similar_top1": 0,
+      "signed_opposite_top1": 0,
+      "alignment_strength_top1": 0,
+      "composition_top1": 0
+    }
+  },
+  "registered_relation_reassignment_sensitivity": [
+    {
+      "query_study_id": "MSV000097426",
+      "query_contrast_id": "mouse_hfd_vs_nfd",
+      "candidate_study_id": "MSV000088023",
+      "candidate_contrast_id": "female_hfd_vs_normal",
+      "evidence_world": "all",
+      "observed_alignment_strength_rank": 13.0,
+      "null_replicates_available": 31,
+      "null_rank_median": 16.0,
+      "null_rank_q05": 4.5,
+      "null_rank_q95": 22.0,
+      "fraction_null_rank_as_good_or_better": 0.4838709677419355,
+      "interpretation": "NONCALIBRATED_RESPONSE_REASSIGNMENT_SENSITIVITY"
+    },
+    {
+      "query_study_id": "MSV000097426",
+      "query_contrast_id": "mouse_hfd_vs_nfd",
+      "candidate_study_id": "MSV000088023",
+      "candidate_contrast_id": "female_hfd_vs_normal",
+      "evidence_world": "known",
+      "observed_alignment_strength_rank": NaN,
+      "null_replicates_available": 0,
+      "null_rank_median": NaN,
+      "null_rank_q05": NaN,
+      "null_rank_q95": NaN,
+      "fraction_null_rank_as_good_or_better": NaN,
+      "interpretation": "NONCALIBRATED_RESPONSE_REASSIGNMENT_SENSITIVITY"
+    },
+    {
+      "query_study_id": "MSV000097426",
+      "query_contrast_id": "mouse_hfd_vs_nfd",
+      "candidate_study_id": "MSV000088023",
+      "candidate_contrast_id": "female_hfd_vs_normal",
+      "evidence_world": "unresolved",
+      "observed_alignment_strength_rank": 14.0,
+      "null_replicates_available": 31,
+      "null_rank_median": 13.0,
+      "null_rank_q05": 3.0,
+      "null_rank_q95": 23.0,
+      "fraction_null_rank_as_good_or_better": 0.5483870967741935,
+      "interpretation": "NONCALIBRATED_RESPONSE_REASSIGNMENT_SENSITIVITY"
+    },
+    {
+      "query_study_id": "MSV000088023",
+      "query_contrast_id": "female_hfd_vs_normal",
+      "candidate_study_id": "MSV000097426",
+      "candidate_contrast_id": "mouse_hfd_vs_nfd",
+      "evidence_world": "all",
+      "observed_alignment_strength_rank": 10.0,
+      "null_replicates_available": 31,
+      "null_rank_median": 12.0,
+      "null_rank_q05": 2.0,
+      "null_rank_q95": 19.5,
+      "fraction_null_rank_as_good_or_better": 0.4838709677419355,
+      "interpretation": "NONCALIBRATED_RESPONSE_REASSIGNMENT_SENSITIVITY"
+    },
+    {
+      "query_study_id": "MSV000088023",
+      "query_contrast_id": "female_hfd_vs_normal",
+      "candidate_study_id": "MSV000097426",
+      "candidate_contrast_id": "mouse_hfd_vs_nfd",
+      "evidence_world": "known",
+      "observed_alignment_strength_rank": NaN,
+      "null_replicates_available": 0,
+      "null_rank_median": NaN,
+      "null_rank_q05": NaN,
+      "null_rank_q95": NaN,
+      "fraction_null_rank_as_good_or_better": NaN,
+      "interpretation": "NONCALIBRATED_RESPONSE_REASSIGNMENT_SENSITIVITY"
+    },
+    {
+      "query_study_id": "MSV000088023",
+      "query_contrast_id": "female_hfd_vs_normal",
+      "candidate_study_id": "MSV000097426",
+      "candidate_contrast_id": "mouse_hfd_vs_nfd",
+      "evidence_world": "unresolved",
+      "observed_alignment_strength_rank": 7.0,
+      "null_replicates_available": 31,
+      "null_rank_median": 10.0,
+      "null_rank_q05": 1.5,
+      "null_rank_q95": 19.5,
+      "fraction_null_rank_as_good_or_better": 0.3870967741935484,
+      "interpretation": "NONCALIBRATED_RESPONSE_REASSIGNMENT_SENSITIVITY"
+    },
+    {
+      "query_study_id": "MSV000097426",
+      "query_contrast_id": "mouse_hfd_vs_nfd",
+      "candidate_study_id": "MSV000088023",
+      "candidate_contrast_id": "male_hfd_vs_normal",
+      "evidence_world": "all",
+      "observed_alignment_strength_rank": 10.0,
+      "null_replicates_available": 31,
+      "null_rank_median": 15.0,
+      "null_rank_q05": 4.0,
+      "null_rank_q95": 23.0,
+      "fraction_null_rank_as_good_or_better": 0.3548387096774194,
+      "interpretation": "NONCALIBRATED_RESPONSE_REASSIGNMENT_SENSITIVITY"
+    },
+    {
+      "query_study_id": "MSV000097426",
+      "query_contrast_id": "mouse_hfd_vs_nfd",
+      "candidate_study_id": "MSV000088023",
+      "candidate_contrast_id": "male_hfd_vs_normal",
+      "evidence_world": "known",
+      "observed_alignment_strength_rank": NaN,
+      "null_replicates_available": 0,
+      "null_rank_median": NaN,
+      "null_rank_q05": NaN,
+      "null_rank_q95": NaN,
+      "fraction_null_rank_as_good_or_better": NaN,
+      "interpretation": "NONCALIBRATED_RESPONSE_REASSIGNMENT_SENSITIVITY"
+    },
+    {
+      "query_study_id": "MSV000097426",
+      "query_contrast_id": "mouse_hfd_vs_nfd",
+      "candidate_study_id": "MSV000088023",
+      "candidate_contrast_id": "male_hfd_vs_normal",
+      "evidence_world": "unresolved",
+      "observed_alignment_strength_rank": 10.0,
+      "null_replicates_available": 31,
+      "null_rank_median": 13.0,
+      "null_rank_q05": 3.0,
+      "null_rank_q95": 23.0,
+      "fraction_null_rank_as_good_or_better": 0.45161290322580644,
+      "interpretation": "NONCALIBRATED_RESPONSE_REASSIGNMENT_SENSITIVITY"
+    },
+    {
+      "query_study_id": "MSV000088023",
+      "query_contrast_id": "male_hfd_vs_normal",
+      "candidate_study_id": "MSV000097426",
+      "candidate_contrast_id": "mouse_hfd_vs_nfd",
+      "evidence_world": "all",
+      "observed_alignment_strength_rank": 9.0,
+      "null_replicates_available": 31,
+      "null_rank_median": 15.0,
+      "null_rank_q05": 1.5,
+      "null_rank_q95": 19.0,
+      "fraction_null_rank_as_good_or_better": 0.3225806451612903,
+      "interpretation": "NONCALIBRATED_RESPONSE_REASSIGNMENT_SENSITIVITY"
+    },
+    {
+      "query_study_id": "MSV000088023",
+      "query_contrast_id": "male_hfd_vs_normal",
+      "candidate_study_id": "MSV000097426",
+      "candidate_contrast_id": "mouse_hfd_vs_nfd",
+      "evidence_world": "known",
+      "observed_alignment_strength_rank": NaN,
+      "null_replicates_available": 0,
+      "null_rank_median": NaN,
+      "null_rank_q05": NaN,
+      "null_rank_q95": NaN,
+      "fraction_null_rank_as_good_or_better": NaN,
+      "interpretation": "NONCALIBRATED_RESPONSE_REASSIGNMENT_SENSITIVITY"
+    },
+    {
+      "query_study_id": "MSV000088023",
+      "query_contrast_id": "male_hfd_vs_normal",
+      "candidate_study_id": "MSV000097426",
+      "candidate_contrast_id": "mouse_hfd_vs_nfd",
+      "evidence_world": "unresolved",
+      "observed_alignment_strength_rank": 6.0,
+      "null_replicates_available": 31,
+      "null_rank_median": 11.0,
+      "null_rank_q05": 1.5,
+      "null_rank_q95": 20.0,
+      "fraction_null_rank_as_good_or_better": 0.3225806451612903,
+      "interpretation": "NONCALIBRATED_RESPONSE_REASSIGNMENT_SENSITIVITY"
+    },
+    {
+      "query_study_id": "MSV000097610",
+      "query_contrast_id": "pediatric_veoibd_vs_healthy",
+      "candidate_study_id": "IBD200_GROUP",
+      "candidate_contrast_id": "adult_all_ibd_vs_healthy",
+      "evidence_world": "all",
+      "observed_alignment_strength_rank": 6.0,
+      "null_replicates_available": 31,
+      "null_rank_median": 10.0,
+      "null_rank_q05": 1.0,
+      "null_rank_q95": 22.0,
+      "fraction_null_rank_as_good_or_better": 0.3548387096774194,
+      "interpretation": "NONCALIBRATED_RESPONSE_REASSIGNMENT_SENSITIVITY"
+    },
+    {
+      "query_study_id": "MSV000097610",
+      "query_contrast_id": "pediatric_veoibd_vs_healthy",
+      "candidate_study_id": "IBD200_GROUP",
+      "candidate_contrast_id": "adult_all_ibd_vs_healthy",
+      "evidence_world": "known",
+      "observed_alignment_strength_rank": 1.0,
+      "null_replicates_available": 31,
+      "null_rank_median": 9.0,
+      "null_rank_q05": 2.5,
+      "null_rank_q95": 19.0,
+      "fraction_null_rank_as_good_or_better": 0.03225806451612903,
+      "interpretation": "NONCALIBRATED_RESPONSE_REASSIGNMENT_SENSITIVITY"
+    },
+    {
+      "query_study_id": "MSV000097610",
+      "query_contrast_id": "pediatric_veoibd_vs_healthy",
+      "candidate_study_id": "IBD200_GROUP",
+      "candidate_contrast_id": "adult_all_ibd_vs_healthy",
+      "evidence_world": "unresolved",
+      "observed_alignment_strength_rank": 8.0,
+      "null_replicates_available": 31,
+      "null_rank_median": 14.0,
+      "null_rank_q05": 3.0,
+      "null_rank_q95": 23.0,
+      "fraction_null_rank_as_good_or_better": 0.22580645161290322,
+      "interpretation": "NONCALIBRATED_RESPONSE_REASSIGNMENT_SENSITIVITY"
+    },
+    {
+      "query_study_id": "IBD200_GROUP",
+      "query_contrast_id": "adult_all_ibd_vs_healthy",
+      "candidate_study_id": "MSV000097610",
+      "candidate_contrast_id": "pediatric_veoibd_vs_healthy",
+      "evidence_world": "all",
+      "observed_alignment_strength_rank": 1.0,
+      "null_replicates_available": 31,
+      "null_rank_median": 8.0,
+      "null_rank_q05": 1.0,
+      "null_rank_q95": 20.5,
+      "fraction_null_rank_as_good_or_better": 0.0967741935483871,
+      "interpretation": "NONCALIBRATED_RESPONSE_REASSIGNMENT_SENSITIVITY"
+    },
+    {
+      "query_study_id": "IBD200_GROUP",
+      "query_contrast_id": "adult_all_ibd_vs_healthy",
+      "candidate_study_id": "MSV000097610",
+      "candidate_contrast_id": "pediatric_veoibd_vs_healthy",
+      "evidence_world": "known",
+      "observed_alignment_strength_rank": 1.0,
+      "null_replicates_available": 31,
+      "null_rank_median": 9.0,
+      "null_rank_q05": 1.0,
+      "null_rank_q95": 20.0,
+      "fraction_null_rank_as_good_or_better": 0.0967741935483871,
+      "interpretation": "NONCALIBRATED_RESPONSE_REASSIGNMENT_SENSITIVITY"
+    },
+    {
+      "query_study_id": "IBD200_GROUP",
+      "query_contrast_id": "adult_all_ibd_vs_healthy",
+      "candidate_study_id": "MSV000097610",
+      "candidate_contrast_id": "pediatric_veoibd_vs_healthy",
+      "evidence_world": "unresolved",
+      "observed_alignment_strength_rank": 4.0,
+      "null_replicates_available": 31,
+      "null_rank_median": 14.0,
+      "null_rank_q05": 2.5,
+      "null_rank_q95": 21.5,
+      "fraction_null_rank_as_good_or_better": 0.16129032258064516,
+      "interpretation": "NONCALIBRATED_RESPONSE_REASSIGNMENT_SENSITIVITY"
+    }
+  ],
+  "truth_boundary": {
+    "score_sha256_before_registered_relations": "7e1691ed8d41c6dc2a2e60f03b4efeaa1a097b9b8abff411281313b11582c62c",
+    "unregistered_pairs": "unadjudicated, never negative",
+    "pass_fail": "not adjudicated because signed-direction truth is absent",
+    "unknown_increment": "not established by descriptive ranks"
+  },
+  "source_reports": [
+    {
+      "study_id": "MSV000097426",
+      "mgf_sha256": "eb6b4517c2ad70b718c5384ff7378e24e650a4ef8333669df84de95a436f8b42",
+      "mgf_spectra_total": 4635,
+      "response_spectra_nonempty": 2163,
+      "fragment_nonzero_bins": 67992,
+      "maximum_bin_index": 28357
+    },
+    {
+      "study_id": "MSV000084112",
+      "mgf_sha256": "5831e21a5e519903802aab5ae29da92e363ebb674e4a27142193260627443a8f",
+      "mgf_spectra_total": 12116,
+      "response_spectra_nonempty": 5501,
+      "fragment_nonzero_bins": 235835,
+      "maximum_bin_index": 39254
+    },
+    {
+      "study_id": "MSV000083077",
+      "mgf_sha256": "8833c9a4a80b2ac508875395ff9e3750075e2616dc42532d55875a63ce33a8c8",
+      "mgf_spectra_total": 15184,
+      "response_spectra_nonempty": 7132,
+      "fragment_nonzero_bins": 213434,
+      "maximum_bin_index": 59681
+    },
+    {
+      "study_id": "MSV000088023",
+      "mgf_sha256": "59ceb4d533b480760bf93c47dc9213de44e271d0fd521b7e8ecdf67615d5fada",
+      "mgf_spectra_total": 971,
+      "response_spectra_nonempty": 212,
+      "fragment_nonzero_bins": 7356,
+      "maximum_bin_index": 16627
+    },
+    {
+      "study_id": "MSV000090788",
+      "mgf_sha256": "57cc380fac1563bfdf736c3208a4cad09f6ce39b991bbd4363b083bb1b93c659",
+      "mgf_spectra_total": 9541,
+      "response_spectra_nonempty": 2350,
+      "fragment_nonzero_bins": 101223,
+      "maximum_bin_index": 20705
+    },
+    {
+      "study_id": "MSV000097610",
+      "mgf_sha256": "c628ce08fc8215942469ec8fb193c6b3c189484032f83cc9ba9b190281c64fd1",
+      "mgf_spectra_total": 43697,
+      "response_spectra_nonempty": 6081,
+      "fragment_nonzero_bins": 244383,
+      "maximum_bin_index": 53685
+    },
+    {
+      "study_id": "IBD200_GROUP",
+      "mgf_sha256": "6aeba8b4c1e9cc94e127985cc18bde9a4d1df8c99030d470d4cec888bc5465e6",
+      "mgf_spectra_total": 2498,
+      "response_spectra_nonempty": 746,
+      "fragment_nonzero_bins": 19324,
+      "maximum_bin_index": 13161
+    },
+    {
+      "study_id": "MSV000090804",
+      "mgf_sha256": "37e8cf36f37b9a0cc9fc25f1dee1bbe718c04f6f4b8cae9cbf9a43b7c6fdd9e6",
+      "mgf_spectra_total": 4612,
+      "response_spectra_nonempty": 4349,
+      "fragment_nonzero_bins": 275248,
+      "maximum_bin_index": 9999
+    },
+    {
+      "study_id": "MSV000086360",
+      "mgf_sha256": "4295507c6fe553ec73e3b301002e06d8c9a5efcaba52b3016bae81bff9cf543f",
+      "mgf_spectra_total": 4316,
+      "response_spectra_nonempty": 3368,
+      "fragment_nonzero_bins": 111593,
+      "maximum_bin_index": 25335
+    },
+    {
+      "study_id": "MSV000084794",
+      "mgf_sha256": "8792840ee815c63028047cede2d646edc79529eebb0b9e9d81e0f3bc382afb91",
+      "mgf_spectra_total": 36234,
+      "response_spectra_nonempty": 2201,
+      "fragment_nonzero_bins": 109822,
+      "maximum_bin_index": 21738
+    }
+  ],
+  "input_sha256": {
+    "tasks\\contrast_atlas_open_collection_fbmn_systematic_extension_v1.json": "f07630c1327bffa8c6fd0398148bd09fddcc7ca6b39134a4dccb9f8b9de55c30",
+    "contract_lineage::tasks\\contrast_atlas_open_collection_v1.json": "259b7fe26841501ce2c82ac4b61becb6ee8657491f3417fb483cd385bf267a98",
+    "contract_lineage::tasks\\contrast_atlas_open_collection_ibd_extension_v1.json": "b4e08b9df7796e02515574942d331724b3cc929543a4919ead624f10690de83a",
+    "contract_lineage::tasks\\contrast_atlas_open_collection_fbmn_systematic_extension_v1.json": "f07630c1327bffa8c6fd0398148bd09fddcc7ca6b39134a4dccb9f8b9de55c30",
+    "data\\validation\\contrast_atlas_open_response_collection_v5_fbmn_20261022\\response_entities.tsv.gz": "c071a05857f6e2bd732a4d9d3fcc5704351be71ca25a267379606dba41db4386",
+    "data\\validation\\contrast_atlas_open_response_collection_v5_fbmn_20261022\\contrast_manifest.tsv": "f92085ab405664327187f161e423a899c41f6910834ae85de849db581e0ce029",
+    "data\\validation\\contrast_atlas_open_response_collection_v5_fbmn_20261022\\registered_relations.tsv": "633bf33e5c0ab1813779914dfa1bf91bc6437d78b0c7e0a94c0801eb8c9c600b"
+  },
+  "claim_boundary": [
+    "All 10 sources are development/consumed.",
+    "Registered relations specify design relevance, not signed response truth.",
+    "This is a relation-layer operator and never merges distinct entities as one molecule.",
+    "Unresolved means not library-supported, not a unique metabolite.",
+    "A better descriptive rank is not an independently verified biological discovery."
+  ]
+}

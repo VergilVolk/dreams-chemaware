@@ -1,0 +1,32 @@
+{
+  "source_id": "msv000084794_human_industrialization",
+  "study_id": "MSV000084794",
+  "pmid": "36416540",
+  "object_id": "industrialized_vs_traditional_context",
+  "scientific_role": "observational_human_context_not_causal_intervention",
+  "estimand": "industrialized-population context minus traditional-population context",
+  "causal_claim_allowed": false,
+  "level_coefficients": {
+    "industrialized": 1.0,
+    "traditional": -1.0
+  },
+  "denominators": {
+    "quantified_features": 36234,
+    "biological_units": 90,
+    "units_per_level": {
+      "industrialized": 44,
+      "traditional": 46
+    },
+    "qc_eligible_features": 2203,
+    "qc_eligible_features_with_ms2": 2201,
+    "qc_eligible_features_by_identity": {
+      "unresolved_entity": 2114,
+      "library_supported": 89
+    }
+  },
+  "provenance": {
+    "design_sha256": "538c41b834974397499f079c77b92ec3babbf6b7ac575329558f6eba6512a7ae",
+    "response_object_sha256": "ad9698a0612d9a9851f90ec411f93ba86b2b6e4dead3168fcddbefcc3833efdf",
+    "sample_normalization_sha256": "8ed5779c36bc8ea55a9d2fac55e37151a311a9e7392001543166497a0d8533fd"
+  }
+}

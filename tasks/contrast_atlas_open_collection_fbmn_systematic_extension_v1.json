@@ -1,0 +1,136 @@
+{
+  "schema": "contrast_atlas_open_collection_extension_v1",
+  "base_contract": "tasks/contrast_atlas_open_collection_ibd_extension_v1.json",
+  "data_role": "development_consumed",
+  "sources": [
+    {
+      "study_id": "MSV000090804",
+      "source_family": "MSV000090804_lanthanide_genetic_nutrient",
+      "species": "Methylorubrum extorquens AM1",
+      "biospecimen": "bacterial culture extract",
+      "biological_units": 19,
+      "effect_adapter": "response_directories",
+      "response_root": "data/validation/public_fbmn_systematic_response_panel_v6_20261022/msv000090804_lanthanide_positive",
+      "effect_report_path": "data/validation/public_fbmn_systematic_response_panel_v6_20261022/report.json",
+      "expected_effect_status": "DEVELOPMENT_CONSUMED_RESPONSE_OBJECTS_BUILT_NO_CROSS_STUDY_RESULT",
+      "entity_column": "entity_id",
+      "beta_column": "beta",
+      "se_column": "se",
+      "prevalence_column": "prevalence",
+      "qc_column": "analysis_eligible",
+      "mgf_path": "data/reference/public_fbmn_systematic_v1/def58641630e488985bfbe5a15c94e32/representative.mgf",
+      "mgf_report_path": "data/validation/public_fbmn_systematic_response_panel_v6_20261022/report.json",
+      "expected_mgf_status": "DEVELOPMENT_CONSUMED_RESPONSE_OBJECTS_BUILT_NO_CROSS_STUDY_RESULT",
+      "nonempty_ms2_spectra": 4612,
+      "identity_path": "data/validation/public_fbmn_systematic_response_panel_v6_20261022/msv000090804_lanthanide_positive/identity_partition.tsv.gz",
+      "identity_sep": "\t",
+      "identity_entity_column": "entity_id",
+      "identity_status_column": "identity_status",
+      "identity_status_map": {
+        "library_supported": "library_supported",
+        "unresolved_entity": "unresolved_entity"
+      },
+      "identity_partition_boundary": "direct GNPS Gold/Silver/Bronze hit with planar InChIKey; strict known-only control, not Level-1 identity",
+      "contrasts": {
+        "lanthanophore_cluster_ko_vs_wt": {
+          "design": "lanthanophore-cluster knockout minus wild type under 2 uM Nd2O3",
+          "condition_family": "lanthanide_metabolism_genetic_perturbation",
+          "independent_units": 10
+        },
+        "lanthanophore_overexpression_vs_wt": {
+          "design": "lanthanophore overexpression minus wild type under 2 uM Nd2O3",
+          "condition_family": "lanthanide_metabolism_genetic_perturbation",
+          "independent_units": 10
+        },
+        "lanthanide_limited_vs_replete_wt": {
+          "design": "50 nM minus 2 uM Nd2O3 in the wild-type background",
+          "condition_family": "lanthanide_availability",
+          "independent_units": 9
+        }
+      }
+    },
+    {
+      "study_id": "MSV000086360",
+      "source_family": "MSV000086360_melon_bsubtilis_intervention",
+      "species": "Cucumis melo",
+      "biospecimen": "root, stem and leaf tissue",
+      "biological_units": 96,
+      "effect_adapter": "response_directories",
+      "response_root": "data/validation/public_fbmn_systematic_response_panel_v6_20261022/msv000086360_melon_bsubtilis",
+      "effect_report_path": "data/validation/public_fbmn_systematic_response_panel_v6_20261022/report.json",
+      "expected_effect_status": "DEVELOPMENT_CONSUMED_RESPONSE_OBJECTS_BUILT_NO_CROSS_STUDY_RESULT",
+      "entity_column": "entity_id",
+      "beta_column": "beta",
+      "se_column": "se",
+      "prevalence_column": "prevalence",
+      "qc_column": "analysis_eligible",
+      "mgf_path": "data/reference/public_fbmn_systematic_v1/63d6d0c95b3e4d8d846d376499bb544e/representative.mgf",
+      "mgf_report_path": "data/validation/public_fbmn_systematic_response_panel_v6_20261022/report.json",
+      "expected_mgf_status": "DEVELOPMENT_CONSUMED_RESPONSE_OBJECTS_BUILT_NO_CROSS_STUDY_RESULT",
+      "nonempty_ms2_spectra": 4316,
+      "identity_path": "data/validation/public_fbmn_systematic_response_panel_v6_20261022/msv000086360_melon_bsubtilis/identity_partition.tsv.gz",
+      "identity_sep": "\t",
+      "identity_entity_column": "entity_id",
+      "identity_status_column": "identity_status",
+      "identity_status_map": {
+        "library_supported": "library_supported",
+        "unresolved_entity": "unresolved_entity"
+      },
+      "identity_partition_boundary": "direct GNPS Gold/Silver/Bronze hit with planar InChIKey; strict known-only control, not Level-1 identity",
+      "contrasts": {
+        "bsubtilis_3610_vs_control_root": {
+          "design": "B. subtilis 3610 treatment minus control within root",
+          "condition_family": "bacterial_growth_promotion_root",
+          "independent_units": 28
+        },
+        "bsubtilis_3610_vs_control_stem": {
+          "design": "B. subtilis 3610 treatment minus control within stem",
+          "condition_family": "bacterial_growth_promotion_stem",
+          "independent_units": 30
+        },
+        "bsubtilis_3610_vs_control_leaf": {
+          "design": "B. subtilis 3610 treatment minus control within leaf",
+          "condition_family": "bacterial_growth_promotion_leaf",
+          "independent_units": 38
+        }
+      }
+    },
+    {
+      "study_id": "MSV000084794",
+      "source_family": "MSV000084794_human_industrialization_context",
+      "species": "Homo sapiens",
+      "biospecimen": "feces",
+      "biological_units": 90,
+      "effect_adapter": "response_directories",
+      "response_root": "data/validation/public_fbmn_systematic_response_panel_v6_20261022/msv000084794_human_industrialization",
+      "effect_report_path": "data/validation/public_fbmn_systematic_response_panel_v6_20261022/report.json",
+      "expected_effect_status": "DEVELOPMENT_CONSUMED_RESPONSE_OBJECTS_BUILT_NO_CROSS_STUDY_RESULT",
+      "entity_column": "entity_id",
+      "beta_column": "beta",
+      "se_column": "se",
+      "prevalence_column": "prevalence",
+      "qc_column": "analysis_eligible",
+      "mgf_path": "data/reference/public_fbmn_systematic_v1/af7ec76b02ac482bbd2b7ee3a3ccbdc5/representative.mgf",
+      "mgf_report_path": "data/validation/public_fbmn_systematic_response_panel_v6_20261022/report.json",
+      "expected_mgf_status": "DEVELOPMENT_CONSUMED_RESPONSE_OBJECTS_BUILT_NO_CROSS_STUDY_RESULT",
+      "nonempty_ms2_spectra": 36195,
+      "identity_path": "data/validation/public_fbmn_systematic_response_panel_v6_20261022/msv000084794_human_industrialization/identity_partition.tsv.gz",
+      "identity_sep": "\t",
+      "identity_entity_column": "entity_id",
+      "identity_status_column": "identity_status",
+      "identity_status_map": {
+        "library_supported": "library_supported",
+        "unresolved_entity": "unresolved_entity"
+      },
+      "identity_partition_boundary": "direct GNPS Gold/Silver/Bronze hit with planar InChIKey; strict known-only control, not Level-1 identity",
+      "contrasts": {
+        "industrialized_vs_traditional_context": {
+          "design": "industrialized-population context minus traditional-population context; descriptive, not causal",
+          "condition_family": "human_industrialization_context",
+          "independent_units": 90
+        }
+      }
+    }
+  ],
+  "registered_relations": []
+}
