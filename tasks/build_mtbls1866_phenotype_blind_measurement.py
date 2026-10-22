@@ -2,9 +2,10 @@
 """Build the frozen phenotype-blind MTBLS1866 positive-DDA measurement object.
 
 This stage cannot read the design ledger.  It constructs the MS1 consensus
-universe and links representative MS2 using only the 109-file acquisition
-manifest.  Biological labels enter only in a separate response script after
-the measurement files and their hashes exist.
+universe and links representative MS2 using the 109-file primary acquisition
+manifest, optionally plus the append-only 18-file ICU-COVID acquisition wave.
+Biological labels enter only in a separate response script after the
+measurement files and their hashes exist.
 """
 
 from __future__ import annotations
@@ -27,6 +28,14 @@ from build_mtbls1066_ketogenic_response import (
 
 EXPECTED_FILES = 109
 EXPECTED_BYTES = 10_485_233_845
+EXTENSION_FILES = 18
+EXTENSION_BYTES = 1_731_083_534
+PRIMARY_OUTPUT = Path(
+    "data/validation/contrast_atlas_mtbls1866_measurement_v1_20261022"
+)
+JOINT_OUTPUT = Path(
+    "data/validation/contrast_atlas_mtbls1866_joint_severity_measurement_v1_20261022"
+)
 START_TIME_RE = re.compile(rb'startTimeStamp="([^"]+)"')
 
 
@@ -38,7 +47,9 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def read_staged_manifest(path: Path) -> pd.DataFrame:
+def read_staged_manifest(
+    path: Path, *, expected_files: int, expected_bytes: int
+) -> pd.DataFrame:
     frame = pd.read_csv(path, sep="\t", dtype=str, keep_default_na=False)
     required = {
         "assay_name", "relative_path", "expected_bytes", "linkage_visibility",
@@ -46,13 +57,13 @@ def read_staged_manifest(path: Path) -> pd.DataFrame:
     }
     if missing := required - set(frame):
         raise RuntimeError(f"staged manifest lacks {sorted(missing)}")
-    if len(frame) != EXPECTED_FILES or frame.assay_name.nunique() != EXPECTED_FILES:
-        raise RuntimeError("expected 109 unique phenotype-blind assays")
+    if len(frame) != expected_files or frame.assay_name.nunique() != expected_files:
+        raise RuntimeError(f"expected {expected_files} unique phenotype-blind assays")
     if set(frame.linkage_visibility) != {"phenotype_blind"}:
         raise RuntimeError("staging manifest exposes non-blind linkage fields")
     expected = pd.to_numeric(frame.expected_bytes, errors="raise").astype("int64")
     observed = pd.to_numeric(frame.observed_bytes, errors="raise").astype("int64")
-    if int(expected.sum()) != EXPECTED_BYTES or not expected.equals(observed):
+    if int(expected.sum()) != expected_bytes or not expected.equals(observed):
         raise RuntimeError("staged byte universe does not match the frozen manifest")
     if not set(frame.status).issubset({"downloaded", "reused"}):
         raise RuntimeError("staging is not complete")
@@ -93,6 +104,12 @@ def main() -> None:
         default=Path("data/mtbls1866/positive_primary_mzml/staged_manifest.tsv"),
     )
     parser.add_argument(
+        "--extension-staged-manifest",
+        type=Path,
+        default=None,
+        help="Optional append-only 18-file ICU-COVID staged manifest.",
+    )
+    parser.add_argument(
         "--work-dir",
         type=Path,
         default=Path("data/mtbls1866/positive_primary_work_v1"),
@@ -100,9 +117,7 @@ def main() -> None:
     parser.add_argument(
         "--output-dir",
         type=Path,
-        default=Path(
-            "data/validation/contrast_atlas_mtbls1866_measurement_v1_20261022"
-        ),
+        default=None,
     )
     parser.add_argument("--noise-threshold", type=float, default=10_000.0)
     parser.add_argument("--mass-error-ppm", type=float, default=5.0)
@@ -114,11 +129,32 @@ def main() -> None:
     parser.add_argument("--ms2-link-rt-sec", type=float, default=15.0)
     parser.add_argument("--minimum-ms2-peaks", type=int, default=6)
     args = parser.parse_args()
+    if args.output_dir is None:
+        args.output_dir = (
+            JOINT_OUTPUT if args.extension_staged_manifest is not None else PRIMARY_OUTPUT
+        )
     if args.output_dir.exists():
         raise FileExistsError(args.output_dir)
     args.work_dir.mkdir(parents=True, exist_ok=True)
 
-    manifest = read_staged_manifest(args.staged_manifest)
+    primary = read_staged_manifest(
+        args.staged_manifest,
+        expected_files=EXPECTED_FILES,
+        expected_bytes=EXPECTED_BYTES,
+    )
+    manifests = [primary]
+    if args.extension_staged_manifest is not None:
+        extension = read_staged_manifest(
+            args.extension_staged_manifest,
+            expected_files=EXTENSION_FILES,
+            expected_bytes=EXTENSION_BYTES,
+        )
+        if set(primary.assay_name) & set(extension.assay_name):
+            raise RuntimeError("primary and ICU-COVID acquisition manifests overlap")
+        if set(primary.relative_path) & set(extension.relative_path):
+            raise RuntimeError("primary and ICU-COVID mzML paths overlap")
+        manifests.append(extension)
+    manifest = pd.concat(manifests, ignore_index=True).sort_values("assay_name")
     frames, extraction_audit = extract_or_reuse_features(
         manifest,
         args.work_dir,
@@ -164,7 +200,11 @@ def main() -> None:
     acquisition.to_csv(acquisition_path, sep="\t", index=False)
 
     report = {
-        "schema": "contrast_atlas_mtbls1866_phenotype_blind_measurement_v1",
+        "schema": (
+            "contrast_atlas_mtbls1866_joint_severity_measurement_v1"
+            if args.extension_staged_manifest is not None
+            else "contrast_atlas_mtbls1866_phenotype_blind_measurement_v1"
+        ),
         "status": "PHENOTYPE_BLIND_MEASUREMENT_OBJECT_FROZEN",
         "evidence_role": "development_consumed",
         "leakage_status": (
@@ -196,7 +236,14 @@ def main() -> None:
             "multiple_candidate_policy": "abstain",
         },
         "provenance": {
-            "staged_manifest_sha256": sha256(args.staged_manifest),
+            "staged_manifests_sha256": {
+                "primary": sha256(args.staged_manifest),
+                **(
+                    {"icu_covid_extension": sha256(args.extension_staged_manifest)}
+                    if args.extension_staged_manifest is not None
+                    else {}
+                ),
+            },
             "consensus_entities_sha256": sha256(entities_path),
             "discovery_intensity_matrix_sha256": sha256(matrix_path),
             "ms2_links_sha256": sha256(links_path),
