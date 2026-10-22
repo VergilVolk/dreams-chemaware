@@ -1,0 +1,2 @@
+study_id	embedding_path	method_id
+IBD200_GROUP	data\validation\contrast_atlas_open_v8_official_embedding_shards_20261022\IBD200_GROUP\IBD200_GROUP.npz	official

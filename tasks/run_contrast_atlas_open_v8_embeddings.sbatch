@@ -34,7 +34,11 @@ PY
 
 OUT="$SHARDS/$STUDY"
 if [[ -e "$OUT" ]]; then
-  echo "refusing to overwrite frozen shard: $OUT" >&2
+  if [[ -f "$OUT/report.json" && -f "$OUT/$STUDY.npz" && -f "$OUT/$STUDY.spectral_eligibility.tsv.gz" ]]; then
+    echo "reusing existing frozen shard; final merge will revalidate checksums: $OUT"
+    exit 0
+  fi
+  echo "refusing incomplete or unrecognized existing shard: $OUT" >&2
   exit 3
 fi
 
