@@ -1,0 +1,70 @@
+{
+  "schema": "contrast_atlas_same_source_axis_specificity_v1",
+  "status": "DEVELOPMENT_CONSUMED_RESPONSE_SPECIFICITY_AUDIT_COMPLETE",
+  "primary_endpoint": "unsigned strict separation: the least-scoring registered response axis must exceed the best nonregistered axis from the same target study",
+  "summary": {
+    "observed": {
+      "all": {
+        "registered_query_target_groups": 3,
+        "axis_specificity_evaluable_groups": 1,
+        "similar_response_strict_separation": 0,
+        "opposite_response_strict_separation": 1,
+        "unsigned_response_strict_separation": 1,
+        "composition_strict_separation": 0
+      },
+      "known": {
+        "registered_query_target_groups": 3,
+        "axis_specificity_evaluable_groups": 1,
+        "similar_response_strict_separation": 0,
+        "opposite_response_strict_separation": 0,
+        "unsigned_response_strict_separation": 0,
+        "composition_strict_separation": 0
+      },
+      "unresolved": {
+        "registered_query_target_groups": 3,
+        "axis_specificity_evaluable_groups": 1,
+        "similar_response_strict_separation": 0,
+        "opposite_response_strict_separation": 1,
+        "unsigned_response_strict_separation": 1,
+        "composition_strict_separation": 0
+      }
+    },
+    "deterministic_within_study_identity_stratum_profile_reassignment": {
+      "all": {
+        "registered_query_target_groups": 3,
+        "axis_specificity_evaluable_groups": 1,
+        "similar_response_strict_separation": 1,
+        "opposite_response_strict_separation": 1,
+        "unsigned_response_strict_separation": 1,
+        "composition_strict_separation": 0
+      },
+      "known": {
+        "registered_query_target_groups": 3,
+        "axis_specificity_evaluable_groups": 1,
+        "similar_response_strict_separation": 0,
+        "opposite_response_strict_separation": 0,
+        "unsigned_response_strict_separation": 0,
+        "composition_strict_separation": 0
+      },
+      "unresolved": {
+        "registered_query_target_groups": 3,
+        "axis_specificity_evaluable_groups": 1,
+        "similar_response_strict_separation": 1,
+        "opposite_response_strict_separation": 1,
+        "unsigned_response_strict_separation": 1,
+        "composition_strict_separation": 0
+      }
+    }
+  },
+  "input_sha256": {
+    "data\\validation\\contrast_atlas_official_local_alignment_v1_20261019\\fixed_candidate_scores.tsv.gz": "c58f0307109ba8a2e80473a908a3f4a1245fd4110675d84c8b5702d060acce21",
+    "data\\validation\\contrast_atlas_official_local_alignment_v1_20261019\\deterministic_profile_reassignment_scores.tsv.gz": "8e7b80585394872bf89416dc78f5da0bf1fe12248eb245b17424afb7fb7b8dd9",
+    "data\\validation\\contrast_atlas_open_response_collection_v2_20261019\\registered_relations.tsv": "b9c4f3862d6f7ae02d4871aebdcfadf501a834eaa4aa2ef6eb96ccda0704ed1d"
+  },
+  "output_sha256": "a448150cb9a3a624f2b0aaf2213a07b92138e3a89184ab0c8acc473cd7c1e195",
+  "claim_boundary": [
+    "Nonregistered response axes are specificity controls, not asserted biological negatives.",
+    "The deterministic reassignment is one sensitivity stress, not a calibrated permutation null.",
+    "A response-specific claim requires observed separation plus failure under calibrated profile reassignment; this audit alone cannot pass that gate."
+  ]
+}
