@@ -24,6 +24,10 @@ SCORES = (
     "unsigned_response_score",
     "composition_score",
 )
+SCORE_ALIASES = {
+    "similar_response_score": "signed_similar_score",
+    "opposite_response_score": "signed_opposite_score",
+}
 
 
 def sha256(path: Path) -> str:
@@ -54,6 +58,14 @@ def registered_groups(relations: pd.DataFrame) -> list[dict[str, object]]:
             "registered_candidate_contrasts": tuple(sorted(set(block["right_contrast_id"].astype(str)))),
         })
     return rows
+
+
+def canonicalize_scores(frame: pd.DataFrame) -> pd.DataFrame:
+    frame = frame.copy()
+    for canonical, alternative in SCORE_ALIASES.items():
+        if canonical not in frame and alternative in frame:
+            frame[canonical] = frame[alternative]
+    return frame
 
 
 def audit_arm(scores: pd.DataFrame, relations: pd.DataFrame, arm_label: str) -> pd.DataFrame:
@@ -113,36 +125,40 @@ def audit_arm(scores: pd.DataFrame, relations: pd.DataFrame, arm_label: str) -> 
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--observed-scores", required=True, type=Path)
-    parser.add_argument("--reassigned-scores", required=True, type=Path)
+    parser.add_argument("--reassigned-scores", type=Path)
     parser.add_argument("--relations", required=True, type=Path)
     parser.add_argument("--output-dir", required=True, type=Path)
     args = parser.parse_args()
     if args.output_dir.exists():
         raise FileExistsError(args.output_dir)
     observed = pd.read_csv(args.observed_scores, sep="\t")
-    reassigned = pd.read_csv(args.reassigned_scores, sep="\t")
+    observed = canonicalize_scores(observed)
+    reassigned = (
+        canonicalize_scores(pd.read_csv(args.reassigned_scores, sep="\t"))
+        if args.reassigned_scores is not None else None
+    )
     relations = pd.read_csv(args.relations, sep="\t", dtype=str)
     required_scores = {
         "query_study_id", "query_contrast_id", "candidate_study_id",
         "candidate_contrast_id", "evidence_world", *SCORES,
     }
-    for name, frame in (("observed", observed), ("reassigned", reassigned)):
+    frames = [("observed", observed)]
+    if reassigned is not None:
+        frames.append(("reassigned", reassigned))
+    for name, frame in frames:
         if not required_scores.issubset(frame.columns):
             raise ValueError(f"{name} score table lacks required fields")
-    result = pd.concat(
-        [
-            audit_arm(observed, relations, "observed"),
-            audit_arm(
-                reassigned,
-                relations,
-                "deterministic_within_study_identity_stratum_profile_reassignment",
-            ),
-        ],
-        ignore_index=True,
-    )
+    arms = [audit_arm(observed, relations, "observed")]
+    if reassigned is not None:
+        arms.append(audit_arm(
+            reassigned,
+            relations,
+            "deterministic_within_study_identity_stratum_profile_reassignment",
+        ))
+    result = pd.concat(arms, ignore_index=True)
     args.output_dir.mkdir(parents=True)
     output = args.output_dir / "same_source_axis_specificity.tsv"
-    result.to_csv(output, sep="\t", index=False)
+    result.to_csv(output, sep="\t", index=False, na_rep="NA")
 
     summary: dict[str, object] = {}
     for arm, block in result.groupby("analysis_arm", sort=False):
@@ -170,6 +186,7 @@ def main() -> None:
         "input_sha256": {
             str(path): sha256(path)
             for path in (args.observed_scores, args.reassigned_scores, args.relations)
+            if path is not None
         },
         "output_sha256": sha256(output),
         "claim_boundary": [

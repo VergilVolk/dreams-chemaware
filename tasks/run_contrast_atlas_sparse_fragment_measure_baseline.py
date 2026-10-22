@@ -325,6 +325,11 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--contract", required=True, type=Path)
     parser.add_argument("--collection", required=True, type=Path)
+    parser.add_argument(
+        "--identity-partition",
+        type=Path,
+        help="Complete common-policy identity partition replacing source-native labels.",
+    )
     parser.add_argument("--output-dir", required=True, type=Path)
     parser.add_argument("--bin-width-da", type=float, default=0.1)
     args = parser.parse_args()
@@ -340,6 +345,40 @@ def main() -> None:
     relations_path = args.collection / "registered_relations.tsv"
     entities = pd.read_csv(entities_path, sep="\t", dtype={"raw_entity_id": str})
     entities["raw_entity_id"] = entities["raw_entity_id"].map(normalise_entity_id)
+    identity_provenance: dict[str, str] = {}
+    if args.identity_partition is not None:
+        identity_report_path = args.identity_partition.parent / "report.json"
+        if not args.identity_partition.is_file() or not identity_report_path.is_file():
+            raise FileNotFoundError(args.identity_partition)
+        identity_report = json.loads(identity_report_path.read_text(encoding="utf-8"))
+        if identity_report.get("status") != "PHENOTYPE_BLIND_COMMON_STRICT_LIBRARY_PARTITIONS_COMPLETE":
+            raise RuntimeError("identity partition is not a complete common-policy artifact")
+        if identity_report.get("provenance", {}).get("combined_partition_sha256") != sha256(
+            args.identity_partition
+        ):
+            raise RuntimeError("common identity partition checksum drift")
+        identity = pd.read_csv(
+            args.identity_partition,
+            sep="\t",
+            usecols=["study_id", "entity_id", "identity_status"],
+            dtype=str,
+        )
+        if identity.duplicated(["study_id", "entity_id"]).any():
+            raise RuntimeError("common identity partition contains duplicate entity keys")
+        original_columns = list(entities.columns)
+        base = entities.drop(columns="identity_status")
+        base_keys = base[["study_id", "entity_id"]].drop_duplicates()
+        if len(identity) != len(base_keys) or set(map(tuple, identity[["study_id", "entity_id"]].to_numpy())) != set(
+            map(tuple, base_keys[["study_id", "entity_id"]].to_numpy())
+        ):
+            raise RuntimeError("common identity partition does not match response entities")
+        entities = base.merge(
+            identity, on=["study_id", "entity_id"], how="left", validate="many_to_one"
+        )[original_columns]
+        identity_provenance = {
+            str(args.identity_partition): sha256(args.identity_partition),
+            str(identity_report_path): sha256(identity_report_path),
+        }
     contrasts = pd.read_csv(contrast_path, sep="\t")
     source_contract = {str(item["study_id"]): item for item in contract["sources"]}
     if set(contrasts["study_id"].astype(str)) != set(source_contract):
@@ -435,6 +474,11 @@ def main() -> None:
             "signed_opposite": "negative signed_similar",
             "unsigned": "0.5*((positive-positive + negative-negative) + (positive-negative + negative-positive))",
             "composition": "dot product of unweighted mean unit-L2 spectrum vectors; beta and se unused",
+            "identity_policy": (
+                "complete common GNPS Gold/Silver strict partition"
+                if args.identity_partition is not None
+                else "source-native development partitions"
+            ),
         },
         "denominators": {
             "independent_studies": int(frozen_manifest["study_id"].nunique()),
@@ -472,11 +516,12 @@ def main() -> None:
             str(entities_path): sha256(entities_path),
             str(contrast_path): sha256(contrast_path),
             str(relations_path): sha256(relations_path),
+            **identity_provenance,
         },
         "claim_boundary": [
             "This sparse fragment-bin implementation is a transparent baseline, not the final Contrast Atlas method.",
             "All collection sources and their prior pairwise analyses are development/consumed.",
-            "Unresolved means not library-supported under the frozen partition, not a unique unknown metabolite.",
+            "Unresolved means not library-supported under the frozen common partition, not a unique unknown metabolite.",
             "Feature rows may include adduct and isotope redundancy.",
             "No unregistered pair is a negative example.",
             "No registered relation is a signed-response PASS/FAIL endpoint unless signed direction truth was preregistered.",

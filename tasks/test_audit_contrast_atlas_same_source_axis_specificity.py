@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-from audit_contrast_atlas_same_source_axis_specificity import audit_arm
+from audit_contrast_atlas_same_source_axis_specificity import audit_arm, canonicalize_scores
 
 
 def test_same_source_axis_strict_separation() -> None:
@@ -30,3 +30,13 @@ def test_same_source_axis_strict_separation() -> None:
     assert result["similar_response_strict_separation"]
     assert not result["unsigned_response_strict_separation"]
     assert not result["composition_strict_separation"]
+
+
+def test_sparse_score_aliases_are_canonicalized() -> None:
+    frame = pd.DataFrame({
+        "signed_similar_score": [0.3],
+        "signed_opposite_score": [-0.3],
+    })
+    converted = canonicalize_scores(frame)
+    assert converted.loc[0, "similar_response_score"] == 0.3
+    assert converted.loc[0, "opposite_response_score"] == -0.3

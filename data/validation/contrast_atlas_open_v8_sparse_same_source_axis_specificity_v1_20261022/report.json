@@ -1,0 +1,43 @@
+{
+  "schema": "contrast_atlas_same_source_axis_specificity_v1",
+  "status": "DEVELOPMENT_CONSUMED_RESPONSE_SPECIFICITY_AUDIT_COMPLETE",
+  "primary_endpoint": "unsigned strict separation: the least-scoring registered response axis must exceed the best nonregistered axis from the same target study",
+  "summary": {
+    "observed": {
+      "all": {
+        "registered_query_target_groups": 9,
+        "axis_specificity_evaluable_groups": 1,
+        "similar_response_strict_separation": 0,
+        "opposite_response_strict_separation": 1,
+        "unsigned_response_strict_separation": 1,
+        "composition_strict_separation": 0
+      },
+      "known": {
+        "registered_query_target_groups": 9,
+        "axis_specificity_evaluable_groups": 1,
+        "similar_response_strict_separation": 0,
+        "opposite_response_strict_separation": 0,
+        "unsigned_response_strict_separation": 1,
+        "composition_strict_separation": 0
+      },
+      "unresolved": {
+        "registered_query_target_groups": 9,
+        "axis_specificity_evaluable_groups": 1,
+        "similar_response_strict_separation": 0,
+        "opposite_response_strict_separation": 1,
+        "unsigned_response_strict_separation": 0,
+        "composition_strict_separation": 0
+      }
+    }
+  },
+  "input_sha256": {
+    "data\\validation\\contrast_atlas_open_v8_sparse_fragment_common_identity_v1_20261022\\fixed_candidate_scores.tsv.gz": "60242712909d0e4d104365c7ccfc90e8e5481d5d48516ca1b544173fa5b018ab",
+    "data\\validation\\contrast_atlas_open_response_collection_v8_plate3_covid_20261022\\registered_relations.tsv": "61c4473d200e29a4210dd18b55c3b222dd9819c8a7a63a0d0c71e1289be720fc"
+  },
+  "output_sha256": "f858bb8b5eeb5f2c7a60a6e128e5d846af28a4ea8c399226d95f54104b5865e7",
+  "claim_boundary": [
+    "Nonregistered response axes are specificity controls, not asserted biological negatives.",
+    "The deterministic reassignment is one sensitivity stress, not a calibrated permutation null.",
+    "A response-specific claim requires observed separation plus failure under calibrated profile reassignment; this audit alone cannot pass that gate."
+  ]
+}
