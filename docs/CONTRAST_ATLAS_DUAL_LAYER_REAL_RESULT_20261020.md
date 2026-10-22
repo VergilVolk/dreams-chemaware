@@ -147,6 +147,22 @@ Metabolomic Contrast Atlas 的核心对象是研究级、有方向、有幅度�
 
 因此 HFD 能力没有广泛泛化到 diabetes/depression 分层下的 obesity 响应。当前最准确的科学边界是：centered kernel 在预登记 exact-intervention HFD 正控中显示来源内响应轴特异性，但对异质条件的通用检索尚未成立。
 
+### 4.4 冻结 official DreaMS 表示复现
+
+为了检验 HFD 结果是否只是 0.1 Da fragment-bin 表示的偶然现象，在五来源、16 对比的同一 consumed 集合上，把完全相同的 centered response operator 应用于既有的 phenotype-blind official DreaMS 1024 维单位 embedding；没有重新编码、训练或选择参数。
+
+Official DreaMS 得到：
+
+- HFD `all` 精确恢复两个 HFD-vs-normal 对比为来源内 Top-2，分离边际 0.00068；
+- HFD `unresolved` 同样精确 Top-2，分离边际 0.01218；
+- 两个世界在 31 次响应重排中均有 3/31 得到同等或更大边际；
+- `known` 仍因目标来源只有 5 个 known entities 而弃权；
+- obesity post-hoc 泛化仍弱：`all` 1/4、known 0/4、unresolved 1/4 exact Top-2。
+
+这说明 HFD 来源内响应轴结果可以跨透明碎片表示与 official DreaMS 表示复现，是“响应中心化 × 谱学坐标”的开发证据；但它仍只覆盖一个 exact-intervention 正控，尚未证明 generalizable response retrieval 或 matched unknown increment。
+
+Noise V1 在本地没有冻结 checkpoint，不能伪造比较。已准备唯一服务器入口，仅用冻结 Noise V1 重编码同一五来源实体，并运行完全相同的 centered kernel、HFD 和 obesity 终点；不得调整参数或依据结果改终点。
+
 ## 5. 中心裁决
 
 当前七来源资产是真实的公共响应底座，但还没有证明 Metabolomic Contrast Atlas 的中心命题：
@@ -184,3 +200,7 @@ Metabolomic Contrast Atlas 的核心对象是研究级、有方向、有幅度�
 - Plate3 centered-kernel 结果：`data/validation/contrast_atlas_centered_response_kernel_ibd200_plate3_v2_20261020/report.json`
 - HFD 来源内正控：`data/validation/contrast_atlas_hfd_source_conditioned_axis_v3_20261022/report.json`
 - Obesity 来源内泛化反证：`data/validation/contrast_atlas_obesity_source_conditioned_axis_v1_20261022/report.json`
+- Official DreaMS centered kernel：`data/validation/contrast_atlas_centered_embedding_kernel_official_v1_20261022/report.json`
+- Official DreaMS HFD 正控：`data/validation/contrast_atlas_hfd_source_conditioned_axis_official_v1_20261022/report.json`
+- Official DreaMS obesity 反证：`data/validation/contrast_atlas_obesity_source_conditioned_axis_official_v1_20261022/report.json`
+- Noise V1 冻结服务器入口：`tasks/run_contrast_atlas_noise_centered_response.sbatch`
