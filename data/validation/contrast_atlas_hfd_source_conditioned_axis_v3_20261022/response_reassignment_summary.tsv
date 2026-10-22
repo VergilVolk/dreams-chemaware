@@ -1,0 +1,94 @@
+null_replicate	evidence_world	score_available	exact_hfd_top2	top2_contrasts	weakest_hfd_minus_strongest_sex_margin	reason
+0	all	True	False	['female_vs_male_hfd', 'male_hfd_vs_normal']	-0.014789622277021401	available
+0	known	False				at least one within-source contrast lacks a score
+0	unresolved	True	False	['female_vs_male_normal', 'male_hfd_vs_normal']	-0.04384880140423781	available
+1	all	True	False	['female_vs_male_hfd', 'female_vs_male_normal']	-0.0258713979274035	available
+1	known	False				at least one within-source contrast lacks a score
+1	unresolved	True	False	['female_vs_male_hfd', 'male_hfd_vs_normal']	-0.0241304002702236	available
+2	all	True	False	['female_hfd_vs_normal', 'female_vs_male_normal']	-0.012769000604748698	available
+2	known	False				at least one within-source contrast lacks a score
+2	unresolved	True	False	['female_vs_male_hfd', 'male_hfd_vs_normal']	-0.011431612074375194	available
+3	all	True	False	['female_vs_male_normal', 'male_hfd_vs_normal']	-0.0402584932744503	available
+3	known	False				at least one within-source contrast lacks a score
+3	unresolved	True	False	['female_hfd_vs_normal', 'female_vs_male_normal']	-0.11083407513797289	available
+4	all	True	False	['female_hfd_vs_normal', 'female_vs_male_hfd']	-0.018008850514888798	available
+4	known	False				at least one within-source contrast lacks a score
+4	unresolved	True	False	['female_hfd_vs_normal', 'female_vs_male_hfd']	-0.09779946226626629	available
+5	all	True	False	['female_hfd_vs_normal', 'female_vs_male_hfd']	-0.08317372947931291	available
+5	known	False				at least one within-source contrast lacks a score
+5	unresolved	True	True	['female_hfd_vs_normal', 'male_hfd_vs_normal']	0.057670146226883004	available
+6	all	True	True	['female_hfd_vs_normal', 'male_hfd_vs_normal']	0.0085593312978745	available
+6	known	False				at least one within-source contrast lacks a score
+6	unresolved	True	False	['female_vs_male_hfd', 'male_hfd_vs_normal']	-0.057021548971533796	available
+7	all	True	True	['female_hfd_vs_normal', 'male_hfd_vs_normal']	0.016386397182941402	available
+7	known	False				at least one within-source contrast lacks a score
+7	unresolved	True	True	['female_hfd_vs_normal', 'male_hfd_vs_normal']	0.0398641042411327	available
+8	all	True	False	['female_hfd_vs_normal', 'female_vs_male_normal']	-0.0730823576450348	available
+8	known	False				at least one within-source contrast lacks a score
+8	unresolved	True	False	['female_hfd_vs_normal', 'female_vs_male_hfd']	-0.060211688280105605	available
+9	all	True	False	['female_vs_male_hfd', 'female_vs_male_normal']	-0.0711218994110822	available
+9	known	False				at least one within-source contrast lacks a score
+9	unresolved	True	False	['female_vs_male_hfd', 'male_hfd_vs_normal']	-0.0528099164366722	available
+10	all	True	False	['female_hfd_vs_normal', 'female_vs_male_hfd']	-0.08150114025920631	available
+10	known	False				at least one within-source contrast lacks a score
+10	unresolved	True	False	['female_hfd_vs_normal', 'female_vs_male_hfd']	-0.0616701170802116	available
+11	all	True	True	['female_hfd_vs_normal', 'male_hfd_vs_normal']	0.023943260312080404	available
+11	known	False				at least one within-source contrast lacks a score
+11	unresolved	True	False	['female_vs_male_normal', 'male_hfd_vs_normal']	-0.031704254448413904	available
+12	all	True	False	['female_vs_male_hfd', 'male_hfd_vs_normal']	-0.0739213265478611	available
+12	known	False				at least one within-source contrast lacks a score
+12	unresolved	True	False	['female_vs_male_normal', 'male_hfd_vs_normal']	-0.0097110513597727	available
+13	all	True	False	['female_hfd_vs_normal', 'female_vs_male_normal']	-0.09221247583627709	available
+13	known	False				at least one within-source contrast lacks a score
+13	unresolved	True	False	['female_hfd_vs_normal', 'female_vs_male_normal']	-0.014598215930163798	available
+14	all	True	False	['female_vs_male_hfd', 'male_hfd_vs_normal']	-0.07381375692784789	available
+14	known	False				at least one within-source contrast lacks a score
+14	unresolved	True	False	['female_hfd_vs_normal', 'female_vs_male_normal']	-0.028462354093790103	available
+15	all	True	False	['female_vs_male_hfd', 'male_hfd_vs_normal']	-0.07669039070606229	available
+15	known	False				at least one within-source contrast lacks a score
+15	unresolved	True	False	['female_vs_male_hfd', 'male_hfd_vs_normal']	-0.0759796975180507	available
+16	all	True	False	['female_vs_male_normal', 'male_hfd_vs_normal']	-0.0231748186051845	available
+16	known	False				at least one within-source contrast lacks a score
+16	unresolved	True	False	['female_vs_male_hfd', 'male_hfd_vs_normal']	-0.1453593447804451	available
+17	all	True	False	['female_vs_male_hfd', 'male_hfd_vs_normal']	-0.0914500057697297	available
+17	known	False				at least one within-source contrast lacks a score
+17	unresolved	True	False	['female_hfd_vs_normal', 'female_vs_male_hfd']	-0.12469632830470799	available
+18	all	True	False	['female_hfd_vs_normal', 'female_vs_male_normal']	-0.037100501358509105	available
+18	known	False				at least one within-source contrast lacks a score
+18	unresolved	True	False	['female_vs_male_normal', 'male_hfd_vs_normal']	-0.0118110496550799	available
+19	all	True	False	['female_vs_male_hfd', 'male_hfd_vs_normal']	-0.0795305445790291	available
+19	known	False				at least one within-source contrast lacks a score
+19	unresolved	True	False	['female_hfd_vs_normal', 'female_vs_male_normal']	-0.0218871235847473	available
+20	all	True	False	['female_hfd_vs_normal', 'female_vs_male_normal']	-6.561726331710122e-05	available
+20	known	False				at least one within-source contrast lacks a score
+20	unresolved	True	False	['female_vs_male_hfd', 'female_vs_male_normal']	-0.0473407916724682	available
+21	all	True	False	['female_hfd_vs_normal', 'female_vs_male_normal']	-0.022124495357275	available
+21	known	False				at least one within-source contrast lacks a score
+21	unresolved	True	False	['female_vs_male_hfd', 'female_vs_male_normal']	-0.050972237950190895	available
+22	all	True	False	['female_hfd_vs_normal', 'female_vs_male_normal']	-0.0718121565878392	available
+22	known	False				at least one within-source contrast lacks a score
+22	unresolved	True	True	['female_hfd_vs_normal', 'male_hfd_vs_normal']	0.0208209864795208	available
+23	all	True	False	['female_vs_male_hfd', 'male_hfd_vs_normal']	-0.0021086111664771964	available
+23	known	False				at least one within-source contrast lacks a score
+23	unresolved	True	False	['female_vs_male_hfd', 'female_vs_male_normal']	-0.0725485198199749	available
+24	all	True	False	['female_hfd_vs_normal', 'female_vs_male_normal']	-0.040985569357872	available
+24	known	False				at least one within-source contrast lacks a score
+24	unresolved	True	False	['female_vs_male_hfd', 'male_hfd_vs_normal']	-0.0995231457054615	available
+25	all	True	False	['female_hfd_vs_normal', 'female_vs_male_hfd']	-0.027826089411974	available
+25	known	False				at least one within-source contrast lacks a score
+25	unresolved	True	True	['female_hfd_vs_normal', 'male_hfd_vs_normal']	0.0023258682340382975	available
+26	all	True	False	['female_vs_male_hfd', 'male_hfd_vs_normal']	-0.043793510645627996	available
+26	known	False				at least one within-source contrast lacks a score
+26	unresolved	True	False	['female_vs_male_normal', 'male_hfd_vs_normal']	-0.0431711710989475	available
+27	all	True	False	['female_hfd_vs_normal', 'female_vs_male_hfd']	-0.016951955854892696	available
+27	known	False				at least one within-source contrast lacks a score
+27	unresolved	True	False	['female_hfd_vs_normal', 'female_vs_male_hfd']	-0.0258419467136264	available
+28	all	True	False	['female_vs_male_hfd', 'female_vs_male_normal']	-0.050872337073087706	available
+28	known	False				at least one within-source contrast lacks a score
+28	unresolved	True	False	['female_vs_male_normal', 'male_hfd_vs_normal']	-0.0167993269860744	available
+29	all	True	False	['female_hfd_vs_normal', 'female_vs_male_hfd']	-0.056114322971552597	available
+29	known	False				at least one within-source contrast lacks a score
+29	unresolved	True	True	['female_hfd_vs_normal', 'male_hfd_vs_normal']	0.0022425521165132	available
+30	all	True	False	['female_hfd_vs_normal', 'female_vs_male_hfd']	-0.0518590249121189	available
+30	known	False				at least one within-source contrast lacks a score
+30	unresolved	True	False	['female_vs_male_normal', 'male_hfd_vs_normal']	-0.05268238484859469	available

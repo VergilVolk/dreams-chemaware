@@ -1,0 +1,53 @@
+{
+  "schema": "contrast_atlas_obesity_source_conditioned_axis_v1",
+  "status": "DEVELOPMENT_CONSUMED_POSTHOC_GENERALISATION_CHECK_COMPLETE",
+  "denominators": {
+    "source_directions": 2,
+    "obesity_queries": 4,
+    "candidate_contrasts_per_target_source": 4,
+    "relevant_obesity_contrasts_per_target_source": 2,
+    "uniform_random_exact_top2_probability": 0.16666666666666666,
+    "response_reassignment_replicates": 31
+  },
+  "summary": [
+    {
+      "evidence_world": "all",
+      "queries": 4,
+      "queries_available": 4,
+      "observed_exact_top2": 0,
+      "null_query_replicates": 124,
+      "null_exact_top2_fraction": 0.18548387096774194
+    },
+    {
+      "evidence_world": "known",
+      "queries": 4,
+      "queries_available": 4,
+      "observed_exact_top2": 0,
+      "null_query_replicates": 124,
+      "null_exact_top2_fraction": 0.10483870967741936
+    },
+    {
+      "evidence_world": "unresolved",
+      "queries": 4,
+      "queries_available": 4,
+      "observed_exact_top2": 1,
+      "null_query_replicates": 124,
+      "null_exact_top2_fraction": 0.16129032258064516
+    }
+  ],
+  "verdict": "The HFD within-source axis result does not broadly generalise: exact obesity Top-2 recovery is sparse and this condition family was not preregistered.",
+  "claim_boundary": [
+    "This obesity analysis is post-hoc and cannot be a confirmatory endpoint.",
+    "Condition-family equality does not guarantee identical biology across diabetes and depression strata.",
+    "Unregistered cross-study pairs remain unadjudicated, not negatives.",
+    "All inputs are development/consumed."
+  ],
+  "input_sha256": {
+    "data\\validation\\contrast_atlas_centered_response_kernel_v2_20261020\\fixed_candidate_scores.tsv.gz": "1e9f1b314c9f5894a3aaf7c141b3079466e110bcc2d617908c7dc8d47758dcc1",
+    "data\\validation\\contrast_atlas_centered_response_kernel_v2_20261020\\stratified_response_reassignment_scores.tsv.gz": "3188b77e4e46d7601383b7f9c17ffebf5c8c497ff1eb5f288cd1f030f85436e5"
+  },
+  "output_sha256": {
+    "observed_query_results.tsv": "b0a35e681773738d6d756e24df090fc707d21abc2b2c8fd434544ca5f8843bdb",
+    "response_reassignment_query_results.tsv.gz": "23e19dd4ee91f71b91e56dd1878513eb4dcf40fe4d47b8a4b04af6cc322760d8"
+  }
+}

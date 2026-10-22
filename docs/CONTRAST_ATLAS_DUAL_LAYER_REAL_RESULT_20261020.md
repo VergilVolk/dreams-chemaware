@@ -123,6 +123,30 @@ Metabolomic Contrast Atlas 的核心对象是研究级、有方向、有幅度�
 
 因此，原 IBD Top-1 不能继续作为关系层成功证据。更严格的结论是：IBD 跨研究响应存在提示性的正向谱学关系，但当前排名对成人效应估计和板次混杂敏感，尚未形成稳健、可裁决的 biological-response retrieval。
 
+### 4.3 来源内响应轴特异性：HFD 正控与 obesity 反证
+
+全局检索排名仍可能由来源差异驱动。现有集合提供了一个不新增数据即可进行的更严格正控：mouse HFD 查询在 `MSV000088023` 同一目标来源内面对四个对比，其中两个是 female/male HFD-vs-normal，两个是 female-vs-male sex contrasts。目标来源、谱图集合和 composition score 完全相同，只有响应权重不同。
+
+使用 centered-kernel alignment strength：
+
+- `all`：male HFD rank 1、female HFD rank 2、normal-sex rank 3、HFD-sex rank 4；
+- `unresolved`：同样精确恢复两个 HFD 对比为 Top-2；
+- 两个 HFD 与最强 sex decoy 的分离边际分别为 0.00827（all）和 0.00718（unresolved）；
+- 31 次分层响应重排中，得到同样大或更大边际的次数均为 3/31；
+- `known` 因目标对比仅有 5 个 known entities、有效响应支持低于冻结门槛而弃权。
+
+这是第一个真正排除“只识别目标来源”的响应轴正控结果。它证明 unresolved-only 谱学响应在这个 exact-intervention 场景中能够回答 known-only 无法回答的问题，但**不能**证明 measurement-matched unknown accuracy increment：known-only 没有形成可比较的有效回答，31 次 feature-level reassignment 也只是 sensitivity，不是校准随机化检验。
+
+随后对唯一另一个双来源、多对比条件族 obesity 做 post-hoc 泛化检查。四个 obesity 查询分别在另一来源的四个候选中检索两个 obesity 对比：
+
+| Evidence world | exact obesity Top-2 / 4 queries | 重排 query-replicates 中 exact Top-2 比例 |
+|---|---:|---:|
+| all | 0/4 | 0.185 |
+| known | 0/4 | 0.105 |
+| unresolved | 1/4 | 0.161 |
+
+因此 HFD 能力没有广泛泛化到 diabetes/depression 分层下的 obesity 响应。当前最准确的科学边界是：centered kernel 在预登记 exact-intervention HFD 正控中显示来源内响应轴特异性，但对异质条件的通用检索尚未成立。
+
 ## 5. 中心裁决
 
 当前七来源资产是真实的公共响应底座，但还没有证明 Metabolomic Contrast Atlas 的中心命题：
@@ -158,4 +182,5 @@ Metabolomic Contrast Atlas 的核心对象是研究级、有方向、有幅度�
 - IBD200 板次审计：`tasks/audit_ibd200_plate_confounding_response.py`
 - Plate3 重算集合：`data/validation/contrast_atlas_open_response_collection_ibd200_plate3_v2_20261020/report.json`
 - Plate3 centered-kernel 结果：`data/validation/contrast_atlas_centered_response_kernel_ibd200_plate3_v2_20261020/report.json`
-
+- HFD 来源内正控：`data/validation/contrast_atlas_hfd_source_conditioned_axis_v3_20261022/report.json`
+- Obesity 来源内泛化反证：`data/validation/contrast_atlas_obesity_source_conditioned_axis_v1_20261022/report.json`

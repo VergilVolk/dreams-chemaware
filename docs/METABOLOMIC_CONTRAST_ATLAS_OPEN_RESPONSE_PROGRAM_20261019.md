@@ -226,3 +226,5 @@ Metabolomic Contrast Atlas 的总目标冻结为**研究级、有方向、有幅
 同日新增的组成中心化响应核把 IBD 双向 signed-similar 排名从 `all` 5/4 改善到 3/1、从 `unresolved` 5/7 改善到 3/3；composition 排名并未同步改善，说明算子开始捕获响应特异信号。但 31 次分层响应重排尚未给出充分的 unresolved 证据，HFD 仍失败，因此该结果只晋级为关系层候选算子，不改变 unknown 增量未证明的中心裁决。
 
 随后发现成人 IBD200 的 19 个健康对照全部位于 Plate3，原 158-vs-19 响应与板次完美混杂。Plate3 内 36-vs-19 重算后，成人→儿童 IBD 的 `all` alignment rank 从 1 降到 7，儿童→成人的 `known` rank 从 1 降到 6。原 IBD Top-1 已正式撤回；仅保留“提示性、对效应估计敏感”的开发信号。
+
+来源内响应轴审计提供了更严格的局部正结果：mouse HFD 查询在同一目标来源的四个候选中，用 `all` 与 `unresolved` 均将两个 HFD-vs-normal 对比精确排为 Top-2，而两个 sex contrasts 排为 3/4；composition 在四个候选间相同。31 次响应重排中仅 3 次得到同等或更大分离边际。该 exact-intervention 正控排除了简单来源识别，但 known-only 因证据不足弃权，故仍不是 matched unknown increment。Post-hoc obesity 泛化为 all 0/4、known 0/4、unresolved 1/4 exact Top-2，表明该能力尚未普适化。
