@@ -1,0 +1,60 @@
+{
+  "schema": "contrast_atlas_open_response_frozen_embeddings_v1",
+  "status": "PHENOTYPE_BLIND_FROZEN_OPEN_RESPONSE_EMBEDDINGS",
+  "data_role": "development_consumed",
+  "model_kind": "official",
+  "checkpoint_kind": "official_embedding_slim",
+  "denominators": {
+    "independent_studies": 1,
+    "response_entities_requested": 1411,
+    "response_entities_encoded": 1411,
+    "response_entities_ineligible": 0,
+    "embedding_dimensions": 1024
+  },
+  "leakage_status": "encoder loaded only study_id, raw_entity_id, and entity_id from the response table; no beta, SE, contrast label, identity status, registered relation, or retrieval truth was read",
+  "preprocessing": {
+    "minimum_fragment_peaks": 3,
+    "n_highest_peaks": 100,
+    "output_order": "representative MGF order restricted to the frozen response-entity registry"
+  },
+  "sources": [
+    {
+      "study_id": "MSV000092887",
+      "mgf_path": "data\\validation\\contrast_atlas_msv000092887_raw_ms2_link_v1_20261022\\representative_ms2.mgf",
+      "mgf_sha256": "b3e8b5c40d70ee17739310d4268b08aa33bc9720fc91aafd1985a290f1cc71e3",
+      "mgf_spectra_total": 1616,
+      "response_entities_requested": 1411,
+      "response_entities_encoded": 1411,
+      "response_entities_ineligible": 0,
+      "embedding_dimensions": 1024,
+      "embedding_npz": "MSV000092887.npz",
+      "embedding_npz_sha256": "2c9a87b0ff1a8e8c69401d817da7fd130677c21f83973b6d7319233dfe2d177d",
+      "spectral_eligibility": "MSV000092887.spectral_eligibility.tsv.gz",
+      "spectral_eligibility_sha256": "2d8e4ec24e041b37fc4e69bdb7162252cb82fc0db993beebf4b7925a3c1f30d7",
+      "encoding_seconds": 177.40860438346863
+    }
+  ],
+  "provenance": {
+    "contract_sha256": "0760fefb1a28519cd79cb7578b2b2afceff99aaffd198f7c14fff929100370e9",
+    "contract_lineage_sha256": {
+      "tasks\\contrast_atlas_open_collection_v1.json": "259b7fe26841501ce2c82ac4b61becb6ee8657491f3417fb483cd385bf267a98",
+      "tasks\\contrast_atlas_open_collection_ibd_extension_v1.json": "b4e08b9df7796e02515574942d331724b3cc929543a4919ead624f10690de83a",
+      "tasks\\contrast_atlas_open_collection_fbmn_systematic_extension_v1.json": "f07630c1327bffa8c6fd0398148bd09fddcc7ca6b39134a4dccb9f8b9de55c30",
+      "tasks\\contrast_atlas_open_collection_ibd3_extension_v1.json": "8f27a301dace04fcc42adba7e66093735b3a895b7d7f6b48c57f48560515ec1e",
+      "tasks\\contrast_atlas_open_collection_covid_extension_v1.json": "0760fefb1a28519cd79cb7578b2b2afceff99aaffd198f7c14fff929100370e9"
+    },
+    "response_entities_sha256": "6610987fe472a195e2fcf40ee6f7b7aae0477c063901436f2d05a9f0557f2330",
+    "raw_checkpoint_sha256": "9884b62ecadf4bd441d22fec79b6787e5ffef168e15e7d8d5804dbdea08b38b2",
+    "encoder_checkpoint_sha256": "e6ae44c8e05c954d403222dd2ef410be24c5fb41b4a0f6e0783b4863da410f97",
+    "encoder_model_state_sha256": "64c6a6e7f27946d424fe045b3b6faaf901aa700ef0a1a6cb289393146c149520",
+    "implementation_sha256": "15e49a6c1a9c0017f3cec096069ad0f83d9ab85206216811a9dca44d19e07447",
+    "mgf_overrides": {
+      "IBD200_GROUP": {
+        "path": "data\\validation\\contrast_atlas_ibd200_precursor_repair_v1_20261022\\representative_spectra.mgf",
+        "sha256": "602222d161cede44eed6406656e3a8fb81dc0a49b7a78c0c04fae3b722f672be"
+      }
+    }
+  },
+  "elapsed_seconds": 177.5338110923767,
+  "claim_boundary": "Frozen spectral coordinates only; this artifact contains no response score, cross-study rank, biological truth, or performance claim."
+}
