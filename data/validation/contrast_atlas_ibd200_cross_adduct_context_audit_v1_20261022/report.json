@@ -1,0 +1,34 @@
+{
+  "schema": "ibd200_cross_adduct_context_audit_v1",
+  "status": "REAL_CONTEXT_DIRECTIONAL_SIGNAL_NOT_QUALIFIED",
+  "data_role": "development_consumed_posthoc_diagnostic",
+  "denominators": {
+    "ion_families": 2,
+    "queries_with_paired_truth_context": 4,
+    "paired_query_fold_truth_edges": 7,
+    "nontrivial_coverage_matched_query_folds": 2
+  },
+  "results": {
+    "truth_edges_real_greater_than_wrong": 7,
+    "truth_edges_real_less_than_wrong": 0,
+    "median_real_minus_wrong": 0.2961809700354934,
+    "positive_ion_family_clusters": 2,
+    "one_sided_exact_family_signflip_p": 0.25,
+    "real_context_coverage_matched_truth_top1": 2,
+    "wrong_context_coverage_matched_truth_top1": 1
+  },
+  "interpretation": "Real sample context consistently favors the cross-adduct truth over the degree-preserving wrong context, including a nontrivial sodium-adduct comparison, but only two ion families exist and BioAware is not statistically qualified.",
+  "leakage_status": "phenotype and response effects were not loaded",
+  "provenance": {
+    "hidden_truth_sha256": "14d12eddda79ce7a1c8e4ca74bf4f19de93ce00efcae433107e17d894cbc1e3e",
+    "context_evidence_sha256": "72cd99c3354e4508ec8dba2b1fca33719c34154b1b687f9f92c0dbcc0b59e513",
+    "truth_context_ledger_sha256": "1d93be713a6bf2cae8b4bd664fe5e3b5bcd806d3500bae2ed94b74daa5e6a6ef",
+    "coverage_matched_ranks_sha256": "fdd761795fac0559348f1b2a57ad84791cfb60ada1d4b7848321a822a382b176",
+    "implementation_sha256": "c59ffd998ed619b85e8abf407f2934114e0309e9fc73fdbe93ea15249f437117"
+  },
+  "claim_boundary": [
+    "The ion-family truth is library-policy anchored, not authentic-standard confirmation.",
+    "Candidate context is sparse and missing context is not negative evidence.",
+    "Two ion families cannot support a general BioAware performance claim."
+  ]
+}

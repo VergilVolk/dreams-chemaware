@@ -1,0 +1,3 @@
+ion_family_id	query_entity_id	outer_fold	coverage_matched_candidates	real_context_truth_top1	wrong_context_truth_top1
+27.0|33.0|390.27693	IBD200_GROUP::1404	0	2	True	False
+27.0|33.0|390.27693	IBD200_GROUP::1404	1	2	True	True
