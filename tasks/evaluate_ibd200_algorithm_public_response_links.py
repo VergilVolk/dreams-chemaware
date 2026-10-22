@@ -70,6 +70,7 @@ def main() -> None:
     parser.add_argument("--slice-dir", required=True, type=Path)
     parser.add_argument("--collection", required=True, type=Path)
     parser.add_argument("--identity-shards-root", required=True, type=Path)
+    parser.add_argument("--adduct-audit", required=True, type=Path)
     parser.add_argument("--output-dir", required=True, type=Path)
     parser.add_argument(
         "--score", action="append", required=True,
@@ -84,7 +85,10 @@ def main() -> None:
     effects_path = args.slice_dir / "sealed_heldout_effects.tsv.gz"
     responses_path = args.collection / "response_entities.tsv.gz"
     relations_path = args.collection / "registered_relations.tsv"
-    for path in (reference_path, candidate_structures_path, effects_path, responses_path, relations_path):
+    for path in (
+        reference_path, candidate_structures_path, effects_path, responses_path,
+        relations_path, args.adduct_audit,
+    ):
         if not path.is_file():
             raise FileNotFoundError(path)
     axis = candidate_axis(reference_path)
@@ -179,6 +183,16 @@ def main() -> None:
     )
     if edge_axis["formula"].isna().any():
         raise RuntimeError("candidate structure metadata does not cover the score axis")
+    adduct = pd.read_csv(args.adduct_audit, sep="\t")
+    adduct = adduct[["entity_id", "candidate_id", "adduct_compatibility_status"]]
+    edge_axis = edge_axis.merge(
+        adduct, on=["entity_id", "candidate_id"], how="left", validate="one_to_one",
+    )
+    if edge_axis["adduct_compatibility_status"].isna().any():
+        raise RuntimeError("adduct audit does not cover the score axis")
+    edge_axis["strict_candidate_allowed"] = edge_axis[
+        "adduct_compatibility_status"
+    ].eq("explicit_neutral_compatible")
     candidate_links = edge_axis.merge(
         anchors[[
             "candidate_id", "target_study_id", "target_contrast_id", "target_entity_id",
@@ -188,6 +202,7 @@ def main() -> None:
         ]],
         on="candidate_id", how="inner", validate="many_to_many",
     )
+    candidate_links = candidate_links.loc[candidate_links["strict_candidate_allowed"]].copy()
     opportunity_queries = set(candidate_links["entity_id"].astype(str))
 
     effects = pd.read_csv(effects_path, sep="\t")
@@ -205,7 +220,8 @@ def main() -> None:
             start, stop = int(query_ptr[query_index]), int(query_ptr[query_index + 1])
             local_scores = values[start:stop]
             local_candidates = candidate_ids[start:stop]
-            available = np.isfinite(local_scores)
+            allowed = edge_axis["strict_candidate_allowed"].to_numpy()[start:stop]
+            available = np.isfinite(local_scores) & allowed
             if not available.any():
                 top_rows.append({
                     "method": method, "entity_id": str(query_id), "score_available": False,
@@ -355,6 +371,7 @@ def main() -> None:
         } if not robust_candidates.empty else {},
         "scientific_contract": {
             "candidate_selection": "scores only; no response effect is available to the ranker",
+            "candidate_chemistry": "only explicit FBMN neutral-mass-compatible candidates; unresolved adduct is abstention",
             "target_selection": "two prespecified registered independent IBD-versus-control study relations",
             "response_evaluation": "IBD200 effects are estimated in held-out participant folds; public effects are fixed",
             "future_comparison": "B and integrated scores must preserve the exact query_ptr/query_ids/candidate_ids axis",
@@ -362,6 +379,7 @@ def main() -> None:
         "provenance": {
             "reference_score_bundle_sha256": sha256(reference_path),
             "candidate_structures_sha256": sha256(candidate_structures_path),
+            "candidate_adduct_audit_sha256": sha256(args.adduct_audit),
             "sealed_heldout_effects_sha256": sha256(effects_path),
             "response_collection_sha256": sha256(responses_path),
             "registered_relations_sha256": sha256(relations_path),
@@ -380,6 +398,7 @@ def main() -> None:
             "Strict library support is not MSI level-1 identity, and unresolved query predictions are not metabolite identifications.",
             "Unregistered public studies are neither positives nor negatives and are excluded from the primary response-support summary.",
             "Development unresolved-response candidates are post-hoc leads and require orthogonal identity and prospective biological confirmation.",
+            "Queries without an explicit neutral-mass-compatible candidate are strict chemistry abstentions, not negative results.",
         ],
     }
     (args.output_dir / "report.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")

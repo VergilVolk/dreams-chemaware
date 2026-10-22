@@ -1,0 +1,38 @@
+{
+  "schema": "ibd200_candidate_adduct_compatibility_audit_v1",
+  "status": "ORIGINAL_PROTONATED_CANDIDATE_UNIVERSE_NOT_APPLICATION_SAFE",
+  "data_role": "development_consumed",
+  "denominators": {
+    "queries": 662,
+    "algorithm_answerable_queries_original": 354,
+    "queries_with_explicit_ion_and_neutral_mass": 58,
+    "queries_with_unresolved_adduct": 604,
+    "queries_with_any_explicit_neutral_compatible_candidate": 10,
+    "candidate_edges": 6813,
+    "explicit_neutral_compatible_edges": 151,
+    "explicit_neutral_incompatible_edges": 366,
+    "adduct_unresolved_edges": 6296,
+    "WSE_answered_queries": 354,
+    "WSE_top1_explicit_neutral_compatible": 7,
+    "WSE_top1_explicit_neutral_incompatible": 25,
+    "WSE_top1_adduct_unresolved": 322
+  },
+  "parameters": {
+    "neutral_mass_ppm": 10.0
+  },
+  "interpretation": "The existing candidate axis assumes protonated precursors. Explicit FBMN neutral masses show that most annotated-query candidates are chemically incompatible; missing ion annotations cannot be silently treated as [M+H]+. Strict biological identity links must therefore use only explicit neutral-mass-compatible candidates until an adduct-aware candidate universe is built.",
+  "provenance": {
+    "query_entities_sha256": "f8f2f13bd027daa675e10b0cb96709f7a41a0bb48077c58cfb23958772af56f1",
+    "candidate_structures_sha256": "766fad9f02246a23c49d1ef48f6f5197c1883a1daac51f52569fb58b25375921",
+    "WSE_score_bundle_sha256": "3867c6868a8648ff58c653f01e98d6c84361fb95b980a8afc5a0f139ef846e8e",
+    "GNPS_quant_sha256": "515c4821d9b0b86322cd7d6493ae9a5345a4541babbf189214e97719ed1e05fb",
+    "candidate_audit_sha256": "fa75ec84b33442558a659d40d2859d935929447d922fc64b22f7562eb401982d",
+    "query_audit_sha256": "d5bb1f136d75b7a4a0212e574119f2ddb96204d8dd419e69748e2a0f85c02b7c",
+    "implementation_sha256": "7f00f29c1fc60607597e1bc3f38ef64a8b1ea2ac860d49b469fabf6b16ca7dae"
+  },
+  "claim_boundary": [
+    "FBMN best-ion and neutral-mass fields are phenotype-blind annotations, not definitive adduct truth.",
+    "Adduct-unresolved queries are abstentions for strict identity use, not proven incompatible.",
+    "This audit invalidates strict biological interpretation of the original candidate universe; it does not invalidate spectrum-only benchmarking on its stated [M+H]+ task."
+  ]
+}

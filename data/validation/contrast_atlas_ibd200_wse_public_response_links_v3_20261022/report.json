@@ -1,7 +1,12 @@
 {
   "schema": "ibd200_algorithm_public_response_link_evaluation_v1",
-  "status": "DESCRIPTIVE_ALGORITHM_TO_PUBLIC_RESPONSE_LINKS_COMPLETE",
+  "status": "SUPERSEDED_INVALID_FOR_STRICT_BIOLOGICAL_IDENTITY",
   "data_role": "development_consumed",
+  "superseded_by": {
+    "reason": "the original candidate universe assumed [M+H]+ and included explicit neutral-mass-incompatible edges",
+    "audit": "data/validation/contrast_atlas_ibd200_candidate_adduct_audit_v1_20261022/report.json",
+    "strict_replacement": "data/validation/contrast_atlas_ibd200_wse_public_response_links_v4_adduct_strict_20261022/report.json"
+  },
   "fixed_denominators": {
     "ibd200_queries": 662,
     "candidate_edges": 6813,
