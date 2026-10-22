@@ -1,0 +1,65 @@
+{
+  "schema": "ibd200_plate3_algorithm_application_slice_v1",
+  "status": "DEVELOPMENT_CONSUMED_ALGORITHM_BIOLOGY_HANDOFF_COMPLETE",
+  "data_role": "development_consumed",
+  "denominators": {
+    "plate3_participants": 55,
+    "plate3_ibd": 36,
+    "plate3_healthy": 19,
+    "response_entities": 662,
+    "spectral_eligible": 543,
+    "spectral_ineligible": 119,
+    "entities_with_mass_compatible_candidates": 433,
+    "algorithm_answerable": 354,
+    "candidate_structures": 6813,
+    "candidate_library_spectra": 19962,
+    "fold_label_counts": {
+      "0": {
+        "IBD": 18,
+        "healthy": 10
+      },
+      "1": {
+        "IBD": 18,
+        "healthy": 9
+      }
+    },
+    "heldout_estimable_by_fold": {
+      "0": 633,
+      "1": 624
+    },
+    "wrong_context_fixed_points_by_fold": {
+      "0": 0,
+      "1": 0
+    }
+  },
+  "fixed_comparison_contract": {
+    "candidate_universe": "identical 10-ppm GNPS Gold/Silver structure candidates for WSE, B, integrated spectral and BioAware arms",
+    "query_denominator": "all 662 corrected Plate3 response entities; unavailable spectra or empty candidate pools are abstentions, not deletions",
+    "bioaware_cross_fit": "context from complementary participants; response evaluated only on held-out participants",
+    "wrong_context": "whole entity-profile permutation within exact training detection-degree strata; sample coverage exactly preserved",
+    "outcome_isolation": "query, candidate and context artifacts contain no diagnosis or beta/SE; outcomes are confined to sealed_heldout_effects.tsv.gz"
+  },
+  "input_sha256": {
+    "data\\reference\\contrast_atlas_ibd_cross_study_20261014\\adult_ibd200_gnps_quant.csv": "515c4821d9b0b86322cd7d6493ae9a5345a4541babbf189214e97719ed1e05fb",
+    "data\\reference\\contrast_atlas_ibd_cross_study_20261014\\adult_ibd200_metadata.tsv": "8b5ab6e63dbb55f059ee3e14fe2d200c8e3040d6a9646d79cb4b9441d07dae03",
+    "data\\validation\\contrast_atlas_ibd200_precursor_repair_v1_20261022\\representative_spectra.mgf": "602222d161cede44eed6406656e3a8fb81dc0a49b7a78c0c04fae3b722f672be",
+    "data\\validation\\gnps_gold_silver_10ppm_benchmark_v1\\manifest.csv.gz": "ab1d04418c89a5fc163d706c8fd79023c8f0e8c6957db99a302e98e9eac6de80",
+    "data\\validation\\contrast_atlas_open_response_collection_v8_plate3_covid_20261022\\response_entities.tsv.gz": "6610987fe472a195e2fcf40ee6f7b7aae0477c063901436f2d05a9f0557f2330",
+    "data\\validation\\contrast_atlas_open_response_collection_v8_plate3_covid_20261022\\report.json": "2dd3fa58bb36797ac5b8645924c81f5b6d1f4f0b48632f5684bc30f0ae47bbe0"
+  },
+  "output_sha256": {
+    "queries": "f8f2f13bd027daa675e10b0cb96709f7a41a0bb48077c58cfb23958772af56f1",
+    "candidate_spectra": "1dca8859aab50b64f889b6a36750fcd40f2271dfd25a17a84ec4ef4fb710258f",
+    "candidate_structures": "766fad9f02246a23c49d1ef48f6f5197c1883a1daac51f52569fb58b25375921",
+    "sample_folds": "13bd9244b81029edf5ba4d95c53675557a96f58b914f81c87682ba73f56e556f",
+    "wrong_context": "c108cca9ce7873581d002ae3c4dfb7ff43b62577f5884d8a320b4c38b290d857",
+    "sealed_effects": "f25e2f21ee0bb5228ec41acd37959be9a9063ed7387c1673d27d0e15281fbf45",
+    "context": "c215c3ca17d2221fe7dead1420b0eb00926368548318467b8985a649baf38845"
+  },
+  "claim_boundary": [
+    "Plate3 removes perfect plate/healthy confounding but is not an independent cohort.",
+    "Mass-compatible candidates are a frozen evaluation universe, not correct structures.",
+    "Unresolved entities and algorithm predictions are not metabolite identifications.",
+    "This handoff enables a fair incremental test; it does not itself establish BioAware or biological benefit."
+  ]
+}
