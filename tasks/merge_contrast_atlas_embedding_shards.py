@@ -66,7 +66,7 @@ def validate_archive(
             raise RuntimeError(f"invalid embedding archive fields: {archive_path}")
         ids = [str(value).strip() for value in packed["entity_id"]]
         embeddings = np.asarray(packed["embeddings"])
-    if len(ids) != len(set(ids)) or set(ids) != expected_entities:
+    if len(ids) != len(set(ids)) or not set(ids).issubset(expected_entities):
         raise RuntimeError(f"embedding/entity registry mismatch: {archive_path}")
     if embeddings.shape != (len(ids), expected_dimensions):
         raise RuntimeError(f"embedding shape mismatch: {archive_path} {embeddings.shape}")
@@ -105,7 +105,8 @@ def main() -> None:
     manifest_rows: list[dict[str, str]] = []
     source_reports: list[dict[str, object]] = []
     shard_reports: dict[str, str] = {}
-    total_entities = 0
+    total_requested = 0
+    total_encoded = 0
     dimensions: int | None = None
     model_kind = ""
 
@@ -175,7 +176,21 @@ def main() -> None:
         )
         if observed_n != int(source_report["response_entities_encoded"]):
             raise RuntimeError(f"embedding shard denominator drift: {study}")
-        total_entities += observed_n
+        requested_n = int(source_report.get("response_entities_requested", observed_n))
+        ineligible_n = int(source_report.get("response_entities_ineligible", 0))
+        if requested_n != len(required_entities) or requested_n - observed_n != ineligible_n:
+            raise RuntimeError(f"embedding eligibility denominator drift: {study}")
+        eligibility_name = str(source_report.get("spectral_eligibility", ""))
+        eligibility_path = shard / eligibility_name
+        if not eligibility_name or not eligibility_path.is_file():
+            raise RuntimeError(f"embedding shard lacks spectral eligibility ledger: {study}")
+        if sha256(eligibility_path) != str(source_report.get("spectral_eligibility_sha256", "")):
+            raise RuntimeError(f"spectral eligibility checksum drift: {study}")
+        eligibility = pd.read_csv(eligibility_path, sep="\t", dtype={"entity_id": str})
+        if set(eligibility["entity_id"].astype(str)) != required_entities:
+            raise RuntimeError(f"spectral eligibility/entity registry mismatch: {study}")
+        total_requested += requested_n
+        total_encoded += observed_n
         manifest_rows.append({
             "study_id": study,
             "embedding_path": str(row.embedding_path),
@@ -186,8 +201,8 @@ def main() -> None:
 
     if dimensions is None or invariant_report_fields is None or invariant_provenance is None:
         raise RuntimeError("no embedding shards were found")
-    if total_entities != len(entities):
-        raise RuntimeError("merged embedding denominator differs from response registry")
+    if total_requested != len(entities):
+        raise RuntimeError("merged embedding request denominator differs from response registry")
 
     args.output_dir.mkdir(parents=True)
     output_manifest = args.output_dir / "embedding_manifest.tsv"
@@ -198,7 +213,9 @@ def main() -> None:
         **invariant_report_fields,
         "denominators": {
             "independent_studies": len(studies),
-            "response_entities_encoded": total_entities,
+            "response_entities_requested": total_requested,
+            "response_entities_encoded": total_encoded,
+            "response_entities_ineligible": total_requested - total_encoded,
             "embedding_dimensions": dimensions,
         },
         "sources": source_reports,

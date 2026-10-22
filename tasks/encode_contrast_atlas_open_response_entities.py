@@ -51,12 +51,16 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def load_required_records(
-    mgf_path: Path, required_ids: set[str]
-) -> tuple[list[str], list[dict[str, object]], int]:
+def load_required_records_with_eligibility(
+    mgf_path: Path,
+    required_ids: set[str],
+    *,
+    minimum_fragment_peaks: int = MINIMUM_FRAGMENT_PEAKS,
+) -> tuple[list[str], list[dict[str, object]], int, pd.DataFrame]:
     ids: list[str] = []
     records: list[dict[str, object]] = []
     seen: set[str] = set()
+    eligibility_rows: list[dict[str, object]] = []
     total = 0
     for metadata, peaks in iter_mgf(mgf_path):
         total += 1
@@ -66,12 +70,19 @@ def load_required_records(
         if entity_id in seen:
             raise ValueError(f"duplicate representative spectrum {entity_id} in {mgf_path}")
         seen.add(entity_id)
-        if len(peaks) < MINIMUM_FRAGMENT_PEAKS:
-            raise ValueError(
-                f"required entity {entity_id} has fewer than {MINIMUM_FRAGMENT_PEAKS} peaks"
-            )
         if "PEPMASS" not in metadata:
             raise ValueError(f"required entity {entity_id} lacks PEPMASS")
+        eligible = len(peaks) >= minimum_fragment_peaks
+        eligibility_rows.append({
+            "raw_entity_id": entity_id,
+            "fragment_peaks": len(peaks),
+            "embedding_eligible": eligible,
+            "ineligibility_reason": (
+                "" if eligible else f"fewer_than_{minimum_fragment_peaks}_fragment_peaks"
+            ),
+        })
+        if not eligible:
+            continue
         peak_array = np.asarray(peaks, dtype=np.float32).T
         ids.append(entity_id)
         records.append(
@@ -85,6 +96,22 @@ def load_required_records(
         raise ValueError(
             f"{len(missing)} required response entities lack spectra in {mgf_path}: "
             f"{sorted(missing)[:10]}"
+        )
+    return ids, records, total, pd.DataFrame(eligibility_rows)
+
+
+def load_required_records(
+    mgf_path: Path, required_ids: set[str]
+) -> tuple[list[str], list[dict[str, object]], int]:
+    """Compatibility wrapper that retains the historical fail-closed contract."""
+    ids, records, total, eligibility = load_required_records_with_eligibility(
+        mgf_path, required_ids,
+    )
+    ineligible = eligibility.loc[~eligibility["embedding_eligible"].astype(bool)]
+    if not ineligible.empty:
+        first = str(ineligible.iloc[0]["raw_entity_id"])
+        raise ValueError(
+            f"required entity {first} has fewer than {MINIMUM_FRAGMENT_PEAKS} peaks"
         )
     return ids, records, total
 
@@ -142,7 +169,22 @@ def main() -> None:
         action="append",
         help="Encode only this study from the contract; repeat for a subset.",
     )
+    parser.add_argument(
+        "--mgf-override",
+        action="append",
+        default=[],
+        metavar="STUDY_ID=PATH",
+        help="Phenotype-blind repaired MGF for one study; repeat as needed.",
+    )
     args = parser.parse_args()
+    mgf_overrides: dict[str, Path] = {}
+    for item in args.mgf_override:
+        if "=" not in item:
+            raise ValueError("--mgf-override must be STUDY_ID=PATH")
+        study_id, raw_path = item.split("=", 1)
+        if not study_id or study_id in mgf_overrides:
+            raise ValueError("duplicate or empty --mgf-override study")
+        mgf_overrides[study_id] = Path(raw_path)
 
     if args.output_dir.exists():
         raise FileExistsError(args.output_dir)
@@ -201,6 +243,10 @@ def main() -> None:
         sources = [source for source in all_sources if str(source["study_id"]) in requested]
     else:
         sources = all_sources
+    if not set(mgf_overrides).issubset(all_studies):
+        raise ValueError(
+            f"MGF override studies are absent from contract: {sorted(set(mgf_overrides) - all_studies)}"
+        )
 
     import torch
 
@@ -245,12 +291,19 @@ def main() -> None:
     try:
         for source in sources:
             study_id = str(source["study_id"])
-            mgf_path = Path(source["mgf_path"])
+            mgf_path = mgf_overrides.get(study_id, Path(source["mgf_path"]))
+            if not mgf_path.is_file():
+                raise FileNotFoundError(mgf_path)
             source_keys = entity_keys.loc[entity_keys["study_id"].eq(study_id)].copy()
             required = set(source_keys["raw_entity_id"].astype(str))
-            raw_ids, records, mgf_total = load_required_records(mgf_path, required)
+            raw_ids, records, mgf_total, eligibility = load_required_records_with_eligibility(
+                mgf_path, required,
+            )
             raw_to_entity = source_keys.set_index("raw_entity_id")["entity_id"].to_dict()
             ids = [str(raw_to_entity[raw_id]) for raw_id in raw_ids]
+            eligibility["entity_id"] = eligibility["raw_entity_id"].map(raw_to_entity)
+            if eligibility["entity_id"].isna().any() or len(eligibility) != len(required):
+                raise RuntimeError(f"spectral eligibility registry mismatch for {study_id}")
             source_started = time.time()
             if official_head is not None:
                 from annotation.embed import embed_records as embed_official_records
@@ -282,16 +335,27 @@ def main() -> None:
                 entity_id=np.asarray(ids, dtype=str),
                 embeddings=embeddings,
             )
+            eligibility_path = temporary / f"{study_id}.spectral_eligibility.tsv.gz"
+            eligibility.to_csv(
+                eligibility_path,
+                sep="\t",
+                index=False,
+                compression={"method": "gzip", "mtime": 0},
+            )
             source_reports.append(
                 {
                     "study_id": study_id,
                     "mgf_path": str(mgf_path),
                     "mgf_sha256": sha256(mgf_path),
                     "mgf_spectra_total": mgf_total,
+                    "response_entities_requested": len(required),
                     "response_entities_encoded": len(ids),
+                    "response_entities_ineligible": len(required) - len(ids),
                     "embedding_dimensions": int(embeddings.shape[1]),
                     "embedding_npz": output_path.name,
                     "embedding_npz_sha256": sha256(output_path),
+                    "spectral_eligibility": eligibility_path.name,
+                    "spectral_eligibility_sha256": sha256(eligibility_path),
                     "encoding_seconds": time.time() - source_started,
                 }
             )
@@ -315,8 +379,14 @@ def main() -> None:
             "checkpoint_kind": checkpoint_kind,
             "denominators": {
                 "independent_studies": len(sources),
+                "response_entities_requested": int(
+                    sum(int(row["response_entities_requested"]) for row in source_reports)
+                ),
                 "response_entities_encoded": int(
                     sum(int(row["response_entities_encoded"]) for row in source_reports)
+                ),
+                "response_entities_ineligible": int(
+                    sum(int(row["response_entities_ineligible"]) for row in source_reports)
                 ),
                 "embedding_dimensions": int(source_reports[0]["embedding_dimensions"]),
             },
@@ -340,6 +410,10 @@ def main() -> None:
                 "encoder_checkpoint_sha256": encoder_sha,
                 "encoder_model_state_sha256": encoder_state_sha,
                 "implementation_sha256": sha256(Path(__file__)),
+                "mgf_overrides": {
+                    study: {"path": str(path), "sha256": sha256(path)}
+                    for study, path in sorted(mgf_overrides.items())
+                },
             },
             "elapsed_seconds": time.time() - started,
             "claim_boundary": (

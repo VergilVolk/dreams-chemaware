@@ -36,6 +36,17 @@ def _write_fixture(root: Path) -> tuple[Path, Path]:
             vectors[index, index % 3] = 1.0
         archive = shard / f"{study}.npz"
         np.savez_compressed(archive, entity_id=np.asarray(ids), embeddings=vectors)
+        eligibility = shard / f"{study}.spectral_eligibility.tsv.gz"
+        pd.DataFrame({
+            "raw_entity_id": ids,
+            "fragment_peaks": [10] * len(ids),
+            "embedding_eligible": [True] * len(ids),
+            "ineligibility_reason": [""] * len(ids),
+            "entity_id": ids,
+        }).to_csv(
+            eligibility, sep="\t", index=False,
+            compression={"method": "gzip", "mtime": 0},
+        )
         pd.DataFrame({
             "study_id": [study],
             "embedding_path": [str(archive)],
@@ -51,14 +62,20 @@ def _write_fixture(root: Path) -> tuple[Path, Path]:
             "preprocessing": {"n_highest_peaks": 100},
             "denominators": {
                 "independent_studies": 1,
+                "response_entities_requested": len(ids),
                 "response_entities_encoded": len(ids),
+                "response_entities_ineligible": 0,
                 "embedding_dimensions": 3,
             },
             "sources": [{
                 "study_id": study,
+                "response_entities_requested": len(ids),
                 "response_entities_encoded": len(ids),
+                "response_entities_ineligible": 0,
                 "embedding_dimensions": 3,
                 "embedding_npz_sha256": merger.sha256(archive),
+                "spectral_eligibility": eligibility.name,
+                "spectral_eligibility_sha256": merger.sha256(eligibility),
             }],
             "provenance": {
                 "contract_sha256": "contract",
@@ -91,7 +108,9 @@ def test_merge_validates_and_preserves_all_studies(tmp_path, monkeypatch):
     assert list(manifest.study_id) == ["A", "B"]
     assert report["denominators"] == {
         "independent_studies": 2,
+        "response_entities_requested": 3,
         "response_entities_encoded": 3,
+        "response_entities_ineligible": 0,
         "embedding_dimensions": 3,
     }
     assert report["status"].endswith("SHARDS_MERGED")

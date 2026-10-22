@@ -81,22 +81,32 @@ def freeze_graphs(
             for world in WORLDS:
                 left_ids = world_ids(universes[left_study], world)
                 right_ids = world_ids(universes[right_study], world)
-                if len(left_ids) and len(right_ids):
-                    left_vectors = left_embedding[[left_lookup[entity] for entity in left_ids]]
-                    right_vectors = right_embedding[[right_lookup[entity] for entity in right_ids]]
+                left_embedded_ids = np.asarray(
+                    [entity for entity in left_ids if entity in left_lookup], dtype=str,
+                )
+                right_embedded_ids = np.asarray(
+                    [entity for entity in right_ids if entity in right_lookup], dtype=str,
+                )
+                if len(left_embedded_ids) and len(right_embedded_ids):
+                    left_vectors = left_embedding[
+                        [left_lookup[entity] for entity in left_embedded_ids]
+                    ]
+                    right_vectors = right_embedding[
+                        [right_lookup[entity] for entity in right_embedded_ids]
+                    ]
                     forward = directed_topk(
-                        left_ids,
+                        left_embedded_ids,
                         left_vectors,
-                        right_ids,
+                        right_embedded_ids,
                         right_vectors,
                         neighbors=NEIGHBORS,
                         minimum_similarity=MINIMUM_COSINE,
                         reverse=False,
                     )
                     reverse = directed_topk(
-                        right_ids,
+                        right_embedded_ids,
                         right_vectors,
-                        left_ids,
+                        left_embedded_ids,
                         left_vectors,
                         neighbors=NEIGHBORS,
                         minimum_similarity=MINIMUM_COSINE,
@@ -424,6 +434,14 @@ def main() -> None:
     source.add_argument("--embedding-manifest", type=Path)
     source.add_argument("--embeddings-root", type=Path)
     parser.add_argument("--method-id")
+    parser.add_argument(
+        "--identity-partition",
+        type=Path,
+        help=(
+            "Optional complete phenotype-blind common-policy partition. When supplied, "
+            "it replaces source-native identity labels before any graph is built."
+        ),
+    )
     parser.add_argument("--output-dir", required=True, type=Path)
     parser.add_argument("--unit-norm-tolerance", type=float, default=2e-5)
     args = parser.parse_args()
@@ -449,6 +467,40 @@ def main() -> None:
         usecols=["study_id", "entity_id", "identity_status"],
         dtype=str,
     ).drop_duplicates()
+    identity_partition_report_path: Path | None = None
+    identity_partition_provenance: dict[str, str] = {}
+    if args.identity_partition is not None:
+        identity_partition_report_path = args.identity_partition.parent / "report.json"
+        if not args.identity_partition.is_file() or not identity_partition_report_path.is_file():
+            raise FileNotFoundError(args.identity_partition)
+        identity_report = json.loads(identity_partition_report_path.read_text(encoding="utf-8"))
+        if identity_report.get("status") != "PHENOTYPE_BLIND_COMMON_STRICT_LIBRARY_PARTITIONS_COMPLETE":
+            raise RuntimeError("identity partition is not a complete common-policy artifact")
+        expected_partition_sha = identity_report.get("provenance", {}).get(
+            "combined_partition_sha256"
+        )
+        if expected_partition_sha != sha256(args.identity_partition):
+            raise RuntimeError("common identity partition checksum drift")
+        identity = pd.read_csv(
+            args.identity_partition,
+            sep="\t",
+            usecols=["study_id", "entity_id", "identity_status"],
+            dtype=str,
+        )
+        if identity.duplicated(["study_id", "entity_id"]).any():
+            raise RuntimeError("common identity partition contains duplicate entity keys")
+        base_keys = registry[["study_id", "entity_id"]].drop_duplicates()
+        if len(identity) != len(base_keys) or set(map(tuple, identity[["study_id", "entity_id"]].to_numpy())) != set(
+            map(tuple, base_keys[["study_id", "entity_id"]].to_numpy())
+        ):
+            raise RuntimeError("common identity partition does not match collection entities")
+        registry = base_keys.merge(
+            identity, on=["study_id", "entity_id"], how="left", validate="one_to_one"
+        )
+        identity_partition_provenance = {
+            str(args.identity_partition): sha256(args.identity_partition),
+            str(identity_partition_report_path): sha256(identity_partition_report_path),
+        }
     sources = pd.read_csv(paths["sources"], sep="\t", dtype={"study_id": str})
     studies = list(sources["study_id"].astype(str).drop_duplicates())
     jobs = resolve_embedding_jobs(args, studies)
@@ -536,6 +588,11 @@ def main() -> None:
             "opposite": "mean(max(-weight_product,0)*cosine)",
             "unsigned": "similar + opposite",
             "composition": "coverage-weighted mean edge cosine without response",
+            "identity_policy": (
+                "complete common GNPS Gold/Silver strict partition"
+                if args.identity_partition is not None
+                else "source-native development partitions"
+            ),
         },
         "denominators": {
             "independent_studies": int(contrasts["study_id"].nunique()),
@@ -568,12 +625,20 @@ def main() -> None:
         },
         "embedding_sources": embedding_reports,
         "input_sha256": {
-            str(path): sha256(path) for path in paths.values()
+            **{str(path): sha256(path) for path in paths.values()},
+            **identity_partition_provenance,
         },
         "claim_boundary": [
             "This is a local spectral-alignment baseline, not the final Contrast Atlas method.",
             "No ion-family collapse or measurement/covariate matching is performed.",
-            "Consequently this baseline cannot support an unknown-information increment claim.",
+            (
+                "The common identity policy removes cross-source partition drift, but absence of "
+                "ion-family collapse and measurement-matched known controls still prevents a "
+                "formal unknown-information increment claim."
+                if args.identity_partition is not None
+                else "Source-native identity policies differ; known/all comparisons cannot support "
+                "an unknown-information increment claim."
+            ),
             "Unresolved means not library-supported, not a unique metabolite.",
             "All collection sources are development/consumed.",
             "The deterministic reassignment is a sensitivity stress, not a calibrated null.",

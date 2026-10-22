@@ -93,20 +93,22 @@ def load_embedding_archive(
             f"embeddings are not unit-normalised in {path}; max error={maximum_norm_error}"
         )
     lookup = {entity: row for row, entity in enumerate(entity_ids)}
-    missing = required_entities - set(lookup)
-    if missing:
+    extra = set(lookup) - required_entities
+    if extra:
         raise ValueError(
-            f"{len(missing)} frozen response entities lack embeddings in {path}: "
-            f"{sorted(missing)[:10]}"
+            f"{len(extra)} embedding entities are absent from the frozen response registry in {path}"
         )
-    selected_ids = sorted(required_entities)
+    missing = required_entities - set(lookup)
+    selected_ids = sorted(set(lookup))
     selected = embeddings[[lookup[entity] for entity in selected_ids]]
     return selected_ids, selected, {
         "embedding_path": str(path),
         "embedding_sha256": sha256(path),
         "archive_entities": len(entity_ids),
         "required_response_entities": len(required_entities),
-        "extra_archive_entities_not_scored": len(entity_ids) - len(required_entities),
+        "embedded_response_entities": len(entity_ids),
+        "spectrally_ineligible_response_entities": len(missing),
+        "extra_archive_entities_not_scored": 0,
         "embedding_dimensions": int(embeddings.shape[1]),
         "maximum_unit_norm_error": maximum_norm_error,
     }

@@ -1,0 +1,23 @@
+{
+  "schema": "contrast_atlas_ibd200_precursor_repair_v1",
+  "status": "PHENOTYPE_BLIND_IBD200_PRECURSOR_REPAIR_COMPLETE",
+  "denominators": {
+    "input_spectra": 2498,
+    "quant_features": 1255,
+    "required_response_entities": 662,
+    "precursors_repaired": 1255,
+    "precursors_already_equal": 0,
+    "spectra_without_quant_row": 1243,
+    "required_entities_with_fewer_than_3_peaks": 119
+  },
+  "repair_rule": "SCANS equals GNPS row ID; replace PEPMASS by exact matching quant-table row m/z",
+  "leakage_status": "only spectrum IDs, peaks, precursor metadata, quant row ID/mz and frozen response entity IDs were read; no beta, SE, phenotype, contrast, relation or retrieval result was loaded",
+  "provenance": {
+    "input_mgf_sha256": "6aeba8b4c1e9cc94e127985cc18bde9a4d1df8c99030d470d4cec888bc5465e6",
+    "quant_sha256": "515c4821d9b0b86322cd7d6493ae9a5345a4541babbf189214e97719ed1e05fb",
+    "response_entities_sha256": "6610987fe472a195e2fcf40ee6f7b7aae0477c063901436f2d05a9f0557f2330",
+    "output_mgf_sha256": "602222d161cede44eed6406656e3a8fb81dc0a49b7a78c0c04fae3b722f672be",
+    "implementation_sha256": "133e4af27414cbe797aad7d85877cf5612934132e88f39032f3ec76017511062"
+  },
+  "claim_boundary": "This is metadata repair, not re-annotation. Sparse spectra remain explicit method-level abstentions and stay in the fixed response denominator."
+}

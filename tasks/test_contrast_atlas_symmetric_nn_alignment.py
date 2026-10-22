@@ -171,3 +171,44 @@ def test_no_thresholded_edge_is_retained_as_zero_not_deleted(tmp_path: Path) -> 
     assert pair["candidate_to_query_edge_coverage"] == 0
     assert pair["unsigned_response_score"] == 0
     assert pair["composition_score"] == 0
+
+
+def test_spectrally_ineligible_entity_remains_in_response_denominator(tmp_path: Path) -> None:
+    collection, embeddings = _fixture(tmp_path)
+    archive = embeddings / "S1" / "entity_embeddings.npz"
+    with np.load(archive, allow_pickle=False) as packed:
+        ids = np.asarray(packed["entity_id"])
+        vectors = np.asarray(packed["embeddings"])
+    np.savez_compressed(archive, entity_id=ids[:3], embeddings=vectors[:3])
+    output = tmp_path / "output"
+    script = Path(__file__).with_name("score_contrast_atlas_symmetric_nn_alignment.py")
+    subprocess.run(
+        [
+            sys.executable,
+            str(script),
+            "--collection",
+            str(collection),
+            "--embeddings-root",
+            str(embeddings),
+            "--method-id",
+            "synthetic_ineligible",
+            "--output-dir",
+            str(output),
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    scores = pd.read_csv(output / "fixed_candidate_scores.tsv.gz", sep="\t")
+    pair = scores.loc[
+        scores["query_study_id"].eq("S1")
+        & scores["candidate_study_id"].eq("S2")
+        & scores["evidence_world"].eq("all")
+    ].iloc[0]
+    assert pair["query_universe_entities"] == 4
+    assert pair["query_to_candidate_edge_coverage"] == 0.75
+    report = json.loads((output / "report.json").read_text(encoding="utf-8"))
+    s1 = next(source for source in report["embedding_sources"] if source["study_id"] == "S1")
+    assert s1["required_response_entities"] == 4
+    assert s1["embedded_response_entities"] == 3
+    assert s1["spectrally_ineligible_response_entities"] == 1
