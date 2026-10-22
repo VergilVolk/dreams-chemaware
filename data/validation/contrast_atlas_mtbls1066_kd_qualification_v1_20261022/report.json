@@ -1,0 +1,116 @@
+{
+  "accession": "MTBLS1066",
+  "admission": {
+    "independent_cross_source_validation": false,
+    "prespecified_metabolite_direction_truth": false,
+    "relation_to_hfd_sources": "intervention-family relevance only; not exact diet replication and not a predeclared same-direction metabolite truth",
+    "sample_level_ms2_evidence": true,
+    "within_source_directed_response": true
+  },
+  "claim_boundary": [
+    "This qualification establishes a real public intervention design and sample-level MS2 acquisition.",
+    "It does not establish a cross-study retrieval success or an unknown-information increment.",
+    "H_MCT and H_LCT must not be pooled until their conflicting public metadata are resolved independently.",
+    "All later effects from this source are development/consumed, never unopened external validation."
+  ],
+  "denominators": {
+    "biological_units": 20,
+    "biological_units_by_group": {
+      "BC_C": 4,
+      "BC_MCT": 3,
+      "H_C": 4,
+      "H_LCT": 5,
+      "H_MCT": 4
+    },
+    "files_by_group": {
+      "BC_C": 16,
+      "BC_MCT": 12,
+      "BLANK": 48,
+      "H_C": 16,
+      "H_LCT": 20,
+      "H_MCT": 16,
+      "POOL": 40
+    },
+    "files_by_panel": {
+      "NEG_HILIC": 42,
+      "NEG_RP": 42,
+      "POS_HILIC": 42,
+      "POS_RP": 42
+    },
+    "mzml_files": 168,
+    "primary_pos_rp_biological_files": 15
+  },
+  "design": {
+    "biospecimen": "blood plasma",
+    "h_lct_status": {
+      "isa_diet_label_collision": true,
+      "reason": "The official filenames separate H_LCT and H_MCT, but the ISA sample table assigns the same diet label to both groups.  Their biological meaning cannot be inferred from the filenames.",
+      "status": "audit_only_excluded_from_claim_bearing_contrasts",
+      "units": 5
+    },
+    "primary_response": {
+      "contrast_id": "healthy_lct_mct8_kd_minus_control",
+      "interpretation": "ketogenic-diet response in healthy mice",
+      "negative_group": "H_C",
+      "positive_group": "H_MCT",
+      "units": {
+        "H_C": 4,
+        "H_MCT": 4
+      }
+    },
+    "secondary_response": {
+      "contrast_id": "breast_cancer_chemo_lct_mct8_kd_minus_control",
+      "interpretation": "ketogenic-diet response conditional on breast-cancer xenograft and cyclophosphamide background",
+      "negative_group": "BC_C",
+      "positive_group": "BC_MCT",
+      "units": {
+        "BC_C": 4,
+        "BC_MCT": 3
+      }
+    },
+    "sex_and_model": "female CD-1 nu/nu mice",
+    "species": "Mus musculus"
+  },
+  "evaluation_role": "development_consumed_after_use",
+  "leakage_status": "metadata_and_acquisition_only_no_abundance_effects_opened",
+  "official_sources": {
+    "assays": {
+      "a_MTBLS1066_NEG_HILIC_LCMS.txt": {
+        "sha256": "3908dc78dbe309f5db788a315cc9e8b9b04531f09c3053d3e26fd74546591e72",
+        "url": "https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1066/a_MTBLS1066_NEG_HILIC_LCMS.txt"
+      },
+      "a_MTBLS1066_NEG_RP_LCMS.txt": {
+        "sha256": "379c6f42f4dbfb85183021c7237e0ef23bde32922976a21a4bfd47efea2eb4d8",
+        "url": "https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1066/a_MTBLS1066_NEG_RP_LCMS.txt"
+      },
+      "a_MTBLS1066_POS_HILIC_LCMS.txt": {
+        "sha256": "20518a93fdb76d847bcc6b54cb9d59600ef5499e55d9e2acffc1f260842311be",
+        "url": "https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1066/a_MTBLS1066_POS_HILIC_LCMS.txt"
+      },
+      "a_MTBLS1066_POS_RP_LCMS.txt": {
+        "sha256": "c65ec54bfd70d2532f094a9e671deadad04685c5601136143a0e628414bb35e6",
+        "url": "https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1066/a_MTBLS1066_POS_RP_LCMS.txt"
+      }
+    },
+    "files_directory": {
+      "sha256": "a1dabe910e4017b929f825da38f413d7fb7cf373f9d4202e0163f57065cb2737",
+      "url": "https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1066/FILES/"
+    },
+    "sample_table": {
+      "sha256": "9e8803b861a4d794bb516f39d58d8109f1340f88f4068cfef83f20dd220eb972",
+      "url": "https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1066/s_MTBLS1066.txt"
+    }
+  },
+  "sample_level_ms2_probe": {
+    "claim_boundary": "A positive count proves that this biological sample contains DDA MS2. Prefix counts are not whole-file scan denominators.",
+    "ms1_tags_in_received_bytes": 9,
+    "ms2_tags_in_received_bytes": 43,
+    "received_bytes": 2097152,
+    "received_sha256": "d89d895084931fc1e70196f60c6a39d57e7a22709efbeae9dc427554a88c0430",
+    "requested_prefix_bytes": 2097152,
+    "status": "sample_level_ms2_observed",
+    "url": "https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1066/FILES/014_DaLi_H9M9_H_C_R1_pos_20.mzML"
+  },
+  "schema": "contrast_atlas_public_intervention_source_qualification_v1",
+  "status": "qualified_with_semantic_exclusion"
+}

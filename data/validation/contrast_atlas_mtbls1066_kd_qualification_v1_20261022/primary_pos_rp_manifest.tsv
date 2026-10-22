@@ -1,0 +1,16 @@
+accession	filename	official_url	group	replicate	role	chromatography	polarity	panel	primary_pos_rp	semantic_audit_only
+MTBLS1066	008_DaLi_H9M9_BC_MCT_R3_pos_14.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1066/FILES/008_DaLi_H9M9_BC_MCT_R3_pos_14.mzML	BC_MCT	R3	biological	RP	POS	POS_RP	True	False
+MTBLS1066	009_DaLi_H9M9_H_C_R2_pos_15.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1066/FILES/009_DaLi_H9M9_H_C_R2_pos_15.mzML	H_C	R2	biological	RP	POS	POS_RP	True	False
+MTBLS1066	012_DaLi_H9M9_H_MCT_R4_pos_18.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1066/FILES/012_DaLi_H9M9_H_MCT_R4_pos_18.mzML	H_MCT	R4	biological	RP	POS	POS_RP	True	False
+MTBLS1066	014_DaLi_H9M9_H_C_R1_pos_20.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1066/FILES/014_DaLi_H9M9_H_C_R1_pos_20.mzML	H_C	R1	biological	RP	POS	POS_RP	True	False
+MTBLS1066	017_DaLi_H9M9_BC_MCT_R1_pos_23.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1066/FILES/017_DaLi_H9M9_BC_MCT_R1_pos_23.mzML	BC_MCT	R1	biological	RP	POS	POS_RP	True	False
+MTBLS1066	018_DaLi_H9M9_H_C_R3_pos_24.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1066/FILES/018_DaLi_H9M9_H_C_R3_pos_24.mzML	H_C	R3	biological	RP	POS	POS_RP	True	False
+MTBLS1066	022_DaLi_H9M9_BC_C_R2_pos_28.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1066/FILES/022_DaLi_H9M9_BC_C_R2_pos_28.mzML	BC_C	R2	biological	RP	POS	POS_RP	True	False
+MTBLS1066	024_DaLi_H9M9_BC_C_R3_pos_30.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1066/FILES/024_DaLi_H9M9_BC_C_R3_pos_30.mzML	BC_C	R3	biological	RP	POS	POS_RP	True	False
+MTBLS1066	027_DaLi_H9M9_BC_MCT_R2_pos_33.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1066/FILES/027_DaLi_H9M9_BC_MCT_R2_pos_33.mzML	BC_MCT	R2	biological	RP	POS	POS_RP	True	False
+MTBLS1066	028_DaLi_H9M9_BC_C_R4_pos_34.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1066/FILES/028_DaLi_H9M9_BC_C_R4_pos_34.mzML	BC_C	R4	biological	RP	POS	POS_RP	True	False
+MTBLS1066	029_DaLi_H9M9_H_MCT_R2_pos_35.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1066/FILES/029_DaLi_H9M9_H_MCT_R2_pos_35.mzML	H_MCT	R2	biological	RP	POS	POS_RP	True	False
+MTBLS1066	032_DaLi_H9M9_BC_C_R1_pos_38.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1066/FILES/032_DaLi_H9M9_BC_C_R1_pos_38.mzML	BC_C	R1	biological	RP	POS	POS_RP	True	False
+MTBLS1066	033_DaLi_H9M9_H_MCT_R1_pos_39.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1066/FILES/033_DaLi_H9M9_H_MCT_R1_pos_39.mzML	H_MCT	R1	biological	RP	POS	POS_RP	True	False
+MTBLS1066	037_DaLi_H9M9_H_MCT_R3_pos_43.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1066/FILES/037_DaLi_H9M9_H_MCT_R3_pos_43.mzML	H_MCT	R3	biological	RP	POS	POS_RP	True	False
+MTBLS1066	038_DaLi_H9M9_H_C_R4_pos_44.mzML	https://ftp.ebi.ac.uk/pub/databases/metabolights/studies/public/MTBLS1066/FILES/038_DaLi_H9M9_H_C_R4_pos_44.mzML	H_C	R4	biological	RP	POS	POS_RP	True	False

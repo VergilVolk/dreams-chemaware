@@ -230,3 +230,9 @@ Metabolomic Contrast Atlas 的总目标冻结为**研究级、有方向、有幅
 来源内响应轴审计提供了更严格的局部正结果：mouse HFD 查询在同一目标来源的四个候选中，用 `all` 与 `unresolved` 均将两个 HFD-vs-normal 对比精确排为 Top-2，而两个 sex contrasts 排为 3/4；composition 在四个候选间相同。31 次响应重排中仅 3 次得到同等或更大分离边际。该 exact-intervention 正控排除了简单来源识别，但 known-only 因证据不足弃权，故仍不是 matched unknown increment。Post-hoc obesity 泛化为 all 0/4、known 0/4、unresolved 1/4 exact Top-2，表明该能力尚未普适化。
 
 同一 centered operator 在冻结 official DreaMS embedding 上复现 HFD `all/unresolved` 精确 Top-2，重排边际同样仅 3/31 达到或超过观察值；official obesity 仍仅 all 1/4、known 0/4、unresolved 1/4。由此排除“仅粗 fragment bins 有效”，但不改变局部正控而非通用成功的边界。Noise V1 只允许通过固定服务器入口在同一实体、同一终点上比较。
+
+## 2026-10-22 系统性干预家族扩展
+
+第二个真实 dietary-intervention 来源 `MTBLS1066` 已通过效应开启前的 metadata/acquisition 准入：20 个生物个体、4 个 LC-MS/MS 模式、168 个 mzML，并在真实个体文件前缀中确认 sample-level DDA MS2。第一轮仅处理 15 个正离子 RP 生物文件，冻结健康 KD-minus-control（4 对 4）和 breast-cancer + cyclophosphamide 背景 KD-minus-control（3 对 4）两条响应；语义冲突的 `H_LCT` 在开效应前排除。
+
+该来源用于扩大干预响应而不是重定义方法。实际 beta/SE 与代表 MS2 尚未生成，KD 与已有 HFD 仅预登记为 dietary-intervention relevance family，不预设逐代谢物同向或共同机制。执行与成败门见 `docs/CONTRAST_ATLAS_SYSTEMATIC_INTERVENTION_EXPANSION_20261022.md`。

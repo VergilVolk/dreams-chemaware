@@ -204,3 +204,9 @@ Noise V1 在本地没有冻结 checkpoint，不能伪造比较。已准备唯一
 - Official DreaMS HFD 正控：`data/validation/contrast_atlas_hfd_source_conditioned_axis_official_v1_20261022/report.json`
 - Official DreaMS obesity 反证：`data/validation/contrast_atlas_obesity_source_conditioned_axis_official_v1_20261022/report.json`
 - Noise V1 冻结服务器入口：`tasks/run_contrast_atlas_noise_centered_response.sbatch`
+
+## 8. 2026-10-22：第二干预来源的真值盲准入
+
+为避免继续围绕单一 HFD 正控优化算子，新增 `MTBLS1066` ketogenic-diet 来源的 metadata/acquisition-only 资格审计。官方目录证明该研究有 20 个生物个体、四种 LC-MS/MS 模式和 168 个 mzML；第一轮冻结为 15 个正离子 RP 生物文件，分别构建健康背景 `H_MCT-H_C`（4 对 4）和 breast-cancer + cyclophosphamide 背景 `BC_MCT-BC_C`（3 对 4）两条有向响应。真实健康对照文件的前 2 MiB 已出现 43 个 MS2 标签，故该来源具备 sample-level DDA，而不是 pooled-QC-only 碎裂。
+
+`H_LCT` 因官方文件名与 ISA diet label 发生语义冲突而在开效应前排除。新来源目前只是合格的 within-source response substrate；尚无实际 beta/SE、开放检索结果或 unknown 增量。完整设计、停止条件和执行入口见 `docs/CONTRAST_ATLAS_SYSTEMATIC_INTERVENTION_EXPANSION_20261022.md`。
