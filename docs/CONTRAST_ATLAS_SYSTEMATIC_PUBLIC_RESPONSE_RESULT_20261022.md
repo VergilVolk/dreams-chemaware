@@ -100,17 +100,32 @@ MSV000090804 的原论文表明 methylolanthanin 产生对正常镧积累是必�
 
 这项负结果不会推翻 Contrast Atlas 总目标；它否定的是“把整个响应压成一个全局平均 fragment vector 就足够”的具体算子。
 
-## 下一项唯一高性价比方法实验
+## Signed fragment/neutral-loss programs：表面改善被零模型完全解释
 
-下一项关系层算子不再继续调全局均值，而是冻结为**局部、多尺度的 signed chemical response programs**：
+在不改变 10-source/25-contrast 候选宇宙的前提下，又完成了一次预先固定的关系层实验：
 
-1. 每个研究内保留多个局部响应程序，而不是把相反的脂质、肽和小极性分子变化相互抵消；
-2. 同时使用 fragment 和 neutral-loss 证据，分别对应共享子结构和局部碎裂差异；
-3. identity track 只累积同实体证据；relation track 只比较局部程序，不合并不同实体的 beta/SE；
-4. 先在新加入的、设计清楚的 B. subtilis 三组织响应中检验同一干预能否跨组织恢复，再一次性回到 10-source/25-contrast 开放候选集合；
-5. all、known、measurement-matched known、unresolved-shuffled-MS2 对照必须保留；只有 unresolved/all 在固定错误风险下增加正确回答覆盖，才称 unknown increment。
+1. 响应仍取 `beta / sqrt(beta^2 + SE^2)` 并在 contrast/world 内中心化；
+2. 正权和负权分别形成 up/down response programs，不再先压成一个正负相消的向量；
+3. 同时比较 fragment-only 与等范数 fragment + neutral-loss 双通道；
+4. 先写出全部 3,276 行固定候选分数，再打开 6 条既有登记关系；
+5. 用 31 次 identity-stratified response reassignment 检查排名究竟来自响应归属还是研究化学组成。
 
-Noise、ChemAware、P2b 或统一算法资产只通过冻结谱学接口替换 fragment/neutral-loss 相似性；不得为本生物学面板重新训练，也不得把模块名称本身当创新。
+冻结目录：`data/validation/contrast_atlas_signed_fragment_loss_programs_v2_20261022`。
+
+| 表示 / 世界 | 可评分登记关系 | alignment Top-1 | composition Top-1 |
+|---|---:|---:|---:|
+| fragment / all | 6/6 | 0/6 | 0/6 |
+| fragment / known | 2/6 | 1/2 | 2/2 |
+| fragment / unresolved | 6/6 | 1/6 | 0/6 |
+| fragment+loss / all | 6/6 | 3/6 | 0/6 |
+| fragment+loss / known | 2/6 | 1/2 | 2/2 |
+| fragment+loss / unresolved | 6/6 | 3/6 | 0/6 |
+
+仅看观察排名，neutral-loss 似乎将 unresolved 的 Top-1 从 1/6 提高到 3/6。但这是误导性的：在 fragment+loss/unresolved 主比较中，31/31 次响应重排都同样得到恰好 3/6 Top-1；零模型的最小值、中位数、最大值均为 3，`plus-one fraction(null >= observed)=1.0`。成人 IBD→儿童 IBD、女性 HFD→mouse HFD、男性 HFD→mouse HFD 在响应被打乱后仍始终为第一，说明排名由来源化学组成/覆盖主导，而不是由真实响应归属产生。
+
+因此该算子正式判为 `FAIL_UNKNOWN_RESPONSE_SPECIFICITY`。这同时否定两种全局压缩：单 signed centroid 和分离 up/down 后的全局 fragment/loss programs。不得再在这 6 条已消耗关系上调整 bin、权重、阈值或通道比例。
+
+下一阶段不再继续榨取这 6 个答案。最高性价比工作转为扩大**独立、预先成立、带明确方向语义的跨来源响应真值**：优先从 95 个具备定量表和代表 MS/MS 的 FBMN 任务中，寻找相同干预/宿主状态在独立项目中的复现，以及明确的 no-match 查询。新关系必须在看检索分数前登记；不同疾病名不自动作为阴性。只有扩大的真值集合冻结后，才能检验局部 relation edges 或 Noise/统一算法替代谱学接口，避免继续用 6 条已消耗关系选方法。
 
 ## 当前科学结论
 
@@ -119,6 +134,6 @@ Noise、ChemAware、P2b 或统一算法资产只通过冻结谱学接口替换 f
 1. 从 95 个具备定量+MS/MS 的公共 FBMN 任务中，实际建立了可扩展的、设计感知的响应对象入口；
 2. 将开放候选宇宙扩展到 10 来源、25 contrasts、651 生物单位和 99,265 张 MS/MS；
 3. 证明大量 unresolved feature entities 可以进入合法研究级效应估计；
-4. 同时证伪了当前全局关系核的 unknown-information 增量。
+4. 同时证伪了 centered kernel 和 signed fragment/loss programs 两种全局关系核的 unknown-information 增量；后者观察到的 3/6 Top-1 在 31/31 个响应重排零模型中原样出现。
 
-所以现在可以继续开发 Contrast Atlas，但不能写“unbiased 方法已经成功”。下一阶段的成败标准只有一个：局部化学响应程序是否能在未调参的新来源中恢复正确关系，并在开放 source-disjoint 检索中提供 known-only 没有的正确答案。
+所以现在可以继续开发 Contrast Atlas，但不能写“unbiased 方法已经成功”。下一阶段的成败标准不再是旧 6 关系上的更高排名，而是：在看分数前冻结的、更大跨来源真值集合中，响应特异的 relation layer 是否在固定错误风险下提供 known-only 没有的正确答案，并能对无对应查询可靠弃权。
