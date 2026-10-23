@@ -24,6 +24,8 @@ def main() -> None:
     parser.add_argument("--effects-root", required=True, type=Path)
     parser.add_argument("--embeddings-root", required=True, type=Path)
     parser.add_argument("--families-root", type=Path)
+    parser.add_argument("--identity-table", type=Path)
+    parser.add_argument("--world", choices=("all", "known", "unresolved"), default="all")
     parser.add_argument("--output-dir", required=True, type=Path)
     parser.add_argument("--permutations", type=int, default=1999)
     parser.add_argument("--seed", type=int, default=20261016)
@@ -37,6 +39,16 @@ def main() -> None:
     if manifest.duplicated(["study_id", "contrast_id"]).any():
         raise ValueError("study manifest contains duplicate response objects")
     registry = pd.read_csv(args.panel_registry, sep="\t", dtype=str).set_index("panel_id", verify_integrity=True)
+    identity = None
+    if args.identity_table:
+        identity = pd.read_csv(args.identity_table, sep="\t", dtype=str)
+        required_identity = {"panel_id", "anchor_id", "identity_status"}
+        if missing := required_identity - set(identity):
+            raise ValueError(f"identity table lacks {sorted(missing)}")
+        if identity.duplicated(["panel_id", "anchor_id"]).any():
+            raise ValueError("identity table contains duplicate panel/anchor rows")
+    if args.world != "all" and identity is None:
+        raise ValueError(f"identity table is required for world={args.world}")
     rng = np.random.default_rng(args.seed)
     object_vectors: dict[tuple[str, str], list[np.ndarray]] = {}
     panel_counts: dict[tuple[str, str], int] = {}
@@ -73,6 +85,21 @@ def main() -> None:
             effects = effects.loc[
                 effects.representative.astype(str).str.lower().isin(["true", "1"])
             ].copy()
+        if identity is not None:
+            panel_identity = identity.loc[
+                identity.panel_id.eq(panel_id), ["anchor_id", "identity_status"]
+            ]
+            effects = effects.merge(
+                panel_identity, on="anchor_id", how="left", validate="many_to_one"
+            )
+            if effects.identity_status.isna().any():
+                raise RuntimeError(f"identity partition incomplete for {panel_id}")
+            if args.world == "known":
+                effects = effects.loc[
+                    effects.identity_status.isin(["confirmed_known", "library_supported"])
+                ].copy()
+            elif args.world == "unresolved":
+                effects = effects.loc[effects.identity_status.eq("unresolved_entity")].copy()
         for contrast_id, block in effects.groupby("contrast_type", sort=True):
             block = block.loc[block.passes_effect_qc.astype(str).str.lower().isin(["true", "1"])]
             beta = block.beta.to_numpy(float)
@@ -124,8 +151,10 @@ def main() -> None:
         "response_objects": len(manifest),
         "embedding_dimensions": dimension,
         "truth_opened": False,
+        "evidence_world": args.world,
+        "identity_partition_available": identity is not None,
         "ion_family_partition_available": args.families_root is not None,
-        "null_operation": "permute bounded prevalence-weighted responses across anchors within panel and contrast",
+        "null_operation": "within the selected evidence world, permute bounded prevalence-weighted responses across anchors within panel and contrast",
         "preserved": [
             "study_and_panel_composition", "spectral_coordinates", "response_marginal_distribution",
             "prevalence_weights", "candidate_universe",

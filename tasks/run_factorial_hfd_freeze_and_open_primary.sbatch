@@ -21,6 +21,10 @@ python -u tasks/freeze_factorial_hfd_pretruth.py \
   --retrieval-dir "$RETRIEVAL" \
   --null-dir "$NULL_DIR" \
   --jackknife-dir "$JACKKNIFE" \
+  --known-null-dir data/validation/factorial_hfd_response_null_known_official_v1_20261023 \
+  --known-jackknife-dir data/validation/factorial_hfd_panel_jackknife_known_official_v1_20261023 \
+  --unresolved-null-dir data/validation/factorial_hfd_response_null_unresolved_official_v1_20261023 \
+  --unresolved-jackknife-dir data/validation/factorial_hfd_panel_jackknife_unresolved_official_v1_20261023 \
   --identity-table data/validation/factorial_hfd_identity_partition_v1_20261023/identity_partition.tsv.gz \
   --output-dir data/validation/factorial_hfd_pretruth_freeze_official_v1_20261023
 
@@ -30,3 +34,17 @@ python -u tasks/evaluate_factorial_hfd_retrieval.py \
   --jackknife "$JACKKNIFE/single_panel_deletion_scores.tsv.gz" \
   --output-dir data/validation/factorial_hfd_primary_adjudication_official_v1_20261023 \
   --world all
+
+python -u tasks/evaluate_factorial_hfd_retrieval.py \
+  --scores "$RETRIEVAL/retrieval_scores.tsv.gz" \
+  --null data/validation/factorial_hfd_response_null_known_official_v1_20261023/response_assignment_null.npz \
+  --jackknife data/validation/factorial_hfd_panel_jackknife_known_official_v1_20261023/single_panel_deletion_scores.tsv.gz \
+  --output-dir data/validation/factorial_hfd_primary_adjudication_known_official_v1_20261023 \
+  --world known
+
+python -u tasks/evaluate_factorial_hfd_retrieval.py \
+  --scores "$RETRIEVAL/retrieval_scores.tsv.gz" \
+  --null data/validation/factorial_hfd_response_null_unresolved_official_v1_20261023/response_assignment_null.npz \
+  --jackknife data/validation/factorial_hfd_panel_jackknife_unresolved_official_v1_20261023/single_panel_deletion_scores.tsv.gz \
+  --output-dir data/validation/factorial_hfd_primary_adjudication_unresolved_official_v1_20261023 \
+  --world unresolved

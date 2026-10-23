@@ -47,8 +47,13 @@ def test_download_verifier_requires_complete_exact_manifest(tmp_path: Path) -> N
 
 
 def test_pretruth_freeze_accepts_complete_contract(tmp_path: Path) -> None:
-    index, retrieval, null, jackknife = [tmp_path / name for name in ("index", "retrieval", "null", "jackknife")]
-    for path in (index, retrieval, null, jackknife):
+    index, retrieval, null, jackknife, known_null, known_jackknife, unresolved_null, unresolved_jackknife = [
+        tmp_path / name for name in (
+            "index", "retrieval", "null", "jackknife", "known_null", "known_jackknife",
+            "unresolved_null", "unresolved_jackknife",
+        )
+    ]
+    for path in (index, retrieval, null, jackknife, known_null, known_jackknife, unresolved_null, unresolved_jackknife):
         path.mkdir()
     identity = tmp_path / "identity.tsv"
     identity.write_text("panel_id\tanchor_id\tidentity_status\np\ta\tlibrary_supported\n", encoding="utf-8")
@@ -57,8 +62,24 @@ def test_pretruth_freeze_accepts_complete_contract(tmp_path: Path) -> None:
         "identity_table_sha256": file_sha256(identity),
     })
     write_json(retrieval / "report.json", {"status": "pretruth_scores_frozen", "truth_opened": False})
-    write_json(null / "report.json", {"status": "pretruth_max_candidate_null_frozen", "truth_opened": False, "permutations": 1999})
-    write_json(jackknife / "report.json", {"status": "pretruth_single_panel_deletion_scores_frozen", "truth_opened": False, "response_objects": 15, "scored_rows": 123})
+    write_json(null / "report.json", {"status": "pretruth_max_candidate_null_frozen", "truth_opened": False, "permutations": 1999, "evidence_world": "all"})
+    write_json(jackknife / "report.json", {"status": "pretruth_single_panel_deletion_scores_frozen", "truth_opened": False, "response_objects": 15, "scored_rows": 123, "evidence_world": "all"})
+    for world, null_dir, jack_dir in (
+        ("known", known_null, known_jackknife),
+        ("unresolved", unresolved_null, unresolved_jackknife),
+    ):
+        write_json(null_dir / "report.json", {
+            "status": "pretruth_max_candidate_null_frozen", "truth_opened": False,
+            "permutations": 1999, "evidence_world": world,
+        })
+        write_json(jack_dir / "report.json", {
+            "status": "pretruth_single_panel_deletion_scores_frozen", "truth_opened": False,
+            "response_objects": 15, "scored_rows": 123, "evidence_world": world,
+        })
+        np.savez_compressed(null_dir / "response_assignment_null.npz", x=np.zeros(1))
+        pd.DataFrame({"x": [1]}).to_csv(
+            jack_dir / "single_panel_deletion_scores.tsv.gz", sep="\t", index=False, compression="gzip"
+        )
 
     manifest = pd.DataFrame({
         "study_id": np.repeat(["A", "B", "C"], 5),
@@ -81,6 +102,9 @@ def test_pretruth_freeze_accepts_complete_contract(tmp_path: Path) -> None:
         sys.executable, str(ROOT / "tasks/freeze_factorial_hfd_pretruth.py"),
         "--index-dir", str(index), "--retrieval-dir", str(retrieval),
         "--null-dir", str(null), "--jackknife-dir", str(jackknife),
+        "--known-null-dir", str(known_null), "--known-jackknife-dir", str(known_jackknife),
+        "--unresolved-null-dir", str(unresolved_null),
+        "--unresolved-jackknife-dir", str(unresolved_jackknife),
         "--identity-table", str(identity),
         "--output-dir", str(output),
     ], check=True, cwd=ROOT)

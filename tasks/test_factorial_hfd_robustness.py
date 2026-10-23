@@ -161,3 +161,59 @@ def test_response_assignment_null_is_truth_blind_and_candidate_maxed(tmp_path: P
         assert np.isfinite(packed["pair_scores"][0, 5]).all()
     report = json.loads((output / "report.json").read_text(encoding="utf-8"))
     assert report["truth_opened"] is False
+
+
+def test_response_assignment_null_respects_identity_world(tmp_path: Path) -> None:
+    registry = pd.DataFrame([
+        {"panel_id": "P1", "dataset_accession": "S1", "source_family": "F1"},
+        {"panel_id": "P2", "dataset_accession": "S2", "source_family": "F2"},
+    ])
+    registry_path = tmp_path / "registry.tsv"
+    registry.to_csv(registry_path, sep="\t", index=False)
+    effects_root, embeddings_root = tmp_path / "effects", tmp_path / "embeddings"
+    identity_rows = []
+    for panel_id in ("P1", "P2"):
+        (effects_root / panel_id).mkdir(parents=True)
+        (embeddings_root / panel_id).mkdir(parents=True)
+        rows = []
+        for contrast in CONTRASTS:
+            rows.extend([
+                {"anchor_id": "known", "contrast_type": contrast, "beta": 1.0,
+                 "se_hc3": 0.5, "unit_prevalence": 1.0, "passes_effect_qc": True},
+                {"anchor_id": "unresolved", "contrast_type": contrast, "beta": -1.0,
+                 "se_hc3": 0.5, "unit_prevalence": 1.0, "passes_effect_qc": True},
+            ])
+        pd.DataFrame(rows).to_csv(
+            effects_root / panel_id / "factorial_contrast_effects.tsv.gz",
+            sep="\t", index=False, compression="gzip",
+        )
+        np.savez_compressed(
+            embeddings_root / panel_id / "anchor_embeddings.npz",
+            anchor_id=np.asarray(["known", "unresolved"]),
+            embeddings=np.eye(2, dtype=np.float32),
+        )
+        identity_rows.extend([
+            {"panel_id": panel_id, "anchor_id": "known", "identity_status": "library_supported"},
+            {"panel_id": panel_id, "anchor_id": "unresolved", "identity_status": "unresolved_entity"},
+        ])
+    identity_path = tmp_path / "identity.tsv"
+    pd.DataFrame(identity_rows).to_csv(identity_path, sep="\t", index=False)
+    manifest = pd.DataFrame([
+        {"sketch_row": i, "study_id": study, "contrast_id": contrast, "assay_panels": 1}
+        for i, (study, contrast) in enumerate(
+            (study, contrast) for study in ("S1", "S2") for contrast in CONTRASTS
+        )
+    ])
+    manifest_path = tmp_path / "study.tsv"
+    manifest.to_csv(manifest_path, sep="\t", index=False)
+    output = tmp_path / "known_null"
+    subprocess.run([
+        sys.executable, str(Path(__file__).with_name("calibrate_factorial_hfd_response_null.py")),
+        "--study-manifest", str(manifest_path), "--panel-registry", str(registry_path),
+        "--effects-root", str(effects_root), "--embeddings-root", str(embeddings_root),
+        "--identity-table", str(identity_path), "--world", "known",
+        "--output-dir", str(output), "--permutations", "99", "--seed", "9",
+    ], check=True, capture_output=True, text=True)
+    report = json.loads((output / "report.json").read_text(encoding="utf-8"))
+    assert report["evidence_world"] == "known"
+    assert report["identity_partition_available"] is True

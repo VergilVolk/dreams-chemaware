@@ -85,8 +85,8 @@ analysis.  It would also not establish a general external biology result.
    library; absence of a hit is never called novelty;
 5. frozen official-DreaMS spectral encoding;
 6. construction of all 15 response objects and all-query scores;
-7. 1,999 within-panel response-assignment permutations and single-panel
-   deletion analysis;
+7. separate 1,999-permutation maximum-candidate nulls and single-panel
+   deletion analyses for `all`, `known` and `unresolved` evidence worlds;
 8. hash freeze of every pre-truth artifact;
 9. automated opening of only the two registered reciprocal Hi-MYC queries.
 
@@ -98,5 +98,5 @@ downstream opening.
 ## Current implementation verification
 
 On 2026-10-23, the original factorial-HFD method tests plus the new download,
-polarity-aware identity and pre-truth gates passed `12/12`.  This verifies executable contracts only;
+polarity-aware identity and pre-truth gates passed `13/13`.  This verifies executable contracts only;
 it is not a biological success result.

@@ -43,6 +43,10 @@ def main() -> None:
     parser.add_argument("--retrieval-dir", required=True, type=Path)
     parser.add_argument("--null-dir", required=True, type=Path)
     parser.add_argument("--jackknife-dir", required=True, type=Path)
+    parser.add_argument("--known-null-dir", required=True, type=Path)
+    parser.add_argument("--known-jackknife-dir", required=True, type=Path)
+    parser.add_argument("--unresolved-null-dir", required=True, type=Path)
+    parser.add_argument("--unresolved-jackknife-dir", required=True, type=Path)
     parser.add_argument("--identity-table", required=True, type=Path)
     parser.add_argument("--output-dir", required=True, type=Path)
     args = parser.parse_args()
@@ -59,11 +63,23 @@ def main() -> None:
     ):
         reports[label], report_paths[label] = load_report(directory, label)
 
+    world_reports: dict[str, tuple[dict[str, object], dict[str, object], Path, Path]] = {}
+    for world, null_dir, jackknife_dir in (
+        ("known", args.known_null_dir, args.known_jackknife_dir),
+        ("unresolved", args.unresolved_null_dir, args.unresolved_jackknife_dir),
+    ):
+        null_report, null_path = load_report(null_dir, "null")
+        jack_report, jack_path = load_report(jackknife_dir, "jackknife")
+        if null_report.get("evidence_world") != world or jack_report.get("evidence_world") != world:
+            raise RuntimeError(f"{world} calibration report has the wrong evidence world")
+        world_reports[world] = (null_report, jack_report, null_path, jack_path)
+
     study_manifest = pd.read_csv(args.index_dir / "study_contrast_manifest.tsv", sep="\t")
     retrieval = pd.read_csv(args.retrieval_dir / "retrieval_scores.tsv.gz", sep="\t")
     if len(study_manifest) != 15 or study_manifest.study_id.nunique() != 3:
         raise RuntimeError("expected 15 response objects from three studies")
-    if not study_manifest["identity_partition_available"].astype(bool).all():
+    identity_available = study_manifest["identity_partition_available"].astype(str).str.lower().isin(["true", "1"])
+    if not identity_available.all():
         raise RuntimeError("study response objects lack the frozen identity partition")
     if int(study_manifest["n_entities_known"].sum()) <= 0 or int(study_manifest["n_entities_unresolved"].sum()) <= 0:
         raise RuntimeError("known/unresolved evidence worlds are empty")
@@ -76,6 +92,8 @@ def main() -> None:
         raise RuntimeError("retrieval worlds are incomplete")
     if int(reports["null"].get("permutations", 0)) != 1999:
         raise RuntimeError("the frozen null must contain 1999 permutations")
+    if reports["null"].get("evidence_world") != "all" or reports["jackknife"].get("evidence_world") != "all":
+        raise RuntimeError("primary calibration reports are not the all-entity world")
     if int(reports["jackknife"].get("response_objects", 0)) != 15:
         raise RuntimeError("jackknife response-object count differs from the index")
 
@@ -93,6 +111,19 @@ def main() -> None:
         "jackknife_scores": args.jackknife_dir / "single_panel_deletion_scores.tsv.gz",
         "identity_partition": args.identity_table,
     }
+    for world, (null_report, jack_report, null_path, jack_path) in world_reports.items():
+        if int(null_report.get("permutations", 0)) != 1999:
+            raise RuntimeError(f"{world} null must contain 1999 permutations")
+        if int(jack_report.get("response_objects", 0)) != 15:
+            raise RuntimeError(f"{world} jackknife response-object count differs from the index")
+        files[f"{world}_null_report"] = null_path
+        files[f"{world}_null_archive"] = (
+            args.known_null_dir if world == "known" else args.unresolved_null_dir
+        ) / "response_assignment_null.npz"
+        files[f"{world}_jackknife_report"] = jack_path
+        files[f"{world}_jackknife_scores"] = (
+            args.known_jackknife_dir if world == "known" else args.unresolved_jackknife_dir
+        ) / "single_panel_deletion_scores.tsv.gz"
     for path in files.values():
         if not path.is_file():
             raise FileNotFoundError(path)
@@ -116,6 +147,7 @@ def main() -> None:
             "evidence_worlds": 3,
             "retrieval_rows": len(retrieval),
             "permutations": 1999,
+            "separately_calibrated_evidence_worlds": 3,
             "jackknife_rows": int(reports["jackknife"].get("scored_rows", 0)),
         },
         "truth_opened": False,
