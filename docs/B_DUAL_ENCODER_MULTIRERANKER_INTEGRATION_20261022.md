@@ -86,6 +86,8 @@ does not change even if its point estimate happens to help.
 ## Executable artifacts
 
 - `tasks/run_b_anchored_dual_encoder_multireranker_gnps.sbatch`: one-GPU job;
+- `tasks/run_b_dual_multireranker_nested_refit.sbatch`: one-GPU nested refit
+  that reuses a cancelled/finished old job's already-built evidence bundles;
 - `tasks/train_b_anchored_dual_encoder_multireranker.py`: cross-fit, metrics,
   per-candidate ledger, ablations and conditional development freeze;
 - `tasks/export_gnps_stage1_rrf_pair_scores.py`: faithful RRF cache adapter;
@@ -99,6 +101,14 @@ The server command is:
 
 ```bash
 sbatch tasks/run_b_anchored_dual_encoder_multireranker_gnps.sbatch
+```
+
+If the pre-correction job already created both `evidence_*.npz` files, cancel
+its invalid second-stage training and avoid repeating encoder work:
+
+```bash
+sbatch tasks/run_b_dual_multireranker_nested_refit.sbatch \
+  data/validation/B_dual_encoder_multireranker_run_<OLD_JOBID>
 ```
 
 The ordinary command automatically finds the single directory containing the

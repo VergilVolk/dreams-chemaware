@@ -143,6 +143,11 @@ def main() -> None:
     for module in ("chemaware_stage1_encoder", "chemaware_phase_a_encoder",
                    "noise_msg_fusion_stack_v1", "noise_rrf_1_7"):
         assert f'--module {module}' in sbatch
+    refit = (Path(__file__).resolve().parent / "run_b_dual_multireranker_nested_refit.sbatch").read_text()
+    assert "#SBATCH --gpus=1" in refit and "#SBATCH --cpus-per-task=10" in refit
+    assert "modeling_nested_oof" in refit
+    assert "encode_gnps_gold_silver_10ppm_checkpoint.py" not in refit
+    assert "--core-identity-bundle" in refit and "--identity-chem" in refit
     print("PASS: B-anchored dual-encoder/multi-reranker contracts")
 
 
