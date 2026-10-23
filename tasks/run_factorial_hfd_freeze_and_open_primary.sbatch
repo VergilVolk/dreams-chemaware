@@ -61,3 +61,10 @@ python -u tasks/evaluate_factorial_hfd_local_response.py \
   --edge-contributions data/validation/factorial_hfd_local_directed_official_v1_20261023/local_edge_contributions.tsv.gz \
   --mean-scores "$RETRIEVAL/retrieval_scores.tsv.gz" \
   --output-dir data/validation/factorial_hfd_local_vs_mean_official_v1_20261023
+
+python -u tasks/evaluate_factorial_hfd_edge_replication.py \
+  --edge-contributions data/validation/factorial_hfd_local_directed_official_v1_20261023/local_edge_contributions.tsv.gz \
+  --entity-profiles data/validation/factorial_hfd_local_directed_official_v1_20261023/entity_response_profiles.tsv.gz \
+  --output-dir data/validation/factorial_hfd_edge_replication_official_v1_20261023 \
+  --permutations 256 \
+  --seed 20261023

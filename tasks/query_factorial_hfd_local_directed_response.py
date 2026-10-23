@@ -25,6 +25,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from scipy.stats import norm
 
 
 WORLDS = ("all", "known", "unresolved")
@@ -51,6 +52,23 @@ def bounded_response(beta: np.ndarray, se: np.ndarray, prevalence: np.ndarray) -
     denominator = np.sqrt(beta * beta + se * se)
     signal = np.divide(beta, denominator, out=np.zeros_like(beta), where=denominator > 0)
     return signal * np.sqrt(np.clip(prevalence, 0.0, 1.0))
+
+
+def bh_adjust(p_values: np.ndarray) -> np.ndarray:
+    values = np.asarray(p_values, dtype=float)
+    output = np.full(len(values), np.nan, dtype=float)
+    finite = np.isfinite(values)
+    selected = values[finite]
+    if not len(selected):
+        return output
+    order = np.argsort(selected, kind="stable")
+    ranked = selected[order]
+    adjusted = ranked * len(ranked) / np.arange(1, len(ranked) + 1)
+    adjusted = np.minimum.accumulate(adjusted[::-1])[::-1]
+    restored = np.empty(len(selected), dtype=float)
+    restored[order] = np.minimum(adjusted, 1.0)
+    output[finite] = restored
+    return output
 
 
 def mutual_top1(
@@ -188,6 +206,9 @@ class Panel:
     entities: pd.DataFrame
     embeddings: np.ndarray
     responses: dict[str, np.ndarray]
+    betas: dict[str, np.ndarray]
+    standard_errors: dict[str, np.ndarray]
+    effect_q: dict[str, np.ndarray]
 
 
 def load_panels(args: argparse.Namespace) -> dict[str, Panel]:
@@ -253,6 +274,9 @@ def load_panels(args: argparse.Namespace) -> dict[str, Panel]:
             raise RuntimeError(f"embeddings are not finite unit vectors for {panel_id}")
 
         responses: dict[str, np.ndarray] = {}
+        betas: dict[str, np.ndarray] = {}
+        standard_errors: dict[str, np.ndarray] = {}
+        effect_q: dict[str, np.ndarray] = {}
         for contrast in CONTRAST_ORDER:
             block = effects.loc[effects.contrast_type.eq(contrast)].copy()
             if len(block) != effects.anchor_id.nunique():
@@ -263,10 +287,15 @@ def load_panels(args: argparse.Namespace) -> dict[str, Panel]:
             )
             if block.isna().any().any() or not as_bool(block.passes_effect_qc).all():
                 raise RuntimeError(f"invalid representative effects for {panel_id}/{contrast}")
+            beta = block.beta.to_numpy(float)
+            se = block.se_hc3.to_numpy(float)
             responses[contrast] = bounded_response(
-                block.beta.to_numpy(float), block.se_hc3.to_numpy(float),
-                block.unit_prevalence.to_numpy(float),
+                beta, se, block.unit_prevalence.to_numpy(float),
             )
+            betas[contrast] = beta
+            standard_errors[contrast] = se
+            z = np.divide(beta, se, out=np.zeros_like(beta), where=se > 0)
+            effect_q[contrast] = bh_adjust(2.0 * norm.sf(np.abs(z)))
         panels[panel_id] = Panel(
             panel_id=panel_id,
             study_id=str(meta.dataset_accession),
@@ -275,6 +304,9 @@ def load_panels(args: argparse.Namespace) -> dict[str, Panel]:
             entities=entities.reset_index(drop=True),
             embeddings=entity_embeddings,
             responses=responses,
+            betas=betas,
+            standard_errors=standard_errors,
+            effect_q=effect_q,
         )
     return panels
 
@@ -354,6 +386,24 @@ def main() -> None:
     pair_rows: list[dict[str, object]] = []
     contribution_rows: list[dict[str, object]] = []
     score_rows: list[dict[str, object]] = []
+    profile_rows: list[dict[str, object]] = []
+    for panel in panels.values():
+        for contrast in CONTRAST_ORDER:
+            for row_index, entity in panel.entities.iterrows():
+                profile_rows.append({
+                    "study_id": panel.study_id,
+                    "source_family": panel.source_family,
+                    "panel_id": panel.panel_id,
+                    "polarity": panel.polarity,
+                    "anchor_id": str(entity.anchor_id),
+                    "family_id": str(entity.family_id),
+                    "identity_status": str(entity.identity_status),
+                    "contrast_id": contrast,
+                    "beta": float(panel.betas[contrast][row_index]),
+                    "se": float(panel.standard_errors[contrast][row_index]),
+                    "effect_q": float(panel.effect_q[contrast][row_index]),
+                    "bounded_response": float(panel.responses[contrast][row_index]),
+                })
     for query_study in studies:
         for target_study in studies:
             if target_study == query_study:
@@ -423,6 +473,12 @@ def main() -> None:
                                     "evidence_track": str(edge.track),
                                     "query_response": lv,
                                     "target_response": rv,
+                                    "query_beta": float(left.betas[query_contrast][lr]),
+                                    "target_beta": float(right.betas[target_contrast][rr]),
+                                    "query_se": float(left.standard_errors[query_contrast][lr]),
+                                    "target_se": float(right.standard_errors[target_contrast][rr]),
+                                    "query_effect_q": float(left.effect_q[query_contrast][lr]),
+                                    "target_effect_q": float(right.effect_q[target_contrast][rr]),
                                     "direction_agreement": int(np.sign(lv) * np.sign(rv)),
                                     "response_support_weight": float(
                                         edge.cosine * min(abs(lv), abs(rv))
@@ -468,6 +524,10 @@ def main() -> None:
         args.output_dir / "local_edge_contributions.tsv.gz", sep="\t", index=False,
         compression={"method": "gzip", "mtime": 0},
     )
+    pd.DataFrame(profile_rows).to_csv(
+        args.output_dir / "entity_response_profiles.tsv.gz", sep="\t", index=False,
+        compression={"method": "gzip", "mtime": 0},
+    )
     report = {
         "schema": "factorial_hfd_local_directed_response_retrieval_v1",
         "status": "development_local_directed_response_scores",
@@ -476,6 +536,7 @@ def main() -> None:
             "study_contrasts": len(studies) * len(CONTRAST_ORDER),
             "candidate_rows": len(scores),
             "edge_contribution_rows": len(contribution_rows),
+            "entity_response_profile_rows": len(profile_rows),
         },
         "method": {
             "chemical_correspondence": "same-polarity mutual top-1 embedding neighbour",

@@ -142,6 +142,8 @@ def test_end_to_end_keeps_identity_and_relation_tracks_separate(tmp_path: Path):
     assert reciprocal.chemical_relation_edges == 1
     edges = pd.read_csv(output / "local_edge_contributions.tsv.gz", sep="\t")
     assert set(edges.evidence_track) == {"identity_compatible", "chemical_relation"}
+    profiles = pd.read_csv(output / "entity_response_profiles.tsv.gz", sep="\t")
+    assert len(profiles) == 3 * 4 * 5
 
     mean = scores[[
         "query_study_id", "query_contrast_id", "target_study_id",
@@ -167,3 +169,17 @@ def test_end_to_end_keeps_identity_and_relation_tracks_separate(tmp_path: Path):
     )
     assert len(compared) == 2 * 3 * 3
     assert (adjudication / "top_supporting_local_edges.tsv").stat().st_size > 0
+
+    replication = tmp_path / "replication"
+    subprocess.run([
+        sys.executable,
+        str(Path(__file__).with_name("evaluate_factorial_hfd_edge_replication.py")),
+        "--edge-contributions", str(output / "local_edge_contributions.tsv.gz"),
+        "--entity-profiles", str(output / "entity_response_profiles.tsv.gz"),
+        "--output-dir", str(replication), "--permutations", "15", "--seed", "11",
+    ], check=True, capture_output=True, text=True)
+    replication_summary = pd.read_csv(replication / "pair_track_summary.tsv", sep="\t")
+    assert len(replication_summary) == 3 * 3
+    assert set(replication_summary.pair_role) == {
+        "registered_replicated_himyc_control", "exploratory_himyc_to_nqo1",
+    }
