@@ -25,6 +25,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 from scipy import sparse, stats
+from ms_entropy import FlashEntropySearch
 
 from run_contrast_atlas_sparse_fragment_measure_baseline import (
     iter_mgf,
@@ -181,6 +182,150 @@ def precursor_map(path: Path, required: set[str]) -> dict[str, float]:
             value = math.nan
         output[entity] = value if np.isfinite(value) and value > 0 else math.nan
     return output
+
+
+def load_raw_spectra(
+    path: Path, required: set[str]
+) -> tuple[np.ndarray, list[np.ndarray], dict[str, float], dict[str, int]]:
+    ids, peaks_by_id, precursors = [], [], {}
+    total = 0
+    for metadata, peaks in iter_mgf(path):
+        total += 1
+        entity = spectrum_id(metadata)
+        if entity not in required or not peaks:
+            continue
+        if entity in precursors:
+            raise ValueError(f"duplicate representative spectrum {entity} in {path}")
+        text = metadata.get("PEPMASS", "").split()[0]
+        try:
+            precursor = float(text)
+        except ValueError:
+            precursor = math.nan
+        precursor = precursor if np.isfinite(precursor) and precursor > 0 else 0.0
+        array = np.asarray(peaks, dtype=np.float32)
+        ids.append(entity)
+        peaks_by_id.append(array)
+        precursors[entity] = precursor if precursor > 0 else math.nan
+    missing = required - set(ids)
+    if missing:
+        raise ValueError(f"{len(missing)} required entities lack raw spectra in {path}")
+    return np.asarray(ids, dtype=str), peaks_by_id, precursors, {
+        "mgf_spectra_total": total,
+        "response_spectra_nonempty": len(ids),
+        "fragment_peaks": int(sum(len(value) for value in peaks_by_id)),
+    }
+
+
+def wse_directional_top1(
+    source_ids: np.ndarray,
+    source_peaks: list[np.ndarray],
+    target_ids: np.ndarray,
+    target_peaks: list[np.ndarray],
+    tolerance: float,
+    minimum: float,
+    min_matched: int,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    search = FlashEntropySearch(max_ms2_tolerance_in_da=max(tolerance, 0.024))
+    indexed = search.build_index(
+        [
+            {"precursor_mz": 0.0, "peaks": peaks.copy(), "entity_id": str(entity)}
+            for entity, peaks in zip(target_ids, target_peaks)
+        ],
+        precursor_ions_removal_da=None,
+        clean_spectra=True,
+    )
+    indexed_ids = np.asarray([str(item["entity_id"]) for item in indexed], dtype=str)
+    positions = {entity: index for index, entity in enumerate(target_ids)}
+    indexed_original_positions = np.asarray([positions[value] for value in indexed_ids])
+    target_index = np.full(len(source_ids), -1, dtype=np.int64)
+    target_score = np.full(len(source_ids), np.nan, dtype=np.float32)
+    target_matches = np.zeros(len(source_ids), dtype=np.int32)
+    for row, peaks in enumerate(source_peaks):
+        cleaned = search.clean_spectrum_for_search(
+            precursor_mz=0.0,
+            peaks=peaks,
+            precursor_ions_removal_da=None,
+            noise_threshold=0.01,
+            min_ms2_difference_in_da=0.05,
+            max_peak_num=0,
+        )
+        if not len(cleaned) or not len(indexed_ids):
+            continue
+        similarity, matched = search.open_search(
+            cleaned, tolerance, output_matched_peak_number=True
+        )
+        eligible = matched >= min_matched
+        if not eligible.any():
+            continue
+        masked = np.where(eligible, similarity, -np.inf)
+        best = int(np.argmax(masked))
+        if float(masked[best]) < minimum:
+            continue
+        target_index[row] = int(indexed_original_positions[best])
+        target_score[row] = float(masked[best])
+        target_matches[row] = int(matched[best])
+    return target_index, target_score, target_matches
+
+
+def freeze_mutual_wse_edges(
+    left_ids: np.ndarray,
+    left_peaks: list[np.ndarray],
+    right_ids: np.ndarray,
+    right_peaks: list[np.ndarray],
+    left_status: dict[str, str],
+    right_status: dict[str, str],
+    left_mz: dict[str, float],
+    right_mz: dict[str, float],
+    minimum: float,
+    tolerance: float,
+    min_matched: int,
+    ppm_limit: float,
+) -> pd.DataFrame:
+    rows = []
+    for world in WORLDS:
+        if world == "all":
+            li, ri = np.arange(len(left_ids)), np.arange(len(right_ids))
+        else:
+            state = "library_supported" if world == "known" else "unresolved_entity"
+            li = np.flatnonzero([left_status.get(str(value)) == state for value in left_ids])
+            ri = np.flatnonzero([right_status.get(str(value)) == state for value in right_ids])
+        if not len(li) or not len(ri):
+            continue
+        lp = [left_peaks[index] for index in li]
+        rp = [right_peaks[index] for index in ri]
+        forward, score, matches = wse_directional_top1(
+            left_ids[li], lp, right_ids[ri], rp, tolerance, minimum, min_matched
+        )
+        reverse, _, _ = wse_directional_top1(
+            right_ids[ri], rp, left_ids[li], lp, tolerance, minimum, min_matched
+        )
+        for local_left, local_right in enumerate(forward):
+            if local_right < 0 or reverse[local_right] != local_left:
+                continue
+            left_entity = str(left_ids[li[local_left]])
+            right_entity = str(right_ids[ri[local_right]])
+            lmz, rmz = left_mz.get(left_entity, np.nan), right_mz.get(right_entity, np.nan)
+            ppm = (
+                abs(lmz - rmz) / ((lmz + rmz) / 2.0) * 1e6
+                if np.isfinite(lmz) and np.isfinite(rmz) and lmz > 0 and rmz > 0
+                else np.nan
+            )
+            rows.append({
+                "evidence_world": world,
+                "left_raw_entity_id": left_entity,
+                "right_raw_entity_id": right_entity,
+                "chemical_similarity": float(score[local_left]),
+                "matched_fragments": int(matches[local_left]),
+                "left_precursor_mz": lmz,
+                "right_precursor_mz": rmz,
+                "precursor_ppm_difference": ppm,
+                "edge_track": (
+                    "precursor_compatible_identity_hypothesis"
+                    if np.isfinite(ppm) and ppm <= ppm_limit
+                    else "chemical_relation_only"
+                ),
+            })
+    return pd.DataFrame(rows)
 
 
 def sparse_top1(
@@ -515,8 +660,14 @@ def main() -> None:
     )
     parser.add_argument("--candidate-contract", type=Path, default=CANDIDATE_CONTRACT)
     parser.add_argument("--output-dir", required=True, type=Path)
+    parser.add_argument(
+        "--spectral-method", choices=("sparse_cosine", "wse"),
+        default="sparse_cosine",
+    )
     parser.add_argument("--bin-width", type=float, default=0.1)
     parser.add_argument("--minimum-cosine", type=float, default=0.70)
+    parser.add_argument("--fragment-tolerance-da", type=float, default=0.02)
+    parser.add_argument("--minimum-matched-fragments", type=int, default=6)
     parser.add_argument("--precursor-ppm", type=float, default=10.0)
     parser.add_argument("--block-size", type=int, default=128)
     args = parser.parse_args()
@@ -531,34 +682,51 @@ def main() -> None:
         set(candidate_mgf),
     )
     spectra_paths = {NEW_STUDY: args.new_mgf, **candidate_mgf}
-    spectra: dict[str, tuple[np.ndarray, sparse.csr_matrix]] = {}
+    spectra: dict[str, tuple[np.ndarray, object]] = {}
     precursors: dict[str, dict[str, float]] = {}
     spectrum_stats = {}
     for study, mgf in spectra_paths.items():
         required = set(identity.loc[identity["study_id"].eq(study), "raw_entity_id"])
-        ids, matrix, stats_block = load_study_spectra(mgf, required, args.bin_width)
-        spectra[study] = (np.asarray(ids, dtype=str), matrix)
-        precursors[study] = precursor_map(mgf, required)
+        if args.spectral_method == "sparse_cosine":
+            ids, representation, stats_block = load_study_spectra(
+                mgf, required, args.bin_width
+            )
+            precursors[study] = precursor_map(mgf, required)
+        else:
+            ids, representation, precursors[study], stats_block = load_raw_spectra(
+                mgf, required
+            )
+        spectra[study] = (np.asarray(ids, dtype=str), representation)
         spectrum_stats[study] = stats_block
-    dimensions = max(matrix.shape[1] for _, matrix in spectra.values())
-    spectra = {
-        study: (ids, pad_columns(matrix, dimensions))
-        for study, (ids, matrix) in spectra.items()
-    }
+    if args.spectral_method == "sparse_cosine":
+        dimensions = max(matrix.shape[1] for _, matrix in spectra.values())
+        spectra = {
+            study: (ids, pad_columns(matrix, dimensions))
+            for study, (ids, matrix) in spectra.items()
+        }
     status_maps = {
         study: dict(zip(block["raw_entity_id"], block["identity_status"]))
         for study, block in identity.groupby("study_id", sort=False)
     }
     edge_blocks = []
-    left_ids, left_matrix = spectra[NEW_STUDY]
+    left_ids, left_representation = spectra[NEW_STUDY]
     for study in candidate_mgf:
-        right_ids, right_matrix = spectra[study]
-        block = freeze_mutual_edges(
-            left_ids, left_matrix, right_ids, right_matrix,
-            status_maps[NEW_STUDY], status_maps[study],
-            precursors[NEW_STUDY], precursors[study],
-            args.minimum_cosine, args.block_size, args.precursor_ppm,
-        )
+        right_ids, right_representation = spectra[study]
+        if args.spectral_method == "sparse_cosine":
+            block = freeze_mutual_edges(
+                left_ids, left_representation, right_ids, right_representation,
+                status_maps[NEW_STUDY], status_maps[study],
+                precursors[NEW_STUDY], precursors[study],
+                args.minimum_cosine, args.block_size, args.precursor_ppm,
+            )
+        else:
+            block = freeze_mutual_wse_edges(
+                left_ids, left_representation, right_ids, right_representation,
+                status_maps[NEW_STUDY], status_maps[study],
+                precursors[NEW_STUDY], precursors[study],
+                args.minimum_cosine, args.fragment_tolerance_da,
+                args.minimum_matched_fragments, args.precursor_ppm,
+            )
         block.insert(0, "left_study_id", NEW_STUDY)
         block.insert(1, "right_study_id", study)
         edge_blocks.append(block)
@@ -605,7 +773,10 @@ def main() -> None:
         ),
         "parameters": {
             "fragment_bin_width_da": args.bin_width,
-            "minimum_sparse_cosine": args.minimum_cosine,
+            "minimum_spectral_similarity": args.minimum_cosine,
+            "spectral_method": args.spectral_method,
+            "fragment_tolerance_da": args.fragment_tolerance_da,
+            "minimum_matched_fragments": args.minimum_matched_fragments,
             "neighbors_each_direction": 1,
             "candidate_scope": args.candidate_scope,
             "edge_rule": "mutual top-1, frozen before effects and drug overlap",
@@ -643,7 +814,11 @@ def main() -> None:
             "Unresolved means not supported by the stated library policy, not a unique metabolite.",
             "Known and unresolved worlds use different-sized entity universes; this is not a measurement-matched formal unknown-increment estimate.",
             "Ion/adduct-family collapse is absent, so support counts are spectral-response edges rather than metabolite counts.",
-            "The sparse 0.1-Da cosine is a transparent baseline; final algorithm replacement must use the same samples, contrasts, candidates and response scoring.",
+            (
+                "The sparse 0.1-Da cosine is a transparent baseline; final algorithm replacement must use the same samples, contrasts, candidates and response scoring."
+                if args.spectral_method == "sparse_cosine"
+                else "WSE is the strong classical baseline; B and the complete integrated algorithm must use the same samples, contrasts, candidates and response scoring."
+            ),
             "Response-specificity centering was introduced during development after the uncentered v1 exposed a generic candidate-response bias; its performance is not sealed confirmation.",
             "Four community-specific responses are repeated biological contexts inside one experiment, not four independent studies.",
         ],
