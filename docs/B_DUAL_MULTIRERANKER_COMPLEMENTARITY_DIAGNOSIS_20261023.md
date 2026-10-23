@@ -83,3 +83,17 @@ complete arm 中达到至少 95% 残差上界的候选仅 `0.168%/0.168%`，出�
 
 输出：`data/validation/B_dual_encoder_multireranker_run_2400157/modeling_nested_oof/complementarity_audit_v2.json`。
 
+## 已实现的一次性修复作业
+
+实现入口：`tasks/train_b_anchor_conditioned_family_repair.py`。
+
+服务器入口只接受既有 prepared run，不重新编码谱图，也不重跑旧七臂：
+
+```bash
+sbatch tasks/run_b_anchor_conditioned_family_repair.sbatch \
+  data/validation/B_dual_encoder_multireranker_run_2400157
+```
+
+该作业只训练严格 nested formula-OOF 的一个修复臂。相对 `run_2400157` 固定改变三项：显式输入 B 状态；Stage-1、Phase-A 与 MSG 分家族表达；以正确候选对 B 最强错误竞争者的 pairwise loss 代替通用 listwise loss。父 B 的 seed、fold、hidden width、epoch、learning rate、trust weight 和 residual-bound 规则均保持不变。
+
+为节省成本，嵌套父链只重建 B，不再同时重建本轮不需要的 A；10 个无序 fold pair 各拟合一次 B，可分别服务对应的两个 outer folds。作业不读取 MassSpecGym 或 Enveda，不扫描参数。成功时保存开发候选 checkpoint；双面板未同时以正 CI 超过 B 时，输出 `KEEP_B_REFERENCE_STOP_SCORE_LEVEL_REPAIR`，不再继续调分数融合。
