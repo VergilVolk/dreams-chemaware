@@ -1,0 +1,63 @@
+{
+  "schema": "chemprop_contrast_atlas_sources_v1",
+  "status": "CHEMPROP_CONTRAST_ATLAS_SOURCES_COMPLETE",
+  "data_role": "development_consumed",
+  "denominators": {
+    "independent_accessions": 3,
+    "study_level_contrasts": 24,
+    "exact_cross_accession_drug_relations": 12,
+    "response_features": 16614,
+    "response_rows": 147117,
+    "biological_units": 69
+  },
+  "leakage_status": "source preparation reads within-study quantification, sample metadata, and MS/MS only; it does not read prior cross-design pair manifests or retrieval outputs",
+  "source_registry_sha256": "8ab9f78263107010960005bae27c62cb4c9c2dc0815dde68e558c0cdcd378935",
+  "implementation_sha256": "e3f638e6f10b1fe4dcd3f878c451c0b2f69052b83d1d9a752a4f12e10da86878",
+  "sources": [
+    {
+      "study_id": "MSV000094899",
+      "effects_path": "data\\validation\\contrast_atlas_chemprop_sources_v1_20261023\\MSV000094899\\effects.tsv",
+      "identity_path": "data\\validation\\contrast_atlas_chemprop_sources_v1_20261023\\MSV000094899\\source_native_identity.tsv",
+      "mgf_path": "data\\reference\\chemprop2_m1_20261011\\consensus.mgf",
+      "report_path": "data\\validation\\contrast_atlas_chemprop_sources_v1_20261023\\MSV000094899\\report.json",
+      "quantification_features": 8055,
+      "nonempty_mgf_features": 8055,
+      "response_features": 8055,
+      "contrasts": 12,
+      "response_rows": 96660,
+      "zero_se_values_floored": 0,
+      "mgf_spectra_total": 16245,
+      "mgf_spectra_nonempty": 8055
+    },
+    {
+      "study_id": "MSV000096724",
+      "effects_path": "data\\validation\\contrast_atlas_chemprop_sources_v1_20261023\\MSV000096724\\effects.tsv",
+      "identity_path": "data\\validation\\contrast_atlas_chemprop_sources_v1_20261023\\MSV000096724\\source_native_identity.tsv",
+      "mgf_path": "data\\reference\\chemprop_cross_design_20261011\\chemprop_23drug\\spectra\\specs_ms.mgf",
+      "report_path": "data\\validation\\contrast_atlas_chemprop_sources_v1_20261023\\MSV000096724\\report.json",
+      "quantification_features": 4429,
+      "nonempty_mgf_features": 4429,
+      "response_features": 4429,
+      "contrasts": 3,
+      "response_rows": 13287,
+      "zero_se_values_floored": 0,
+      "mgf_spectra_total": 9153,
+      "mgf_spectra_nonempty": 4429
+    },
+    {
+      "study_id": "MSV000093571",
+      "effects_path": "data\\validation\\contrast_atlas_chemprop_sources_v1_20261023\\MSV000093571\\effects.tsv",
+      "identity_path": "data\\validation\\contrast_atlas_chemprop_sources_v1_20261023\\MSV000093571\\source_native_identity.tsv",
+      "mgf_path": "data\\reference\\chemprop_cross_design_20261011\\chemprop_45drug\\spectra\\specs_ms.mgf",
+      "report_path": "data\\validation\\contrast_atlas_chemprop_sources_v1_20261023\\MSV000093571\\report.json",
+      "quantification_features": 4130,
+      "nonempty_mgf_features": 4130,
+      "response_features": 4130,
+      "contrasts": 9,
+      "response_rows": 37170,
+      "zero_se_values_floored": 0,
+      "mgf_spectra_total": 8581,
+      "mgf_spectra_nonempty": 4130
+    }
+  ]
+}

@@ -140,6 +140,66 @@ def directional_score_matrices(
     return similar, opposite, similar + opposite
 
 
+def directional_response_energy_matrices(
+    source_profiles: np.ndarray,
+    target_profiles: np.ndarray,
+    source_rows: np.ndarray,
+    target_rows: np.ndarray,
+    cosine: np.ndarray,
+    source_universe_rows: np.ndarray,
+    target_universe_rows: np.ndarray,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Response-measure kernel normalized by complete-world response energy.
+
+    The numerator is supported only by the phenotype-blind frozen chemical
+    edges.  The denominator contains the complete response energy in the
+    selected identity world, so missing chemical support is not silently
+    discarded.  Whole-profile permutation preserves these denominators.
+    """
+    shape = (source_profiles.shape[1], target_profiles.shape[1])
+    if not len(source_universe_rows) or not len(target_universe_rows):
+        nan = np.full(shape, np.nan, dtype=np.float64)
+        return nan.copy(), nan.copy(), nan.copy()
+    source_energy = np.sum(
+        source_profiles[source_universe_rows] * source_profiles[source_universe_rows],
+        axis=0,
+    )
+    target_energy = np.sum(
+        target_profiles[target_universe_rows] * target_profiles[target_universe_rows],
+        axis=0,
+    )
+    denominator = np.sqrt(source_energy[:, None] * target_energy[None, :])
+    if not len(source_rows):
+        zero = np.zeros(shape, dtype=np.float64)
+        return zero.copy(), zero.copy(), zero.copy()
+    left = source_profiles[source_rows]
+    right = target_profiles[target_rows]
+    weight = cosine[:, None]
+    left_pos = np.clip(left, 0.0, None)
+    left_neg = np.clip(-left, 0.0, None)
+    right_pos = np.clip(right, 0.0, None)
+    right_neg = np.clip(-right, 0.0, None)
+    similar_numerator = (
+        left_pos.T @ (weight * right_pos) + left_neg.T @ (weight * right_neg)
+    )
+    opposite_numerator = (
+        left_pos.T @ (weight * right_neg) + left_neg.T @ (weight * right_pos)
+    )
+    similar = np.divide(
+        similar_numerator,
+        denominator,
+        out=np.zeros(shape, dtype=np.float64),
+        where=denominator > 0,
+    )
+    opposite = np.divide(
+        opposite_numerator,
+        denominator,
+        out=np.zeros(shape, dtype=np.float64),
+        where=denominator > 0,
+    )
+    return similar, opposite, similar + opposite
+
+
 def prepare_graphs(
     edges: pd.DataFrame,
     entity_ids: dict[str, list[str]],
@@ -170,12 +230,18 @@ def prepare_graphs(
             & edges["evidence_world"].astype(str).eq(world)
         ]
         if world == "all":
+            left_universe_rows = np.arange(len(statuses[left]), dtype=np.int64)
+            right_universe_rows = np.arange(len(statuses[right]), dtype=np.int64)
             left_denominator = len(statuses[left])
             right_denominator = len(statuses[right])
         elif world == "known":
+            left_universe_rows = np.flatnonzero(statuses[left] == "library_supported")
+            right_universe_rows = np.flatnonzero(statuses[right] == "library_supported")
             left_denominator = int((statuses[left] == "library_supported").sum())
             right_denominator = int((statuses[right] == "library_supported").sum())
         elif world == "unresolved":
+            left_universe_rows = np.flatnonzero(statuses[left] == "unresolved_entity")
+            right_universe_rows = np.flatnonzero(statuses[right] == "unresolved_entity")
             left_denominator = int((statuses[left] == "unresolved_entity").sum())
             right_denominator = int((statuses[right] == "unresolved_entity").sum())
         else:
@@ -193,6 +259,8 @@ def prepare_graphs(
             ),
             "forward_cosine": forward["chemical_similarity"].to_numpy(float),
             "forward_denominator": left_denominator,
+            "left_universe_rows": left_universe_rows,
+            "right_universe_rows": right_universe_rows,
             "reverse_source": np.asarray(
                 [lookups[right][value] for value in reverse["right_entity_id"].astype(str)],
                 dtype=np.int64,
@@ -211,23 +279,32 @@ def score_pair(
     left_profiles: np.ndarray,
     right_profiles: np.ndarray,
     graph: dict[str, object],
+    score_mode: str = "entity_mean",
 ) -> dict[str, np.ndarray]:
-    forward = directional_score_matrices(
-        left_profiles,
-        right_profiles,
-        graph["forward_source"],
-        graph["forward_target"],
-        graph["forward_cosine"],
-        int(graph["forward_denominator"]),
-    )
-    reverse = directional_score_matrices(
-        right_profiles,
-        left_profiles,
-        graph["reverse_source"],
-        graph["reverse_target"],
-        graph["reverse_cosine"],
-        int(graph["reverse_denominator"]),
-    )
+    if score_mode == "entity_mean":
+        forward = directional_score_matrices(
+            left_profiles, right_profiles, graph["forward_source"],
+            graph["forward_target"], graph["forward_cosine"],
+            int(graph["forward_denominator"]),
+        )
+        reverse = directional_score_matrices(
+            right_profiles, left_profiles, graph["reverse_source"],
+            graph["reverse_target"], graph["reverse_cosine"],
+            int(graph["reverse_denominator"]),
+        )
+    elif score_mode == "response_energy":
+        forward = directional_response_energy_matrices(
+            left_profiles, right_profiles, graph["forward_source"],
+            graph["forward_target"], graph["forward_cosine"],
+            graph["left_universe_rows"], graph["right_universe_rows"],
+        )
+        reverse = directional_response_energy_matrices(
+            right_profiles, left_profiles, graph["reverse_source"],
+            graph["reverse_target"], graph["reverse_cosine"],
+            graph["right_universe_rows"], graph["left_universe_rows"],
+        )
+    else:
+        raise ValueError(f"unsupported score mode: {score_mode}")
     return {
         metric: 0.5 * (forward[index] + reverse[index].T)
         for index, metric in enumerate(METRICS)
@@ -276,13 +353,16 @@ def score_candidate_rows(
         tuple[str, str, str], tuple[np.ndarray, np.ndarray, np.ndarray]
     ],
     row_count: int,
+    score_mode: str = "entity_mean",
 ) -> dict[str, np.ndarray]:
     values = {
         metric: np.full(row_count, np.nan, dtype=np.float64) for metric in METRICS
     }
     for key, graph in graphs.items():
         left, right, _world = key
-        pair_scores = score_pair(profiles[left], profiles[right], graph)
+        pair_scores = score_pair(
+            profiles[left], profiles[right], graph, score_mode=score_mode
+        )
         rows, left_columns, right_columns = coordinates[key]
         for metric in METRICS:
             values[metric][rows] = pair_scores[metric][left_columns, right_columns]
@@ -375,6 +455,12 @@ def main() -> None:
     parser.add_argument("--output-dir", required=True, type=Path)
     parser.add_argument("--permutations", type=int, default=256)
     parser.add_argument("--seed", type=int, default=20261023)
+    parser.add_argument(
+        "--score-mode",
+        choices=("entity_mean", "response_energy"),
+        default="entity_mean",
+        help="entity_mean reproduces the frozen v1 score; response_energy uses a complete-world response-measure kernel",
+    )
     args = parser.parse_args()
     if args.output_dir.exists():
         raise FileExistsError(args.output_dir)
@@ -440,22 +526,44 @@ def main() -> None:
         for metric in METRICS
     }
     recomputed_observed = score_candidate_rows(
-        matrices, graphs, coordinates, row_count=n
+        matrices, graphs, coordinates, row_count=n, score_mode=args.score_mode
     )
-    for metric in METRICS:
-        if not np.allclose(
-            recomputed_observed[metric], observed_values[metric], rtol=1e-10, atol=1e-12
-        ):
-            maximum = float(
-                np.max(np.abs(recomputed_observed[metric] - observed_values[metric]))
-            )
-            raise RuntimeError(
-                f"vectorized {metric} scorer does not reproduce frozen scores; max={maximum}"
-            )
+    if args.score_mode == "entity_mean":
+        for metric in METRICS:
+            if not np.allclose(
+                recomputed_observed[metric], observed_values[metric], rtol=1e-10, atol=1e-12
+            ):
+                maximum = float(
+                    np.max(np.abs(recomputed_observed[metric] - observed_values[metric]))
+                )
+                raise RuntimeError(
+                    f"vectorized {metric} scorer does not reproduce frozen scores; max={maximum}"
+                )
+    else:
+        observed_values = recomputed_observed
+        for metric in METRICS:
+            observed[f"{metric}_response_score"] = observed_values[metric]
+        observed["signed_response_score"] = (
+            observed_values["similar"] - observed_values["opposite"]
+        )
+        rank_groups = observed.groupby(
+            ["query_study_id", "query_contrast_id", "evidence_world"], sort=False
+        ).groups
+        for metric in METRICS:
+            rank_column = f"{metric}_response_absolute_rank"
+            observed[rank_column] = np.nan
+            for indices in rank_groups.values():
+                values = observed.loc[indices, f"{metric}_response_score"]
+                present = values.notna()
+                observed.loc[values.index[present], rank_column] = values.loc[present].rank(
+                    ascending=False, method="min"
+                )
     for seed in seeds:
         donors = permutation_indices(statuses, int(seed))
         permuted = {study: matrix[donors[study]] for study, matrix in matrices.items()}
-        values = score_candidate_rows(permuted, graphs, coordinates, row_count=n)
+        values = score_candidate_rows(
+            permuted, graphs, coordinates, row_count=n, score_mode=args.score_mode
+        )
         for metric in METRICS:
             if not np.isfinite(values[metric]).all():
                 raise RuntimeError(f"non-finite null {metric} scores")
@@ -518,8 +626,22 @@ def main() -> None:
                 block["unsigned_response_null_empirical_p"].le(1 / (args.permutations + 1)).sum()
             ),
         }
+    stratum_summary = {}
+    for (relation_class, world), block in canonical.groupby(
+        ["relation_class", "evidence_world"], sort=True
+    ):
+        stratum_summary.setdefault(str(relation_class), {})[str(world)] = {
+            "canonical_relations": int(len(block)),
+            "similar_z_top1": int(block["similar_response_null_z_absolute_rank"].eq(1).sum()),
+            "unsigned_z_top1": int(block["unsigned_response_null_z_absolute_rank"].eq(1).sum()),
+            "median_similar_z_rank": float(block["similar_response_null_z_absolute_rank"].median()),
+            "median_unsigned_z_rank": float(block["unsigned_response_null_z_absolute_rank"].median()),
+            "empirical_p_at_minimum_resolution": int(
+                block["unsigned_response_null_empirical_p"].le(1 / (args.permutations + 1)).sum()
+            ),
+        }
     report = {
-        "schema": "contrast_atlas_sparse_local_response_null_calibration_v1",
+        "schema": "contrast_atlas_sparse_local_response_null_calibration_v2",
         "status": "DEVELOPMENT_CONSUMED_RESPONSE_SPECIFICITY_CALIBRATION_COMPLETE",
         "data_role": "development_consumed",
         "method": {
@@ -535,6 +657,12 @@ def main() -> None:
                 "identity-world entity counts",
             ],
             "calibrated_score": "candidate-specific z score against response-profile reassignment",
+            "score_mode": args.score_mode,
+            "score_normalization": (
+                "complete identity-world entity count"
+                if args.score_mode == "entity_mean"
+                else "geometric mean of complete identity-world query and candidate response energy"
+            ),
             "registered_relations_opened": "after every observed and null candidate score was frozen",
         },
         "denominators": {
@@ -547,9 +675,10 @@ def main() -> None:
             "independent_biological_relation_components": relation_components,
         },
         "canonical_registered_relation_descriptive_ranks": summary,
+        "canonical_registered_relation_strata_descriptive_ranks": stratum_summary,
         "decision_boundary": {
             "pass_fail": "NOT_ADJUDICATED",
-            "reason": "only two biological relation components and no signed metabolite-level truth",
+            "reason": "heterogeneous consumed and post-hoc relation strata, no signed metabolite-level truth, and no pre-registered pass gate",
             "unregistered_pairs": "unadjudicated, never treated as negatives",
         },
         "provenance": {
@@ -566,8 +695,9 @@ def main() -> None:
         "claim_boundary": [
             "This calibration removes candidate-specific chemical-composition expectations; it does not create biological truth.",
             "Empirical p values are descriptive development statistics and are not multiplicity-corrected discovery claims.",
-            "Forward and reverse registered rows are not independent; the primary summary uses five canonical rows.",
-            "Only two biological relation components are registered, so no generalization claim is qualified.",
+            f"Forward and reverse registered rows are not independent; the primary summary uses {int(len(canonical) / len(WORLDS))} canonical relations per evidence world.",
+            f"The {relation_components} relation components do not imply equal experimental independence; twelve exact-drug components share one consumed ChemProp project.",
+            "No external generalization claim is qualified.",
         ],
     }
     (args.output_dir / "report.json").write_text(

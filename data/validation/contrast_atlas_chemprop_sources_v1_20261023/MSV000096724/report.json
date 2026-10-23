@@ -1,0 +1,31 @@
+{
+  "schema": "chemprop_contrast_atlas_source_v1",
+  "status": "CHEMPROP_CONTRAST_ATLAS_SOURCE_PREPARED",
+  "study_id": "MSV000096724",
+  "data_role": "development_consumed",
+  "estimand": "(bacteria T2 - abiotic T2) - (bacteria T0 - abiotic T0)",
+  "biological_units": 6,
+  "denominators": {
+    "quantification_features": 4429,
+    "nonempty_mgf_features": 4429,
+    "response_features": 4429,
+    "contrasts": 3,
+    "response_rows": 13287,
+    "zero_se_values_floored": 0,
+    "mgf_spectra_total": 9153,
+    "mgf_spectra_nonempty": 4429
+  },
+  "leakage_status": "within-study sample metadata define frozen beta and SE; MS/MS eligibility is phenotype blind; no cross-study feature map, drug retrieval result, or relation rank was read",
+  "provenance": {
+    "quantification_sha256": "7340e99a5b2c41525ca1cd3ae41c53384394786fc32ee849a17d484e5d330d33",
+    "mgf_sha256": "b54c361d415a452c47961666e9372467e5cb5065bed73c6b3fff2c4b4d5c8142",
+    "effects_sha256": "bb1a829157d9a4c045ea22a517982cb0e4d12ed86123aa1aad7fd433448acc4e",
+    "source_native_identity_sha256": "b538173a75fbc463f334c5585ae63c161137c9bb8b8b3ed8937fa8e385ce786a",
+    "implementation_sha256": "e3f638e6f10b1fe4dcd3f878c451c0b2f69052b83d1d9a752a4f12e10da86878"
+  },
+  "claim_boundary": [
+    "The three accessions come from the consumed ChemProp project and are not external validation.",
+    "Source-native unresolved status means structure labels were not used here; the common strict library partition must be rebuilt separately.",
+    "Drug identity defines registered intervention relevance only after every cross-study candidate score is frozen."
+  ]
+}

@@ -1,0 +1,188 @@
+{
+  "schema": "contrast_atlas_sparse_local_response_null_calibration_v2",
+  "status": "DEVELOPMENT_CONSUMED_RESPONSE_SPECIFICITY_CALIBRATION_COMPLETE",
+  "data_role": "development_consumed",
+  "method": {
+    "permutations": 256,
+    "seed": 20261023,
+    "reassignment_unit": "whole entity response profile",
+    "reassignment_strata": "within study and common identity status",
+    "preserved": [
+      "frozen phenotype-blind chemical graph",
+      "complete candidate universe",
+      "study and contrast structure",
+      "within-profile cross-contrast dependence",
+      "identity-world entity counts"
+    ],
+    "calibrated_score": "candidate-specific z score against response-profile reassignment",
+    "score_mode": "entity_mean",
+    "score_normalization": "complete identity-world entity count",
+    "registered_relations_opened": "after every observed and null candidate score was frozen"
+  },
+  "denominators": {
+    "studies": 15,
+    "contrasts": 51,
+    "candidate_rows": 6858,
+    "permutations": 256,
+    "canonical_registered_relations": 21,
+    "registered_directional_relations": 42,
+    "independent_biological_relation_components": 15
+  },
+  "canonical_registered_relation_descriptive_ranks": {
+    "all": {
+      "canonical_relations": 21,
+      "similar_z_top1": 1,
+      "unsigned_z_top1": 1,
+      "median_similar_z_rank": 11.0,
+      "median_unsigned_z_rank": 24.0,
+      "empirical_p_at_minimum_resolution": 4
+    },
+    "known": {
+      "canonical_relations": 21,
+      "similar_z_top1": 2,
+      "unsigned_z_top1": 0,
+      "median_similar_z_rank": 21.0,
+      "median_unsigned_z_rank": 19.0,
+      "empirical_p_at_minimum_resolution": 1
+    },
+    "unresolved": {
+      "canonical_relations": 21,
+      "similar_z_top1": 1,
+      "unsigned_z_top1": 1,
+      "median_similar_z_rank": 10.0,
+      "median_unsigned_z_rank": 22.0,
+      "empirical_p_at_minimum_resolution": 4
+    }
+  },
+  "canonical_registered_relation_strata_descriptive_ranks": {
+    "consumed_exact_drug_cross_design": {
+      "all": {
+        "canonical_relations": 12,
+        "similar_z_top1": 1,
+        "unsigned_z_top1": 1,
+        "median_similar_z_rank": 4.5,
+        "median_unsigned_z_rank": 24.5,
+        "empirical_p_at_minimum_resolution": 3
+      },
+      "known": {
+        "canonical_relations": 12,
+        "similar_z_top1": 1,
+        "unsigned_z_top1": 0,
+        "median_similar_z_rank": 13.5,
+        "median_unsigned_z_rank": 20.0,
+        "empirical_p_at_minimum_resolution": 0
+      },
+      "unresolved": {
+        "canonical_relations": 12,
+        "similar_z_top1": 1,
+        "unsigned_z_top1": 1,
+        "median_similar_z_rank": 4.5,
+        "median_unsigned_z_rank": 25.0,
+        "empirical_p_at_minimum_resolution": 3
+      }
+    },
+    "posthoc_registered_cross_source_obesity_family": {
+      "all": {
+        "canonical_relations": 4,
+        "similar_z_top1": 0,
+        "unsigned_z_top1": 0,
+        "median_similar_z_rank": 27.5,
+        "median_unsigned_z_rank": 30.5,
+        "empirical_p_at_minimum_resolution": 0
+      },
+      "known": {
+        "canonical_relations": 4,
+        "similar_z_top1": 0,
+        "unsigned_z_top1": 0,
+        "median_similar_z_rank": 23.0,
+        "median_unsigned_z_rank": 12.0,
+        "empirical_p_at_minimum_resolution": 1
+      },
+      "unresolved": {
+        "canonical_relations": 4,
+        "similar_z_top1": 0,
+        "unsigned_z_top1": 0,
+        "median_similar_z_rank": 26.0,
+        "median_unsigned_z_rank": 32.0,
+        "empirical_p_at_minimum_resolution": 0
+      }
+    },
+    "prespecified_exact_intervention_family": {
+      "all": {
+        "canonical_relations": 2,
+        "similar_z_top1": 0,
+        "unsigned_z_top1": 0,
+        "median_similar_z_rank": 23.5,
+        "median_unsigned_z_rank": 32.0,
+        "empirical_p_at_minimum_resolution": 0
+      },
+      "known": {
+        "canonical_relations": 2,
+        "similar_z_top1": 0,
+        "unsigned_z_top1": 0,
+        "median_similar_z_rank": 40.5,
+        "median_unsigned_z_rank": 24.0,
+        "empirical_p_at_minimum_resolution": 0
+      },
+      "unresolved": {
+        "canonical_relations": 2,
+        "similar_z_top1": 0,
+        "unsigned_z_top1": 0,
+        "median_similar_z_rank": 22.0,
+        "median_unsigned_z_rank": 26.5,
+        "empirical_p_at_minimum_resolution": 0
+      }
+    },
+    "prespecified_near_exact_condition_family": {
+      "all": {
+        "canonical_relations": 3,
+        "similar_z_top1": 0,
+        "unsigned_z_top1": 0,
+        "median_similar_z_rank": 15.0,
+        "median_unsigned_z_rank": 15.0,
+        "empirical_p_at_minimum_resolution": 1
+      },
+      "known": {
+        "canonical_relations": 3,
+        "similar_z_top1": 1,
+        "unsigned_z_top1": 0,
+        "median_similar_z_rank": 22.0,
+        "median_unsigned_z_rank": 26.0,
+        "empirical_p_at_minimum_resolution": 0
+      },
+      "unresolved": {
+        "canonical_relations": 3,
+        "similar_z_top1": 0,
+        "unsigned_z_top1": 0,
+        "median_similar_z_rank": 15.0,
+        "median_unsigned_z_rank": 15.0,
+        "empirical_p_at_minimum_resolution": 1
+      }
+    }
+  },
+  "decision_boundary": {
+    "pass_fail": "NOT_ADJUDICATED",
+    "reason": "heterogeneous consumed and post-hoc relation strata, no signed metabolite-level truth, and no pre-registered pass gate",
+    "unregistered_pairs": "unadjudicated, never treated as negatives"
+  },
+  "provenance": {
+    "alignment_report_sha256": "87d57cc04b90cfc8a01d50c96f1619675ba0d2117f7dbbb8be9115f95fba8db0",
+    "alignment_scores_sha256": "a9a9fae94f02e9d018239087be8a10c79012545f20d31e643246b784fa9d404b",
+    "alignment_edges_sha256": "0432786a0ddeef318b311bdaf8cb91dee9eeb25b8d33e04c3baa344ddf66882a",
+    "response_entities_sha256": "6f6fa005983b9172c4f2cb7aa055feedd2165de90b6ce7c482eaa56af6b8de75",
+    "contrast_manifest_sha256": "a3b46e4dcacd65a5845e7b319db3decff8cbe64a242ec65116ff7dd48fc5089c",
+    "registered_relations_sha256": "8fba3fe5652773c68740d5237e02d0db314a2185b3c12c7581c3c9e4ced4014c",
+    "identity_partition_sha256": "239af73938fc03056406afea8fc3d17fa29d761735a5e96e23e0efb8e8e395b2",
+    "scores": "acafc870d1bd2924bbd4fac769d20f4f2ff8e1c6711da392534a4aebc473de41",
+    "seeds": "afe1b6e04741a4a8cad40cb52b27cdc880d7316ff27a64879e965662335a64a2",
+    "relations": "7a68f231c3c285afedf4cb9e2590341101b9efa821fd5bf6a6d739085ef64619",
+    "implementation_sha256": "5aa7fbcd2c103125b26308ecde925833bf7b0086ba3c2aa67de89fa4b46b23e8"
+  },
+  "claim_boundary": [
+    "This calibration removes candidate-specific chemical-composition expectations; it does not create biological truth.",
+    "Empirical p values are descriptive development statistics and are not multiplicity-corrected discovery claims.",
+    "Forward and reverse registered rows are not independent; the primary summary uses 21 canonical relations per evidence world.",
+    "The 15 relation components do not imply equal experimental independence; twelve exact-drug components share one consumed ChemProp project.",
+    "No external generalization claim is qualified."
+  ]
+}

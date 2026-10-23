@@ -1,0 +1,39 @@
+{
+  "schema": "contrast_atlas_open_source_common_identity_partition_v1",
+  "status": "PHENOTYPE_BLIND_COMMON_STRICT_LIBRARY_PARTITION_FROZEN",
+  "study_id": "MSV000083077",
+  "denominators": {
+    "representative_mgf_spectra": 15184,
+    "response_entities": 7132,
+    "library_supported": 77,
+    "unresolved_entity": 7055
+  },
+  "parameters": {
+    "precursor_ppm": 10.0,
+    "fragment_da": 0.02,
+    "minimum_wse": 0.7,
+    "minimum_matched_peaks": 6,
+    "reference_library": "frozen GNPS Gold/Silver positive [M+H]+ development library"
+  },
+  "leakage_status": "only study/entity identifiers, representative MS/MS and the frozen library were read; no beta, SE, contrast label, registered relation, rank or retrieval truth was loaded",
+  "provenance": {
+    "contract_sha256": "0760fefb1a28519cd79cb7578b2b2afceff99aaffd198f7c14fff929100370e9",
+    "contract_lineage_sha256": {
+      "tasks\\contrast_atlas_open_collection_v1.json": "259b7fe26841501ce2c82ac4b61becb6ee8657491f3417fb483cd385bf267a98",
+      "tasks\\contrast_atlas_open_collection_ibd_extension_v1.json": "b4e08b9df7796e02515574942d331724b3cc929543a4919ead624f10690de83a",
+      "tasks\\contrast_atlas_open_collection_fbmn_systematic_extension_v1.json": "f07630c1327bffa8c6fd0398148bd09fddcc7ca6b39134a4dccb9f8b9de55c30",
+      "tasks\\contrast_atlas_open_collection_ibd3_extension_v1.json": "8f27a301dace04fcc42adba7e66093735b3a895b7d7f6b48c57f48560515ec1e",
+      "tasks\\contrast_atlas_open_collection_covid_extension_v1.json": "0760fefb1a28519cd79cb7578b2b2afceff99aaffd198f7c14fff929100370e9"
+    },
+    "response_entities_sha256": "6610987fe472a195e2fcf40ee6f7b7aae0477c063901436f2d05a9f0557f2330",
+    "source_manifest_sha256": "d14790782d06268e9926b3207e4caaf08032375b3a59db8c9159463d072265be",
+    "collection_report_sha256": "2dd3fa58bb36797ac5b8645924c81f5b6d1f4f0b48632f5684bc30f0ae47bbe0",
+    "representative_mgf_sha256": "8833c9a4a80b2ac508875395ff9e3750075e2616dc42532d55875a63ce33a8c8",
+    "representative_mgf_override": false,
+    "library_manifest_sha256": "ab1d04418c89a5fc163d706c8fd79023c8f0e8c6957db99a302e98e9eac6de80",
+    "library_mgf_sha256": "b813c9e85cdfa4c85d0c6585ffa0f6ffa03e74fa4ce5f12af861d219bd95afae",
+    "identity_partition_sha256": "25879473c082902d3a01dadd33694d12d7c306f9ad3a15e3c4c1410db61c2225",
+    "implementation_sha256": "cd72b73e8d396c4f6198a784c1c27f55829d964b23d1e59926ecb47ac894355d"
+  },
+  "claim_boundary": "Library-supported is a strict common control, not MSI level-1 identity. Unresolved means no qualifying hit under this library contract, not novelty."
+}

@@ -1,0 +1,55 @@
+{
+  "schema": "contrast_atlas_frozen_base_append_v1",
+  "status": "DEVELOPMENT_CONSUMED_FROZEN_BASE_EXTENSION_COMPLETE",
+  "data_role": "development_consumed",
+  "denominators": {
+    "independent_studies": 15,
+    "source_families": 15,
+    "study_level_contrasts": 51,
+    "eligible_response_rows": 238412,
+    "unique_study_entities": 54861,
+    "base_response_rows_preserved": 91295,
+    "new_response_rows": 147117,
+    "registered_directional_relations": 42,
+    "new_registered_directional_relations": 32,
+    "source_disjoint_candidates_per_query_min": 39,
+    "source_disjoint_candidates_per_query_max": 50
+  },
+  "frozen_base_protection": {
+    "rule": "all pre-existing source, contrast and response rows come from the frozen base; only explicitly new studies are selected from the staged contract replay",
+    "base_status": "DEVELOPMENT_CONSUMED_PLATE_CONFOUNDING_SENSITIVITY_COMPLETE",
+    "staged_status": "DEVELOPMENT_CONSUMED_OPEN_RESPONSE_COLLECTION_FROZEN",
+    "new_studies": [
+      "MSV000094899",
+      "MSV000096724",
+      "MSV000093571"
+    ]
+  },
+  "leakage_status": "mechanical append by registered study IDs; no candidate score, rank, response relation outcome, or model prediction was read",
+  "provenance": {
+    "base_report_sha256": "2dd3fa58bb36797ac5b8645924c81f5b6d1f4f0b48632f5684bc30f0ae47bbe0",
+    "staged_extension_report_sha256": "3aeef5e2f71281afae3624baf17fa55f797beb4a93d40bb9ed6cc0fac346fd6c",
+    "extension_contract_sha256": "fc11d2efffa281383ffa1795cfc9445f13682169c0163fb820a290059db44bbb",
+    "base_response_entities.tsv.gz": "6610987fe472a195e2fcf40ee6f7b7aae0477c063901436f2d05a9f0557f2330",
+    "base_source_manifest.tsv": "d14790782d06268e9926b3207e4caaf08032375b3a59db8c9159463d072265be",
+    "base_contrast_manifest.tsv": "c83a5b88e326553330e590eff80437194930e6f3d8122c4627f6ab429118e68b",
+    "base_registered_relations.tsv": "61c4473d200e29a4210dd18b55c3b222dd9819c8a7a63a0d0c71e1289be720fc",
+    "staged_extension_response_entities.tsv.gz": "b56c0553e960bb5f76ae7464e3d8881bf10900abf33d9c9e12feb94958f96bee",
+    "staged_extension_source_manifest.tsv": "d48b24c1c8eb2685b083312350936faef3515ad9c3c9d4241c08c96c22b30d9b",
+    "staged_extension_contrast_manifest.tsv": "c9059e76814b46f045ec63b7ee14079a0fba0922c9184cb5a1c468c6f4ec2642",
+    "staged_extension_registered_relations.tsv": "bddfdd8f661e274727a11bda606fd082e7110b7ff6a3b8dcb528612e42b3618b",
+    "implementation_sha256": "7c9a04906768a7a022009afc5b067d734c62b6bbd2d2e3ebc9681b086df98006"
+  },
+  "output_sha256": {
+    "response_entities.tsv.gz": "6f6fa005983b9172c4f2cb7aa055feedd2165de90b6ce7c482eaa56af6b8de75",
+    "source_manifest.tsv": "5b9e2e02eebb34bba6c54a6000b7ea0bbdf3132f3376a9ddfeb17b8e84311448",
+    "contrast_manifest.tsv": "a3b46e4dcacd65a5845e7b319db3decff8cbe64a242ec65116ff7dd48fc5089c",
+    "registered_relations.tsv": "8fba3fe5652773c68740d5237e02d0db314a2185b3c12c7581c3c9e4ced4014c"
+  },
+  "claim_boundary": [
+    "The pre-existing IBD200 Plate3 correction is preserved and not reconstructed from its older contract artifact.",
+    "New exact-drug relations are development/consumed and come from one broader ChemProp project.",
+    "Post-hoc obesity relations remain marked ineligible for primary relevance.",
+    "This append operation contains no retrieval-performance claim."
+  ]
+}

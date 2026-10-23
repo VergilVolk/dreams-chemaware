@@ -4,10 +4,30 @@ import pandas as pd
 from calibrate_contrast_atlas_sparse_local_response import (
     build_profile_matrices,
     connected_relation_components,
+    directional_response_energy_matrices,
     directional_score_matrices,
     permutation_indices,
     prepare_graphs,
 )
+
+
+def test_response_energy_kernel_uses_complete_world_denominator():
+    source = np.asarray([[1.0], [1.0]])
+    target = np.asarray([[1.0], [1.0]])
+    similar, opposite, unsigned = directional_response_energy_matrices(
+        source,
+        target,
+        np.asarray([0]),
+        np.asarray([0]),
+        np.asarray([1.0]),
+        np.asarray([0, 1]),
+        np.asarray([0, 1]),
+    )
+    # One of two unit-energy entities is chemically supported; missing support
+    # therefore contributes zero instead of being removed from the denominator.
+    assert np.allclose(similar, [[0.5]])
+    assert np.allclose(opposite, [[0.0]])
+    assert np.allclose(unsigned, [[0.5]])
 
 
 def test_directional_score_matrices_match_hand_calculation():

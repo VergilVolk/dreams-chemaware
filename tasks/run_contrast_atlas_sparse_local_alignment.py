@@ -338,13 +338,13 @@ def main() -> None:
                 (~relations["expected_signed_direction"].str.lower().eq("unspecified")).sum()
             ),
             "unregistered_pairs": "unadjudicated, never negative",
-            "pass_fail": "not adjudicated because every registered direction is unspecified",
+            "pass_fail": "not adjudicated because no registered relation supplies signed metabolite-level truth or a frozen pass gate",
         },
         "sources": source_reports,
         "claim_boundary": [
-            "This is a complete 12-study development run, not external validation.",
+            f"This is a complete {len(studies)}-study development-consumed run, not external validation.",
             "Registered condition-family relevance is not metabolite-level signed truth.",
-            "Top-1 counts are descriptive because only two biological relation components are registered.",
+            f"Top-1 counts are descriptive across {int(relations['relation_direction'].eq('registered').sum())} canonical registered relations with heterogeneous evidence qualification.",
             "Unresolved means not supported by the common strict library policy, not a unique unknown molecule.",
             "Feature rows may retain adduct and isotope redundancy.",
         ],

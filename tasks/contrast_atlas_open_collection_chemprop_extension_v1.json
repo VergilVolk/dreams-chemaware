@@ -1,0 +1,182 @@
+{
+  "schema": "contrast_atlas_open_collection_extension_v1",
+  "base_contract": "tasks/contrast_atlas_open_collection_covid_extension_v1.json",
+  "data_role": "development_consumed",
+  "sources": [
+    {
+      "study_id": "MSV000094899",
+      "source_family": "MSV000094899_chemprop2_time_series",
+      "species": "human-derived gut microbial community",
+      "biospecimen": "microbial culture supernatant",
+      "biological_units": 36,
+      "effect_adapter": "flat_csv",
+      "effects_path": "data/validation/contrast_atlas_chemprop_sources_v1_20261023/MSV000094899/effects.tsv",
+      "effects_sep": "\t",
+      "effect_report_path": "data/validation/contrast_atlas_chemprop_sources_v1_20261023/MSV000094899/report.json",
+      "expected_effect_status": "CHEMPROP_CONTRAST_ATLAS_SOURCE_PREPARED",
+      "entity_column": "entity_id",
+      "beta_column": "beta",
+      "se_column": "se",
+      "prevalence_column": "prevalence",
+      "effect_model_column": "effect_model",
+      "mgf_path": "data/reference/chemprop2_m1_20261011/consensus.mgf",
+      "mgf_report_path": "data/validation/contrast_atlas_chemprop_sources_v1_20261023/MSV000094899/report.json",
+      "expected_mgf_status": "CHEMPROP_CONTRAST_ATLAS_SOURCE_PREPARED",
+      "nonempty_ms2_spectra": 8055,
+      "identity_path": "data/validation/contrast_atlas_chemprop_sources_v1_20261023/MSV000094899/source_native_identity.tsv",
+      "identity_sep": "\t",
+      "identity_entity_column": "entity_id",
+      "identity_status_column": "identity_status",
+      "identity_status_map": {
+        "unresolved_entity": "unresolved_entity"
+      },
+      "identity_partition_boundary": "structure-hidden source preparation; replaced by the common strict library policy before known/unresolved comparison",
+      "contrasts": {
+        "drug_cilnidipine": {"design": "Cilnidipine microbial transformation response at T2 relative to T0 and abiotic control", "condition_family": "chemprop_drug_cilnidipine", "independent_units": 3},
+        "drug_clomifen": {"design": "Clomifen microbial transformation response at T2 relative to T0 and abiotic control", "condition_family": "chemprop_drug_clomifen", "independent_units": 3},
+        "drug_erythromycin": {"design": "Erythromycin microbial transformation response at T2 relative to T0 and abiotic control", "condition_family": "chemprop_drug_erythromycin", "independent_units": 3},
+        "drug_ketoconazole": {"design": "Ketoconazole microbial transformation response at T2 relative to T0 and abiotic control", "condition_family": "chemprop_drug_ketoconazole", "independent_units": 3},
+        "drug_lansoprazole": {"design": "Lansoprazole microbial transformation response at T2 relative to T0 and abiotic control", "condition_family": "chemprop_drug_lansoprazole", "independent_units": 3},
+        "drug_loratadine": {"design": "Loratadine microbial transformation response at T2 relative to T0 and abiotic control", "condition_family": "chemprop_drug_loratadine", "independent_units": 3},
+        "drug_metronidazole": {"design": "Metronidazole microbial transformation response at T2 relative to T0 and abiotic control", "condition_family": "chemprop_drug_metronidazole", "independent_units": 3},
+        "drug_montelukast": {"design": "Montelukast microbial transformation response at T2 relative to T0 and abiotic control", "condition_family": "chemprop_drug_montelukast", "independent_units": 3},
+        "drug_omeprazole": {"design": "Omeprazole microbial transformation response at T2 relative to T0 and abiotic control", "condition_family": "chemprop_drug_omeprazole", "independent_units": 3},
+        "drug_sertraline": {"design": "Sertraline microbial transformation response at T2 relative to T0 and abiotic control", "condition_family": "chemprop_drug_sertraline", "independent_units": 3},
+        "drug_simvastatin": {"design": "Simvastatin microbial transformation response at T2 relative to T0 and abiotic control", "condition_family": "chemprop_drug_simvastatin", "independent_units": 3},
+        "drug_telmisartan": {"design": "Telmisartan microbial transformation response at T2 relative to T0 and abiotic control", "condition_family": "chemprop_drug_telmisartan", "independent_units": 3}
+      }
+    },
+    {
+      "study_id": "MSV000096724",
+      "source_family": "MSV000096724_chemprop_23drug_endpoint",
+      "species": "human-derived gut microbial community",
+      "biospecimen": "microbial culture supernatant",
+      "biological_units": 6,
+      "effect_adapter": "flat_csv",
+      "effects_path": "data/validation/contrast_atlas_chemprop_sources_v1_20261023/MSV000096724/effects.tsv",
+      "effects_sep": "\t",
+      "effect_report_path": "data/validation/contrast_atlas_chemprop_sources_v1_20261023/MSV000096724/report.json",
+      "expected_effect_status": "CHEMPROP_CONTRAST_ATLAS_SOURCE_PREPARED",
+      "entity_column": "entity_id",
+      "beta_column": "beta",
+      "se_column": "se",
+      "prevalence_column": "prevalence",
+      "effect_model_column": "effect_model",
+      "mgf_path": "data/reference/chemprop_cross_design_20261011/chemprop_23drug/spectra/specs_ms.mgf",
+      "mgf_report_path": "data/validation/contrast_atlas_chemprop_sources_v1_20261023/MSV000096724/report.json",
+      "expected_mgf_status": "CHEMPROP_CONTRAST_ATLAS_SOURCE_PREPARED",
+      "nonempty_ms2_spectra": 4429,
+      "identity_path": "data/validation/contrast_atlas_chemprop_sources_v1_20261023/MSV000096724/source_native_identity.tsv",
+      "identity_sep": "\t",
+      "identity_entity_column": "entity_id",
+      "identity_status_column": "identity_status",
+      "identity_status_map": {
+        "unresolved_entity": "unresolved_entity"
+      },
+      "identity_partition_boundary": "structure-hidden source preparation; replaced by the common strict library policy before known/unresolved comparison",
+      "contrasts": {
+        "drug_cilnidipine": {"design": "Cilnidipine endpoint microbial transformation response relative to abiotic control", "condition_family": "chemprop_drug_cilnidipine", "independent_units": 2},
+        "drug_clomifen": {"design": "Clomifen endpoint microbial transformation response relative to abiotic control", "condition_family": "chemprop_drug_clomifen", "independent_units": 2},
+        "drug_erythromycin": {"design": "Erythromycin endpoint microbial transformation response relative to abiotic control", "condition_family": "chemprop_drug_erythromycin", "independent_units": 2}
+      }
+    },
+    {
+      "study_id": "MSV000093571",
+      "source_family": "MSV000093571_chemprop_45drug_endpoint",
+      "species": "human-derived gut microbial community",
+      "biospecimen": "microbial culture supernatant",
+      "biological_units": 27,
+      "effect_adapter": "flat_csv",
+      "effects_path": "data/validation/contrast_atlas_chemprop_sources_v1_20261023/MSV000093571/effects.tsv",
+      "effects_sep": "\t",
+      "effect_report_path": "data/validation/contrast_atlas_chemprop_sources_v1_20261023/MSV000093571/report.json",
+      "expected_effect_status": "CHEMPROP_CONTRAST_ATLAS_SOURCE_PREPARED",
+      "entity_column": "entity_id",
+      "beta_column": "beta",
+      "se_column": "se",
+      "prevalence_column": "prevalence",
+      "effect_model_column": "effect_model",
+      "mgf_path": "data/reference/chemprop_cross_design_20261011/chemprop_45drug/spectra/specs_ms.mgf",
+      "mgf_report_path": "data/validation/contrast_atlas_chemprop_sources_v1_20261023/MSV000093571/report.json",
+      "expected_mgf_status": "CHEMPROP_CONTRAST_ATLAS_SOURCE_PREPARED",
+      "nonempty_ms2_spectra": 4130,
+      "identity_path": "data/validation/contrast_atlas_chemprop_sources_v1_20261023/MSV000093571/source_native_identity.tsv",
+      "identity_sep": "\t",
+      "identity_entity_column": "entity_id",
+      "identity_status_column": "identity_status",
+      "identity_status_map": {
+        "unresolved_entity": "unresolved_entity"
+      },
+      "identity_partition_boundary": "structure-hidden source preparation; replaced by the common strict library policy before known/unresolved comparison",
+      "contrasts": {
+        "drug_ketoconazole": {"design": "Ketoconazole endpoint microbial transformation response relative to abiotic control", "condition_family": "chemprop_drug_ketoconazole", "independent_units": 3},
+        "drug_lansoprazole": {"design": "Lansoprazole endpoint microbial transformation response relative to abiotic control", "condition_family": "chemprop_drug_lansoprazole", "independent_units": 3},
+        "drug_loratadine": {"design": "Loratadine endpoint microbial transformation response relative to abiotic control", "condition_family": "chemprop_drug_loratadine", "independent_units": 3},
+        "drug_metronidazole": {"design": "Metronidazole endpoint microbial transformation response relative to abiotic control", "condition_family": "chemprop_drug_metronidazole", "independent_units": 3},
+        "drug_montelukast": {"design": "Montelukast endpoint microbial transformation response relative to abiotic control", "condition_family": "chemprop_drug_montelukast", "independent_units": 3},
+        "drug_omeprazole": {"design": "Omeprazole endpoint microbial transformation response relative to abiotic control", "condition_family": "chemprop_drug_omeprazole", "independent_units": 3},
+        "drug_sertraline": {"design": "Sertraline endpoint microbial transformation response relative to abiotic control", "condition_family": "chemprop_drug_sertraline", "independent_units": 3},
+        "drug_simvastatin": {"design": "Simvastatin endpoint microbial transformation response relative to abiotic control", "condition_family": "chemprop_drug_simvastatin", "independent_units": 3},
+        "drug_telmisartan": {"design": "Telmisartan endpoint microbial transformation response relative to abiotic control", "condition_family": "chemprop_drug_telmisartan", "independent_units": 3}
+      }
+    }
+  ],
+  "registered_relations": [
+    {
+      "left_study_id": "MSV000084112", "left_contrast_id": "obesity_with_diabetes", "right_study_id": "MSV000083077", "right_contrast_id": "obesity_high_depression",
+      "relation_class": "posthoc_registered_cross_source_obesity_family", "expected_signed_direction": "unspecified", "eligible_primary_relevance": false,
+      "evidence_boundary": "human obesity contrasts across independent urine and saliva studies with different T1D and depressive-symptom strata; registered after earlier development scores existed and therefore descriptive only", "signed_truth_claimed": false
+    },
+    {
+      "left_study_id": "MSV000084112", "left_contrast_id": "obesity_with_diabetes", "right_study_id": "MSV000083077", "right_contrast_id": "obesity_low_depression",
+      "relation_class": "posthoc_registered_cross_source_obesity_family", "expected_signed_direction": "unspecified", "eligible_primary_relevance": false,
+      "evidence_boundary": "human obesity contrasts across independent urine and saliva studies with different T1D and depressive-symptom strata; registered after earlier development scores existed and therefore descriptive only", "signed_truth_claimed": false
+    },
+    {
+      "left_study_id": "MSV000084112", "left_contrast_id": "obesity_without_diabetes", "right_study_id": "MSV000083077", "right_contrast_id": "obesity_high_depression",
+      "relation_class": "posthoc_registered_cross_source_obesity_family", "expected_signed_direction": "unspecified", "eligible_primary_relevance": false,
+      "evidence_boundary": "human obesity contrasts across independent urine and saliva studies with different T1D and depressive-symptom strata; registered after earlier development scores existed and therefore descriptive only", "signed_truth_claimed": false
+    },
+    {
+      "left_study_id": "MSV000084112", "left_contrast_id": "obesity_without_diabetes", "right_study_id": "MSV000083077", "right_contrast_id": "obesity_low_depression",
+      "relation_class": "posthoc_registered_cross_source_obesity_family", "expected_signed_direction": "unspecified", "eligible_primary_relevance": false,
+      "evidence_boundary": "human obesity contrasts across independent urine and saliva studies with different T1D and depressive-symptom strata; registered after earlier development scores existed and therefore descriptive only", "signed_truth_claimed": false
+    },
+    {
+      "left_study_id": "MSV000094899", "left_contrast_id": "drug_cilnidipine", "right_study_id": "MSV000096724", "right_contrast_id": "drug_cilnidipine", "relation_class": "consumed_exact_drug_cross_design", "expected_signed_direction": "unspecified", "eligible_primary_relevance": true, "evidence_boundary": "same drug and microbial-transformation estimand across separate accessions within one ChemProp project; prior cross-design outcomes are consumed and this is not cross-laboratory confirmation", "signed_truth_claimed": false
+    },
+    {
+      "left_study_id": "MSV000094899", "left_contrast_id": "drug_clomifen", "right_study_id": "MSV000096724", "right_contrast_id": "drug_clomifen", "relation_class": "consumed_exact_drug_cross_design", "expected_signed_direction": "unspecified", "eligible_primary_relevance": true, "evidence_boundary": "same drug and microbial-transformation estimand across separate accessions within one ChemProp project; prior cross-design outcomes are consumed and this is not cross-laboratory confirmation", "signed_truth_claimed": false
+    },
+    {
+      "left_study_id": "MSV000094899", "left_contrast_id": "drug_erythromycin", "right_study_id": "MSV000096724", "right_contrast_id": "drug_erythromycin", "relation_class": "consumed_exact_drug_cross_design", "expected_signed_direction": "unspecified", "eligible_primary_relevance": true, "evidence_boundary": "same drug and microbial-transformation estimand across separate accessions within one ChemProp project; prior cross-design outcomes are consumed and this is not cross-laboratory confirmation", "signed_truth_claimed": false
+    },
+    {
+      "left_study_id": "MSV000094899", "left_contrast_id": "drug_ketoconazole", "right_study_id": "MSV000093571", "right_contrast_id": "drug_ketoconazole", "relation_class": "consumed_exact_drug_cross_design", "expected_signed_direction": "unspecified", "eligible_primary_relevance": true, "evidence_boundary": "same drug and microbial-transformation estimand across separate accessions within one ChemProp project; prior cross-design outcomes are consumed and this is not cross-laboratory confirmation", "signed_truth_claimed": false
+    },
+    {
+      "left_study_id": "MSV000094899", "left_contrast_id": "drug_lansoprazole", "right_study_id": "MSV000093571", "right_contrast_id": "drug_lansoprazole", "relation_class": "consumed_exact_drug_cross_design", "expected_signed_direction": "unspecified", "eligible_primary_relevance": true, "evidence_boundary": "same drug and microbial-transformation estimand across separate accessions within one ChemProp project; prior cross-design outcomes are consumed and this is not cross-laboratory confirmation", "signed_truth_claimed": false
+    },
+    {
+      "left_study_id": "MSV000094899", "left_contrast_id": "drug_loratadine", "right_study_id": "MSV000093571", "right_contrast_id": "drug_loratadine", "relation_class": "consumed_exact_drug_cross_design", "expected_signed_direction": "unspecified", "eligible_primary_relevance": true, "evidence_boundary": "same drug and microbial-transformation estimand across separate accessions within one ChemProp project; prior cross-design outcomes are consumed and this is not cross-laboratory confirmation", "signed_truth_claimed": false
+    },
+    {
+      "left_study_id": "MSV000094899", "left_contrast_id": "drug_metronidazole", "right_study_id": "MSV000093571", "right_contrast_id": "drug_metronidazole", "relation_class": "consumed_exact_drug_cross_design", "expected_signed_direction": "unspecified", "eligible_primary_relevance": true, "evidence_boundary": "same drug and microbial-transformation estimand across separate accessions within one ChemProp project; prior cross-design outcomes are consumed and this is not cross-laboratory confirmation", "signed_truth_claimed": false
+    },
+    {
+      "left_study_id": "MSV000094899", "left_contrast_id": "drug_montelukast", "right_study_id": "MSV000093571", "right_contrast_id": "drug_montelukast", "relation_class": "consumed_exact_drug_cross_design", "expected_signed_direction": "unspecified", "eligible_primary_relevance": true, "evidence_boundary": "same drug and microbial-transformation estimand across separate accessions within one ChemProp project; prior cross-design outcomes are consumed and this is not cross-laboratory confirmation", "signed_truth_claimed": false
+    },
+    {
+      "left_study_id": "MSV000094899", "left_contrast_id": "drug_omeprazole", "right_study_id": "MSV000093571", "right_contrast_id": "drug_omeprazole", "relation_class": "consumed_exact_drug_cross_design", "expected_signed_direction": "unspecified", "eligible_primary_relevance": true, "evidence_boundary": "same drug and microbial-transformation estimand across separate accessions within one ChemProp project; prior cross-design outcomes are consumed and this is not cross-laboratory confirmation", "signed_truth_claimed": false
+    },
+    {
+      "left_study_id": "MSV000094899", "left_contrast_id": "drug_sertraline", "right_study_id": "MSV000093571", "right_contrast_id": "drug_sertraline", "relation_class": "consumed_exact_drug_cross_design", "expected_signed_direction": "unspecified", "eligible_primary_relevance": true, "evidence_boundary": "same drug and microbial-transformation estimand across separate accessions within one ChemProp project; prior cross-design outcomes are consumed and this is not cross-laboratory confirmation", "signed_truth_claimed": false
+    },
+    {
+      "left_study_id": "MSV000094899", "left_contrast_id": "drug_simvastatin", "right_study_id": "MSV000093571", "right_contrast_id": "drug_simvastatin", "relation_class": "consumed_exact_drug_cross_design", "expected_signed_direction": "unspecified", "eligible_primary_relevance": true, "evidence_boundary": "same drug and microbial-transformation estimand across separate accessions within one ChemProp project; prior cross-design outcomes are consumed and this is not cross-laboratory confirmation", "signed_truth_claimed": false
+    },
+    {
+      "left_study_id": "MSV000094899", "left_contrast_id": "drug_telmisartan", "right_study_id": "MSV000093571", "right_contrast_id": "drug_telmisartan", "relation_class": "consumed_exact_drug_cross_design", "expected_signed_direction": "unspecified", "eligible_primary_relevance": true, "evidence_boundary": "same drug and microbial-transformation estimand across separate accessions within one ChemProp project; prior cross-design outcomes are consumed and this is not cross-laboratory confirmation", "signed_truth_claimed": false
+    }
+  ]
+}
