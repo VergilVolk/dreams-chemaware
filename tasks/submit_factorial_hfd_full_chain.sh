@@ -10,8 +10,9 @@ embedding_job=$(sbatch --parsable --dependency="afterok:${panel_job}" tasks/run_
 identity_job=$(sbatch --parsable --dependency="afterok:${panel_job}" tasks/run_factorial_hfd_identity_partitions.sbatch)
 identity_finalize_job=$(sbatch --parsable --dependency="afterok:${identity_job}" tasks/run_factorial_hfd_identity_finalize.sbatch)
 index_job=$(sbatch --parsable --dependency="afterok:${embedding_job}:${identity_finalize_job}" tasks/run_factorial_hfd_pretruth_index.sbatch)
+local_response_job=$(sbatch --parsable --dependency="afterok:${index_job}" tasks/run_factorial_hfd_local_response.sbatch)
 robustness_job=$(sbatch --parsable --dependency="afterok:${index_job}" tasks/run_factorial_hfd_pretruth_robustness.sbatch)
-open_job=$(sbatch --parsable --dependency="afterok:${robustness_job}" tasks/run_factorial_hfd_freeze_and_open_primary.sbatch)
+open_job=$(sbatch --parsable --dependency="afterok:${robustness_job}:${local_response_job}" tasks/run_factorial_hfd_freeze_and_open_primary.sbatch)
 
 printf '%s\n' \
   "FACTORIAL_HFD_CHAIN_SUBMITTED" \
@@ -22,5 +23,6 @@ printf '%s\n' \
   "identity_partitions=${identity_job}" \
   "identity_finalize=${identity_finalize_job}" \
   "pretruth_index=${index_job}" \
+  "local_directed_response=${local_response_job}" \
   "pretruth_robustness=${robustness_job}" \
   "freeze_and_open=${open_job}"

@@ -55,3 +55,9 @@ python -u tasks/evaluate_factorial_hfd_count_matched_unresolved.py \
   --known-scores "$RETRIEVAL/retrieval_scores.tsv.gz" \
   --output-dir data/validation/factorial_hfd_count_matched_adjudication_official_v1_20261023 \
   --required-fraction 0.80
+
+python -u tasks/evaluate_factorial_hfd_local_response.py \
+  --local-scores data/validation/factorial_hfd_local_directed_official_v1_20261023/local_directed_retrieval_scores.tsv.gz \
+  --edge-contributions data/validation/factorial_hfd_local_directed_official_v1_20261023/local_edge_contributions.tsv.gz \
+  --mean-scores "$RETRIEVAL/retrieval_scores.tsv.gz" \
+  --output-dir data/validation/factorial_hfd_local_vs_mean_official_v1_20261023
