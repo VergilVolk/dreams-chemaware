@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 """Fast CPU contracts for the one-shot anchor-conditioned repair."""
 from pathlib import Path
+from tempfile import TemporaryDirectory
 
 import numpy as np
 import torch
@@ -10,9 +11,15 @@ from train_b_anchor_conditioned_family_repair import (
     anchored_training_features,
     dynamic_hardest_false_loss,
     fit_standardizer,
+    fit_repair,
     msg_logit,
     static_family_features,
     strongest_false_positions,
+)
+from apply_b_anchor_conditioned_family_repair import (
+    family_inference_features,
+    query_repair_eligibility,
+    write_candidate_table,
 )
 
 
@@ -65,6 +72,45 @@ def main() -> None:
     observed = dynamic_hardest_false_loss(scores, labels_t, ptr_t)
     expected = torch.nn.functional.softplus(torch.tensor([1.0 - 2.0, 1.1 - 0.4])).mean()
     assert torch.allclose(observed, expected)
+
+    repair_panel = {
+        "static_features": np.tile(static[:2], (3, 1)).astype(np.float32),
+        "query_ptr": np.asarray([0, 2, 4, 6], dtype=np.int64),
+        "labels": np.asarray([1, 0, 0, 1, 1, 0], dtype=np.int8),
+    }
+    nested_repair = np.asarray([0.8, 0.1, 0.2, 0.7, np.nan, np.nan], dtype=np.float32)
+    fitted = fit_repair(
+        repair_panel, np.asarray([0, 1], dtype=np.int64), nested_repair,
+        {"hidden": 4, "learning_rate": 0.01, "epochs": 2, "trust_weight": 0.05},
+        19, "cpu",
+    )
+    assert np.isfinite(fitted[5]["total"])
+
+    # Deployment keeps zero/single/missing-family queries and falls back to B.
+    inference = {
+        "module_names": bundle["module_names"],
+        "scores": np.asarray([
+            [0.4, 0.9, 0.2], [0.5, 0.8, 0.1], [0.6, 0.7, 0.3],
+        ], dtype=np.float32),
+        "availability": np.asarray([
+            [1, 1, 1], [1, 1, 1], [1, 1, 0],
+        ], dtype=np.int8),
+        "query_ptr": np.asarray([0, 0, 1, 3], dtype=np.int64),
+        "query_ids": np.asarray(["q0", "q1", "q2"]),
+        "candidate_ids": np.asarray(["c0", "c1", "c2"]),
+    }
+    deployed, available, _ = family_inference_features(inference)
+    eligible_query, eligible_candidate = query_repair_eligibility(
+        inference["query_ptr"], available,
+    )
+    assert deployed.shape == (3, 9)
+    assert eligible_query.tolist() == [False, False, False]
+    assert eligible_candidate.tolist() == [False, False, False]
+    with TemporaryDirectory() as temporary:
+        table = Path(temporary) / "scores.tsv.gz"
+        values = np.asarray([0.1, 0.2, 0.3], dtype=np.float32)
+        write_candidate_table(table, inference, values, values, np.zeros(3), eligible_candidate)
+        assert table.stat().st_size > 0
 
     sbatch = (Path(__file__).resolve().parent / "run_b_anchor_conditioned_family_repair.sbatch").read_text()
     assert "#SBATCH --gpus=1" in sbatch and "#SBATCH --cpus-per-task=10" in sbatch

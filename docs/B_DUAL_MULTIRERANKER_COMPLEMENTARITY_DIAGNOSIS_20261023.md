@@ -75,7 +75,7 @@ complete arm 中达到至少 95% 残差上界的候选仅 `0.168%/0.168%`，出�
 2. **按证据家族校准**：Stage-1、Phase-A、MSG 分别保留自己的 raw/gap/margin；不再对 MSG 与 P2b 直接做分数差。所有尺度和单调校准只在每个 outer-train fold 内拟合。
 3. **排名目标直接对齐错误交换**：在相同 nested formula-OOF 下，以 positive-vs-current-top competitor 的候选对损失训练，并同时报告 corrected/introduced；不以 listwise loss 下降替代 Top-1 改善。
 
-固定比较仅需三项：B、当前失败的 complete arm、修复后的 anchor-conditioned family model。若修复模型仍不能在两个面板同时超过 B，停止这条分数级融合线；这时才有依据转向使用 1024 维 embedding 邻域几何的独立表示实验。若胜出，再用同一架构做 encoder、MSG、V2 留一消融，不能先用真值 oracle 选择专家。
+固定比较仅需三项：B、当前失败的 complete arm、修复后的 anchor-conditioned family model。若修复模型仍不能在两个面板同时超过 B，只能裁决该固定修复不晋级；这既不能证明所有分数级融合都无效，也没有检验完整 embedding 整合。若胜出，再用同一架构做 encoder、MSG、V2 留一消融，不能先用真值 oracle 选择专家。
 
 ## 可复现入口
 
@@ -96,4 +96,6 @@ sbatch tasks/run_b_anchor_conditioned_family_repair.sbatch \
 
 该作业只训练严格 nested formula-OOF 的一个修复臂。相对 `run_2400157` 固定改变三项：显式输入 B 状态；Stage-1、Phase-A 与 MSG 分家族表达；以正确候选对 B 最强错误竞争者的 pairwise loss 代替通用 listwise loss。父 B 的 seed、fold、hidden width、epoch、learning rate、trust weight 和 residual-bound 规则均保持不变。
 
-为节省成本，嵌套父链只重建 B，不再同时重建本轮不需要的 A；10 个无序 fold pair 各拟合一次 B，可分别服务对应的两个 outer folds。作业不读取 MassSpecGym 或 Enveda，不扫描参数。成功时保存开发候选 checkpoint；双面板未同时以正 CI 超过 B 时，输出 `KEEP_B_REFERENCE_STOP_SCORE_LEVEL_REPAIR`，不再继续调分数融合。
+为节省成本，嵌套父链只重建 B，不再同时重建本轮不需要的 A；10 个无序 fold pair 各拟合一次 B，可分别服务对应的两个 outer folds。作业不读取 MassSpecGym 或 Enveda，不扫描参数。成功时保存开发候选 checkpoint；双面板未同时以正 CI 超过 B 时，输出 `KEEP_B_REFERENCE_REPAIR_NOT_PROMOTED`。
+
+这一修复仍然是 12 维候选分数模型，并不读取 Stage-1 或 Phase-A 的 1024 维表示，因此不得称为已经完成双 embedding 整合。表示层的邻域几何或其他保真整合属于另一项独立方法问题。

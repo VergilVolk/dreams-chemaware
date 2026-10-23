@@ -398,7 +398,7 @@ def main() -> None:
         })
     report["selection"] = (
         "FREEZE_ANCHOR_CONDITIONED_FAMILY_DEVELOPMENT_CANDIDATE" if passed
-        else "KEEP_B_REFERENCE_STOP_SCORE_LEVEL_REPAIR"
+        else "KEEP_B_REFERENCE_REPAIR_NOT_PROMOTED"
     )
     report["claim_boundary"] = (
         "Single pre-specified repair on consumed GNPS development data. "
