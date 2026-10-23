@@ -44,9 +44,8 @@ The corrected implementation uses nested formula cross-fitting:
 2. generate A/B anchors for the outer training set by inner cross-fitting while
    excluding k from every inner parent fit;
 3. train the incremental head only on those nested anchors;
-4. fit an outer parent without k and score k once;
-5. verify that regenerated outer A/B Top-1 candidates exactly reproduce the
-   frozen historical A/B ledger.
+4. use the exact frozen historical A/B OOF bytes for outer fold k; those parent
+   predictions were already fitted without k.
 
 For efficiency, a parent fitted while omitting folds `{a,b}` is reused to
 predict fold b inside outer fold a and fold a inside outer fold b.  Both uses
@@ -56,6 +55,13 @@ to the ten unordered pairs without weakening isolation.
 The final deployable incremental checkpoint follows conventional stacking: it
 is fitted on the full frozen OOF-B development ledger and is applied after the
 separately full-fitted frozen B checkpoint.
+
+The corrected job deliberately does not retrain the outer A/B parent.  An
+earlier strict check found five identity-query Top-1 changes out of 10,995 when
+retraining B on GPU (`0.9995452478` agreement), despite identical recipe and
+candidate axis.  That is numerical retraining drift, not a scientific reason
+to redefine the frozen B reference.  Nested parents remain newly fitted only
+for second-stage training rows, where they are required for isolation.
 
 ## Fixed comparison matrix
 
