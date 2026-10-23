@@ -1,0 +1,75 @@
+{
+  "status": "MSV000095331_ENTITY_METHOD_INCREMENT_COMPLETE",
+  "dataset": "MSV000095331 plus three ChemProp studies",
+  "dataset_role": "development_consumed_not_external_validation",
+  "candidate_axis": "complete same-observed-precursor 10-ppm identity hypotheses",
+  "methods": [
+    "weighted_spectral_entropy"
+  ],
+  "method_summary": {
+    "weighted_spectral_entropy": {
+      "forward_entity_queries": 22014,
+      "forward_selected_identity_hypotheses": 5491,
+      "forward_mutual_identity_hypotheses": 2402,
+      "prespecified_overlap_contexts": 30,
+      "prespecified_overlap_top1_contexts": 2,
+      "prespecified_overlap_median_rank": 10.5
+    }
+  },
+  "denominators": {
+    "new_study_response_entities": 7338,
+    "new_study_response_contrasts": 20,
+    "candidate_response_contrasts": 24,
+    "directional_entity_queries_per_method": 38628,
+    "identity_candidate_pairs": 22046
+  },
+  "biological_endpoint": {
+    "entity_selection": "method Top-1 followed by cross-direction mutual Top-1",
+    "response_score": "sum of matched response-weight products divided by fixed full-contrast L2 norms",
+    "spectral_score_enters_response_endpoint": false,
+    "prespecified_drug_overlap": {
+      "1": "drug_sertraline",
+      "3": "drug_omeprazole",
+      "4": "drug_loratadine"
+    },
+    "independence_note": "five microbial strata per mixture are repeated contexts, not independent studies"
+  },
+  "files": {
+    "entity_decisions": {
+      "path": "data\\validation\\msv000095331_entity_method_increment_wse_v2_20261023\\entity_method_decisions.tsv.gz",
+      "sha256": "48bc0ef6909921aa355b699ae712929a5443f61c5031b8024d314e21949852ab"
+    },
+    "method_transitions": {
+      "path": "data\\validation\\msv000095331_entity_method_increment_wse_v2_20261023\\method_transitions_vs_wse.tsv.gz",
+      "sha256": "07c794970ad0aab00ab8268756e27e3c20e762870add685649c41d3dfcdba88f"
+    },
+    "entity_response_support": {
+      "path": "data\\validation\\msv000095331_entity_method_increment_wse_v2_20261023\\entity_response_support.tsv.gz",
+      "sha256": "a68383a225c51f5f550c00e623df49ab2d569c978701e8212b000bfcae601c18"
+    },
+    "response_retrieval_scores": {
+      "path": "data\\validation\\msv000095331_entity_method_increment_wse_v2_20261023\\response_retrieval_scores.tsv.gz",
+      "sha256": "edcacd3d95a56544548efff88a7ef0584ec120e036bcfa35dd43bf7d24d1ea10"
+    },
+    "prespecified_overlap_results": {
+      "path": "data\\validation\\msv000095331_entity_method_increment_wse_v2_20261023\\prespecified_overlap_results.tsv",
+      "sha256": "b24c836c4118c5ac4711701770eded66eb919a1f71841ee5b65ad14721b7b941"
+    },
+    "priority_entities": {
+      "path": "data\\validation\\msv000095331_entity_method_increment_wse_v2_20261023\\priority_entities_for_algorithm_delta.tsv",
+      "sha256": "b93eb870551a28872427baf7936e553dc2400228aa648af7a08c21c96329204b"
+    }
+  },
+  "inputs": {
+    "candidate_pairs_sha256": "72de3fd1a7323b251461d399273d306bd093819a988ff5e60f9408938a93c4df",
+    "query_registry_sha256": "751c14626a8467d5bbfbf0dc8fda64f21507b121b104f967e6bf1c2a212b17ab",
+    "additional_method_tables": []
+  },
+  "claim_boundary": [
+    "Matched unresolved entities remain identity hypotheses without standards or orthogonal identity evidence.",
+    "Prespecified drug overlaps are positive controls; ranks across repeated microbial strata are not independent discoveries.",
+    "The response endpoint retains coverage and abstention costs and does not reward a method for its raw score scale.",
+    "A WSE-only run is a baseline, not evidence that the integrated algorithm changed biology.",
+    "Priority entities are post-response follow-up targets and must never be used to fit or tune the spectral model."
+  ]
+}

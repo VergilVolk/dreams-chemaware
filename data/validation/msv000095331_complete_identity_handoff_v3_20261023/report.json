@@ -1,0 +1,87 @@
+{
+  "status": "MSV000095331_COMPLETE_IDENTITY_HANDOFF_COMPLETE",
+  "dataset": "MSV000095331 plus three ChemProp studies",
+  "dataset_role": "development_consumed_not_external_validation",
+  "labels_accessed": false,
+  "response_effects_accessed": false,
+  "drug_names_accessed": false,
+  "registered_relations_accessed": false,
+  "candidate_axis": {
+    "track": "identity_hypothesis",
+    "rule": "all pairs within symmetric observed-precursor ppm window",
+    "precursor_ppm": 10.0,
+    "spectral_threshold_for_admission": null,
+    "neutral_mass_or_cross_adduct_inference": false
+  },
+  "wse_baseline": {
+    "fragment_tolerance_da": 0.02,
+    "minimum_score_for_admission": null,
+    "minimum_matched_fragments_for_admission": null
+  },
+  "denominators": {
+    "studies": 4,
+    "directional_study_pairs": 6,
+    "directional_queries": 38628,
+    "queries_without_mass_candidate": 27815,
+    "queries_with_one_mass_candidate": 6477,
+    "queries_with_multiple_mass_candidates": 4336,
+    "candidate_pairs": 22046,
+    "wse_queries_with_spectral_evidence": 9182,
+    "wse_mutual_top1_directions": 4804
+  },
+  "files": {
+    "candidate_pairs": {
+      "path": "data\\validation\\msv000095331_complete_identity_handoff_v3_20261023\\complete_identity_candidate_pairs.tsv.gz",
+      "sha256": "72de3fd1a7323b251461d399273d306bd093819a988ff5e60f9408938a93c4df"
+    },
+    "query_registry": {
+      "path": "data\\validation\\msv000095331_complete_identity_handoff_v3_20261023\\directional_query_registry.tsv.gz",
+      "sha256": "751c14626a8467d5bbfbf0dc8fda64f21507b121b104f967e6bf1c2a212b17ab"
+    },
+    "wse_entity_decisions": {
+      "path": "data\\validation\\msv000095331_complete_identity_handoff_v3_20261023\\wse_entity_decisions.tsv.gz",
+      "sha256": "faaed7269383839f2817a3f173cdb46015a1ad37045670898658c6afc67418d0"
+    },
+    "entity_registry": {
+      "path": "data\\validation\\msv000095331_complete_identity_handoff_v3_20261023\\study_entity_registry.tsv.gz",
+      "sha256": "eabe1802fbb0a2ebfbd2d607c84b3606711f9aaea43bb3a131a5f9e3ffeadda8"
+    },
+    "inference_axis": {
+      "path": "data\\validation\\msv000095331_complete_identity_handoff_v3_20261023\\wse_identity_inference_axis.npz",
+      "sha256": "9f54fe5d4af10fff8426c113e13585be4132a44f76427108874e950dc8318139"
+    }
+  },
+  "spectrum_loading": {
+    "MSV000095331": {
+      "mgf_spectra_total": 17889,
+      "response_spectra_nonempty": 7338,
+      "fragment_peaks": 93857
+    },
+    "MSV000094899": {
+      "mgf_spectra_total": 16245,
+      "response_spectra_nonempty": 8055,
+      "fragment_peaks": 351689
+    },
+    "MSV000096724": {
+      "mgf_spectra_total": 9153,
+      "response_spectra_nonempty": 4429,
+      "fragment_peaks": 139593
+    },
+    "MSV000093571": {
+      "mgf_spectra_total": 8581,
+      "response_spectra_nonempty": 4130,
+      "fragment_peaks": 98037
+    }
+  },
+  "required_algorithm_return": [
+    "candidate_pair_id",
+    "method_name",
+    "method_score",
+    "evidence_available"
+  ],
+  "claim_boundary": [
+    "The axis is complete for same-observed-precursor 10-ppm candidates, not for cross-adduct neutral entities.",
+    "Mass compatibility defines identity hypotheses but does not prove identity or resolve isomers.",
+    "The former WSE Top-20 axis remains a separate chemical-relation baseline and is not a universal admission gate."
+  ]
+}
