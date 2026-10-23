@@ -1,0 +1,108 @@
+{
+  "schema": "contrast_atlas_open_response_qualification_audit_v1",
+  "status": "DEVELOPMENT_CONSUMED_QUALIFICATION_COMPLETE_PRIMARY_TRUTH_INSUFFICIENT",
+  "data_role": "development_consumed",
+  "fixed_denominators": {
+    "studies": 12,
+    "source_families": 12,
+    "contrasts": 27,
+    "response_rows": 91295,
+    "unique_response_entities": 38247
+  },
+  "registered_relation_registry": {
+    "directional_registered_rows": 10,
+    "canonical_registered_relations": 5,
+    "connected_biological_relation_components": 2,
+    "component_sizes_in_contrasts": [
+      3,
+      3
+    ],
+    "component_members": [
+      [
+        "IBD200_GROUP::adult_all_ibd_vs_healthy",
+        "MSV000096564::baseline_ibd_vs_control",
+        "MSV000097610::pediatric_veoibd_vs_healthy"
+      ],
+      [
+        "MSV000088023::female_hfd_vs_normal",
+        "MSV000088023::male_hfd_vs_normal",
+        "MSV000097426::mouse_hfd_vs_nfd"
+      ]
+    ],
+    "query_contrasts_with_registered_target": 6,
+    "query_contrasts_without_registered_target": 21,
+    "source_disjoint_directional_candidate_pairs": 648,
+    "unlabeled_source_disjoint_directional_pairs": 638,
+    "confirmed_negative_directional_pairs": 0,
+    "eligible_relevance_rows": 10,
+    "signed_truth_rows": 0,
+    "expected_signed_direction_unspecified_rows": 10
+  },
+  "strict_identity_opportunities": {
+    "canonical_relations_with_any_shared_identity": 3,
+    "canonical_relations_without_shared_identity": 2,
+    "relation_specific_shared_identity_keys": 31,
+    "strict_identity_entity_pairs": 84,
+    "pairs_both_abs_z_ge_1_96": 2,
+    "direction_concordant_pairs_descriptive": 51
+  },
+  "identity_harmonization": {
+    "response_entities": 38247,
+    "original_source_specific_library_supported": 1249,
+    "common_policy_library_supported": 752,
+    "unchanged_library_supported": 405,
+    "source_specific_library_downgraded_by_common_policy": 844,
+    "source_specific_unresolved_promoted_by_common_policy": 347,
+    "identity_status_changes": 1191,
+    "known_only_definition_for_comparison": "common_identity_policy"
+  },
+  "unresolved_relation_readiness": {
+    "embedding_root_supplied": true,
+    "complete_study_shards": 10,
+    "total_studies": 12,
+    "missing_study_shards": [
+      "MSV000083077",
+      "MSV000097610"
+    ],
+    "registered_relation_studies_complete": 4,
+    "registered_relation_studies_total": 5,
+    "missing_registered_relation_study_shards": [
+      "MSV000097610"
+    ]
+  },
+  "qualification": {
+    "registered_unsigned_relevance_evaluation_possible": true,
+    "signed_response_truth_available": false,
+    "unregistered_pairs_may_be_used_as_negatives": false,
+    "all_registered_relation_studies_have_embeddings": false,
+    "primary_biological_discovery_claim_ready": false,
+    "blocking_reasons": [
+      "no registered relation claims signed response truth",
+      "unregistered source-disjoint pairs are unlabeled rather than confirmed negatives",
+      "only two connected biological relation components are registered",
+      "strict common-identity support is absent for two of five canonical relations",
+      "official embedding shards are incomplete for registered-relation studies"
+    ]
+  },
+  "interpretation": "The collection supports a development test of preregistered unsigned relation ranking and abstention. It does not currently support signed-response accuracy, open-world FDR, or a primary biological discovery claim. Missing chemical-relation coverage must be completed before assessing unresolved-entity increment.",
+  "claim_boundary": [
+    "A registered condition-family relation is relevance evidence, not metabolite-level signed truth.",
+    "Unregistered contrast pairs are unknown relations and cannot be counted as negatives.",
+    "Strict identity response pairs are descriptive opportunities, not independent biological discoveries.",
+    "Relation-specific entity-pair counts are not independent when an InChIKey has multiple entities.",
+    "Known-only comparisons must use the harmonized common identity policy, not heterogeneous source-specific labels.",
+    "All inputs and outputs are development/consumed."
+  ],
+  "provenance": {
+    "response_entities_sha256": "6610987fe472a195e2fcf40ee6f7b7aae0477c063901436f2d05a9f0557f2330",
+    "contrast_manifest_sha256": "c83a5b88e326553330e590eff80437194930e6f3d8122c4627f6ab429118e68b",
+    "source_manifest_sha256": "d14790782d06268e9926b3207e4caaf08032375b3a59db8c9159463d072265be",
+    "registered_relations_sha256": "61c4473d200e29a4210dd18b55c3b222dd9819c8a7a63a0d0c71e1289be720fc",
+    "registered_relation_opportunities_sha256": "145a64f18b4b4180cdad4c55f0da6abdc878eeb7273127e7ef6ba510c8fe4e0c",
+    "strict_identity_response_pairs_sha256": "65c6149f548ce767cdde7db4b0153ee84b251bfa99bd5c5261a2e5c601574858",
+    "query_retrieval_eligibility_sha256": "944073d7d4b7de037ca8dcefd6ed086eccaf35ca5bac40057407c6e07df7dcb4",
+    "embedding_readiness_sha256": "973b617d8594c4e59a047b0bdf3086d56c54123b94fef3b8458e02fc4cef0aac",
+    "identity_harmonization_sha256": "71b7e48aa1eb3e17086bca9f80d00ac864e46d50435d644f191a842a6ce22f31",
+    "implementation_sha256": "ca5c6317da7df1ed66921db020d36172bf397f04c57ef7c29d0967b2c6e48a90"
+  }
+}

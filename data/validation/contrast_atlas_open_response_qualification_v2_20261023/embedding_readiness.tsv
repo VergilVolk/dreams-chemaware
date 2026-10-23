@@ -1,0 +1,13 @@
+study_id	used_by_registered_relation	report_present	embedding_present	spectral_eligibility_present	embedding_shard_complete
+MSV000097426	True	True	True	True	True
+MSV000084112	False	True	True	True	True
+MSV000083077	False	False	False	False	False
+MSV000088023	True	True	True	True	True
+MSV000090788	False	True	True	True	True
+MSV000097610	True	False	False	False	False
+IBD200_GROUP	True	True	True	True	True
+MSV000090804	False	True	True	True	True
+MSV000086360	False	True	True	True	True
+MSV000084794	False	True	True	True	True
+MSV000096564	True	True	True	True	True
+MSV000092887	False	True	True	True	True
