@@ -232,6 +232,13 @@ def main() -> None:
     parser.add_argument("--permutations", type=int, default=256)
     parser.add_argument("--seed", type=int, default=20261023)
     parser.add_argument("--precursor-ppm", type=float, default=10.0)
+    parser.add_argument(
+        "--relation-class",
+        action="append",
+        dest="relation_classes",
+        default=None,
+        help="registered relation class to audit; repeat for multiple classes",
+    )
     args = parser.parse_args()
     if args.output_dir.exists():
         raise FileExistsError(args.output_dir)
@@ -253,15 +260,16 @@ def main() -> None:
     if report["provenance"]["response_entities_sha256"] != sha256(paths["entities"]):
         raise RuntimeError("response collection checksum drift")
 
-    # The relation registry is already frozen.  Only canonical exact-drug
-    # development controls are queried; no relation is learned from effects.
+    relation_classes = args.relation_classes or ["consumed_exact_drug_cross_design"]
+    # The relation registry is already frozen.  Only explicitly requested
+    # canonical development relations are queried; none is learned from effects.
     all_relations = pd.read_csv(paths["relations"], sep="\t", dtype=str)
     relations = all_relations.loc[
         all_relations["relation_direction"].eq("registered")
-        & all_relations["relation_class"].eq("consumed_exact_drug_cross_design")
+        & all_relations["relation_class"].isin(relation_classes)
     ].reset_index(drop=True)
-    if len(relations) != 12:
-        raise RuntimeError(f"expected 12 exact-drug controls, found {len(relations)}")
+    if not len(relations):
+        raise RuntimeError(f"no canonical relations found for {relation_classes}")
     studies = set(relations["left_study_id"]) | set(relations["right_study_id"])
 
     identity = pd.read_csv(args.identity_partition, sep="\t", dtype=str)
@@ -394,7 +402,7 @@ def main() -> None:
     args.output_dir.mkdir(parents=True)
     outputs = {
         "detail": args.output_dir / "unresolved_edge_response_evidence.tsv.gz",
-        "summary": args.output_dir / "exact_drug_edge_replication_summary.tsv",
+        "summary": args.output_dir / "registered_relation_edge_replication_summary.tsv",
         "seeds": args.output_dir / "permutation_seeds.tsv",
     }
     compression = {"method": "gzip", "mtime": 0}
@@ -409,7 +417,8 @@ def main() -> None:
         "status": "DEVELOPMENT_CONSUMED_EDGE_REPLICATION_COMPLETE",
         "data_role": "development_consumed",
         "denominators": {
-            "exact_drug_relations": len(relations),
+            "registered_relations": len(relations),
+            "relation_classes": relation_classes,
             "unresolved_effect_rows": len(effects),
             "relation_edge_evaluations": len(detail),
             "unique_spectral_edges_involved": int(len(detail.drop_duplicates([
@@ -459,13 +468,17 @@ def main() -> None:
                 ).sum()
             ),
         },
-        "leakage_status": "spectral edges and exact-drug relation registry were frozen upstream; no edge was selected from effect direction or significance; null reassigns whole entity response profiles within each study",
+        "leakage_status": "spectral edges and the requested registered-relation subset were frozen upstream; no edge was selected from effect direction or significance; null reassigns whole entity response profiles within each study",
         "claim_boundary": [
             "Both-endpoint FDR and same direction establish cross-accession response support, not molecular mechanism.",
             "Ten-ppm precursor compatibility is an identity hypothesis, not proof against isomers or in-source/adduct ambiguity.",
             "Non-mass-compatible edges are chemical relation evidence and their beta values are never meta-analysed as one entity.",
-            "All three accessions are consumed and belong to one broader ChemProp project; this is not external validation.",
+            "Every queried source is development-consumed; independent accessions do not by themselves constitute sealed external validation.",
+            "Biological comparability is limited to the evidence boundaries frozen in the registered relation table.",
         ],
+        "registered_evidence_boundaries": sorted(
+            relations["evidence_boundary"].astype(str).unique().tolist()
+        ),
         "provenance": {
             "contract_sha256": sha256(args.contract),
             "contract_lineage": {

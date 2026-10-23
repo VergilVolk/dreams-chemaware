@@ -1,0 +1,60 @@
+{
+  "schema": "contrast_atlas_unresolved_edge_response_replication_v1",
+  "status": "DEVELOPMENT_CONSUMED_EDGE_REPLICATION_COMPLETE",
+  "data_role": "development_consumed",
+  "denominators": {
+    "registered_relations": 3,
+    "relation_classes": [
+      "prespecified_near_exact_condition_family"
+    ],
+    "unresolved_effect_rows": 9253,
+    "relation_edge_evaluations": 4765,
+    "unique_spectral_edges_involved": 4765,
+    "permutations": 256
+  },
+  "result": {
+    "relations_with_any_dual_fdr_same_direction_edge": 0,
+    "total_dual_fdr_same_direction_edges": 0,
+    "precursor_compatible_dual_edges": 0,
+    "chemical_relation_only_dual_edges": 0,
+    "relations_at_minimum_empirical_p": 0,
+    "mutual_top1_dual_edges": 0,
+    "relations_with_mutual_top1_support": 0,
+    "relations_with_mutual_top1_minimum_empirical_p": 0,
+    "mutual_top1_precursor_compatible_dual_edges": 0,
+    "mutual_top1_chemical_relation_only_dual_edges": 0,
+    "relations_with_mutual_top1_precursor_compatible_minimum_empirical_p": 0,
+    "relations_with_mutual_top1_chemical_relation_only_minimum_empirical_p": 0
+  },
+  "leakage_status": "spectral edges and the requested registered-relation subset were frozen upstream; no edge was selected from effect direction or significance; null reassigns whole entity response profiles within each study",
+  "claim_boundary": [
+    "Both-endpoint FDR and same direction establish cross-accession response support, not molecular mechanism.",
+    "Ten-ppm precursor compatibility is an identity hypothesis, not proof against isomers or in-source/adduct ambiguity.",
+    "Non-mass-compatible edges are chemical relation evidence and their beta values are never meta-analysed as one entity.",
+    "Every queried source is development-consumed; independent accessions do not by themselves constitute sealed external validation.",
+    "Biological comparability is limited to the evidence boundaries frozen in the registered relation table."
+  ],
+  "registered_evidence_boundaries": [
+    "independent adult human fecal IBD-versus-control sources; CCFA is Crohn's active-or-remission whereas IBD200 combines adult Crohn's and ulcerative colitis",
+    "independent human fecal IBD-versus-control sources, but adult Crohn's active-or-remission differs from pediatric very-early-onset IBD in age, subtype and treatment exposure",
+    "independent human fecal IBD-versus-healthy studies, but pediatric VEO-IBD differs from adult CD/UC in age, subtype and treatment exposure"
+  ],
+  "provenance": {
+    "contract_sha256": "fc11d2efffa281383ffa1795cfc9445f13682169c0163fb820a290059db44bbb",
+    "contract_lineage": {
+      "tasks\\contrast_atlas_open_collection_v1.json": "259b7fe26841501ce2c82ac4b61becb6ee8657491f3417fb483cd385bf267a98",
+      "tasks\\contrast_atlas_open_collection_ibd_extension_v1.json": "b4e08b9df7796e02515574942d331724b3cc929543a4919ead624f10690de83a",
+      "tasks\\contrast_atlas_open_collection_fbmn_systematic_extension_v1.json": "f07630c1327bffa8c6fd0398148bd09fddcc7ca6b39134a4dccb9f8b9de55c30",
+      "tasks\\contrast_atlas_open_collection_ibd3_extension_v1.json": "8f27a301dace04fcc42adba7e66093735b3a895b7d7f6b48c57f48560515ec1e",
+      "tasks\\contrast_atlas_open_collection_covid_extension_v1.json": "0760fefb1a28519cd79cb7578b2b2afceff99aaffd198f7c14fff929100370e9",
+      "tasks\\contrast_atlas_open_collection_chemprop_extension_v1.json": "fc11d2efffa281383ffa1795cfc9445f13682169c0163fb820a290059db44bbb"
+    },
+    "response_entities_sha256": "6f6fa005983b9172c4f2cb7aa055feedd2165de90b6ce7c482eaa56af6b8de75",
+    "identity_partition_sha256": "239af73938fc03056406afea8fc3d17fa29d761735a5e96e23e0efb8e8e395b2",
+    "frozen_edges_sha256": "0432786a0ddeef318b311bdaf8cb91dee9eeb25b8d33e04c3baa344ddf66882a",
+    "detail": "da4b15bd505ec6ee7f398a362772fff069d210e1b926692ea9f5e48923c9caae",
+    "summary": "367beae95f7642e6f8f112412927b77c0e75d18c878b36b2c63a95bcf834f2ea",
+    "seeds": "afe1b6e04741a4a8cad40cb52b27cdc880d7316ff27a64879e965662335a64a2",
+    "implementation_sha256": "0f5de31a0f02b20afe325b3ec09f6993520750ed2c08a0799022f9544b0025ff"
+  }
+}

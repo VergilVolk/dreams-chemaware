@@ -172,6 +172,29 @@ development signal, and (2) chemical-relation response association, which has
 not yet qualified.  The former must be tested across a genuinely independent
 project or laboratory before it can anchor a paper claim.
 
+## Frozen cross-project stress tests
+
+The exact same edge-level rule was then applied without retuning to the five
+previously registered HFD/IBD relations in independent accessions.
+
+For HFD, the two sex-stratified target relations contained 32 and 30 dual-FDR
+same-direction edges, but these did not exceed whole-profile reassignment:
+all-edge empirical p values were 0.0856 and 0.2840; mutual-top1 p values were
+0.0973 and 0.5525.  Neither identity-hypothesis nor relation-only tracks passed.
+
+For the three near-exact IBD relations, 4,765 frozen relation-edge evaluations
+produced zero dual-FDR same-direction edges.  The sources differ in age,
+subtype and treatment exposure, so this is not evidence that IBD biology lacks
+shared chemistry.  It is evidence that the current frozen operator cannot
+recover it under these data and comparability boundaries.
+
+Therefore the ChemProp entity-replication signal has **not generalized**.  The
+method currently supports a consumed, same-project positive control and two
+cross-project negative stress tests.  No general Contrast Atlas success claim
+is qualified.  Further threshold tuning on HFD or IBD is prohibited; the next
+confirmation panel must contain a genuinely repeated perturbation with
+compatible biospecimen/estimand and adequate independent sampling.
+
 ## Reproducible artifacts
 
 - Source preparation: `tasks/prepare_chemprop_contrast_atlas_sources.py`
@@ -184,3 +207,5 @@ project or laboratory before it can anchor a paper claim.
 - Response-energy sensitivity: `data/validation/contrast_atlas_sparse_local_response_calibration_v1_responseenergy_chemprop_20261023`
 - Count-matched unresolved control: `data/validation/contrast_atlas_count_matched_unresolved_v1_chemprop_20261023`
 - Edge-level replication: `data/validation/contrast_atlas_unresolved_edge_replication_v3_chemprop_20261023`
+- HFD stress test: `data/validation/contrast_atlas_unresolved_edge_replication_v2_hfd_20261023`
+- IBD stress test: `data/validation/contrast_atlas_unresolved_edge_replication_v2_ibd_20261023`
