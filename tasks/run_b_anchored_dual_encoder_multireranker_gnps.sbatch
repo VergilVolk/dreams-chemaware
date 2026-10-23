@@ -1,7 +1,7 @@
 #!/bin/bash
 # One bounded development job: fixed B + two ChemAware encoders + MSG/RRF
 # family evidence.  GNPS is consumed development; no external data are read.
-#SBATCH --job-name=B_dual_multi
+#SBATCH --job-name=B_dual_nested
 #SBATCH --gpus=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=10
@@ -143,4 +143,4 @@ python -u tasks/train_b_anchored_dual_encoder_multireranker.py \
 
 cp "${STAGE1_EMB%.npz}.json" "$OUT/chemaware_stage1_encoding.json"
 cp "${PHASEA_EMB%.npz}.json" "$OUT/chemaware_phaseA_encoding.json"
-echo "B_DUAL_ENCODER_MULTIRERANKER_GNPS_COMPLETE_NO_EXTERNAL_ACCESS: $OUT"
+echo "B_DUAL_ENCODER_MULTIRERANKER_NESTED_OOF_GNPS_COMPLETE_NO_EXTERNAL_ACCESS: $OUT"

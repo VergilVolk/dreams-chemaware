@@ -501,7 +501,7 @@ def main() -> None:
         ("complete_spectral", "B"), ("complete_spectral", "wse"),
     )
     report = {
-        "status": "B_ANCHORED_DUAL_ENCODER_MULTIRERANKER_DEVELOPMENT_COMPLETE",
+        "status": "B_ANCHORED_DUAL_ENCODER_MULTIRERANKER_NESTED_OOF_DEVELOPMENT_COMPLETE",
         "dataset": "GNPS Gold/Silver 10-ppm", "dataset_role": "development_consumed",
         "enveda_accessed": False, "B_fixed_reference": True,
         "stacking_isolation": {
