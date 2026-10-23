@@ -36,7 +36,9 @@ REQUIRED_METHOD_COLUMNS = {
 }
 
 
-def load_method_scores(pair_table: pd.DataFrame, paths: list[Path]) -> pd.DataFrame:
+def load_method_scores(
+    pair_table: pd.DataFrame, paths: list[Path]
+) -> tuple[pd.DataFrame, list[dict]]:
     baseline = pair_table[["candidate_pair_id", "wse_score", "wse_matched_fragments"]].copy()
     baseline["method_name"] = "weighted_spectral_entropy"
     baseline["method_score"] = baseline["wse_score"].astype(float)
@@ -44,12 +46,24 @@ def load_method_scores(pair_table: pd.DataFrame, paths: list[Path]) -> pd.DataFr
         baseline["wse_score"].gt(0) & baseline["wse_matched_fragments"].gt(0)
     )
     blocks = [baseline[list(REQUIRED_METHOD_COLUMNS)]]
+    import_summary: list[dict] = []
+    fixed_pairs = set(pair_table["candidate_pair_id"])
     for path in paths:
         block = pd.read_csv(path, sep="\t", dtype={"candidate_pair_id": str})
         missing = REQUIRED_METHOD_COLUMNS - set(block.columns)
         if missing:
             raise ValueError(f"{path} misses method columns: {sorted(missing)}")
         block = block[list(REQUIRED_METHOD_COLUMNS)].copy()
+        rows_total = int(len(block))
+        outside = ~block["candidate_pair_id"].isin(fixed_pairs)
+        rows_outside = int(outside.sum())
+        block = block.loc[~outside].copy()
+        # The locally frozen WSE baseline remains authoritative.  An algorithm
+        # delivery may include its own WSE column for engineering checks, but
+        # it cannot silently replace the biological baseline.
+        external_wse = block["method_name"].astype(str).eq("weighted_spectral_entropy")
+        rows_external_wse = int(external_wse.sum())
+        block = block.loc[~external_wse].copy()
         block["method_score"] = pd.to_numeric(block["method_score"], errors="coerce")
         if block["evidence_available"].dtype != bool:
             block["evidence_available"] = (
@@ -60,13 +74,23 @@ def load_method_scores(pair_table: pd.DataFrame, paths: list[Path]) -> pd.DataFr
         if block["evidence_available"].isna().any():
             raise ValueError(f"{path} has invalid evidence_available values")
         blocks.append(block)
+        for method, method_block in block.groupby("method_name", sort=False):
+            import_summary.append({
+                "path": str(path),
+                "method_name": str(method),
+                "input_rows_total_all_methods": rows_total,
+                "rows_outside_fixed_axis_all_methods": rows_outside,
+                "external_wse_rows_ignored": rows_external_wse,
+                "fixed_axis_rows_delivered": int(len(method_block)),
+                "fixed_axis_rows_evidence_available": int(
+                    method_block["evidence_available"].eq(True).sum()
+                ),
+                "fixed_axis_candidate_pairs": int(len(fixed_pairs)),
+            })
     scores = pd.concat(blocks, ignore_index=True)
     if scores.duplicated(["method_name", "candidate_pair_id"]).any():
         raise ValueError("duplicate method/candidate pair scores")
-    unknown = set(scores["candidate_pair_id"]) - set(pair_table["candidate_pair_id"])
-    if unknown:
-        raise ValueError(f"method tables contain {len(unknown)} out-of-universe pairs")
-    return scores
+    return scores, import_summary
 
 
 def choose_entities(
@@ -315,7 +339,7 @@ def main() -> None:
     for column in numeric_pair:
         pairs[column] = pd.to_numeric(pairs[column], errors="raise")
     queries["candidate_count"] = pd.to_numeric(queries["candidate_count"], errors="raise")
-    method_scores = load_method_scores(pairs, args.method_score_table)
+    method_scores, method_import_summary = load_method_scores(pairs, args.method_score_table)
     decisions = choose_entities(pairs, queries, method_scores)
     transitions = method_transitions(decisions)
 
@@ -414,6 +438,7 @@ def main() -> None:
             "additional_method_tables": [
                 {"path": str(path), "sha256": sha256(path)} for path in args.method_score_table
             ],
+            "method_score_import": method_import_summary,
         },
         "claim_boundary": [
             "Matched unresolved entities remain identity hypotheses without standards or orthogonal identity evidence.",
