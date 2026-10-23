@@ -2,8 +2,9 @@
 
 ## Verdict
 
-This expansion produces a real development signal, but it does **not** yet
-qualify a general or external biological-discovery claim.
+This expansion produces a real coverage-dependent development signal, but it
+does **not** establish an unknown-information increment or qualify a general
+or external biological-discovery claim.
 
 The frozen collection now contains 15 studies, 51 directed study contrasts,
 238,412 study-contrast response rows and 54,861 study-level chemical entities.
@@ -23,6 +24,8 @@ confirmation.
 - `MSV000094899`: 8,055 entities, 12 drug responses, 96,660 response rows.
 - `MSV000096724`: 4,429 entities, 3 shared-drug responses, 13,287 rows.
 - `MSV000093571`: 4,130 entities, 9 shared-drug responses, 37,170 rows.
+- The source reports contain 36, 6 and 27 biological units, respectively;
+  consequently the endpoint panels remain small-sample development controls.
 - Added total: 16,614 study entities and 147,117 response rows.
 - Corrected IBD Plate3 input remains 662 estimable entities; the old 746-row
   plate-confounded version was not reintroduced.
@@ -95,12 +98,79 @@ claim that Contrast Atlas has solved open biological response retrieval.  It
 does, however, provide the first systematic non-zero response-specific signal
 on twelve exact intervention controls, concentrated in the unresolved world.
 
-The next decisive control is a count/coverage-matched unresolved world.  It
-must determine whether the 10/12 versus 2/12 difference reflects genuinely
-additional chemical response information or merely thousands more measured
-entities.  Any scoring rule frozen after this consumed panel must then be
-tested on a new independent perturbation family before a biological discovery
-claim.
+## Count-matched unresolved control
+
+The required entity-count control was completed with 16 independently frozen
+resamples and 256 response-profile permutations per resample.  Within every
+study, unresolved entities were sampled without replacement to equal that
+study's strict-known count.  Each resample therefore contained 979 entities in
+total, exactly matching the full strict-known world.  All 105 cross-study
+spectral graphs were rebuilt inside each sampled universe before effects or
+relations were opened; this was not a post-hoc deletion from the full graph.
+
+For the twelve exact-drug relations:
+
+- minimum-resolution same-direction p count: median 0/12, range 0--1/12;
+- same-direction Top-5: median 2/12, range 0--6/12;
+- median same-direction rank: 12.25 across resamples;
+- unsigned Top-1: four occurrences across 16 x 12 relation evaluations.
+
+Thus the full unresolved 10/12 signal does not survive entity-count matching.
+It depends strongly on the much broader unresolved chemical coverage.  This
+does not prove that the full signal is mere random noise: additional relevant
+chemistry can only be observed when coverage is retained.  It does prove that
+the current known-versus-unresolved comparison cannot distinguish biologically
+useful additional coverage from a generic entity-count/coverage advantage.
+Consequently, **unknown increment remains unqualified**.
+
+The next useful experiment is no longer another aggregate ranker adjustment.
+It is a systematic edge-level replication analysis that separates
+mass-compatible same-entity evidence from non-identical chemical relations and
+asks whether any unresolved support has significant effects on both sides of
+an exact cross-accession perturbation.  Any scoring rule frozen after this
+consumed panel must still be tested on a new independent perturbation family
+before a biological discovery claim.
+
+## Edge-level response replication
+
+That systematic analysis was completed for all twelve exact-drug relations.
+The frozen unresolved graph contained 10,314 unique spectral edges and 68,118
+relation-edge evaluations.  An edge counted as response support only when both
+endpoints passed within-contrast feature-level BH FDR 0.05 and had the same
+effect direction.  No edge was selected using its effect.  The null reassigned
+whole entity response profiles within each study 256 times.
+
+Across all one-direction or mutual edges, all 12/12 drug relations had at
+least one dual-FDR same-direction edge, and 8/12 reached the minimum empirical
+p=1/257.  The more selective mutual-top1 analysis gave:
+
+- 1,421 relation-edge supports across the twelve drugs;
+- 12/12 drugs with at least one mutual support;
+- 9/12 drugs at empirical p=1/257;
+- 1,270 supports on the precursor-compatible 10-ppm identity-hypothesis track;
+- 151 supports on the non-mass-compatible chemical-relation track;
+- 9/12 minimum-p results on the identity-hypothesis track, but only 1/12 on
+  the chemical-relation-only track.
+
+This is the first non-zero, entity-resolved result worth carrying forward.
+Without requiring a structure name, the method recovers cross-accession
+response replication for same-mass, mutually similar spectra.  It still does
+not prove exact molecular identity: isomers, adduct/in-source ambiguity and
+ion-family redundancy remain.  It is also development evidence within one
+broader ChemProp project.
+
+Just as importantly, the ambitious relation-layer claim is currently mostly
+unsupported.  Different-mass chemical neighbours did not show systematic
+response replication beyond the null: only one of twelve drugs reached the
+minimum permutation resolution on the mutual relation-only track.  Such edges
+remain hypotheses and their beta/SE values must not be meta-analysed as if they
+belonged to one molecule.
+
+The next independent experiment should therefore freeze two separate outputs:
+(1) structure-agnostic same-entity response replication, which now has a real
+development signal, and (2) chemical-relation response association, which has
+not yet qualified.  The former must be tested across a genuinely independent
+project or laboratory before it can anchor a paper claim.
 
 ## Reproducible artifacts
 
@@ -112,4 +182,5 @@ claim.
 - Frozen graph/alignment: `data/validation/contrast_atlas_sparse_local_alignment_v3_chemprop_20261023`
 - Entity-mean calibration: `data/validation/contrast_atlas_sparse_local_response_calibration_v4_entitymean_chemprop_20261023`
 - Response-energy sensitivity: `data/validation/contrast_atlas_sparse_local_response_calibration_v1_responseenergy_chemprop_20261023`
-
+- Count-matched unresolved control: `data/validation/contrast_atlas_count_matched_unresolved_v1_chemprop_20261023`
+- Edge-level replication: `data/validation/contrast_atlas_unresolved_edge_replication_v3_chemprop_20261023`

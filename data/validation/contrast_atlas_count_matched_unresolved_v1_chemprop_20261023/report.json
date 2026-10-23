@@ -1,0 +1,212 @@
+{
+  "schema": "contrast_atlas_count_matched_unresolved_control_v1",
+  "status": "DEVELOPMENT_CONSUMED_COUNT_MATCHED_CONTROL_COMPLETE",
+  "data_role": "development_consumed",
+  "method": {
+    "resamples": 16,
+    "permutations_per_resample": 256,
+    "seed": 20261023,
+    "selection": "within each study sample unresolved entities without replacement to equal strict-known entity count",
+    "graph": "rebuild bidirectional top-1 fragment-cosine graph inside every sampled universe before opening responses or relations",
+    "null": "whole response-profile permutation within sampled study"
+  },
+  "denominators": {
+    "studies": 15,
+    "contrasts": 51,
+    "selected_entities_per_resample": 979,
+    "selected_response_rows_per_resample": [
+      3385,
+      3387,
+      3391,
+      3392,
+      3394,
+      3396,
+      3397,
+      3399,
+      3400,
+      3401,
+      3402,
+      3404,
+      3410,
+      3413
+    ],
+    "candidate_rows_per_resample": 2286,
+    "exact_drug_relations": 12,
+    "frozen_edges_per_resample_range": [
+      316,
+      470
+    ]
+  },
+  "exact_drug_resample_result": {
+    "similar_p_at_minimum_median": 0.0,
+    "similar_p_at_minimum_range": [
+      0,
+      1
+    ],
+    "similar_top5_median": 2.0,
+    "similar_top5_range": [
+      0,
+      6
+    ],
+    "median_similar_rank_across_resamples": 12.25,
+    "unsigned_top1_total_across_resamples": 4
+  },
+  "leakage_status": "selection and every chemical graph were frozen from common identity status and MS/MS only; beta/SE were opened after graphs; registered relations were opened after all observed and null candidate scores",
+  "decision_boundary": "development evidence-count control only; it does not match chemical class, ion redundancy, platform coverage or independent project source",
+  "provenance": {
+    "contract_sha256": "fc11d2efffa281383ffa1795cfc9445f13682169c0163fb820a290059db44bbb",
+    "contract_lineage": {
+      "tasks\\contrast_atlas_open_collection_v1.json": "259b7fe26841501ce2c82ac4b61becb6ee8657491f3417fb483cd385bf267a98",
+      "tasks\\contrast_atlas_open_collection_ibd_extension_v1.json": "b4e08b9df7796e02515574942d331724b3cc929543a4919ead624f10690de83a",
+      "tasks\\contrast_atlas_open_collection_fbmn_systematic_extension_v1.json": "f07630c1327bffa8c6fd0398148bd09fddcc7ca6b39134a4dccb9f8b9de55c30",
+      "tasks\\contrast_atlas_open_collection_ibd3_extension_v1.json": "8f27a301dace04fcc42adba7e66093735b3a895b7d7f6b48c57f48560515ec1e",
+      "tasks\\contrast_atlas_open_collection_covid_extension_v1.json": "0760fefb1a28519cd79cb7578b2b2afceff99aaffd198f7c14fff929100370e9",
+      "tasks\\contrast_atlas_open_collection_chemprop_extension_v1.json": "fc11d2efffa281383ffa1795cfc9445f13682169c0163fb820a290059db44bbb"
+    },
+    "response_entities_sha256": "6f6fa005983b9172c4f2cb7aa055feedd2165de90b6ce7c482eaa56af6b8de75",
+    "identity_partition_sha256": "239af73938fc03056406afea8fc3d17fa29d761735a5e96e23e0efb8e8e395b2",
+    "alignment_report_sha256": "87d57cc04b90cfc8a01d50c96f1619675ba0d2117f7dbbb8be9115f95fba8db0",
+    "scores": "3fb8af0d969929fde8fd44d98d9ad5a652af0b220f4de852060ce1001f178d67",
+    "selections": "1ca3eb1a356a2e0842eea282262dd5b350e2e1627b1b243d94016a2d3b4ee9c0",
+    "relations": "13c530497c0ce5f71a1416467a43b06b1524a9a5d67bf48c08dc199b12314435",
+    "summary": "5e2832dbef6e54f7ccaca6326c5880e81491e4afeb0b04aef5f4931b40e827e5",
+    "implementation_sha256": "661b9e3ea00cf523ef5a720f0100a89c44480f09eeb877ab59e4ba66963dd6e5"
+  },
+  "sources": [
+    {
+      "study_id": "MSV000097426",
+      "mgf_path": "data\\validation\\msv000097426_hfd_ms2_anchored_20261014_v1\\representative_spectra.mgf",
+      "mgf_sha256": "eb6b4517c2ad70b718c5384ff7378e24e650a4ef8333669df84de95a436f8b42",
+      "mgf_spectra_total": 4635,
+      "response_spectra_nonempty": 2163,
+      "fragment_nonzero_bins": 67992,
+      "maximum_bin_index": 28357
+    },
+    {
+      "study_id": "MSV000084112",
+      "mgf_path": "data\\validation\\msv000084112_matched_ms2_anchored_20261014_v1\\representative_spectra.mgf",
+      "mgf_sha256": "5831e21a5e519903802aab5ae29da92e363ebb674e4a27142193260627443a8f",
+      "mgf_spectra_total": 12116,
+      "response_spectra_nonempty": 5501,
+      "fragment_nonzero_bins": 235835,
+      "maximum_bin_index": 39254
+    },
+    {
+      "study_id": "MSV000083077",
+      "mgf_path": "data\\validation\\msv000083077_saliva_ms2_anchored_20261014_v4\\representative_spectra.mgf",
+      "mgf_sha256": "8833c9a4a80b2ac508875395ff9e3750075e2616dc42532d55875a63ce33a8c8",
+      "mgf_spectra_total": 15184,
+      "response_spectra_nonempty": 7132,
+      "fragment_nonzero_bins": 213434,
+      "maximum_bin_index": 59681
+    },
+    {
+      "study_id": "MSV000088023",
+      "mgf_path": "data\\reference\\msv000088023_hfd_response\\ms2spectra_maxTic.mgf",
+      "mgf_sha256": "59ceb4d533b480760bf93c47dc9213de44e271d0fd521b7e8ecdf67615d5fada",
+      "mgf_spectra_total": 971,
+      "response_spectra_nonempty": 212,
+      "fragment_nonzero_bins": 7356,
+      "maximum_bin_index": 16627
+    },
+    {
+      "study_id": "MSV000090788",
+      "mgf_path": "data\\reference\\public_fbmn\\a36305db40414b6ea9c5b9a5de380bea\\representative.mgf",
+      "mgf_sha256": "57cc380fac1563bfdf736c3208a4cad09f6ce39b991bbd4363b083bb1b93c659",
+      "mgf_spectra_total": 9541,
+      "response_spectra_nonempty": 2350,
+      "fragment_nonzero_bins": 101223,
+      "maximum_bin_index": 20705
+    },
+    {
+      "study_id": "MSV000097610",
+      "mgf_path": "data\\reference\\contrast_atlas_ibd_cross_study_20261014\\pediatric_veoibd_consensus.mgf",
+      "mgf_sha256": "c628ce08fc8215942469ec8fb193c6b3c189484032f83cc9ba9b190281c64fd1",
+      "mgf_spectra_total": 43697,
+      "response_spectra_nonempty": 6081,
+      "fragment_nonzero_bins": 244383,
+      "maximum_bin_index": 53685
+    },
+    {
+      "study_id": "IBD200_GROUP",
+      "mgf_path": "data\\reference\\contrast_atlas_ibd_cross_study_20261014\\adult_ibd200_consensus.mgf",
+      "mgf_sha256": "6aeba8b4c1e9cc94e127985cc18bde9a4d1df8c99030d470d4cec888bc5465e6",
+      "mgf_spectra_total": 2498,
+      "response_spectra_nonempty": 662,
+      "fragment_nonzero_bins": 17172,
+      "maximum_bin_index": 13161
+    },
+    {
+      "study_id": "MSV000090804",
+      "mgf_path": "data\\reference\\public_fbmn_systematic_v1\\def58641630e488985bfbe5a15c94e32\\representative.mgf",
+      "mgf_sha256": "37e8cf36f37b9a0cc9fc25f1dee1bbe718c04f6f4b8cae9cbf9a43b7c6fdd9e6",
+      "mgf_spectra_total": 4612,
+      "response_spectra_nonempty": 4349,
+      "fragment_nonzero_bins": 275248,
+      "maximum_bin_index": 9999
+    },
+    {
+      "study_id": "MSV000086360",
+      "mgf_path": "data\\reference\\public_fbmn_systematic_v1\\63d6d0c95b3e4d8d846d376499bb544e\\representative.mgf",
+      "mgf_sha256": "4295507c6fe553ec73e3b301002e06d8c9a5efcaba52b3016bae81bff9cf543f",
+      "mgf_spectra_total": 4316,
+      "response_spectra_nonempty": 3368,
+      "fragment_nonzero_bins": 111593,
+      "maximum_bin_index": 25335
+    },
+    {
+      "study_id": "MSV000084794",
+      "mgf_path": "data\\reference\\public_fbmn_systematic_v1\\af7ec76b02ac482bbd2b7ee3a3ccbdc5\\representative.mgf",
+      "mgf_sha256": "8792840ee815c63028047cede2d646edc79529eebb0b9e9d81e0f3bc382afb91",
+      "mgf_spectra_total": 36234,
+      "response_spectra_nonempty": 2201,
+      "fragment_nonzero_bins": 109822,
+      "maximum_bin_index": 21738
+    },
+    {
+      "study_id": "MSV000096564",
+      "mgf_path": "data\\reference\\msv000096564_baseline_ibd_v1\\mgf.mgf",
+      "mgf_sha256": "2b8892c89650f774704c556f1fc0287afcfed38879488cdf9b959b65e4ec1e46",
+      "mgf_spectra_total": 7267,
+      "response_spectra_nonempty": 2817,
+      "fragment_nonzero_bins": 52963,
+      "maximum_bin_index": 7724
+    },
+    {
+      "study_id": "MSV000092887",
+      "mgf_path": "data\\validation\\contrast_atlas_msv000092887_raw_ms2_link_v1_20261022\\representative_ms2.mgf",
+      "mgf_sha256": "b3e8b5c40d70ee17739310d4268b08aa33bc9720fc91aafd1985a290f1cc71e3",
+      "mgf_spectra_total": 1616,
+      "response_spectra_nonempty": 1411,
+      "fragment_nonzero_bins": 19001,
+      "maximum_bin_index": 9971
+    },
+    {
+      "study_id": "MSV000094899",
+      "mgf_path": "data\\reference\\chemprop2_m1_20261011\\consensus.mgf",
+      "mgf_sha256": "49ab4ca3815e43c8110b263cc753cd858ed32a2eaf40b7a1fd67667c284ace7d",
+      "mgf_spectra_total": 16245,
+      "response_spectra_nonempty": 8055,
+      "fragment_nonzero_bins": 308651,
+      "maximum_bin_index": 21363
+    },
+    {
+      "study_id": "MSV000096724",
+      "mgf_path": "data\\reference\\chemprop_cross_design_20261011\\chemprop_23drug\\spectra\\specs_ms.mgf",
+      "mgf_sha256": "b54c361d415a452c47961666e9372467e5cb5065bed73c6b3fff2c4b4d5c8142",
+      "mgf_spectra_total": 9153,
+      "response_spectra_nonempty": 4429,
+      "fragment_nonzero_bins": 124237,
+      "maximum_bin_index": 43107
+    },
+    {
+      "study_id": "MSV000093571",
+      "mgf_path": "data\\reference\\chemprop_cross_design_20261011\\chemprop_45drug\\spectra\\specs_ms.mgf",
+      "mgf_sha256": "516a613773f0a0f307bcd7fd6362ce52cdecedf68dd39ca49aff4d59fa597886",
+      "mgf_spectra_total": 8581,
+      "response_spectra_nonempty": 4130,
+      "fragment_nonzero_bins": 84375,
+      "maximum_bin_index": 16859
+    }
+  ]
+}
