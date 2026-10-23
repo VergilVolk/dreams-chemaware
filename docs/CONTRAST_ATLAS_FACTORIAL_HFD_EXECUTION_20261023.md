@@ -87,8 +87,11 @@ analysis.  It would also not establish a general external biology result.
 6. construction of all 15 response objects and all-query scores;
 7. separate 1,999-permutation maximum-candidate nulls and single-panel
    deletion analyses for `all`, `known` and `unresolved` evidence worlds;
-8. hash freeze of every pre-truth artifact;
-9. automated opening of only the two registered reciprocal Hi-MYC queries.
+8. 16 pre-truth unresolved resamples matched to each panel's strict-known
+   ion-family representative count, with the same sampled entities reused
+   across all five response types;
+9. hash freeze of every pre-truth artifact;
+10. automated opening of only the two registered reciprocal Hi-MYC queries.
 
 Because the final opening is dependency-bound to the hash-freeze job, there is
 no opportunity to inspect scores and then change the response method, candidate
@@ -98,5 +101,6 @@ downstream opening.
 ## Current implementation verification
 
 On 2026-10-23, the original factorial-HFD method tests plus the new download,
-polarity-aware identity and pre-truth gates passed `13/13`.  This verifies executable contracts only;
+polarity-aware identity, three-world calibration and count-matched gates passed
+`15/15`.  This verifies executable contracts only;
 it is not a biological success result.

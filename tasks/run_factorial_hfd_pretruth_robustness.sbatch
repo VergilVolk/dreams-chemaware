@@ -42,3 +42,15 @@ for world in all known unresolved; do
     --world "$world" \
     --minimum-entities 12
 done
+
+python -u tasks/build_factorial_hfd_count_matched_unresolved.py \
+  --panel-jobs data/validation/factorial_hfd_panel_jobs_v1_20261016/panel_jobs.tsv \
+  --panel-registry data/validation/factorial_hfd_wave_manifest_v5_20261016/panel_registry.tsv \
+  --effects-root data/validation/factorial_hfd_panel_effects_v1_20261016 \
+  --embeddings-root data/validation/factorial_hfd_panel_embeddings_official_v1_20261016 \
+  --families-root data/validation/factorial_hfd_ion_families_v1_20261016 \
+  --identity-table "$IDENTITY" \
+  --output-dir data/validation/factorial_hfd_count_matched_unresolved_official_v1_20261023 \
+  --resamples 16 \
+  --seed 20261023 \
+  --minimum-entities 12

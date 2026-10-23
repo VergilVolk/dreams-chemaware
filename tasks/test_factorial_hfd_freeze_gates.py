@@ -57,6 +57,18 @@ def test_pretruth_freeze_accepts_complete_contract(tmp_path: Path) -> None:
         path.mkdir()
     identity = tmp_path / "identity.tsv"
     identity.write_text("panel_id\tanchor_id\tidentity_status\np\ta\tlibrary_supported\n", encoding="utf-8")
+    count_matched = tmp_path / "count_matched"
+    count_matched.mkdir()
+    write_json(count_matched / "report.json", {
+        "status": "PRETRUTH_COUNT_MATCHED_UNRESOLVED_SCORES_FROZEN",
+        "truth_opened": False, "denominators": {"resamples": 16},
+    })
+    pd.DataFrame({"x": [1]}).to_csv(
+        count_matched / "count_matched_retrieval_scores.tsv.gz", sep="\t", index=False, compression="gzip"
+    )
+    pd.DataFrame({"x": [1]}).to_csv(
+        count_matched / "resample_entity_ledger.tsv.gz", sep="\t", index=False, compression="gzip"
+    )
     write_json(index / "report.json", {
         "status": "development_pretruth_factorial_response_index",
         "identity_table_sha256": file_sha256(identity),
@@ -106,6 +118,7 @@ def test_pretruth_freeze_accepts_complete_contract(tmp_path: Path) -> None:
         "--unresolved-null-dir", str(unresolved_null),
         "--unresolved-jackknife-dir", str(unresolved_jackknife),
         "--identity-table", str(identity),
+        "--count-matched-dir", str(count_matched),
         "--output-dir", str(output),
     ], check=True, cwd=ROOT)
     report = json.loads((output / "report.json").read_text(encoding="utf-8"))

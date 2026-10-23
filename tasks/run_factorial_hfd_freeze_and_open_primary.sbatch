@@ -26,6 +26,7 @@ python -u tasks/freeze_factorial_hfd_pretruth.py \
   --unresolved-null-dir data/validation/factorial_hfd_response_null_unresolved_official_v1_20261023 \
   --unresolved-jackknife-dir data/validation/factorial_hfd_panel_jackknife_unresolved_official_v1_20261023 \
   --identity-table data/validation/factorial_hfd_identity_partition_v1_20261023/identity_partition.tsv.gz \
+  --count-matched-dir data/validation/factorial_hfd_count_matched_unresolved_official_v1_20261023 \
   --output-dir data/validation/factorial_hfd_pretruth_freeze_official_v1_20261023
 
 python -u tasks/evaluate_factorial_hfd_retrieval.py \
@@ -48,3 +49,9 @@ python -u tasks/evaluate_factorial_hfd_retrieval.py \
   --jackknife data/validation/factorial_hfd_panel_jackknife_unresolved_official_v1_20261023/single_panel_deletion_scores.tsv.gz \
   --output-dir data/validation/factorial_hfd_primary_adjudication_unresolved_official_v1_20261023 \
   --world unresolved
+
+python -u tasks/evaluate_factorial_hfd_count_matched_unresolved.py \
+  --scores data/validation/factorial_hfd_count_matched_unresolved_official_v1_20261023/count_matched_retrieval_scores.tsv.gz \
+  --known-scores "$RETRIEVAL/retrieval_scores.tsv.gz" \
+  --output-dir data/validation/factorial_hfd_count_matched_adjudication_official_v1_20261023 \
+  --required-fraction 0.80

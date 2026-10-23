@@ -48,6 +48,7 @@ def main() -> None:
     parser.add_argument("--unresolved-null-dir", required=True, type=Path)
     parser.add_argument("--unresolved-jackknife-dir", required=True, type=Path)
     parser.add_argument("--identity-table", required=True, type=Path)
+    parser.add_argument("--count-matched-dir", required=True, type=Path)
     parser.add_argument("--output-dir", required=True, type=Path)
     args = parser.parse_args()
     if args.output_dir.exists():
@@ -96,6 +97,14 @@ def main() -> None:
         raise RuntimeError("primary calibration reports are not the all-entity world")
     if int(reports["jackknife"].get("response_objects", 0)) != 15:
         raise RuntimeError("jackknife response-object count differs from the index")
+    count_matched_report_path = args.count_matched_dir / "report.json"
+    count_matched_report = json.loads(count_matched_report_path.read_text(encoding="utf-8"))
+    if count_matched_report.get("status") != "PRETRUTH_COUNT_MATCHED_UNRESOLVED_SCORES_FROZEN":
+        raise RuntimeError("count-matched unresolved scores are not frozen")
+    if count_matched_report.get("truth_opened") is not False:
+        raise RuntimeError("count-matched control did not preserve truth-blind state")
+    if int(count_matched_report.get("denominators", {}).get("resamples", 0)) != 16:
+        raise RuntimeError("count-matched control must contain 16 frozen resamples")
 
     files = {
         "index_report": report_paths["index"],
@@ -110,6 +119,9 @@ def main() -> None:
         "jackknife_report": report_paths["jackknife"],
         "jackknife_scores": args.jackknife_dir / "single_panel_deletion_scores.tsv.gz",
         "identity_partition": args.identity_table,
+        "count_matched_report": count_matched_report_path,
+        "count_matched_scores": args.count_matched_dir / "count_matched_retrieval_scores.tsv.gz",
+        "count_matched_ledger": args.count_matched_dir / "resample_entity_ledger.tsv.gz",
     }
     for world, (null_report, jack_report, null_path, jack_path) in world_reports.items():
         if int(null_report.get("permutations", 0)) != 1999:
@@ -148,6 +160,7 @@ def main() -> None:
             "retrieval_rows": len(retrieval),
             "permutations": 1999,
             "separately_calibrated_evidence_worlds": 3,
+            "count_matched_unresolved_resamples": 16,
             "jackknife_rows": int(reports["jackknife"].get("scored_rows", 0)),
         },
         "truth_opened": False,
