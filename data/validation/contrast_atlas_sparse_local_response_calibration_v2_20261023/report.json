@@ -1,0 +1,79 @@
+{
+  "schema": "contrast_atlas_sparse_local_response_null_calibration_v1",
+  "status": "DEVELOPMENT_CONSUMED_RESPONSE_SPECIFICITY_CALIBRATION_COMPLETE",
+  "data_role": "development_consumed",
+  "method": {
+    "permutations": 256,
+    "seed": 20261023,
+    "reassignment_unit": "whole entity response profile",
+    "reassignment_strata": "within study and common identity status",
+    "preserved": [
+      "frozen phenotype-blind chemical graph",
+      "complete candidate universe",
+      "study and contrast structure",
+      "within-profile cross-contrast dependence",
+      "identity-world entity counts"
+    ],
+    "calibrated_score": "candidate-specific z score against response-profile reassignment",
+    "registered_relations_opened": "after every observed and null candidate score was frozen"
+  },
+  "denominators": {
+    "studies": 12,
+    "contrasts": 27,
+    "candidate_rows": 1944,
+    "permutations": 256,
+    "canonical_registered_relations": 5,
+    "registered_directional_relations": 10,
+    "independent_biological_relation_components": 2
+  },
+  "canonical_registered_relation_descriptive_ranks": {
+    "all": {
+      "canonical_relations": 5,
+      "similar_z_top1": 0,
+      "unsigned_z_top1": 0,
+      "median_similar_z_rank": 12.0,
+      "median_unsigned_z_rank": 10.0,
+      "empirical_p_at_minimum_resolution": 0
+    },
+    "known": {
+      "canonical_relations": 5,
+      "similar_z_top1": 1,
+      "unsigned_z_top1": 0,
+      "median_similar_z_rank": 20.0,
+      "median_unsigned_z_rank": 16.0,
+      "empirical_p_at_minimum_resolution": 0
+    },
+    "unresolved": {
+      "canonical_relations": 5,
+      "similar_z_top1": 0,
+      "unsigned_z_top1": 0,
+      "median_similar_z_rank": 10.0,
+      "median_unsigned_z_rank": 8.0,
+      "empirical_p_at_minimum_resolution": 0
+    }
+  },
+  "decision_boundary": {
+    "pass_fail": "NOT_ADJUDICATED",
+    "reason": "only two biological relation components and no signed metabolite-level truth",
+    "unregistered_pairs": "unadjudicated, never treated as negatives"
+  },
+  "provenance": {
+    "alignment_report_sha256": "97adc11dc6b4c6f3d152a81050e5a7d584359266a8adc065079ca36bb99fc1c7",
+    "alignment_scores_sha256": "3bab64ff839c4e1dfff884c783e996d1426bf652a4b774b077e97ee0062ccff8",
+    "alignment_edges_sha256": "5c87c770a3b143ba2c78cd63cef72b17c4386c36c5221473677b9f9953379222",
+    "response_entities_sha256": "6610987fe472a195e2fcf40ee6f7b7aae0477c063901436f2d05a9f0557f2330",
+    "contrast_manifest_sha256": "c83a5b88e326553330e590eff80437194930e6f3d8122c4627f6ab429118e68b",
+    "registered_relations_sha256": "61c4473d200e29a4210dd18b55c3b222dd9819c8a7a63a0d0c71e1289be720fc",
+    "identity_partition_sha256": "8e61125587bb79aa10b0c5381f90a9bf8743b138997f287aeacf0f14332b0780",
+    "scores": "0bf292a058816c1edf032333f62c3325efb76a3e25392361f7763c174d1c8512",
+    "seeds": "afe1b6e04741a4a8cad40cb52b27cdc880d7316ff27a64879e965662335a64a2",
+    "relations": "4f72bd777d50b60e3d01c8ac1e78da8ee3481f893850089073de57f7cfa5c96c",
+    "implementation_sha256": "5781a504b15d3459466eaee1e512fa21cc733b7ffd79b1b7be35f17b60101b89"
+  },
+  "claim_boundary": [
+    "This calibration removes candidate-specific chemical-composition expectations; it does not create biological truth.",
+    "Empirical p values are descriptive development statistics and are not multiplicity-corrected discovery claims.",
+    "Forward and reverse registered rows are not independent; the primary summary uses five canonical rows.",
+    "Only two biological relation components are registered, so no generalization claim is qualified."
+  ]
+}

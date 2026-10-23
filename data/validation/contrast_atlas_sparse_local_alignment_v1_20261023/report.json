@@ -1,0 +1,193 @@
+{
+  "schema": "contrast_atlas_sparse_local_response_alignment_v1",
+  "status": "DEVELOPMENT_CONSUMED_SPARSE_LOCAL_ALIGNMENT_COMPLETE",
+  "data_role": "development_consumed",
+  "method": {
+    "fragment_bin_width_da": 0.1,
+    "minimum_cosine": 0.7,
+    "neighbors_each_direction": 1,
+    "graph_freeze": "source-pair and identity-world graphs frozen before beta, SE, contrasts or relations are opened",
+    "response_weight": "beta/sqrt(beta^2+se^2)",
+    "directional_denominator": "complete common-policy source entity universe; absent edges contribute zero",
+    "score": "symmetric mean of locally aligned response-weight products weighted by fragment cosine"
+  },
+  "denominators": {
+    "studies": 12,
+    "contrasts": 27,
+    "response_rows": 91295,
+    "fragment_dimensions": 59682,
+    "source_pair_world_graphs": 198,
+    "frozen_directional_edges": 150440,
+    "fixed_candidate_rows_per_arm": 1944,
+    "registered_directional_relations": 10
+  },
+  "registered_relation_descriptive_ranks": {
+    "all": {
+      "relations": 10,
+      "similar_top1": 3,
+      "unsigned_top1": 2,
+      "composition_top1": 2,
+      "median_similar_rank": 2.5,
+      "median_unsigned_rank": 2.0
+    },
+    "known": {
+      "relations": 10,
+      "similar_top1": 2,
+      "unsigned_top1": 2,
+      "composition_top1": 2,
+      "median_similar_rank": 15.5,
+      "median_unsigned_rank": 15.0
+    },
+    "unresolved": {
+      "relations": 10,
+      "similar_top1": 3,
+      "unsigned_top1": 2,
+      "composition_top1": 2,
+      "median_similar_rank": 2.5,
+      "median_unsigned_rank": 2.5
+    }
+  },
+  "truth_boundary": {
+    "registered_signed_truth_relations": 0,
+    "unregistered_pairs": "unadjudicated, never negative",
+    "pass_fail": "not adjudicated because every registered direction is unspecified"
+  },
+  "sources": [
+    {
+      "study_id": "MSV000097426",
+      "mgf_path": "data\\validation\\msv000097426_hfd_ms2_anchored_20261014_v1\\representative_spectra.mgf",
+      "mgf_sha256": "eb6b4517c2ad70b718c5384ff7378e24e650a4ef8333669df84de95a436f8b42",
+      "mgf_spectra_total": 4635,
+      "response_spectra_nonempty": 2163,
+      "fragment_nonzero_bins": 67992,
+      "maximum_bin_index": 28357
+    },
+    {
+      "study_id": "MSV000084112",
+      "mgf_path": "data\\validation\\msv000084112_matched_ms2_anchored_20261014_v1\\representative_spectra.mgf",
+      "mgf_sha256": "5831e21a5e519903802aab5ae29da92e363ebb674e4a27142193260627443a8f",
+      "mgf_spectra_total": 12116,
+      "response_spectra_nonempty": 5501,
+      "fragment_nonzero_bins": 235835,
+      "maximum_bin_index": 39254
+    },
+    {
+      "study_id": "MSV000083077",
+      "mgf_path": "data\\validation\\msv000083077_saliva_ms2_anchored_20261014_v4\\representative_spectra.mgf",
+      "mgf_sha256": "8833c9a4a80b2ac508875395ff9e3750075e2616dc42532d55875a63ce33a8c8",
+      "mgf_spectra_total": 15184,
+      "response_spectra_nonempty": 7132,
+      "fragment_nonzero_bins": 213434,
+      "maximum_bin_index": 59681
+    },
+    {
+      "study_id": "MSV000088023",
+      "mgf_path": "data\\reference\\msv000088023_hfd_response\\ms2spectra_maxTic.mgf",
+      "mgf_sha256": "59ceb4d533b480760bf93c47dc9213de44e271d0fd521b7e8ecdf67615d5fada",
+      "mgf_spectra_total": 971,
+      "response_spectra_nonempty": 212,
+      "fragment_nonzero_bins": 7356,
+      "maximum_bin_index": 16627
+    },
+    {
+      "study_id": "MSV000090788",
+      "mgf_path": "data\\reference\\public_fbmn\\a36305db40414b6ea9c5b9a5de380bea\\representative.mgf",
+      "mgf_sha256": "57cc380fac1563bfdf736c3208a4cad09f6ce39b991bbd4363b083bb1b93c659",
+      "mgf_spectra_total": 9541,
+      "response_spectra_nonempty": 2350,
+      "fragment_nonzero_bins": 101223,
+      "maximum_bin_index": 20705
+    },
+    {
+      "study_id": "MSV000097610",
+      "mgf_path": "data\\reference\\contrast_atlas_ibd_cross_study_20261014\\pediatric_veoibd_consensus.mgf",
+      "mgf_sha256": "c628ce08fc8215942469ec8fb193c6b3c189484032f83cc9ba9b190281c64fd1",
+      "mgf_spectra_total": 43697,
+      "response_spectra_nonempty": 6081,
+      "fragment_nonzero_bins": 244383,
+      "maximum_bin_index": 53685
+    },
+    {
+      "study_id": "IBD200_GROUP",
+      "mgf_path": "data\\reference\\contrast_atlas_ibd_cross_study_20261014\\adult_ibd200_consensus.mgf",
+      "mgf_sha256": "6aeba8b4c1e9cc94e127985cc18bde9a4d1df8c99030d470d4cec888bc5465e6",
+      "mgf_spectra_total": 2498,
+      "response_spectra_nonempty": 662,
+      "fragment_nonzero_bins": 17172,
+      "maximum_bin_index": 13161
+    },
+    {
+      "study_id": "MSV000090804",
+      "mgf_path": "data\\reference\\public_fbmn_systematic_v1\\def58641630e488985bfbe5a15c94e32\\representative.mgf",
+      "mgf_sha256": "37e8cf36f37b9a0cc9fc25f1dee1bbe718c04f6f4b8cae9cbf9a43b7c6fdd9e6",
+      "mgf_spectra_total": 4612,
+      "response_spectra_nonempty": 4349,
+      "fragment_nonzero_bins": 275248,
+      "maximum_bin_index": 9999
+    },
+    {
+      "study_id": "MSV000086360",
+      "mgf_path": "data\\reference\\public_fbmn_systematic_v1\\63d6d0c95b3e4d8d846d376499bb544e\\representative.mgf",
+      "mgf_sha256": "4295507c6fe553ec73e3b301002e06d8c9a5efcaba52b3016bae81bff9cf543f",
+      "mgf_spectra_total": 4316,
+      "response_spectra_nonempty": 3368,
+      "fragment_nonzero_bins": 111593,
+      "maximum_bin_index": 25335
+    },
+    {
+      "study_id": "MSV000084794",
+      "mgf_path": "data\\reference\\public_fbmn_systematic_v1\\af7ec76b02ac482bbd2b7ee3a3ccbdc5\\representative.mgf",
+      "mgf_sha256": "8792840ee815c63028047cede2d646edc79529eebb0b9e9d81e0f3bc382afb91",
+      "mgf_spectra_total": 36234,
+      "response_spectra_nonempty": 2201,
+      "fragment_nonzero_bins": 109822,
+      "maximum_bin_index": 21738
+    },
+    {
+      "study_id": "MSV000096564",
+      "mgf_path": "data\\reference\\msv000096564_baseline_ibd_v1\\mgf.mgf",
+      "mgf_sha256": "2b8892c89650f774704c556f1fc0287afcfed38879488cdf9b959b65e4ec1e46",
+      "mgf_spectra_total": 7267,
+      "response_spectra_nonempty": 2817,
+      "fragment_nonzero_bins": 52963,
+      "maximum_bin_index": 7724
+    },
+    {
+      "study_id": "MSV000092887",
+      "mgf_path": "data\\validation\\contrast_atlas_msv000092887_raw_ms2_link_v1_20261022\\representative_ms2.mgf",
+      "mgf_sha256": "b3e8b5c40d70ee17739310d4268b08aa33bc9720fc91aafd1985a290f1cc71e3",
+      "mgf_spectra_total": 1616,
+      "response_spectra_nonempty": 1411,
+      "fragment_nonzero_bins": 19001,
+      "maximum_bin_index": 9971
+    }
+  ],
+  "claim_boundary": [
+    "This is a complete 12-study development run, not external validation.",
+    "Registered condition-family relevance is not metabolite-level signed truth.",
+    "Top-1 counts are descriptive because only two biological relation components are registered.",
+    "Unresolved means not supported by the common strict library policy, not a unique unknown molecule.",
+    "Feature rows may retain adduct and isotope redundancy."
+  ],
+  "provenance": {
+    "contract_sha256": "0760fefb1a28519cd79cb7578b2b2afceff99aaffd198f7c14fff929100370e9",
+    "contract_lineage": {
+      "tasks\\contrast_atlas_open_collection_v1.json": "259b7fe26841501ce2c82ac4b61becb6ee8657491f3417fb483cd385bf267a98",
+      "tasks\\contrast_atlas_open_collection_ibd_extension_v1.json": "b4e08b9df7796e02515574942d331724b3cc929543a4919ead624f10690de83a",
+      "tasks\\contrast_atlas_open_collection_fbmn_systematic_extension_v1.json": "f07630c1327bffa8c6fd0398148bd09fddcc7ca6b39134a4dccb9f8b9de55c30",
+      "tasks\\contrast_atlas_open_collection_ibd3_extension_v1.json": "8f27a301dace04fcc42adba7e66093735b3a895b7d7f6b48c57f48560515ec1e",
+      "tasks\\contrast_atlas_open_collection_covid_extension_v1.json": "0760fefb1a28519cd79cb7578b2b2afceff99aaffd198f7c14fff929100370e9"
+    },
+    "response_entities_sha256": "6610987fe472a195e2fcf40ee6f7b7aae0477c063901436f2d05a9f0557f2330",
+    "contrast_manifest_sha256": "c83a5b88e326553330e590eff80437194930e6f3d8122c4627f6ab429118e68b",
+    "registered_relations_sha256": "61c4473d200e29a4210dd18b55c3b222dd9819c8a7a63a0d0c71e1289be720fc",
+    "identity_partition_sha256": "8e61125587bb79aa10b0c5381f90a9bf8743b138997f287aeacf0f14332b0780",
+    "scores": "3bab64ff839c4e1dfff884c783e996d1426bf652a4b774b077e97ee0062ccff8",
+    "sensitivity": "538b85a133eaa234f63121b2b54671c7d3eed036a6e47fd97dc0077a01036018",
+    "mapping": "762723461a35981e13cfb579ef40e7b094f61ee67237ee4e8a6b801355529f41",
+    "edges": "5c87c770a3b143ba2c78cd63cef72b17c4386c36c5221473677b9f9953379222",
+    "graphs": "039090df950db453e215c209a1d29074cd4e0c86c4c53da7ec2283ffb1fbd598",
+    "relations": "cbed827a2d79199d8fa0cab506b22a8f917cf22f4b1bfc58adc0a56fd36159e8",
+    "implementation_sha256": "922b17dbdf3f4fc66622fa81dec0daa70c7410452e1b586091adca2688457c41"
+  }
+}
