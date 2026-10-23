@@ -100,6 +100,32 @@ def anchored_features(static: np.ndarray, base_scores: np.ndarray,
     return output, names
 
 
+def anchored_training_features(static: np.ndarray, base_scores: np.ndarray,
+                               query_ptr: np.ndarray, queries: np.ndarray
+                               ) -> tuple[np.ndarray, np.ndarray, np.ndarray, tuple[str, ...]]:
+    """Build anchor features only on outer-training queries.
+
+    ``base_scores`` is deliberately NaN on the outer validation fold.  Packing
+    the requested queries before summarization preserves that isolation and
+    avoids either reading or fabricating validation anchors.
+    """
+    candidate_index, packed_ptr = candidate_indices(query_ptr, queries)
+    packed_base = np.asarray(base_scores[candidate_index], dtype=np.float32)
+    if np.any(~np.isfinite(packed_base)):
+        raise RuntimeError("selected nested B training rows are incomplete")
+    anchor = query_score_features(packed_base, packed_ptr)
+    output = np.column_stack((anchor, static[candidate_index])).astype(np.float32)
+    names = (
+        "B_raw", "B_gap", "B_margin",
+        f"{STAGE1}_raw", f"{STAGE1}_gap", f"{STAGE1}_margin",
+        f"{PHASEA}_raw", f"{PHASEA}_gap", f"{PHASEA}_margin",
+        "msg_logit_raw", "msg_logit_gap", "msg_logit_margin",
+    )
+    if output.shape[1] != len(names) or not np.all(np.isfinite(output)):
+        raise RuntimeError("invalid packed anchor-conditioned feature matrix")
+    return candidate_index, packed_ptr, output, names
+
+
 def fit_standardizer(features: np.ndarray, candidate_index: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     selected = np.asarray(features[candidate_index], dtype=np.float64)
     mean = selected.mean(axis=0).astype(np.float32)
@@ -125,17 +151,33 @@ def strongest_false_positions(base: np.ndarray, labels: np.ndarray,
     return np.asarray(positive, dtype=np.int64), np.asarray(competitor, dtype=np.int64)
 
 
+def dynamic_hardest_false_loss(scores: torch.Tensor, labels: torch.Tensor,
+                               packed_ptr: np.ndarray) -> torch.Tensor:
+    """Contrast truth against the strongest *current* false candidate."""
+    lengths = torch.as_tensor(np.diff(packed_ptr), dtype=torch.long, device=scores.device)
+    qindex = torch.repeat_interleave(torch.arange(len(lengths), device=scores.device), lengths)
+    positive = labels > 0
+    if int(positive.sum()) != len(lengths):
+        raise RuntimeError("each packed query must contain one truth candidate")
+    false_scores = scores.masked_fill(positive, -torch.inf)
+    strongest_false = torch.full(
+        (len(lengths),), -torch.inf, dtype=scores.dtype, device=scores.device,
+    )
+    strongest_false.scatter_reduce_(0, qindex, false_scores, reduce="amax", include_self=True)
+    if torch.any(~torch.isfinite(strongest_false)):
+        raise RuntimeError("each training query needs at least one false candidate")
+    return F.softplus(strongest_false - scores[positive]).mean()
+
+
 def fit_repair(panel: dict, train_queries: np.ndarray, nested_b: np.ndarray,
                recipe: dict, seed: int, device: str):
-    candidate_index, packed_ptr = candidate_indices(panel["query_ptr"], train_queries)
-    if np.any(~np.isfinite(nested_b[candidate_index])):
-        raise RuntimeError("nested B ledger is incomplete")
-    dynamic, feature_names = anchored_features(panel["static_features"], nested_b, panel["query_ptr"])
-    mean, scale = fit_standardizer(dynamic, candidate_index)
-    x_np = (dynamic[candidate_index] - mean) / scale
+    candidate_index, packed_ptr, dynamic, feature_names = anchored_training_features(
+        panel["static_features"], nested_b, panel["query_ptr"], train_queries,
+    )
+    mean, scale = fit_standardizer(dynamic, np.arange(len(dynamic), dtype=np.int64))
+    x_np = (dynamic - mean) / scale
     base_np = np.asarray(nested_b[candidate_index], dtype=np.float32)
     labels_np = np.asarray(panel["labels"][candidate_index], dtype=np.int8)
-    positive, competitor = strongest_false_positions(base_np, labels_np, packed_ptr)
     bound, capacity = training_residual_bound(nested_b, panel["query_ptr"], train_queries)
 
     random.seed(seed); np.random.seed(seed); torch.manual_seed(seed)
@@ -145,14 +187,13 @@ def fit_repair(panel: dict, train_queries: np.ndarray, nested_b: np.ndarray,
     )
     base = torch.as_tensor(base_np, dtype=torch.float32, device=device)
     x = torch.as_tensor(x_np, dtype=torch.float32, device=device)
-    pos = torch.as_tensor(positive, dtype=torch.long, device=device)
-    neg = torch.as_tensor(competitor, dtype=torch.long, device=device)
+    labels = torch.as_tensor(labels_np, dtype=torch.int8, device=device)
     final = None
     for _ in range(int(recipe["epochs"])):
         optimizer.zero_grad(set_to_none=True)
         residual = model.residual(x)
         score = base + residual
-        pairwise = F.softplus(-(score[pos] - score[neg])).mean()
+        pairwise = dynamic_hardest_false_loss(score, labels, packed_ptr)
         trust = float(recipe["trust_weight"]) * torch.mean(residual ** 2)
         loss = pairwise + trust
         loss.backward(); torch.nn.utils.clip_grad_norm_(model.parameters(), 5.0); optimizer.step()
@@ -316,7 +357,7 @@ def main() -> None:
         "scientific_change": {
             "anchor_conditioning": "B raw/gap/margin are explicit candidate features",
             "family_semantics": "Stage-1 and Phase-A direct summaries; MSG logit summaries; no MSG-P2b subtraction",
-            "objective": "truth candidate versus B strongest false competitor plus inherited trust penalty",
+            "objective": "truth candidate versus strongest current false competitor at every update plus inherited trust penalty",
             "unchanged": "same parent B recipe, hidden width, epochs, learning rate, trust weight and fold assignment",
         },
         "stacking_isolation": {

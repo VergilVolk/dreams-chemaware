@@ -3,9 +3,12 @@
 from pathlib import Path
 
 import numpy as np
+import torch
 
 from train_b_anchor_conditioned_family_repair import (
     anchored_features,
+    anchored_training_features,
+    dynamic_hardest_false_loss,
     fit_standardizer,
     msg_logit,
     static_family_features,
@@ -46,6 +49,22 @@ def main() -> None:
     positive, negative = strongest_false_positions(first_b, labels, bundle["query_ptr"])
     assert positive.tolist() == [0, 3]
     assert negative.tolist() == [1, 2]
+
+    # Outer-validation anchors remain NaN and are never summarized or filled.
+    nested = np.asarray([0.8, 0.1, np.nan, np.nan], dtype=np.float32)
+    selected, packed_ptr, packed, _ = anchored_training_features(
+        static, nested, bundle["query_ptr"], np.asarray([0], dtype=np.int64),
+    )
+    assert selected.tolist() == [0, 1] and packed_ptr.tolist() == [0, 2]
+    assert np.all(np.isfinite(packed)) and np.isnan(nested[2:]).all()
+
+    # The active competitor is recomputed from current scores, not frozen to B.
+    scores = torch.tensor([2.0, 1.0, 0.2, 0.4, 0.9, 1.1])
+    labels_t = torch.tensor([1, 0, 0, 1, 0, 0], dtype=torch.int8)
+    ptr_t = np.asarray([0, 3, 6], dtype=np.int64)
+    observed = dynamic_hardest_false_loss(scores, labels_t, ptr_t)
+    expected = torch.nn.functional.softplus(torch.tensor([1.0 - 2.0, 1.1 - 0.4])).mean()
+    assert torch.allclose(observed, expected)
 
     sbatch = (Path(__file__).resolve().parent / "run_b_anchor_conditioned_family_repair.sbatch").read_text()
     assert "#SBATCH --gpus=1" in sbatch and "#SBATCH --cpus-per-task=10" in sbatch
