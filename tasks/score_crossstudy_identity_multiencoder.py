@@ -16,10 +16,14 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from ms_entropy import calculate_entropy_similarity
 
 from analyze_msv000095331_chemprop_open_retrieval import CHEMPROP_MGF, NEW_STUDY
 from encode_pan_redu_panel_spectra import load_mgf
+from noise_gnps_article_spectral_scores import (
+    prepare_spectrum,
+    weighted_entropy_backend,
+    weighted_entropy_similarity,
+)
 
 
 NEW_MGF = Path("data/reference/msv000095331_drug_microbiome_20261023/consensus.mgf")
@@ -118,10 +122,11 @@ def main() -> None:
                 if any(query_id not in caches[name] or candidate_id not in caches[name]
                        for name in methods):
                     continue
-                wse = float(calculate_entropy_similarity(
-                    query_peaks, cand_peaks, ms2_tolerance_in_da=args.fragment_da,
-                    clean_spectra=True,
-                ))
+                wse = weighted_entropy_similarity(
+                    prepare_spectrum(query_peaks.T),
+                    prepare_spectrum(cand_peaks.T),
+                    tolerance=args.fragment_da,
+                )
                 text = f"{query_id}|{candidate_id}"
                 record: dict[str, object] = {
                     "candidate_pair_id": hashlib.sha256(text.encode()).hexdigest(),
@@ -182,6 +187,7 @@ def main() -> None:
         "labels_or_responses_accessed": False,
         "candidate_admission": "all precursor-compatible candidates; no spectral-score threshold",
         "methods": ["weighted_spectral_entropy", *methods, "simple_query_minmax_mean"],
+        "weighted_entropy_backend": weighted_entropy_backend(),
         "parameters": {"precursor_ppm": args.precursor_ppm, "fragment_da": args.fragment_da},
         "denominators": {
             "directional_queries": int(len(queries)),
