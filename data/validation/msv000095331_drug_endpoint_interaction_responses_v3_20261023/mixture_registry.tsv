@@ -1,0 +1,16 @@
+mixture	drug	chemprop_overlap	source
+1	sertraline	True	published Methods; DOI 10.1038/s41467-025-65993-5
+1	quinidine	False	published Methods; DOI 10.1038/s41467-025-65993-5
+1	venlafaxine	False	published Methods; DOI 10.1038/s41467-025-65993-5
+2	cetirizine	False	published Methods; DOI 10.1038/s41467-025-65993-5
+2	losartan	False	published Methods; DOI 10.1038/s41467-025-65993-5
+2	quetiapine	False	published Methods; DOI 10.1038/s41467-025-65993-5
+2	ritonavir	False	published Methods; DOI 10.1038/s41467-025-65993-5
+3	darunavir	False	published Methods; DOI 10.1038/s41467-025-65993-5
+3	quinine	False	published Methods; DOI 10.1038/s41467-025-65993-5
+3	atorvastatin	False	published Methods; DOI 10.1038/s41467-025-65993-5
+3	omeprazole	True	published Methods; DOI 10.1038/s41467-025-65993-5
+4	loratadine	True	published Methods; DOI 10.1038/s41467-025-65993-5
+4	terbinafine	False	published Methods; DOI 10.1038/s41467-025-65993-5
+4	trazodone	False	published Methods; DOI 10.1038/s41467-025-65993-5
+4	abacavir	False	published Methods; DOI 10.1038/s41467-025-65993-5

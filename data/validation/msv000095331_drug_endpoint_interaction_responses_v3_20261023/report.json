@@ -1,0 +1,50 @@
+{
+  "schema": "msv000095331_drug_endpoint_interaction_responses_v2",
+  "status": "MSV000095331_DRUG_ENDPOINT_INTERACTION_RESPONSES_COMPLETE",
+  "study_id": "MSV000095331",
+  "data_role": "new_source_development_not_sealed_confirmation",
+  "gnps_task": "401db749414546aeb37222c752294861",
+  "scientific_question": "Which LC-MS/MS entities show a drug-mixture-associated 72-hour response in microbial communities beyond both the no-drug community endpoint and the matched abiotic medium response?",
+  "primary_estimand": "equal-weight mean across four communities of (microbial drug T72 - microbial no-drug T72), minus (BHI drug T72 - BHI no-drug T72)",
+  "sensitivity_estimand": "historical (microbial T72-T0)-(BHI T72-T0), written separately and not interpreted as drug-specific because no-drug community growth is absent",
+  "denominators": {
+    "deposited_metadata_rows": 291,
+    "analysis_samples": 135,
+    "drug_timecourse_samples": 120,
+    "no_drug_endpoint_samples": 15,
+    "primary_communities": 4,
+    "published_drug_mixtures": 4,
+    "response_contrasts": 20,
+    "quantification_features": 8710,
+    "mgf_spectra_total": 17889,
+    "nonempty_ms2_linked_features": 8493,
+    "response_eligible_entity_union": 7338,
+    "response_rows": 124275,
+    "sensitivity_response_rows": 122661,
+    "library_supported_entities": 39,
+    "unresolved_entities": 7299,
+    "chemprop_overlap_drugs": 3
+  },
+  "prespecified_biological_truth": {
+    "increased_microbiota_associated_products": [
+      "ritonavir",
+      "atorvastatin",
+      "abacavir",
+      "quetiapine"
+    ],
+    "abiotic_decreasing_product": "omeprazole m/z 330.127",
+    "basis": "published before this cross-project response analysis"
+  },
+  "exclusions": {
+    "drug_mix5": "not one of the four mixtures defined in the published Methods",
+    "48_hour_groups": "fast and medium-fast communities excluded from the primary common-time estimand because the matched abiotic endpoint is 72 hours"
+  },
+  "claim_boundary": [
+    "MSV000095331 is a new experiment/project but shares the Dorrestein research ecosystem with the ChemProp sources; it is not independent-laboratory confirmation.",
+    "The primary endpoint interaction removes the deposited no-drug endpoint and abiotic response; it does not establish a single-drug causal effect inside a multi-drug mixture.",
+    "A mixture response cannot establish which co-administered drug caused a feature response.",
+    "Three paired response replicates provide only two degrees of freedom; normal-approximation p-values are prohibited and feature-wise significance is exploratory even with a t reference.",
+    "Library-supported means a stringent public-library match, not level-1 identification.",
+    "The paper's named drug products are validation targets and do not enter feature filtering or beta/SE estimation."
+  ]
+}

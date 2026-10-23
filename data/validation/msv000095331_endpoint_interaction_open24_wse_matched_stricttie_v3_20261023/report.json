@@ -1,0 +1,196 @@
+{
+  "schema": "msv000095331_chemprop_open_response_retrieval_v1",
+  "status": "MSV000095331_CHEMPROP_OPEN_RESPONSE_RETRIEVAL_COMPLETE",
+  "data_role": "development; MSV000095331 is new to this method but not sealed and not independent-laboratory confirmation",
+  "question": "Can a four-mixture endpoint interaction response, net of no-drug community and abiotic medium effects, retrieve prespecified overlapping drug-exposure responses from an open multi-study candidate collection?",
+  "parameters": {
+    "fragment_bin_width_da": 0.1,
+    "minimum_spectral_similarity": 0.7,
+    "spectral_method": "wse",
+    "fragment_tolerance_da": 0.02,
+    "minimum_matched_fragments": 6,
+    "neighbors_each_direction": 1,
+    "candidate_scope": "chemprop",
+    "edge_rule": "mutual top-1, frozen before effects and drug overlap",
+    "precursor_compatible_identity_hypothesis_ppm": 10.0,
+    "response_weight": "beta/sqrt(beta^2+se^2)",
+    "ranking_ties": "worst rank; a zero-evidence tie cannot receive Top-1 credit",
+    "response_specificity_score": "signed aligned-response score minus that candidate contrast's mean signed score across all four query mixtures; no drug name or registered overlap enters centering",
+    "dual_response_support": "exploratory BH q<=0.05 at both endpoints with equal beta sign; the new source uses Student t with df=2, and these counts are not confirmatory"
+  },
+  "denominators": {
+    "new_project_samples": 135,
+    "new_project_query_contrasts": 20,
+    "primary_pooled_query_contrasts": 4,
+    "community_specific_query_contrasts": 16,
+    "open_chemprop_candidate_contrasts": 24,
+    "chemprop_candidate_sources": 3,
+    "prespecified_overlap_queries": 3,
+    "prespecified_true_source_relations": 6,
+    "phenotype_blind_edge_rows_all_worlds": 1378,
+    "dual_exploratory_q05_same_direction_support_rows": 0,
+    "measurement_matched_unresolved_entities_by_study": {
+      "MSV000095331": 39,
+      "MSV000093571": 55,
+      "MSV000094899": 94,
+      "MSV000096724": 78
+    }
+  },
+  "retrieval_summary": [
+    {
+      "evidence_world": "all",
+      "open_candidates_per_query": 24,
+      "prespecified_overlap_queries": 3,
+      "prespecified_true_source_relations": 6,
+      "top1_queries_correct": 2,
+      "mean_reciprocal_best_true_rank": 0.7142857142857143,
+      "median_best_true_rank": 1.0,
+      "specificity_top1_queries_correct": 1,
+      "specificity_mean_reciprocal_best_true_rank": 0.46296296296296297,
+      "specificity_median_best_true_rank": 3.0,
+      "specificity_true_relations_top3": 2,
+      "specificity_true_relations_top5": 3,
+      "true_relations_top3": 2,
+      "true_relations_top5": 2,
+      "true_dual_exploratory_q05_same_direction_edges": 0,
+      "true_identity_hypothesis_edges": 0,
+      "true_chemical_relation_edges": 0
+    },
+    {
+      "evidence_world": "known",
+      "open_candidates_per_query": 24,
+      "prespecified_overlap_queries": 3,
+      "prespecified_true_source_relations": 6,
+      "top1_queries_correct": 0,
+      "mean_reciprocal_best_true_rank": 0.3148148148148148,
+      "median_best_true_rank": 3.0,
+      "specificity_top1_queries_correct": 1,
+      "specificity_mean_reciprocal_best_true_rank": 0.43703703703703706,
+      "specificity_median_best_true_rank": 5.0,
+      "specificity_true_relations_top3": 1,
+      "specificity_true_relations_top5": 2,
+      "true_relations_top3": 2,
+      "true_relations_top5": 2,
+      "true_dual_exploratory_q05_same_direction_edges": 0,
+      "true_identity_hypothesis_edges": 0,
+      "true_chemical_relation_edges": 0
+    },
+    {
+      "evidence_world": "unresolved",
+      "open_candidates_per_query": 24,
+      "prespecified_overlap_queries": 3,
+      "prespecified_true_source_relations": 6,
+      "top1_queries_correct": 2,
+      "mean_reciprocal_best_true_rank": 0.7142857142857143,
+      "median_best_true_rank": 1.0,
+      "specificity_top1_queries_correct": 1,
+      "specificity_mean_reciprocal_best_true_rank": 0.5196078431372549,
+      "specificity_median_best_true_rank": 2.0,
+      "specificity_true_relations_top3": 2,
+      "specificity_true_relations_top5": 2,
+      "true_relations_top3": 2,
+      "true_relations_top5": 2,
+      "true_dual_exploratory_q05_same_direction_edges": 0,
+      "true_identity_hypothesis_edges": 0,
+      "true_chemical_relation_edges": 0
+    },
+    {
+      "evidence_world": "measurement_matched_unresolved",
+      "open_candidates_per_query": 24,
+      "prespecified_overlap_queries": 3,
+      "prespecified_true_source_relations": 6,
+      "top1_queries_correct": 0,
+      "mean_reciprocal_best_true_rank": 0.041666666666666664,
+      "median_best_true_rank": 24.0,
+      "specificity_top1_queries_correct": 0,
+      "specificity_mean_reciprocal_best_true_rank": 0.041666666666666664,
+      "specificity_median_best_true_rank": 24.0,
+      "specificity_true_relations_top3": 0,
+      "specificity_true_relations_top5": 0,
+      "true_relations_top3": 0,
+      "true_relations_top5": 0,
+      "true_dual_exploratory_q05_same_direction_edges": 0,
+      "true_identity_hypothesis_edges": 0,
+      "true_chemical_relation_edges": 0
+    }
+  ],
+  "community_replication_summary": [
+    {
+      "evidence_world": "all",
+      "prespecified_overlap_mixtures": 3,
+      "prespecified_true_source_relations": 6,
+      "community_mean_top1_mixtures_correct": 1,
+      "community_mean_mrr": 0.4362745098039216,
+      "community_mean_median_best_true_rank": 4.0,
+      "true_relations_positive_in_all_four_communities": 0,
+      "true_relations_top5_in_at_least_three_communities": 1
+    },
+    {
+      "evidence_world": "known",
+      "prespecified_overlap_mixtures": 3,
+      "prespecified_true_source_relations": 6,
+      "community_mean_top1_mixtures_correct": 1,
+      "community_mean_mrr": 0.43703703703703706,
+      "community_mean_median_best_true_rank": 5.0,
+      "true_relations_positive_in_all_four_communities": 5,
+      "true_relations_top5_in_at_least_three_communities": 2
+    },
+    {
+      "evidence_world": "measurement_matched_unresolved",
+      "prespecified_overlap_mixtures": 3,
+      "prespecified_true_source_relations": 6,
+      "community_mean_top1_mixtures_correct": 0,
+      "community_mean_mrr": 0.041666666666666664,
+      "community_mean_median_best_true_rank": 24.0,
+      "true_relations_positive_in_all_four_communities": 0,
+      "true_relations_top5_in_at_least_three_communities": 0
+    },
+    {
+      "evidence_world": "unresolved",
+      "prespecified_overlap_mixtures": 3,
+      "prespecified_true_source_relations": 6,
+      "community_mean_top1_mixtures_correct": 1,
+      "community_mean_mrr": 0.4362745098039216,
+      "community_mean_median_best_true_rank": 4.0,
+      "true_relations_positive_in_all_four_communities": 0,
+      "true_relations_top5_in_at_least_three_communities": 1
+    }
+  ],
+  "spectrum_loading": {
+    "MSV000095331": {
+      "mgf_spectra_total": 17889,
+      "response_spectra_nonempty": 7338,
+      "fragment_peaks": 93857
+    },
+    "MSV000094899": {
+      "mgf_spectra_total": 16245,
+      "response_spectra_nonempty": 8055,
+      "fragment_peaks": 351689
+    },
+    "MSV000096724": {
+      "mgf_spectra_total": 9153,
+      "response_spectra_nonempty": 4429,
+      "fragment_peaks": 139593
+    },
+    "MSV000093571": {
+      "mgf_spectra_total": 8581,
+      "response_spectra_nonempty": 4130,
+      "fragment_peaks": 98037
+    }
+  },
+  "no_match_query": "drug_mix_2_pooled_microbiota has no prespecified overlapping ChemProp drug and is retained as a no-match pressure test; no calibrated abstention threshold is claimed",
+  "claim_boundary": [
+    "A drug-mixture response cannot identify which co-administered drug caused an individual feature.",
+    "The primary response uses deposited no-drug 72-hour controls and matched abiotic controls; the historical time-only difference-in-differences is sensitivity analysis only.",
+    "Ten-ppm precursor compatibility is an identity hypothesis, not proof against isomers, adduct ambiguity, or in-source fragments.",
+    "Mass-incompatible edges are chemical relations; their beta values are not meta-analysed as one molecule.",
+    "Unresolved means not supported by the stated library policy, not a unique metabolite.",
+    "Known and unresolved worlds use different-sized entity universes; this is not a measurement-matched formal unknown-increment estimate.",
+    "The measurement-matched-unresolved world equals the known entity count within each study and matches precursor m/z, fragment count, prevalence, and contrast coverage without beta or truth; it is a diagnostic single matching, not a replicated formal unknown-increment test.",
+    "Ion/adduct-family collapse is absent, so support counts are spectral-response edges rather than metabolite counts.",
+    "WSE is the strong classical baseline; B and the complete integrated algorithm must use the same samples, contrasts, candidates and response scoring.",
+    "Response-specificity centering was introduced during development after the uncentered v1 exposed a generic candidate-response bias; its performance is not sealed confirmation.",
+    "Four community-specific responses are repeated biological contexts inside one experiment, not four independent studies.",
+    "Three paired response replicates imply df=2; no normal-approximation feature significance is used for the new source, and q<=0.05 edge counts remain exploratory."
+  ]
+}

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Open cross-project retrieval of drug-microbiome response contrasts.
+"""Open cross-project retrieval of drug-exposure microbiome responses.
 
 MSV000095331 provides four mixture-level microbiota responses.  This script
 queries them against every drug contrast in three earlier ChemProp sources.
@@ -25,6 +25,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 from scipy import sparse, stats
+from scipy.optimize import linear_sum_assignment
 from ms_entropy import FlashEntropySearch
 
 from run_contrast_atlas_sparse_fragment_measure_baseline import (
@@ -39,7 +40,7 @@ from build_contrast_atlas_open_response_collection import load_contract
 
 STATUS = "MSV000095331_CHEMPROP_OPEN_RESPONSE_RETRIEVAL_COMPLETE"
 NEW_STUDY = "MSV000095331"
-WORLDS = ("all", "known", "unresolved")
+WORLDS = ("all", "known", "unresolved", "measurement_matched_unresolved")
 TRUE_OVERLAPS = {
     "drug_mix_1_pooled_microbiota": "drug_sertraline",
     "drug_mix_3_pooled_microbiota": "drug_omeprazole",
@@ -95,7 +96,23 @@ def add_inference(table: pd.DataFrame) -> pd.DataFrame:
             out=np.zeros(len(block), dtype=float),
             where=block["se"].to_numpy(float) > 0,
         )
-        block["pvalue"] = 2.0 * stats.norm.sf(np.abs(z))
+        if "degrees_of_freedom" in block.columns:
+            degrees = pd.to_numeric(
+                block["degrees_of_freedom"], errors="coerce"
+            ).to_numpy(float)
+            block["pvalue"] = np.where(
+                np.isfinite(degrees) & (degrees > 0),
+                2.0 * stats.t.sf(np.abs(z), degrees),
+                2.0 * stats.norm.sf(np.abs(z)),
+            )
+            block["inference_reference"] = np.where(
+                np.isfinite(degrees) & (degrees > 0),
+                "student_t_with_recorded_df",
+                "normal_reference_df_unavailable",
+            )
+        else:
+            block["pvalue"] = 2.0 * stats.norm.sf(np.abs(z))
+            block["inference_reference"] = "normal_reference_df_unavailable"
         block["qvalue"] = bh_qvalues(block["pvalue"].to_numpy(float))
         denominator = np.sqrt(
             block["beta"].to_numpy(float) ** 2
@@ -167,6 +184,119 @@ def load_identity(
     if output.duplicated(["study_id", "raw_entity_id"]).any():
         raise ValueError("duplicate entity in identity partitions")
     return output
+
+
+def load_measurement_covariates(
+    new_effect_path: Path,
+    collection_effect_path: Path,
+    candidate_studies: set[str],
+) -> pd.DataFrame:
+    """Load only response-observation coverage, never beta, labels, or truth."""
+    new = pd.read_csv(
+        new_effect_path,
+        sep="\t",
+        usecols=["entity_id", "contrast_id", "prevalence"],
+        dtype={"entity_id": str, "contrast_id": str},
+    )
+    new["study_id"] = NEW_STUDY
+    new["raw_entity_id"] = new["entity_id"].map(normalise_entity_id)
+    old = pd.read_csv(
+        collection_effect_path,
+        sep="\t",
+        usecols=["study_id", "raw_entity_id", "contrast_id", "prevalence"],
+        dtype={"study_id": str, "raw_entity_id": str, "contrast_id": str},
+    )
+    old = old.loc[old["study_id"].isin(candidate_studies)].copy()
+    old["raw_entity_id"] = old["raw_entity_id"].map(normalise_entity_id)
+    table = pd.concat(
+        [
+            new[["study_id", "raw_entity_id", "contrast_id", "prevalence"]],
+            old[["study_id", "raw_entity_id", "contrast_id", "prevalence"]],
+        ],
+        ignore_index=True,
+    )
+    table["prevalence"] = pd.to_numeric(table["prevalence"], errors="coerce")
+    return table.groupby(["study_id", "raw_entity_id"], as_index=False).agg(
+        median_prevalence=("prevalence", "median"),
+        observed_contrasts=("contrast_id", "nunique"),
+    )
+
+
+def match_unresolved_measurements(
+    identity: pd.DataFrame,
+    covariates: pd.DataFrame,
+    spectra: dict[str, tuple[np.ndarray, object]],
+    precursors: dict[str, dict[str, float]],
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Select one unique unresolved entity per known entity within each study.
+
+    Matching uses only precursor m/z, fragment peak count, detection prevalence,
+    and number of observed contrasts.  It does not inspect beta, drug names,
+    registered relations, or retrieval outcomes.
+    """
+    identity = identity.copy()
+    identity["measurement_matched_unresolved"] = False
+    ledgers = []
+    for study, block in identity.groupby("study_id", sort=True):
+        ids, representation = spectra[str(study)]
+        if sparse.issparse(representation):
+            peak_counts = np.asarray(representation.getnnz(axis=1)).ravel()
+        else:
+            peak_counts = np.asarray([len(value) for value in representation])
+        spectral = pd.DataFrame({
+            "raw_entity_id": ids.astype(str),
+            "precursor_mz": [precursors[str(study)].get(str(value), np.nan) for value in ids],
+            "fragment_peak_count": peak_counts,
+        })
+        current = block.merge(
+            covariates.loc[covariates["study_id"].eq(study)].drop(columns="study_id"),
+            on="raw_entity_id",
+            how="left",
+            validate="one_to_one",
+        ).merge(spectral, on="raw_entity_id", how="left", validate="one_to_one")
+        known = current.loc[current["identity_status"].eq("library_supported")].copy()
+        unresolved = current.loc[current["identity_status"].eq("unresolved_entity")].copy()
+        if known.empty or len(unresolved) < len(known):
+            raise ValueError(f"cannot measurement-match unresolved entities in {study}")
+        columns = [
+            "precursor_mz", "fragment_peak_count", "median_prevalence",
+            "observed_contrasts",
+        ]
+        combined = pd.concat([known[columns], unresolved[columns]], ignore_index=True)
+        combined["precursor_mz"] = np.log1p(combined["precursor_mz"])
+        combined["fragment_peak_count"] = np.log1p(combined["fragment_peak_count"])
+        combined["observed_contrasts"] = np.log1p(combined["observed_contrasts"])
+        for column in columns:
+            values = combined[column].to_numpy(float)
+            finite = values[np.isfinite(values)]
+            fill = float(np.median(finite)) if len(finite) else 0.0
+            values = np.where(np.isfinite(values), values, fill)
+            q25, q75 = np.quantile(values, [0.25, 0.75])
+            scale = float(q75 - q25)
+            if not np.isfinite(scale) or scale <= 0:
+                scale = float(np.std(values))
+            if not np.isfinite(scale) or scale <= 0:
+                scale = 1.0
+            combined[column] = (values - np.median(values)) / scale
+        known_x = combined.iloc[:len(known)].to_numpy(float)
+        unresolved_x = combined.iloc[len(known):].to_numpy(float)
+        cost = np.abs(known_x[:, None, :] - unresolved_x[None, :, :]).sum(axis=2)
+        rows, columns_selected = linear_sum_assignment(cost)
+        selected = unresolved.iloc[columns_selected].copy()
+        selected_ids = set(selected["raw_entity_id"].astype(str))
+        identity.loc[
+            identity["study_id"].eq(study)
+            & identity["raw_entity_id"].isin(selected_ids),
+            "measurement_matched_unresolved",
+        ] = True
+        ledger = pd.DataFrame({
+            "study_id": study,
+            "known_raw_entity_id": known.iloc[rows]["raw_entity_id"].to_numpy(),
+            "matched_unresolved_raw_entity_id": selected["raw_entity_id"].to_numpy(),
+            "matching_l1_distance": cost[rows, columns_selected],
+        })
+        ledgers.append(ledger)
+    return identity, pd.concat(ledgers, ignore_index=True)
 
 
 def precursor_map(path: Path, required: set[str]) -> dict[str, float]:
@@ -267,6 +397,29 @@ def wse_directional_top1(
     return target_index, target_score, target_matches
 
 
+def world_indices(
+    identifiers: np.ndarray,
+    status: dict[str, str],
+    matched_unresolved: set[str],
+    world: str,
+) -> np.ndarray:
+    if world == "all":
+        return np.arange(len(identifiers))
+    if world == "known":
+        return np.flatnonzero(
+            [status.get(str(value)) == "library_supported" for value in identifiers]
+        )
+    if world == "unresolved":
+        return np.flatnonzero(
+            [status.get(str(value)) == "unresolved_entity" for value in identifiers]
+        )
+    if world == "measurement_matched_unresolved":
+        return np.flatnonzero(
+            [str(value) in matched_unresolved for value in identifiers]
+        )
+    raise ValueError(f"unknown evidence world {world}")
+
+
 def freeze_mutual_wse_edges(
     left_ids: np.ndarray,
     left_peaks: list[np.ndarray],
@@ -274,6 +427,8 @@ def freeze_mutual_wse_edges(
     right_peaks: list[np.ndarray],
     left_status: dict[str, str],
     right_status: dict[str, str],
+    left_matched_unresolved: set[str],
+    right_matched_unresolved: set[str],
     left_mz: dict[str, float],
     right_mz: dict[str, float],
     minimum: float,
@@ -283,12 +438,12 @@ def freeze_mutual_wse_edges(
 ) -> pd.DataFrame:
     rows = []
     for world in WORLDS:
-        if world == "all":
-            li, ri = np.arange(len(left_ids)), np.arange(len(right_ids))
-        else:
-            state = "library_supported" if world == "known" else "unresolved_entity"
-            li = np.flatnonzero([left_status.get(str(value)) == state for value in left_ids])
-            ri = np.flatnonzero([right_status.get(str(value)) == state for value in right_ids])
+        li = world_indices(
+            left_ids, left_status, left_matched_unresolved, world
+        )
+        ri = world_indices(
+            right_ids, right_status, right_matched_unresolved, world
+        )
         if not len(li) or not len(ri):
             continue
         lp = [left_peaks[index] for index in li]
@@ -355,6 +510,8 @@ def freeze_mutual_edges(
     right: sparse.csr_matrix,
     left_status: dict[str, str],
     right_status: dict[str, str],
+    left_matched_unresolved: set[str],
+    right_matched_unresolved: set[str],
     left_mz: dict[str, float],
     right_mz: dict[str, float],
     minimum: float,
@@ -363,13 +520,12 @@ def freeze_mutual_edges(
 ) -> pd.DataFrame:
     rows = []
     for world in WORLDS:
-        if world == "all":
-            li = np.arange(len(left_ids))
-            ri = np.arange(len(right_ids))
-        else:
-            status = "library_supported" if world == "known" else "unresolved_entity"
-            li = np.flatnonzero([left_status.get(str(value)) == status for value in left_ids])
-            ri = np.flatnonzero([right_status.get(str(value)) == status for value in right_ids])
+        li = world_indices(
+            left_ids, left_status, left_matched_unresolved, world
+        )
+        ri = world_indices(
+            right_ids, right_status, right_matched_unresolved, world
+        )
         if not len(li) or not len(ri):
             continue
         forward, fs = sparse_top1(left[li], right[ri], minimum, block_size)
@@ -441,10 +597,26 @@ def score_candidates(
                 if world == "all":
                     qn = identity.loc[identity["study_id"].eq(NEW_STUDY), "raw_entity_id"].nunique()
                     cn = identity.loc[identity["study_id"].eq(study), "raw_entity_id"].nunique()
-                else:
-                    status = "library_supported" if world == "known" else "unresolved_entity"
+                elif world in {"known", "unresolved"}:
+                    status = (
+                        "library_supported" if world == "known"
+                        else "unresolved_entity"
+                    )
                     qn = int(identity_counts.get((NEW_STUDY, status), 0))
                     cn = int(identity_counts.get((study, status), 0))
+                else:
+                    qn = int(
+                        identity.loc[
+                            identity["study_id"].eq(NEW_STUDY),
+                            "measurement_matched_unresolved",
+                        ].sum()
+                    )
+                    cn = int(
+                        identity.loc[
+                            identity["study_id"].eq(study),
+                            "measurement_matched_unresolved",
+                        ].sum()
+                    )
                 similar = opposite = composition = 0.0
                 dual_same = dual_opposite = 0
                 identity_same = relation_same = 0
@@ -504,8 +676,8 @@ def score_candidates(
                     "similar_response_score": similar / symmetric_denominator if qn and cn else np.nan,
                     "opposite_response_score": opposite / symmetric_denominator if qn and cn else np.nan,
                     "composition_score": composition / symmetric_denominator if qn and cn else np.nan,
-                    "dual_fdr_same_direction_edges": dual_same,
-                    "dual_fdr_opposite_direction_edges": dual_opposite,
+                    "dual_exploratory_q05_same_direction_edges": dual_same,
+                    "dual_exploratory_q05_opposite_direction_edges": dual_opposite,
                     "identity_hypothesis_same_direction_edges": identity_same,
                     "chemical_relation_same_direction_edges": relation_same,
                     "registered_overlap": (
@@ -532,13 +704,15 @@ def score_candidates(
     )
     scores["similar_response_rank"] = scores.groupby(
         ["query_contrast_id", "evidence_world"]
-    )["similar_response_score"].rank(ascending=False, method="min")
+    )["similar_response_score"].rank(ascending=False, method="max")
     scores["response_specificity_rank"] = scores.groupby(
         ["query_contrast_id", "evidence_world"]
-    )["response_specificity_score"].rank(ascending=False, method="min")
-    scores["dual_fdr_support_rank"] = scores.groupby(
+    )["response_specificity_score"].rank(ascending=False, method="max")
+    scores["dual_exploratory_q05_support_rank"] = scores.groupby(
         ["query_contrast_id", "evidence_world"]
-    )["dual_fdr_same_direction_edges"].rank(ascending=False, method="min")
+    )["dual_exploratory_q05_same_direction_edges"].rank(
+        ascending=False, method="max"
+    )
     return scores, pd.DataFrame(support_rows)
 
 
@@ -557,7 +731,9 @@ def evaluation(scores: pd.DataFrame) -> pd.DataFrame:
                 "best_true_specificity_rank": float(
                     truth["response_specificity_rank"].min()
                 ),
-                "best_true_support_rank": float(truth["dual_fdr_support_rank"].min()),
+                "best_true_support_rank": float(
+                    truth["dual_exploratory_q05_support_rank"].min()
+                ),
                 "top1_correct": bool(q.loc[q["similar_response_rank"].eq(1), "registered_overlap"].any()),
             })
         rows.append({
@@ -585,7 +761,9 @@ def evaluation(scores: pd.DataFrame) -> pd.DataFrame:
             ),
             "true_relations_top3": int(positive["similar_response_rank"].le(3).sum()),
             "true_relations_top5": int(positive["similar_response_rank"].le(5).sum()),
-            "true_dual_fdr_same_direction_edges": int(positive["dual_fdr_same_direction_edges"].sum()),
+            "true_dual_exploratory_q05_same_direction_edges": int(
+                positive["dual_exploratory_q05_same_direction_edges"].sum()
+            ),
             "true_identity_hypothesis_edges": int(positive["identity_hypothesis_same_direction_edges"].sum()),
             "true_chemical_relation_edges": int(positive["chemical_relation_same_direction_edges"].sum()),
         })
@@ -612,7 +790,7 @@ def community_replication(scores: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFr
     )
     aggregate["community_mean_rank"] = aggregate.groupby(
         ["query_mixture", "evidence_world"]
-    )["mean_response_specificity"].rank(ascending=False, method="min")
+    )["mean_response_specificity"].rank(ascending=False, method="max")
 
     summaries = []
     eligible = aggregate.loc[aggregate["query_mixture"].isin(TRUE_DRUG_BY_MIXTURE)]
@@ -640,7 +818,10 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--new-response-dir", type=Path,
-        default=Path("data/validation/msv000095331_directed_drug_microbiome_responses_v2_20261023"),
+        default=Path(
+            "data/validation/"
+            "msv000095331_drug_endpoint_interaction_responses_v3_20261023"
+        ),
     )
     parser.add_argument(
         "--new-mgf", type=Path,
@@ -674,7 +855,8 @@ def main() -> None:
     if args.output_dir.exists():
         raise FileExistsError(args.output_dir)
 
-    # Phase 1: load only entity registries and spectra, then freeze all edges.
+    # Phase 1: load entity registries, spectra, and measurement-coverage fields,
+    # then freeze all edges.  No beta, drug relation, or retrieval truth is read.
     candidate_mgf = candidate_spectra(args.candidate_scope, args.candidate_contract)
     identity = load_identity(
         args.new_response_dir / "source_native_identity.tsv",
@@ -704,8 +886,22 @@ def main() -> None:
             study: (ids, pad_columns(matrix, dimensions))
             for study, (ids, matrix) in spectra.items()
         }
+    measurement_covariates = load_measurement_covariates(
+        args.new_response_dir / "effects.tsv",
+        args.collection / "response_entities.tsv.gz",
+        set(candidate_mgf),
+    )
+    identity, measurement_matches = match_unresolved_measurements(
+        identity, measurement_covariates, spectra, precursors,
+    )
     status_maps = {
         study: dict(zip(block["raw_entity_id"], block["identity_status"]))
+        for study, block in identity.groupby("study_id", sort=False)
+    }
+    matched_sets = {
+        study: set(block.loc[
+            block["measurement_matched_unresolved"], "raw_entity_id"
+        ].astype(str))
         for study, block in identity.groupby("study_id", sort=False)
     }
     edge_blocks = []
@@ -716,6 +912,7 @@ def main() -> None:
             block = freeze_mutual_edges(
                 left_ids, left_representation, right_ids, right_representation,
                 status_maps[NEW_STUDY], status_maps[study],
+                matched_sets[NEW_STUDY], matched_sets[study],
                 precursors[NEW_STUDY], precursors[study],
                 args.minimum_cosine, args.block_size, args.precursor_ppm,
             )
@@ -723,6 +920,7 @@ def main() -> None:
             block = freeze_mutual_wse_edges(
                 left_ids, left_representation, right_ids, right_representation,
                 status_maps[NEW_STUDY], status_maps[study],
+                matched_sets[NEW_STUDY], matched_sets[study],
                 precursors[NEW_STUDY], precursors[study],
                 args.minimum_cosine, args.fragment_tolerance_da,
                 args.minimum_matched_fragments, args.precursor_ppm,
@@ -734,6 +932,9 @@ def main() -> None:
 
     # Phase 2: only after edge freezing, open effects and registered drug overlap.
     new_effects = load_new_effects(args.new_response_dir / "effects.tsv")
+    new_response_report = json.loads(
+        (args.new_response_dir / "report.json").read_text(encoding="utf-8")
+    )
     chem_effects = load_candidate_effects(
         args.collection / "response_entities.tsv.gz", set(candidate_mgf)
     )
@@ -747,12 +948,16 @@ def main() -> None:
         args.output_dir / "phenotype_blind_mutual_top1_edges.tsv.gz",
         sep="\t", index=False, compression=compression,
     )
+    measurement_matches.to_csv(
+        args.output_dir / "measurement_matched_unresolved_pairs.tsv",
+        sep="\t", index=False,
+    )
     scores.to_csv(
         args.output_dir / "open_candidate_scores.tsv.gz",
         sep="\t", index=False, compression=compression,
     )
     supports.to_csv(
-        args.output_dir / "dual_fdr_same_direction_supports.tsv.gz",
+        args.output_dir / "exploratory_dual_q05_same_direction_supports.tsv.gz",
         sep="\t", index=False, compression=compression,
     )
     metrics.to_csv(args.output_dir / "retrieval_summary.tsv", sep="\t", index=False)
@@ -768,7 +973,8 @@ def main() -> None:
         "status": STATUS,
         "data_role": "development; MSV000095331 is new to this method but not sealed and not independent-laboratory confirmation",
         "question": (
-            "Can a four-mixture microbial response retrieve prespecified overlapping drug "
+            "Can a four-mixture endpoint interaction response, net of no-drug community "
+            "and abiotic medium effects, retrieve prespecified overlapping drug-exposure "
             "responses from an open multi-study candidate collection?"
         ),
         "parameters": {
@@ -782,11 +988,17 @@ def main() -> None:
             "edge_rule": "mutual top-1, frozen before effects and drug overlap",
             "precursor_compatible_identity_hypothesis_ppm": args.precursor_ppm,
             "response_weight": "beta/sqrt(beta^2+se^2)",
+            "ranking_ties": "worst rank; a zero-evidence tie cannot receive Top-1 credit",
             "response_specificity_score": "signed aligned-response score minus that candidate contrast's mean signed score across all four query mixtures; no drug name or registered overlap enters centering",
-            "dual_response_support": "BH q<=0.05 within each contrast at both edge endpoints and equal beta sign",
+            "dual_response_support": (
+                "exploratory BH q<=0.05 at both endpoints with equal beta sign; the new "
+                "source uses Student t with df=2, and these counts are not confirmatory"
+            ),
         },
         "denominators": {
-            "new_project_samples": 120,
+            "new_project_samples": int(
+                new_response_report["denominators"]["analysis_samples"]
+            ),
             "new_project_query_contrasts": int(new_effects["contrast_id"].nunique()),
             "primary_pooled_query_contrasts": 4,
             "community_specific_query_contrasts": 16,
@@ -801,7 +1013,10 @@ def main() -> None:
                 ].shape[0]
             ),
             "phenotype_blind_edge_rows_all_worlds": int(len(edges)),
-            "dual_fdr_same_direction_support_rows": int(len(supports)),
+            "dual_exploratory_q05_same_direction_support_rows": int(len(supports)),
+            "measurement_matched_unresolved_entities_by_study": {
+                study: len(values) for study, values in matched_sets.items()
+            },
         },
         "retrieval_summary": metrics.to_dict("records"),
         "community_replication_summary": community_metrics.to_dict("records"),
@@ -809,10 +1024,12 @@ def main() -> None:
         "no_match_query": "drug_mix_2_pooled_microbiota has no prespecified overlapping ChemProp drug and is retained as a no-match pressure test; no calibrated abstention threshold is claimed",
         "claim_boundary": [
             "A drug-mixture response cannot identify which co-administered drug caused an individual feature.",
+            "The primary response uses deposited no-drug 72-hour controls and matched abiotic controls; the historical time-only difference-in-differences is sensitivity analysis only.",
             "Ten-ppm precursor compatibility is an identity hypothesis, not proof against isomers, adduct ambiguity, or in-source fragments.",
             "Mass-incompatible edges are chemical relations; their beta values are not meta-analysed as one molecule.",
             "Unresolved means not supported by the stated library policy, not a unique metabolite.",
             "Known and unresolved worlds use different-sized entity universes; this is not a measurement-matched formal unknown-increment estimate.",
+            "The measurement-matched-unresolved world equals the known entity count within each study and matches precursor m/z, fragment count, prevalence, and contrast coverage without beta or truth; it is a diagnostic single matching, not a replicated formal unknown-increment test.",
             "Ion/adduct-family collapse is absent, so support counts are spectral-response edges rather than metabolite counts.",
             (
                 "The sparse 0.1-Da cosine is a transparent baseline; final algorithm replacement must use the same samples, contrasts, candidates and response scoring."
@@ -821,6 +1038,7 @@ def main() -> None:
             ),
             "Response-specificity centering was introduced during development after the uncentered v1 exposed a generic candidate-response bias; its performance is not sealed confirmation.",
             "Four community-specific responses are repeated biological contexts inside one experiment, not four independent studies.",
+            "Three paired response replicates imply df=2; no normal-approximation feature significance is used for the new source, and q<=0.05 edge counts remain exploratory.",
         ],
     }
     (args.output_dir / "report.json").write_text(

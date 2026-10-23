@@ -1,0 +1,76 @@
+{
+  "status": "MSV000095331_PUBLISHED_PRODUCT_DIRECTION_CHECK_COMPLETE",
+  "data_role": "development; published targets opened only after response estimation",
+  "dataset": "MSV000095331",
+  "denominators": {
+    "analysis_samples": 135,
+    "prespecified_exact_product_targets_observable": 3,
+    "microbiota_associated_positive_targets": 2,
+    "abiotic_nonpositive_targets": 1,
+    "directions_recovered": 3
+  },
+  "results": [
+    {
+      "target_id": "omeprazole_product_mz330.127",
+      "entity_id": "11178",
+      "library_compound_name": "related spectra of 'EsomeprazoleNa (Delta Mass:-15.995)'",
+      "published_interpretation": "abiotic transformation product",
+      "expected_endpoint_direction": "nonpositive",
+      "pooled_endpoint_beta": -0.0400227592927458,
+      "pooled_endpoint_se": 0.0328221284522827,
+      "descriptive_t_df2_pvalue": 0.346988554362744,
+      "positive_community_contexts": 1,
+      "negative_community_contexts": 3,
+      "direction_recovered": true,
+      "time_did_sensitivity_beta": -0.2112651876622028,
+      "primary_sensitivity_same_sign": true,
+      "library_mqscore": 0.933447,
+      "library_shared_peaks": 11
+    },
+    {
+      "target_id": "atorvastatin_delta_minus_18.01",
+      "entity_id": "13809",
+      "library_compound_name": "related spectra of 'atorvastatin (Delta Mass:-18.01)'",
+      "published_interpretation": "microbiota-associated transformation product",
+      "expected_endpoint_direction": "positive",
+      "pooled_endpoint_beta": 0.214437658731438,
+      "pooled_endpoint_se": 0.0510836266289337,
+      "descriptive_t_df2_pvalue": 0.05233439053982376,
+      "positive_community_contexts": 3,
+      "negative_community_contexts": 1,
+      "direction_recovered": true,
+      "time_did_sensitivity_beta": 0.0526506264936748,
+      "primary_sensitivity_same_sign": true,
+      "library_mqscore": 0.90495,
+      "library_shared_peaks": 11
+    },
+    {
+      "target_id": "abacavir_delta_plus_31.99",
+      "entity_id": "7256",
+      "library_compound_name": "related spectra of 'abacavir (Delta Mass:31.99)'",
+      "published_interpretation": "microbiota-associated transformation product",
+      "expected_endpoint_direction": "positive",
+      "pooled_endpoint_beta": 4.029429833451675,
+      "pooled_endpoint_se": 0.1135645623554018,
+      "descriptive_t_df2_pvalue": 0.0007933802546374128,
+      "positive_community_contexts": 4,
+      "negative_community_contexts": 0,
+      "direction_recovered": true,
+      "time_did_sensitivity_beta": 3.853535687594578,
+      "primary_sensitivity_same_sign": true,
+      "library_mqscore": 1.0,
+      "library_shared_peaks": 15
+    }
+  ],
+  "not_observable_as_exact_product_targets": [
+    "ritonavir propagated analog",
+    "quetiapine propagated analog"
+  ],
+  "claim_boundary": [
+    "These are three prepublished product-ion direction checks, not an untargeted discovery count.",
+    "Propagated-analog library labels are related-spectrum evidence, not level-1 structures.",
+    "The four community designs are fixed biological contexts within one experiment, not independent studies.",
+    "The df=2 t p-values are descriptive and are not used as a discovery or FDR claim.",
+    "A mixture cannot attribute a product response to one constituent without targeted follow-up."
+  ]
+}

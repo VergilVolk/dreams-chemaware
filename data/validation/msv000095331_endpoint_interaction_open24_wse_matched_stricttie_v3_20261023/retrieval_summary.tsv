@@ -1,0 +1,5 @@
+evidence_world	open_candidates_per_query	prespecified_overlap_queries	prespecified_true_source_relations	top1_queries_correct	mean_reciprocal_best_true_rank	median_best_true_rank	specificity_top1_queries_correct	specificity_mean_reciprocal_best_true_rank	specificity_median_best_true_rank	specificity_true_relations_top3	specificity_true_relations_top5	true_relations_top3	true_relations_top5	true_dual_exploratory_q05_same_direction_edges	true_identity_hypothesis_edges	true_chemical_relation_edges
+all	24	3	6	2	0.7142857142857143	1.0	1	0.46296296296296297	3.0	2	3	2	2	0	0	0
+known	24	3	6	0	0.3148148148148148	3.0	1	0.43703703703703706	5.0	1	2	2	2	0	0	0
+unresolved	24	3	6	2	0.7142857142857143	1.0	1	0.5196078431372549	2.0	2	2	2	2	0	0	0
+measurement_matched_unresolved	24	3	6	0	0.041666666666666664	24.0	0	0.041666666666666664	24.0	0	0	0	0	0	0	0

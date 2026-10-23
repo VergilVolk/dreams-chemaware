@@ -1,0 +1,4 @@
+target_id	mixture	name_contains	precursor_mz	expected_endpoint_direction	published_interpretation	entity_id	library_compound_name	library_mqscore	library_shared_peaks	observed_precursor_mz
+atorvastatin_delta_minus_18.01	3	atorvastatin (Delta Mass:-18.01)	541.249	positive	microbiota-associated transformation product	13809	related spectra of 'atorvastatin (Delta Mass:-18.01)'	0.90495	11	541.249
+abacavir_delta_plus_31.99	4	abacavir (Delta Mass:31.99)	319.151	positive	microbiota-associated transformation product	7256	related spectra of 'abacavir (Delta Mass:31.99)'	1.0	15	319.151
+omeprazole_product_mz330.127	3	EsomeprazoleNa (Delta Mass:-15.995)	330.127	nonpositive	abiotic transformation product	11178	related spectra of 'EsomeprazoleNa (Delta Mass:-15.995)'	0.933447	11	330.127

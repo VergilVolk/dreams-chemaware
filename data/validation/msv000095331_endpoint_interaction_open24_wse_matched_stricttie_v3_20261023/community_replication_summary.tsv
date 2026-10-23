@@ -1,0 +1,5 @@
+evidence_world	prespecified_overlap_mixtures	prespecified_true_source_relations	community_mean_top1_mixtures_correct	community_mean_mrr	community_mean_median_best_true_rank	true_relations_positive_in_all_four_communities	true_relations_top5_in_at_least_three_communities
+all	3	6	1	0.4362745098039216	4.0	0	1
+known	3	6	1	0.43703703703703706	5.0	5	2
+measurement_matched_unresolved	3	6	0	0.041666666666666664	24.0	0	0
+unresolved	3	6	1	0.4362745098039216	4.0	0	1

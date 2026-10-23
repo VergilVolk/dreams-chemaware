@@ -1,0 +1,91 @@
+{
+  "status": "MSV000095331_INTEGRATED_ALGORITHM_HANDOFF_COMPLETE",
+  "labels_accessed": false,
+  "response_effects_accessed": false,
+  "registered_relations_accessed": false,
+  "candidate_generation": {
+    "method": "WSE directional top-K",
+    "topk": 20,
+    "minimum_wse": 0.7,
+    "fragment_tolerance_da": 0.02,
+    "minimum_matched_fragments": 6
+  },
+  "denominators": {
+    "studies": 4,
+    "directional_study_pairs": 6,
+    "directional_queries": 38628,
+    "queries_with_candidates": 3886,
+    "queries_without_candidates": 34742,
+    "candidate_pairs": 17280,
+    "identity_hypothesis_pairs": 2937,
+    "chemical_relation_pairs": 14343
+  },
+  "required_algorithm_output": [
+    "candidate_pair_id",
+    "query_id",
+    "candidate_id",
+    "method_name",
+    "method_score",
+    "evidence_available"
+  ],
+  "comparison_rule": "WSE, B, and the integrated model must retain this exact query/candidate axis; each method selects directional Top-1 within a study pair, followed by mutual Top-1 response scoring with zero-evidence ties receiving no Top-1 credit",
+  "files": {
+    "candidate_pairs": {
+      "path": "data\\validation\\msv000095331_integrated_algorithm_handoff_top20_v1_20261023\\fixed_directional_candidate_pairs.tsv.gz",
+      "sha256": "b5f935728d11fa27f92fb3c699dbbc25311fd42b33ef8a5d6c042fe7d2404496"
+    },
+    "query_registry": {
+      "path": "data\\validation\\msv000095331_integrated_algorithm_handoff_top20_v1_20261023\\directional_query_registry.tsv.gz",
+      "sha256": "f551b69fe913fa4a255d8f71bc216126b9da8aa2adfd8aa30947ae3956568fff"
+    },
+    "entity_registry": {
+      "path": "data\\validation\\msv000095331_integrated_algorithm_handoff_top20_v1_20261023\\study_entity_registry.tsv.gz",
+      "sha256": "eabe1802fbb0a2ebfbd2d607c84b3606711f9aaea43bb3a131a5f9e3ffeadda8"
+    },
+    "mgfs": {
+      "MSV000095331": {
+        "path": "data\\reference\\msv000095331_drug_microbiome_20261023\\consensus.mgf",
+        "sha256": "f016291233c16b3dbec20a51ecb4307abdcb9ae3b77ceb8113fe2e78d4cabe04"
+      },
+      "MSV000094899": {
+        "path": "data\\reference\\chemprop2_m1_20261011\\consensus.mgf",
+        "sha256": "49ab4ca3815e43c8110b263cc753cd858ed32a2eaf40b7a1fd67667c284ace7d"
+      },
+      "MSV000096724": {
+        "path": "data\\reference\\chemprop_cross_design_20261011\\chemprop_23drug\\spectra\\specs_ms.mgf",
+        "sha256": "b54c361d415a452c47961666e9372467e5cb5065bed73c6b3fff2c4b4d5c8142"
+      },
+      "MSV000093571": {
+        "path": "data\\reference\\chemprop_cross_design_20261011\\chemprop_45drug\\spectra\\specs_ms.mgf",
+        "sha256": "516a613773f0a0f307bcd7fd6362ce52cdecedf68dd39ca49aff4d59fa597886"
+      }
+    }
+  },
+  "spectrum_loading": {
+    "MSV000095331": {
+      "mgf_spectra_total": 17889,
+      "response_spectra_nonempty": 7338,
+      "fragment_peaks": 93857
+    },
+    "MSV000094899": {
+      "mgf_spectra_total": 16245,
+      "response_spectra_nonempty": 8055,
+      "fragment_peaks": 351689
+    },
+    "MSV000096724": {
+      "mgf_spectra_total": 9153,
+      "response_spectra_nonempty": 4429,
+      "fragment_peaks": 139593
+    },
+    "MSV000093571": {
+      "mgf_spectra_total": 8581,
+      "response_spectra_nonempty": 4130,
+      "fragment_peaks": 98037
+    }
+  },
+  "claim_boundary": [
+    "This handoff tests reranking within a fixed WSE shortlist; it cannot measure candidates outside that shortlist.",
+    "No drug name, response effect, or cross-project truth enters candidate generation.",
+    "A chemical-relation pair is not an identity assertion."
+  ]
+}
