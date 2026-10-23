@@ -5,7 +5,7 @@
 #SBATCH --gpus=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=10
-#SBATCH --time=18:00:00
+#SBATCH --time=24:00:00
 #SBATCH --output=data/validation/B_dual_multi_%j.out
 #SBATCH --error=data/validation/B_dual_multi_%j.err
 
@@ -23,6 +23,7 @@ FORMULA_PANEL="${GNPS_FORMULA_PANEL:-$BENCHMARK/panel_formula_disjoint.npz}"
 BASE_SCORES="${GNPS_SCORE_BUNDLE:-data/validation/noise_gnps_article_benchmark_run_2349091/method_scores.npz}"
 SOURCE_RUN="${UNIFIED_GNPS_SOURCE_RUN:-data/validation/unified_candidate_energy_run_2364137}"
 AB_RUN="${WSE_AB_PARENT_RUN:-data/validation/wse_conditional_residual_run_2376648}"
+CHEM_CACHE="${CHEMAWARE_CONTINUOUS_CACHE:-$AB_RUN/continuous_chem_evidence}"
 ARCH="${DREAMS_ARCHITECTURE_CHECKPOINT:-dreams/models/pretrained/ssl_model_server.pt}"
 CHEM_STAGE1="${CHEMAWARE_STAGE1_CHECKPOINT:-data/validation/chemaware_high_coverage_native/run_2340721_resume_2340524/training/best.ckpt}"
 CHEM_PHASEA="${CHEMAWARE_PHASEA_CHECKPOINT:-data/validation/chemaware_online_role_budget_native/run_2345481/phasea_reproduction_gate/chemaware_phasea_max_boundary_step2000.ckpt}"
@@ -57,6 +58,8 @@ required=(
   "$BENCHMARK/panel_identity_disjoint.npz" "$BENCHMARK/panel_formula_disjoint.npz"
   "$IDENTITY_PANEL" "$FORMULA_PANEL" "$BASE_SCORES"
   "$SOURCE_RUN/evidence_identity_disjoint.npz" "$SOURCE_RUN/evidence_formula_disjoint.npz"
+  "$CHEM_CACHE/continuous_chem_identity_disjoint.npz"
+  "$CHEM_CACHE/continuous_chem_formula_disjoint.npz"
   "$AB_RUN/modeling/report.json" "$AB_RUN/modeling/candidate_predictions.npz"
   "$ARCH" "$CHEM_STAGE1" "$CHEM_PHASEA" "$NOISE_STAGE1_EMB"
   "$MSG_CACHE/report.json"
@@ -130,6 +133,10 @@ done
 python -u tasks/train_b_anchored_dual_encoder_multireranker.py \
   --identity-bundle "$OUT/evidence_identity_disjoint.npz" \
   --formula-bundle "$OUT/evidence_formula_disjoint.npz" \
+  --core-identity-bundle "$SOURCE_RUN/evidence_identity_disjoint.npz" \
+  --core-formula-bundle "$SOURCE_RUN/evidence_formula_disjoint.npz" \
+  --identity-chem "$CHEM_CACHE/continuous_chem_identity_disjoint.npz" \
+  --formula-chem "$CHEM_CACHE/continuous_chem_formula_disjoint.npz" \
   --parent-report "$AB_RUN/modeling/report.json" \
   --parent-predictions "$AB_RUN/modeling/candidate_predictions.npz" \
   --output "$OUT/modeling" --device cuda

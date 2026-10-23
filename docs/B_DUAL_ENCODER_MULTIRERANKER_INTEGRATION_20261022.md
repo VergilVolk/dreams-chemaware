@@ -16,7 +16,7 @@ and cannot authorize external generalization.
 | Asset | Actual computation in this implementation | Qualification |
 |---|---|---|
 | WSE, Noise V1, frozen P2b | inherited from the exact B OOF score and B checkpoint | enabled; P2b enters once |
-| ChemAware V2 continuous evidence | inherited from B; A is replayed as the no-V2 comparator | development-only, no hard action |
+| ChemAware V2 continuous evidence | inherited from B; the no-V2 arm is independently refitted on nested A anchors | development-only, no hard action |
 | ChemAware Stage-1 | independently encoded and scored on every frozen candidate edge | role-3 confirmed internally; GNPS transfer previously uncertain |
 | ChemAware Phase-A | independently encoded and scored; never renamed Stage-1 | role-2 development-only |
 | Noise MSG stack | frozen formula-OOF model, applied through its existing GNPS pair-score cache | provisional |
@@ -28,6 +28,34 @@ represented separately relative to Noise V1.  MSG and RRF are represented
 relative to the already-counted P2b composite.  Consequently, adding a family
 does not insert another unconditional copy of the same absolute spectral
 signal.
+
+## Corrected stacking isolation
+
+The first implementation at commit `21e7be4` reused the historical B OOF
+ledger as second-stage training input in every outer fold.  Although every B
+row was individually OOF, a training row for fold j could have been produced
+by a parent trained with labels from the current outer validation fold k.  That
+implementation is valid only for engineering/candidate-axis debugging and must
+not support a performance claim.
+
+The corrected implementation uses nested formula cross-fitting:
+
+1. choose outer fold k;
+2. generate A/B anchors for the outer training set by inner cross-fitting while
+   excluding k from every inner parent fit;
+3. train the incremental head only on those nested anchors;
+4. fit an outer parent without k and score k once;
+5. verify that regenerated outer A/B Top-1 candidates exactly reproduce the
+   frozen historical A/B ledger.
+
+For efficiency, a parent fitted while omitting folds `{a,b}` is reused to
+predict fold b inside outer fold a and fold a inside outer fold b.  Both uses
+exclude both folds, so this reduces duplicate training from ordered fold pairs
+to the ten unordered pairs without weakening isolation.
+
+The final deployable incremental checkpoint follows conventional stacking: it
+is fitted on the full frozen OOF-B development ledger and is applied after the
+separately full-fitted frozen B checkpoint.
 
 ## Fixed comparison matrix
 
@@ -41,10 +69,10 @@ B epochs, hidden width, optimizer rate and trust penalty without a grid:
 5. an audit-only extension with historical RRF versus the MSG system;
 6. the complete deployable spectral system versus a same-input linear additive control;
 7. the complete deployable spectral system versus B and WSE;
-8. the complete deployable spectral system versus an A-anchor replay using the identical learned
-   incremental residual (V2 removal while holding new evidence fixed).
+8. the complete deployable spectral system versus the same incremental
+   architecture independently refitted on nested A anchors (true V2 removal).
 
-Every learned score in the comparison is formula-OOF.  Upstream MSG is allowed
+Every learned score in the comparison is nested formula-OOF.  Upstream MSG is allowed
 only as the already-frozen formula-OOF parent model applied to GNPS without
 GNPS labels.  Candidate and query IDs must exactly match the parent B ledger.
 
@@ -88,3 +116,20 @@ The result directory contains the extended score bundle, both aligned evidence
 bundles, RRF cache, full report and `modeling/candidate_predictions.npz`.  The
 latter preserves B, A, WSE and every new arm on the exact same candidate axis,
 which is the handoff required for unchanged-condition biological evaluation.
+
+## Truth-free application contract
+
+The application entrypoint does not load labels, formula groups or near-query
+truth.  It retains every input query and uses explicit statuses:
+
+- `no_candidate`: no candidate row and an abstention;
+- `single_candidate_no_reranking`: preserve the WSE anchor, with no learned
+  B or incremental reranking because competition is unobserved;
+- `ranked_multi_candidate`: ordinary B plus integrated residual scoring.
+
+The 0/1-candidate behavior prevents fabricated Top1-Top2 margins and lets the
+same output preserve the full biology denominator.  ChemAware evidence is
+aligned only by query/candidate identifiers during inference; true formula and
+benchmark labels are neither required nor read.
+The retired RRF score is not required by the deployable checkpoint; it remains
+available only in the GNPS audit arm.

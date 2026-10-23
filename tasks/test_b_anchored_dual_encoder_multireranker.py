@@ -5,7 +5,13 @@ from __future__ import annotations
 import numpy as np
 import torch
 from pathlib import Path
+from tempfile import TemporaryDirectory
 
+from apply_b_anchored_dual_encoder_multireranker import (
+    build_b_inference_panel,
+    load_inference_bundle,
+    query_deployment_status,
+)
 from train_b_anchored_dual_encoder_multireranker import (
     AnchoredResidual,
     ARM_EXPERTS,
@@ -14,6 +20,7 @@ from train_b_anchored_dual_encoder_multireranker import (
     feature_columns,
     fit_arm,
     fit_scale,
+    query_score_features_inference,
 )
 
 
@@ -44,6 +51,12 @@ def main() -> None:
     scale = fit_scale(features, np.arange(4))
     assert np.all(features[2:, phase] / scale[phase] == 0)
     assert np.all(scale > 0)
+    production = synthetic_bundle()
+    production["module_names"] = production["module_names"][:-1]
+    production["scores"] = production["scores"][:-1]
+    production["availability"] = production["availability"][:-1]
+    production_features, _ = build_features(production, experts=(0, 1, 2))
+    assert production_features.shape == (4, 12)  # retired RRF is not required at deployment
 
     torch.manual_seed(1)
     for linear in (False, True):
@@ -67,8 +80,61 @@ def main() -> None:
     queries = np.arange(6, dtype=np.int64)
     for arm, experts in ARM_EXPERTS.items():
         fitted = fit_arm(panel, queries, experts, recipe, 7, "cpu",
+                         base,
                          linear=(arm == "complete_spectral_additive"))
         assert np.isfinite(fitted[-1])
+
+    # Real inference is truth-free and retains zero/single/multi-candidate
+    # queries without manufacturing a ranking decision for the first two.
+    ptr = np.asarray([0, 0, 1, 3], dtype=np.int64)
+    values = np.asarray([0.4, 0.1, 0.8], dtype=np.float32)
+    summarized = query_score_features_inference(values, ptr)
+    assert np.array_equal(summarized[0], np.asarray([0.4, 0.0, 0.0], dtype=np.float32))
+    status, multi = query_deployment_status(ptr)
+    assert status.tolist() == ["no_candidate", "single_candidate_no_reranking", "ranked_multi_candidate"]
+    assert multi.tolist() == [False, True, True]
+    with TemporaryDirectory() as temporary:
+        path = Path(temporary) / "truth_free.npz"
+        np.savez_compressed(
+            path, module_names=np.asarray(["m"]), scores=values[None, :],
+            availability=np.ones((1, len(values)), dtype=np.int8), query_ptr=ptr,
+            query_ids=np.asarray(["q0", "q1", "q2"]),
+            candidate_ids=np.asarray(["c0", "c1", "c2"]),
+        )
+        loaded = load_inference_bundle(path)
+        assert "labels" not in loaded and "group_ids" not in loaded
+        core_path = Path(temporary) / "core.npz"
+        module_names = np.asarray([
+            "weighted_spectral_entropy", "noise_v1", "p2b_noise_v1_frozen",
+        ])
+        np.savez_compressed(
+            core_path, module_names=module_names,
+            scores=np.vstack((values, values + 0.1, values + 0.2)),
+            availability=np.ones((3, len(values)), dtype=np.int8), query_ptr=ptr,
+            query_ids=np.asarray(["q0", "q1", "q2"]),
+            candidate_ids=np.asarray(["c0", "c1", "c2"]),
+            # These truth-like fields must not be loaded by inference.
+            labels=np.asarray([1, 1, 0]), group_ids=np.asarray(["x", "y", "z"]),
+        )
+        chem_path = Path(temporary) / "chem.npz"
+        np.savez_compressed(
+            chem_path, schema=np.asarray("gnps_chemaware_continuous_null_evidence_v1"),
+            query_ptr=ptr, query_ids=np.asarray(["q0", "q1", "q2"]),
+            candidate_ids=np.asarray(["c0", "c1", "c2"]),
+            availability=np.asarray([1, 0, 1], dtype=np.int8),
+            utility_correct=np.asarray([0.4, 0.0, 0.7], dtype=np.float32),
+            utility_zero=np.zeros(3, dtype=np.float32),
+            utility_reversed=np.asarray([0.1, 0.0, 0.2], dtype=np.float32),
+            utility_candidate_mismatch=np.asarray([0.2, 0.0, 0.3], dtype=np.float32),
+            query_formula=np.asarray(["SHOULD", "NOT", "LOAD"]),
+            near_query=np.asarray([1, 1, 1], dtype=np.int8),
+        )
+        truth_free_core = load_inference_bundle(core_path)
+        assert set(truth_free_core) == {
+            "module_names", "scores", "availability", "query_ptr", "query_ids", "candidate_ids"
+        }
+        inference_panel = build_b_inference_panel(truth_free_core, chem_path)
+        assert inference_panel["features"].shape == (3, 13)
     sbatch = (Path(__file__).resolve().parent / "run_b_anchored_dual_encoder_multireranker_gnps.sbatch").read_text()
     assert "#SBATCH --gpus=1" in sbatch
     assert "#SBATCH --cpus-per-task=10" in sbatch
