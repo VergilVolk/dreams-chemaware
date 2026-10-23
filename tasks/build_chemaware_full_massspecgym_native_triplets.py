@@ -89,19 +89,23 @@ def array_sha256(value: np.ndarray) -> str:
 def validate_geometry_cache(
     report_path: Path, checkpoint: Path, manifest_path: Path,
     rows: np.ndarray, embeddings: np.ndarray, manifest: Mapping[str, np.ndarray],
+    official_anchors: set[int], anchor_pool_path: Path,
 ) -> dict[str, object]:
     """Validate either the all-manifest token cache or the newer encode cache."""
     report = json.loads(report_path.read_text(encoding="utf-8"))
     checkpoint_sha = file_sha256(checkpoint)
     manifest_sha = file_sha256(manifest_path)
     status = str(report.get("status"))
-    if status == "CHEMAWARE_CHECKPOINT_MANIFEST_EMBEDDINGS_COMPLETE":
+    if status == "CHEMAWARE_TRAINING_MANIFEST_EMBEDDINGS_COMPLETE":
         expected = {
             "checkpoint_sha256": checkpoint_sha,
+            "anchor_pool_sha256": file_sha256(anchor_pool_path),
             "manifest_sha256": manifest_sha,
             "rows_array_sha256": array_sha256(rows),
             "embeddings_array_sha256": array_sha256(embeddings),
-            "formula_role_4_accessed": False,
+            "truth_labels_accessed": False,
+            "scope_train_anchors_only": True,
+            "held_query_rows_accessed": False,
         }
         drift = {key: (report.get(key), value) for key, value in expected.items()
                  if report.get(key) != value}
@@ -117,12 +121,21 @@ def validate_geometry_cache(
             raise RuntimeError("all-manifest cache row count drifted")
     else:
         raise RuntimeError(f"unsupported embedding cache report: {status}")
-    required = np.unique(np.concatenate((
+    selected_queries = np.flatnonzero(np.isin(
         np.asarray(manifest["query_row"], dtype=np.int64),
-        np.asarray(manifest["pair_candidate_row"], dtype=np.int64),
-    )))
+        np.asarray(sorted(official_anchors), dtype=np.int64),
+    ))
+    blocks = [np.asarray(manifest["query_row"][selected_queries], dtype=np.int64)]
+    for query in selected_queries:
+        left, right = map(int, manifest["query_ptr"][query:query + 2])
+        ref_left = int(manifest["molecule_ptr"][left])
+        ref_right = int(manifest["molecule_ptr"][right])
+        blocks.append(np.asarray(
+            manifest["pair_candidate_row"][ref_left:ref_right], dtype=np.int64,
+        ))
+    required = np.unique(np.concatenate(blocks))
     if not np.array_equal(required, rows):
-        raise RuntimeError("geometry cache does not cover the complete candidate manifest")
+        raise RuntimeError("geometry cache does not exactly cover training-anchor candidates")
     if embeddings.ndim != 2 or len(embeddings) != len(rows):
         raise RuntimeError("geometry cache row/embedding shapes disagree")
     norms = np.linalg.norm(np.asarray(embeddings, dtype=np.float32), axis=1)
@@ -416,7 +429,8 @@ def main() -> None:
     cache = FrozenEmbeddings(args.embedding_rows, args.embeddings)
     embedding_provenance = validate_geometry_cache(
         args.embedding_report, args.geometry_checkpoint, args.manifest,
-        rows, cache.embeddings, manifest,
+        rows, cache.embeddings, manifest, official_anchors,
+        args.official_train_pool[0],
     )
     scores, families = read_source_ledgers(args.source_ledger)
     overrides, selection_audit = select_chemical_overrides(
@@ -472,8 +486,7 @@ def main() -> None:
         "scientific_contract": {
             "coverage": (
                 "every eligible official MassSpecGym anchor exactly once "
-                "(all provided official pools merged: train and validation "
-                "splits)"
+                "across the explicitly supplied optimization pools"
             ),
             "native_fallback": "official positive and negative candidate lists unchanged",
             "chemical_event": "one query-local, identity-correct, molecule-max active (q,p*,n*)",
