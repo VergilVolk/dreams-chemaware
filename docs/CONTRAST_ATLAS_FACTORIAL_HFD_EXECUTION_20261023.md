@@ -79,12 +79,16 @@ analysis.  It would also not establish a general external biology result.
    manifest and per-batch receipts;
 3. phenotype-blind panel construction, ion-family collapse and factorial
    effect estimation;
-4. frozen official-DreaMS spectral encoding;
-5. construction of all 15 response objects and all-query scores;
-6. 1,999 within-panel response-assignment permutations and single-panel
+4. polarity-matched phenotype-blind identity partitioning: positive panels use
+   the frozen GNPS Gold/Silver `[M+H]+` control and negative panels use only
+   InChIKey-bearing `[M-H]-` entries in the consumed GNPS-source negative
+   library; absence of a hit is never called novelty;
+5. frozen official-DreaMS spectral encoding;
+6. construction of all 15 response objects and all-query scores;
+7. 1,999 within-panel response-assignment permutations and single-panel
    deletion analysis;
-7. hash freeze of every pre-truth artifact;
-8. automated opening of only the two registered reciprocal Hi-MYC queries.
+8. hash freeze of every pre-truth artifact;
+9. automated opening of only the two registered reciprocal Hi-MYC queries.
 
 Because the final opening is dependency-bound to the hash-freeze job, there is
 no opportunity to inspect scores and then change the response method, candidate
@@ -93,6 +97,6 @@ downstream opening.
 
 ## Current implementation verification
 
-On 2026-10-23, the original factorial-HFD method tests plus the new download
-and pre-truth gates passed `10/10`.  This verifies executable contracts only;
+On 2026-10-23, the original factorial-HFD method tests plus the new download,
+polarity-aware identity and pre-truth gates passed `12/12`.  This verifies executable contracts only;
 it is not a biological success result.

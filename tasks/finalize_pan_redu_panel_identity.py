@@ -34,7 +34,11 @@ def main() -> None:
         report_path = root / "report.json"
         table_path = root / "identity_partition.tsv.gz"
         report = json.loads(report_path.read_text(encoding="utf-8"))
-        if report.get("status") != "PHENOTYPE_BLIND_STRICT_LIBRARY_PARTITION_FROZEN":
+        allowed_status = {
+            "PHENOTYPE_BLIND_STRICT_LIBRARY_PARTITION_FROZEN",
+            "PHENOTYPE_BLIND_POLARITY_MATCHED_LIBRARY_PARTITION_FROZEN",
+        }
+        if report.get("status") not in allowed_status:
             raise RuntimeError(f"inadmissible identity partition: {panel_id}")
         if report.get("panel_id") != panel_id:
             raise RuntimeError(f"identity report panel mismatch: {panel_id}")

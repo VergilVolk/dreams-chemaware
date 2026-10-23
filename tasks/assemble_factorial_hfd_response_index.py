@@ -228,6 +228,7 @@ def main() -> None:
         "identity_partition_available": identity is not None,
         "ion_family_partition_available": args.families_root is not None,
         "leakage_status": "effect_and_spectral_objects_joined_without_opening_cross_study_relationship",
+        "identity_table_sha256": sha256(args.identity_table) if args.identity_table else None,
         "sources": sources,
         "claim_boundary": [
             "The index is pre-truth and is not evidence that Hi-MYC interactions retrieve one another.",

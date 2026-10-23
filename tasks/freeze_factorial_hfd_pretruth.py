@@ -43,6 +43,7 @@ def main() -> None:
     parser.add_argument("--retrieval-dir", required=True, type=Path)
     parser.add_argument("--null-dir", required=True, type=Path)
     parser.add_argument("--jackknife-dir", required=True, type=Path)
+    parser.add_argument("--identity-table", required=True, type=Path)
     parser.add_argument("--output-dir", required=True, type=Path)
     args = parser.parse_args()
     if args.output_dir.exists():
@@ -62,6 +63,12 @@ def main() -> None:
     retrieval = pd.read_csv(args.retrieval_dir / "retrieval_scores.tsv.gz", sep="\t")
     if len(study_manifest) != 15 or study_manifest.study_id.nunique() != 3:
         raise RuntimeError("expected 15 response objects from three studies")
+    if not study_manifest["identity_partition_available"].astype(bool).all():
+        raise RuntimeError("study response objects lack the frozen identity partition")
+    if int(study_manifest["n_entities_known"].sum()) <= 0 or int(study_manifest["n_entities_unresolved"].sum()) <= 0:
+        raise RuntimeError("known/unresolved evidence worlds are empty")
+    if reports["index"].get("identity_table_sha256") != sha256(args.identity_table):
+        raise RuntimeError("response-index identity partition provenance differs from the frozen table")
     expected_rows = 15 * 10 * 3
     if len(retrieval) != expected_rows:
         raise RuntimeError(f"expected {expected_rows} three-world candidate scores, observed {len(retrieval)}")
@@ -84,6 +91,7 @@ def main() -> None:
         "null_archive": args.null_dir / "response_assignment_null.npz",
         "jackknife_report": report_paths["jackknife"],
         "jackknife_scores": args.jackknife_dir / "single_panel_deletion_scores.tsv.gz",
+        "identity_partition": args.identity_table,
     }
     for path in files.values():
         if not path.is_file():

@@ -50,7 +50,12 @@ def test_pretruth_freeze_accepts_complete_contract(tmp_path: Path) -> None:
     index, retrieval, null, jackknife = [tmp_path / name for name in ("index", "retrieval", "null", "jackknife")]
     for path in (index, retrieval, null, jackknife):
         path.mkdir()
-    write_json(index / "report.json", {"status": "development_pretruth_factorial_response_index"})
+    identity = tmp_path / "identity.tsv"
+    identity.write_text("panel_id\tanchor_id\tidentity_status\np\ta\tlibrary_supported\n", encoding="utf-8")
+    write_json(index / "report.json", {
+        "status": "development_pretruth_factorial_response_index",
+        "identity_table_sha256": file_sha256(identity),
+    })
     write_json(retrieval / "report.json", {"status": "pretruth_scores_frozen", "truth_opened": False})
     write_json(null / "report.json", {"status": "pretruth_max_candidate_null_frozen", "truth_opened": False, "permutations": 1999})
     write_json(jackknife / "report.json", {"status": "pretruth_single_panel_deletion_scores_frozen", "truth_opened": False, "response_objects": 15, "scored_rows": 123})
@@ -58,6 +63,9 @@ def test_pretruth_freeze_accepts_complete_contract(tmp_path: Path) -> None:
     manifest = pd.DataFrame({
         "study_id": np.repeat(["A", "B", "C"], 5),
         "contrast_id": [f"c{i}" for _ in range(3) for i in range(5)],
+        "identity_partition_available": True,
+        "n_entities_known": 2,
+        "n_entities_unresolved": 3,
     })
     manifest.to_csv(index / "study_contrast_manifest.tsv", sep="\t", index=False)
     pd.DataFrame({"x": [1]}).to_csv(index / "panel_contrast_manifest.tsv", sep="\t", index=False)
@@ -73,6 +81,7 @@ def test_pretruth_freeze_accepts_complete_contract(tmp_path: Path) -> None:
         sys.executable, str(ROOT / "tasks/freeze_factorial_hfd_pretruth.py"),
         "--index-dir", str(index), "--retrieval-dir", str(retrieval),
         "--null-dir", str(null), "--jackknife-dir", str(jackknife),
+        "--identity-table", str(identity),
         "--output-dir", str(output),
     ], check=True, cwd=ROOT)
     report = json.loads((output / "report.json").read_text(encoding="utf-8"))

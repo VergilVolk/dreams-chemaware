@@ -21,6 +21,7 @@ python -u tasks/freeze_factorial_hfd_pretruth.py \
   --retrieval-dir "$RETRIEVAL" \
   --null-dir "$NULL_DIR" \
   --jackknife-dir "$JACKKNIFE" \
+  --identity-table data/validation/factorial_hfd_identity_partition_v1_20261023/identity_partition.tsv.gz \
   --output-dir data/validation/factorial_hfd_pretruth_freeze_official_v1_20261023
 
 python -u tasks/evaluate_factorial_hfd_retrieval.py \

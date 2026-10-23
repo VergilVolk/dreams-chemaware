@@ -7,7 +7,9 @@ download_job=$(sbatch --parsable tasks/run_factorial_hfd_download.sbatch)
 verify_job=$(sbatch --parsable --dependency="afterok:${download_job}" tasks/run_factorial_hfd_verify_download.sbatch)
 panel_job=$(sbatch --parsable --dependency="afterok:${verify_job}" tasks/run_factorial_hfd_panels_and_effects.sbatch)
 embedding_job=$(sbatch --parsable --dependency="afterok:${panel_job}" tasks/run_factorial_hfd_embeddings.sbatch)
-index_job=$(sbatch --parsable --dependency="afterok:${embedding_job}" tasks/run_factorial_hfd_pretruth_index.sbatch)
+identity_job=$(sbatch --parsable --dependency="afterok:${panel_job}" tasks/run_factorial_hfd_identity_partitions.sbatch)
+identity_finalize_job=$(sbatch --parsable --dependency="afterok:${identity_job}" tasks/run_factorial_hfd_identity_finalize.sbatch)
+index_job=$(sbatch --parsable --dependency="afterok:${embedding_job}:${identity_finalize_job}" tasks/run_factorial_hfd_pretruth_index.sbatch)
 robustness_job=$(sbatch --parsable --dependency="afterok:${index_job}" tasks/run_factorial_hfd_pretruth_robustness.sbatch)
 open_job=$(sbatch --parsable --dependency="afterok:${robustness_job}" tasks/run_factorial_hfd_freeze_and_open_primary.sbatch)
 
@@ -17,6 +19,8 @@ printf '%s\n' \
   "verify=${verify_job}" \
   "panels_and_effects=${panel_job}" \
   "embeddings=${embedding_job}" \
+  "identity_partitions=${identity_job}" \
+  "identity_finalize=${identity_finalize_job}" \
   "pretruth_index=${index_job}" \
   "pretruth_robustness=${robustness_job}" \
   "freeze_and_open=${open_job}"

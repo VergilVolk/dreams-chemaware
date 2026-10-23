@@ -19,6 +19,7 @@ python -u tasks/assemble_factorial_hfd_response_index.py \
   --effects-root data/validation/factorial_hfd_panel_effects_v1_20261016 \
   --embeddings-root data/validation/factorial_hfd_panel_embeddings_official_v1_20261016 \
   --families-root data/validation/factorial_hfd_ion_families_v1_20261016 \
+  --identity-table data/validation/factorial_hfd_identity_partition_v1_20261023/identity_partition.tsv.gz \
   --output-dir "$INDEX" \
   --minimum-entities 12
 
