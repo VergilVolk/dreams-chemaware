@@ -1,0 +1,22 @@
+{
+  "status": "MSV000095331_TRUE_RELATION_ATTRIBUTION_COMPLETE",
+  "data_role": "post-result interpretation; development only",
+  "registered_relations": 6,
+  "precursor_compatible_weight_fraction_range": [
+    0.5574606582963952,
+    0.6748589021009119
+  ],
+  "both_unresolved_weight_fraction_range": [
+    0.8420915832636281,
+    0.9071378049283427
+  ],
+  "drug_named_weight_fraction_range": [
+    0.0,
+    0.02490809340014188
+  ],
+  "claim_boundary": [
+    "Drug-named classification uses post-result public-library labels only for interpretation.",
+    "Low drug-named fraction argues against direct parent/propagated-drug peaks dominating the score; it does not establish an endogenous mechanism.",
+    "Mass-compatible pairs remain identity hypotheses rather than confirmed identical molecules."
+  ]
+}
