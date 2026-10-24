@@ -12,21 +12,91 @@ import argparse
 import gzip
 import hashlib
 import json
+import math
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
-from analyze_msv000095331_chemprop_open_retrieval import CHEMPROP_MGF, NEW_STUDY
 from encode_pan_redu_panel_spectra import load_mgf
-from noise_gnps_article_spectral_scores import (
-    prepare_spectrum,
-    weighted_entropy_backend,
-    weighted_entropy_similarity,
-)
 
 
+NEW_STUDY = "MSV000095331"
 NEW_MGF = Path("data/reference/msv000095331_drug_microbiome_20261023/consensus.mgf")
+CHEMPROP_MGF = {
+    "MSV000094899": Path("data/reference/chemprop2_m1_20261011/consensus.mgf"),
+    "MSV000096724": Path(
+        "data/reference/chemprop_cross_design_20261011/chemprop_23drug/spectra/specs_ms.mgf"
+    ),
+    "MSV000093571": Path(
+        "data/reference/chemprop_cross_design_20261011/chemprop_45drug/spectra/specs_ms.mgf"
+    ),
+}
+
+
+def prepare_spectrum(spectrum: np.ndarray, n_peaks: int = 100) -> np.ndarray:
+    values = np.asarray(spectrum, dtype=np.float64)
+    if values.ndim != 2 or values.shape[0] != 2:
+        raise ValueError("spectrum must have shape (2, peaks)")
+    keep = (
+        np.isfinite(values[0]) & np.isfinite(values[1])
+        & (values[0] > 0) & (values[1] > 0)
+    )
+    values = values[:, keep]
+    if values.shape[1] > n_peaks:
+        selected = np.argpartition(values[1], -n_peaks)[-n_peaks:]
+        values = values[:, selected]
+    return values[:, np.argsort(values[0], kind="stable")]
+
+
+def _entropy_weight(intensity: np.ndarray) -> np.ndarray:
+    values = np.asarray(intensity, dtype=np.float64)
+    values /= max(float(values.sum()), 1e-15)
+    nonzero = values > 0
+    entropy = -float(np.sum(values[nonzero] * np.log(values[nonzero])))
+    if entropy < 3.0:
+        values = values ** (0.25 + 0.25 * entropy)
+        values /= max(float(values.sum()), 1e-15)
+    return values
+
+
+def weighted_entropy_similarity(
+    spectrum_a: np.ndarray, spectrum_b: np.ndarray, tolerance: float = 0.02,
+) -> float:
+    """Dependency-free weighted spectral entropy with greedy peak matching."""
+    mz_a, mz_b = spectrum_a[0], spectrum_b[0]
+    intensity_a = _entropy_weight(spectrum_a[1])
+    intensity_b = _entropy_weight(spectrum_b[1])
+    candidates: list[tuple[float, int, int]] = []
+    for i, value in enumerate(mz_a):
+        left = int(np.searchsorted(mz_b, value - tolerance, side="left"))
+        right = int(np.searchsorted(mz_b, value + tolerance, side="right"))
+        candidates.extend((abs(float(value - mz_b[j])), i, j) for j in range(left, right))
+    used_a: set[int] = set()
+    used_b: set[int] = set()
+    matches: list[tuple[int, int]] = []
+    for _, i, j in sorted(candidates):
+        if i not in used_a and j not in used_b:
+            used_a.add(i); used_b.add(j); matches.append((i, j))
+    pa: list[float] = []
+    pb: list[float] = []
+    for i, j in matches:
+        pa.append(float(intensity_a[i])); pb.append(float(intensity_b[j]))
+    for i in set(range(len(intensity_a))) - used_a:
+        pa.append(float(intensity_a[i])); pb.append(0.0)
+    for j in set(range(len(intensity_b))) - used_b:
+        pa.append(0.0); pb.append(float(intensity_b[j]))
+    left = np.asarray(pa, dtype=np.float64)
+    right = np.asarray(pb, dtype=np.float64)
+    mean = 0.5 * (left + right)
+    nz_left, nz_right = left > 0, right > 0
+    js = 0.5 * np.sum(left[nz_left] * np.log(left[nz_left] / mean[nz_left]))
+    js += 0.5 * np.sum(right[nz_right] * np.log(right[nz_right] / mean[nz_right]))
+    return float(np.clip(1.0 - js / math.log(2.0), 0.0, 1.0))
+
+
+def weighted_entropy_backend() -> str:
+    return "dependency_free_weighted_entropy_v1"
 
 
 def sha256(path: Path) -> str:
