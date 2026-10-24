@@ -22,6 +22,7 @@ ARCH="${DREAMS_ARCHITECTURE_CHECKPOINT:-dreams/models/pretrained/ssl_model_serve
 NOISE="${NOISE_V1_CHECKPOINT:-data/validation/noise_relation_t1_t3_run_2347055/checkpoint/primary_seed_3407_slim.pt}"
 STAGE1="${CHEMAWARE_STAGE1_CHECKPOINT:-data/validation/chemaware_high_coverage_native/run_2340721_resume_2340524/training/best.ckpt}"
 PHASEA="${CHEMAWARE_PHASEA_CHECKPOINT:-data/validation/chemaware_online_role_budget_native/run_2345481/phasea_reproduction_gate/chemaware_phasea_max_boundary_step2000.ckpt}"
+FULLMSG_CHEM="${NOISE_CHEMAWARE_FULLMSG_CHECKPOINT:-data/validation/noise_chemaware_full_massspecgym_native/run_2401890/checkpoint/noise_chemaware_fullmsg_slim.pt}"
 MGF_NEW="data/reference/msv000095331_drug_microbiome_20261023/consensus.mgf"
 MGF_M1="data/reference/chemprop2_m1_20261011/consensus.mgf"
 MGF_23="data/reference/chemprop_cross_design_20261011/chemprop_23drug/spectra/specs_ms.mgf"
@@ -34,7 +35,7 @@ mkdir -p "$OUT" "$SCRATCH"
 trap 'rm -rf -- "$SCRATCH"' EXIT
 
 required=(
-  "$ARCH" "$NOISE" "$STAGE1" "$PHASEA"
+  "$ARCH" "$NOISE" "$STAGE1" "$PHASEA" "$FULLMSG_CHEM"
   "$MGF_NEW" "$MGF_M1" "$MGF_23" "$MGF_45"
   tasks/prepare_official_embedding_checkpoint.py
   tasks/encode_crossstudy_mgfs_checkpoint.py
@@ -71,17 +72,20 @@ encode_one() {
 encode_one noise_v1 "$NOISE" "$OUT/noise_v1_embeddings.npz"
 encode_one chemaware_stage1 "$SCRATCH/chemaware_stage1_slim.pt" "$OUT/chemaware_stage1_embeddings.npz"
 encode_one chemaware_phase_a "$SCRATCH/chemaware_phasea_slim.pt" "$OUT/chemaware_phase_a_embeddings.npz"
+encode_one noise_chemaware_fullmsg "$FULLMSG_CHEM" "$OUT/noise_chemaware_fullmsg_embeddings.npz"
 
 python -u tasks/score_crossstudy_identity_multiencoder.py \
   --embedding "noise_v1=$OUT/noise_v1_embeddings.npz" \
   --embedding "chemaware_stage1=$OUT/chemaware_stage1_embeddings.npz" \
   --embedding "chemaware_phase_a=$OUT/chemaware_phase_a_embeddings.npz" \
+  --embedding "noise_chemaware_fullmsg=$OUT/noise_chemaware_fullmsg_embeddings.npz" \
   --output-dir "$OUT/identity_scoring" --precursor-ppm 10 --fragment-da 0.02
 
 sha256sum \
   "$OUT/noise_v1_embeddings.npz" \
   "$OUT/chemaware_stage1_embeddings.npz" \
   "$OUT/chemaware_phase_a_embeddings.npz" \
+  "$OUT/noise_chemaware_fullmsg_embeddings.npz" \
   "$OUT/identity_scoring/identity_candidate_scores.tsv.gz" \
   "$OUT/identity_scoring/method_scores_long.tsv.gz" \
   "$OUT/identity_scoring/report.json" > "$OUT/SHA256SUMS.txt"
