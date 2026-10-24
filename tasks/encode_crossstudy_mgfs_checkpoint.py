@@ -14,7 +14,64 @@ from pathlib import Path
 
 import numpy as np
 
-from encode_ad_mgf_frozen_checkpoint import embed_records, load_eligible_mgf
+from encode_pan_redu_panel_spectra import load_mgf
+
+
+MINIMUM_FRAGMENT_PEAKS = 3
+N_HIGHEST_PEAKS = 100
+
+
+def load_eligible_mgf(path: Path) -> tuple[list[str], list[dict[str, object]], list[str]]:
+    all_ids, all_records = load_mgf(path, minimum_peaks=0, skip_ineligible=False)
+    entity_ids, records = load_mgf(
+        path, minimum_peaks=MINIMUM_FRAGMENT_PEAKS, skip_ineligible=True,
+    )
+    expected = [
+        entity for entity, record in zip(all_ids, all_records, strict=True)
+        if np.asarray(record["peaks"]).shape[-1] >= MINIMUM_FRAGMENT_PEAKS
+    ]
+    if entity_ids != expected:
+        raise RuntimeError("MGF eligibility changed between parser passes")
+    eligible = set(entity_ids)
+    return entity_ids, records, [entity for entity in all_ids if entity not in eligible]
+
+
+def embed_records(
+    records: list[dict[str, object]], checkpoint: Path, raw_checkpoint: Path,
+    *, device_name: str, batch_size: int,
+) -> tuple[np.ndarray, str]:
+    import torch
+    from torch.utils.data import DataLoader, Dataset
+
+    from train_e1_identity import load_base_model, preprocess_spectrum
+
+    device = torch.device(device_name)
+    if device.type == "cuda" and not torch.cuda.is_available():
+        raise RuntimeError("CUDA encoding requested without an allocated GPU")
+
+    class SpectrumDataset(Dataset):
+        def __len__(self) -> int:
+            return len(records)
+
+        def __getitem__(self, index: int):
+            record = records[index]
+            return preprocess_spectrum(
+                np.asarray(record["peaks"]), float(record["precursor_mz"]),
+                N_HIGHEST_PEAKS,
+            )
+
+    model, checkpoint_kind = load_base_model(
+        checkpoint, raw_checkpoint, device, N_HIGHEST_PEAKS,
+    )
+    if checkpoint_kind != "official_embedding_slim":
+        raise RuntimeError(f"application encoder must be a slim embedding checkpoint: {checkpoint_kind}")
+    model.eval()
+    loader = DataLoader(SpectrumDataset(), batch_size=batch_size, shuffle=False, num_workers=0)
+    batches: list[np.ndarray] = []
+    with torch.inference_mode():
+        for batch in loader:
+            batches.append(model(batch.to(device, non_blocking=True)).float().cpu().numpy())
+    return np.concatenate(batches).astype(np.float32, copy=False), checkpoint_kind
 
 
 def sha256(path: Path) -> str:
