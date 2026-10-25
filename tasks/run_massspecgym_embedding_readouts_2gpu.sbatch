@@ -79,16 +79,24 @@ fi
 BUILD_CHEM_EVIDENCE=0
 if [[ -z "$CHEM_EVIDENCE" || ! -f "$CHEM_EVIDENCE" ]]; then
   set +e
-  DISCOVERED_CHEM="$(python - "$EVIDENCE/evidence.npz" "$POLICY_DIR/truthblind_policy.joblib" <<'PY'
-import hashlib, sys
+  DISCOVERED_CHEM="$(python - "$EVIDENCE/evidence.npz" "$POLICY_DIR" <<'PY'
+import hashlib, json, sys
 from pathlib import Path
 import numpy as np
 source = Path(sys.argv[1])
 h = hashlib.sha256(source.read_bytes()).hexdigest()
-policy = Path(sys.argv[2])
-if not policy.is_file():
+policy_dir = Path(sys.argv[2])
+policy = policy_dir / 'truthblind_policy.joblib'
+report = policy_dir / 'report.json'
+if policy.is_file():
+    policy_h = hashlib.sha256(policy.read_bytes()).hexdigest()
+elif report.is_file():
+    body = json.loads(report.read_text(encoding='utf-8'))
+    policy_h = body.get('frozen_truthblind_policy', {}).get('sha256', '')
+    if not policy_h:
+        raise SystemExit(1)
+else:
     raise SystemExit(1)
-policy_h = hashlib.sha256(policy.read_bytes()).hexdigest()
 matches = []
 for path in Path('data/validation').glob('**/conditional_null_chem_evidence.npz'):
     try:
