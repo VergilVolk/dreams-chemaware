@@ -215,3 +215,39 @@ training or metric selection.
 
 - Packet builder: `tasks/build_msv000095331_fullmsg_validation_packet.py`
 - Final packet: `data/validation/msv000095331_fullmsg_validation_packet_v5_20261025/`
+
+## Context-robust biological endpoint (2026-10-25)
+
+The five microbial backgrounds within each drug mixture are related strata,
+not independent confirmations. To prevent the three FullMSG context-specific
+Top-1 gains from being counted as three biological replications, the frozen
+response scores were aggregated with equal weight across the five backgrounds.
+This yields six evaluable mixture-by-candidate-study units: three registered
+mixtures in each of two studies containing the corresponding drug response.
+
+| Method | Target Top-1 units, mean aggregation | Median target rank | Mean target rank | Improved / worsened / unchanged vs Noise |
+|---|---:|---:|---:|---:|
+| WSE | 1/6 | 4.5 | 5.00 | 1 / 2 / 3 |
+| Noise V1 | 2/6 | 4.0 | 4.83 | reference |
+| ChemAware Stage-1 | 1/6 | 4.5 | 5.33 | 0 / 2 / 4 |
+| ChemAware Phase-A | 1/6 | 4.0 | 4.83 | 1 / 1 / 4 |
+| Noise-ChemAware FullMSG | 1/6 | 4.0 | 4.83 | 1 / 1 / 4 |
+| Simple normalized mean | 1/6 | 4.0 | 5.00 | 0 / 1 / 5 |
+
+FullMSG therefore does not show a context-robust aggregate advantage over
+Noise on this consumed panel. Its three raw-context Top-1 gains remain useful
+evidence that the representation can change biologically relevant entity
+support in particular microbial settings, but they do not survive as a broad
+retrieval improvement after the related contexts are collapsed. Specifically,
+FullMSG improves the loratadine target rank from 11 to 10 in `MSV000094899`,
+but worsens the omeprazole target rank from 1 to 2 in the same study; the other
+four mean-aggregated target ranks are unchanged from Noise.
+
+The median-across-context sensitivity also gives every method 1/6 target
+Top-1 units. With only six descriptive development units, no significance or
+general-transfer claim is made. The correct current conclusion is localized
+entity-level complementarity plus a prioritized validation set, not a proven
+overall biological retrieval gain.
+
+- Aggregation script: `tasks/summarize_msv000095331_context_robust_retrieval.py`
+- Frozen result: `data/validation/msv000095331_context_robust_retrieval_v1_20261025/`

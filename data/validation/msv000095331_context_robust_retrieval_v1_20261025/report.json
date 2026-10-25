@@ -1,0 +1,118 @@
+{
+  "status": "MSV000095331_CONTEXT_ROBUST_RETRIEVAL_COMPLETE",
+  "dataset": "MSV000095331 plus two ChemProp candidate studies",
+  "dataset_role": "development_consumed_not_external_validation",
+  "aggregation": {
+    "primary": "equal mean of five microbial-context response scores",
+    "sensitivity": "median of five microbial-context response scores",
+    "ranking_unit": "mixture x candidate study",
+    "spectral_scores_reused_as_biological_weights": false
+  },
+  "denominators": {
+    "registered_mixtures": 3,
+    "candidate_studies_with_registered_target": 2,
+    "microbial_contexts_per_unit": 5,
+    "mixture_study_units_per_method": 6,
+    "methods": 6
+  },
+  "method_summary": [
+    {
+      "method_name": "chemaware_phase_a",
+      "mixture_study_units": 6,
+      "mean_aggregate_top1_units": 1,
+      "median_aggregate_top1_units": 1,
+      "median_target_rank_mean_aggregation": 4.0,
+      "mean_target_rank_mean_aggregation": 4.833333333333333,
+      "median_target_rank_median_aggregation": 4.5,
+      "improved_units_vs_noise_mean": 1,
+      "worsened_units_vs_noise_mean": 1,
+      "unchanged_units_vs_noise_mean": 4
+    },
+    {
+      "method_name": "chemaware_stage1",
+      "mixture_study_units": 6,
+      "mean_aggregate_top1_units": 1,
+      "median_aggregate_top1_units": 1,
+      "median_target_rank_mean_aggregation": 4.5,
+      "mean_target_rank_mean_aggregation": 5.333333333333333,
+      "median_target_rank_median_aggregation": 5.5,
+      "improved_units_vs_noise_mean": 0,
+      "worsened_units_vs_noise_mean": 2,
+      "unchanged_units_vs_noise_mean": 4
+    },
+    {
+      "method_name": "noise_chemaware_fullmsg",
+      "mixture_study_units": 6,
+      "mean_aggregate_top1_units": 1,
+      "median_aggregate_top1_units": 1,
+      "median_target_rank_mean_aggregation": 4.0,
+      "mean_target_rank_mean_aggregation": 4.833333333333333,
+      "median_target_rank_median_aggregation": 4.0,
+      "improved_units_vs_noise_mean": 1,
+      "worsened_units_vs_noise_mean": 1,
+      "unchanged_units_vs_noise_mean": 4
+    },
+    {
+      "method_name": "noise_v1",
+      "mixture_study_units": 6,
+      "mean_aggregate_top1_units": 2,
+      "median_aggregate_top1_units": 1,
+      "median_target_rank_mean_aggregation": 4.0,
+      "mean_target_rank_mean_aggregation": 4.833333333333333,
+      "median_target_rank_median_aggregation": 5.0,
+      "improved_units_vs_noise_mean": 0,
+      "worsened_units_vs_noise_mean": 0,
+      "unchanged_units_vs_noise_mean": 6
+    },
+    {
+      "method_name": "simple_query_minmax_mean",
+      "mixture_study_units": 6,
+      "mean_aggregate_top1_units": 1,
+      "median_aggregate_top1_units": 1,
+      "median_target_rank_mean_aggregation": 4.0,
+      "mean_target_rank_mean_aggregation": 5.0,
+      "median_target_rank_median_aggregation": 4.0,
+      "improved_units_vs_noise_mean": 0,
+      "worsened_units_vs_noise_mean": 1,
+      "unchanged_units_vs_noise_mean": 5
+    },
+    {
+      "method_name": "weighted_spectral_entropy",
+      "mixture_study_units": 6,
+      "mean_aggregate_top1_units": 1,
+      "median_aggregate_top1_units": 1,
+      "median_target_rank_mean_aggregation": 4.5,
+      "mean_target_rank_mean_aggregation": 5.0,
+      "median_target_rank_median_aggregation": 3.5,
+      "improved_units_vs_noise_mean": 1,
+      "worsened_units_vs_noise_mean": 2,
+      "unchanged_units_vs_noise_mean": 3
+    }
+  ],
+  "inputs": {
+    "response_scores": {
+      "path": "data\\validation\\msv000095331_entity_method_increment_multiencoder_run_2404230\\response_retrieval_scores.tsv.gz",
+      "sha256": "0b85b623b54cf4856f3fea83ab52e1951d01771f2924248048da96595b2af41c"
+    }
+  },
+  "outputs": {
+    "aggregate_candidates": {
+      "path": "data\\validation\\msv000095331_context_robust_retrieval_v1_20261025\\aggregate_candidate_scores.tsv",
+      "sha256": "377881879be85abd3226a2a99ae2fe411d64654acd7d8329b9de7926dc3b289d"
+    },
+    "registered_targets": {
+      "path": "data\\validation\\msv000095331_context_robust_retrieval_v1_20261025\\registered_target_results.tsv",
+      "sha256": "8a47bdf1114d98acd355d75301b6c3f4e2f989823ca93f0fa3578b462843d9ab"
+    },
+    "method_summary": {
+      "path": "data\\validation\\msv000095331_context_robust_retrieval_v1_20261025\\method_summary.tsv",
+      "sha256": "9c378af6a4d5bfb8bbc68788e54982903d21930b952cb34db4d08a9bb1f356a0"
+    }
+  },
+  "claim_boundary": [
+    "Five microbial contexts are related strata, not independent replications.",
+    "The six mixture-study units are descriptive development endpoints and do not support a significance claim.",
+    "A context-specific Top-1 gain is not a context-robust gain unless it survives aggregation.",
+    "The analysis reuses frozen entity decisions and response estimates and does not tune a spectral model."
+  ]
+}
