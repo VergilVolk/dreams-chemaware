@@ -79,17 +79,22 @@ fi
 BUILD_CHEM_EVIDENCE=0
 if [[ -z "$CHEM_EVIDENCE" || ! -f "$CHEM_EVIDENCE" ]]; then
   set +e
-  DISCOVERED_CHEM="$(python - "$EVIDENCE/evidence.npz" <<'PY'
+  DISCOVERED_CHEM="$(python - "$EVIDENCE/evidence.npz" "$POLICY_DIR/truthblind_policy.joblib" <<'PY'
 import hashlib, sys
 from pathlib import Path
 import numpy as np
 source = Path(sys.argv[1])
 h = hashlib.sha256(source.read_bytes()).hexdigest()
+policy = Path(sys.argv[2])
+if not policy.is_file():
+    raise SystemExit(1)
+policy_h = hashlib.sha256(policy.read_bytes()).hexdigest()
 matches = []
 for path in Path('data/validation').glob('**/conditional_null_chem_evidence.npz'):
     try:
         with np.load(path, allow_pickle=False) as body:
-            aligned = str(body['evidence_sha256'].item()) == h
+            aligned = (str(body['evidence_sha256'].item()) == h
+                       and str(body['policy_sha256'].item()) == policy_h)
     except Exception:
         continue
     if aligned:
@@ -159,7 +164,26 @@ python -m py_compile \
 python -u tasks/test_massspecgym_embedding_readouts.py
 
 if (( BUILD_CHEM_EVIDENCE == 1 )); then
-  if [[ ! -s "$POLICY_DIR/truthblind_policy.joblib" || ! -s "$POLICY_DIR/report.json" ]]; then
+  POLICY_VALID=0
+  if [[ -s "$POLICY_DIR/truthblind_policy.joblib" && -s "$POLICY_DIR/report.json" ]]; then
+    set +e
+    python - "$POLICY_DIR/report.json" <<'PY'
+import json, sys
+body = json.load(open(sys.argv[1], encoding='utf-8'))
+method = body.get('method', {})
+assert method.get('rule_control_variants') == [
+    'rule_response_content_permuted',
+    'rule_response_content_permuted_b',
+    'rule_response_content_permuted_c',
+]
+assert method.get('contrast_representation') == 'symmetric_summary'
+assert body.get('selection_control_mode') == 'deployment_safe'
+assert body.get('candidate_conditioned') is True
+PY
+    POLICY_VALID=$?
+    set -e
+  fi
+  if (( POLICY_VALID != 0 )); then
     POLICY_DIR="$SCRATCH/rebuilt_multinull_v2_policy"
     python -u tasks/audit_chemaware_orthogonal_rule_residual_policy.py \
       --rule-control-variants \
