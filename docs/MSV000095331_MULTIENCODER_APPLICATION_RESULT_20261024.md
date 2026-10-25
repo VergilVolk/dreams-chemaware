@@ -81,3 +81,58 @@ be described as the completed grand unified algorithm.
 The deterministic summary exports method coverage, pairwise Top-1 agreement,
 all changed identity hypotheses versus Noise, and prespecified response-rank
 deltas. Its report records all input and output SHA-256 values.
+
+## Entity attribution of the response gains (2026-10-25)
+
+The five Top-1 gains were decomposed after scoring into the mutual identity
+hypotheses that changed relative to Noise V1. This is an evaluation-only
+analysis: biological responses were not used to fit, tune or select an
+encoder. The decomposition exactly reproduces the change in each response
+numerator.
+
+| Encoder and registered response | Noise rank -> encoder rank | Gained / removed edges | Helpful / harmful changed edges | Net numerator change | Largest helpful edge share |
+|---|---:|---:|---:|---:|---:|
+| Phase-A, mix-1 full SynCom -> sertraline (MSV000093571) | 4 -> 1 | 113 / 112 | 120 / 105 | +6.251 | 1.44% |
+| Phase-A, mix-3 SynCom-red -> omeprazole (MSV000093571) | 2 -> 1 | 120 / 117 | 126 / 111 | +9.395 | 1.22% |
+| FullMSG, mix-1 group-4 slow -> sertraline (MSV000094899) | 8 -> 1 | 173 / 173 | 190 / 156 | +10.959 | 1.22% |
+| FullMSG, mix-1 group-3 medium-slow -> sertraline (MSV000093571) | 2 -> 1 | 96 / 97 | 95 / 98 | +0.106 | 1.88% |
+| FullMSG, mix-1 full SynCom -> sertraline (MSV000093571) | 4 -> 1 | 104 / 103 | 113 / 94 | +13.838 | 1.51% |
+
+Across these five contexts, 1,208 identity hypotheses changed: 644 moved the
+registered response numerator in the helpful direction and 564 opposed it.
+The net gain therefore did not come from accepting every new edge. It combined
+355 newly added concordant edges with removal of 289 discordant edges.
+
+The structure-agnostic contribution is concrete but not yet externally
+validated. Of the 644 helpful changes, 612 (95.0%) connected two unresolved
+entities and 32 touched at least one library-supported entity. Across all
+changed edges, 1,142/1,208 (94.5%) were unresolved on both ends. No single
+helpful edge explained more than 1.88% of the positive contribution in any
+gain context, so the registered gains are distributed response evidence rather
+than one dominant annotated peak.
+
+One prespecified omeprazole-product query (`MSV000095331` entity `11178`) is a
+particularly useful orthogonal follow-up. Phase-A removed its Noise-selected
+link to `MSV000093571` entity `3375` and added a link to entity `4908`; those
+two changes contributed +0.324 and +0.540 to the response numerator,
+respectively. Both candidate links remain unresolved identity hypotheses.
+They are therefore a falsifiable target for retention-time, adduct/isotope and
+targeted-MS/MS review, not a confirmed molecular correction.
+
+The follow-up table deliberately includes the six largest helpful and six
+largest harmful changed edges per gain context. This prevents the application
+story from being assembled only from favorable examples.
+
+Reproducible attribution artifacts:
+
+- `tasks/attribute_msv000095331_multiencoder_response_gains.py`
+- `data/validation/msv000095331_multiencoder_response_gain_attribution_v3_20261025/`
+
+### Biological interpretation boundary
+
+These results establish that encoder choice changes which unresolved entities
+carry a study-level response and that this can change prespecified cross-study
+retrieval. They do not yet establish the molecular identities of those edges,
+independent-study replication, or a broad drug-mechanism claim. The five
+microbial strata are repeated contexts in one application, not five independent
+studies. This remains consumed development evidence.
