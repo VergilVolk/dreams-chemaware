@@ -120,7 +120,9 @@ PY
     echo "Reusing aligned ChemAware V2 evidence: $CHEM_EVIDENCE"
   else
     BUILD_CHEM_EVIDENCE=1
-    CHEM_EVIDENCE="$SCRATCH/conditional_null_chem_evidence.npz"
+    # Keep the expensive aligned export in the job output immediately.  A
+    # later encoder/training failure must not erase a completed V2 replay.
+    CHEM_EVIDENCE="$OUT/conditional_null_chem_evidence.npz"
     echo "Aligned ChemAware V2 cache absent; it will be generated inside this job"
   fi
 fi
@@ -172,6 +174,35 @@ python -m py_compile \
 python -u tasks/test_massspecgym_embedding_readouts.py
 
 if (( BUILD_CHEM_EVIDENCE == 1 )); then
+  if [[ ! -s "$POLICY_DIR/truthblind_policy.joblib" ]]; then
+    set +e
+    REUSED_POLICY_DIR="$(python - <<'PY'
+import json
+from pathlib import Path
+matches = []
+for report in Path('data/validation').glob(
+        'massspecgym_unified_ranker_run_*/rebuilt_multinull_v2_policy/report.json'):
+    try:
+        body = json.loads(report.read_text(encoding='utf-8'))
+    except Exception:
+        continue
+    policy = report.parent / 'truthblind_policy.joblib'
+    if (body.get('status') == 'CHEMAWARE_ORTHOGONAL_RULE_RESIDUAL_POLICY_COMPLETE'
+            and policy.is_file()):
+        matches.append(report.parent)
+if not matches:
+    raise SystemExit(1)
+matches.sort(key=lambda path: (path.stat().st_mtime_ns, str(path)))
+print(matches[-1])
+PY
+)"
+    REUSE_POLICY_STATUS=$?
+    set -e
+    if (( REUSE_POLICY_STATUS == 0 )) && [[ -d "$REUSED_POLICY_DIR" ]]; then
+      POLICY_DIR="$REUSED_POLICY_DIR"
+      echo "Reusing previously rebuilt ChemAware V2 policy: $POLICY_DIR"
+    fi
+  fi
   # Missing files are invalid.  Only the explicit report/hash contract below
   # may set this to zero.  The previous zero initialization accidentally
   # skipped the registered in-job rebuild when truthblind_policy.joblib was
@@ -179,9 +210,22 @@ if (( BUILD_CHEM_EVIDENCE == 1 )); then
   POLICY_VALID=1
   if [[ -s "$POLICY_DIR/truthblind_policy.joblib" && -s "$POLICY_DIR/report.json" ]]; then
     set +e
-    python - "$POLICY_DIR/report.json" <<'PY'
-import json, sys
-body = json.load(open(sys.argv[1], encoding='utf-8'))
+    python - "$POLICY_DIR/report.json" \
+      "$POLICY_DIR/truthblind_policy.joblib" "$CHEM_MANIFEST" \
+      "$CHEM_TOKENS/official_embeddings_f32.npy" "$RULE_LIBRARY" <<'PY'
+import hashlib, json, sys
+from pathlib import Path
+
+report_path, policy_path, manifest_path, embedding_path, rule_path = map(Path, sys.argv[1:])
+
+def sha256(path):
+    digest = hashlib.sha256()
+    with path.open('rb') as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b''):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+body = json.loads(report_path.read_text(encoding='utf-8'))
 method = body.get('method', {})
 assert method.get('rule_control_variants') == [
     'rule_response_content_permuted',
@@ -191,13 +235,22 @@ assert method.get('rule_control_variants') == [
 assert method.get('contrast_representation') == 'symmetric_summary'
 assert body.get('selection_control_mode') == 'deployment_safe'
 assert body.get('candidate_conditioned') is True
+assert body.get('frozen_truthblind_policy', {}).get('sha256') == sha256(policy_path)
+provenance = body.get('provenance', {})
+assert provenance.get('manifest_sha256') == sha256(manifest_path)
+assert provenance.get('official_embeddings_sha256') == sha256(embedding_path)
+assert provenance.get('rule_library_sha256') == sha256(rule_path)
 PY
     POLICY_VALID=$?
     set -e
   fi
   if (( POLICY_VALID != 0 )); then
-    POLICY_DIR="$SCRATCH/rebuilt_multinull_v2_policy"
+    # Persist the expensive reconstruction under the job output so a later
+    # downstream failure never forces the same policy fit again.
+    POLICY_DIR="$OUT/rebuilt_multinull_v2_policy"
     python -u tasks/audit_chemaware_orthogonal_rule_residual_policy.py \
+      --manifest "$CHEM_MANIFEST" --token-dir "$CHEM_TOKENS" \
+      --rule-library "$RULE_LIBRARY" \
       --rule-control-variants \
         rule_response_content_permuted \
         rule_response_content_permuted_b \
@@ -252,10 +305,6 @@ CUDA_VISIBLE_DEVICES="${GPUS[0]}" python -u tasks/train_massspecgym_embedding_re
   --epochs 3 --batch-queries 256 --learning-rate 0.0003 \
   --weight-decay 0.0001 --projection-dimension 16 \
   --maximum-negatives 6 --bootstrap-resamples 5000
-if (( BUILD_CHEM_EVIDENCE == 1 )); then
-  cp "$CHEM_EVIDENCE" "$OUT/conditional_null_chem_evidence.npz"
-fi
-
 # Fail before four GNPS encodings if the freshly trained artifact ever drifts
 # back to the scalar control or loses its full-integration contract.
 python - "$OUT/modeling/report.json" "$OUT/modeling/selected_readout.pt" <<'PY'

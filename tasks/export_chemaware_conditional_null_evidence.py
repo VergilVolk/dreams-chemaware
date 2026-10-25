@@ -18,7 +18,9 @@ import numpy as np
 
 from audit_chemaware_mass_kernel_embedding import KernelCache, score_queries_truthblind
 from chemaware_truthblind_candidate_core import predict_truthblind_policy_arms
-from export_chemaware_v2_grand_fusion_scores import _kernel_args, _load_policy, _token_state
+from export_chemaware_v2_grand_fusion_scores import (
+    _kernel_args, _load_policy, _token_state,
+)
 from conditional_null_energy_core import deterministic_keyed_derangements
 from noise_final_core import CandidateGraph, sha256_file
 
@@ -28,6 +30,67 @@ POLICY_ARMS = {
     "zero_contrast": "candidate_utility_zero",
     "reversed_contrast": "candidate_utility_reversed",
 }
+
+
+def _verify_policy_inputs(args: argparse.Namespace) -> dict[str, str]:
+    """Bind the frozen policy to the exact inputs used for this replay."""
+    report_path = args.policy_dir / "report.json"
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    declared = report.get("provenance")
+    if not isinstance(declared, dict):
+        raise RuntimeError("ChemAware policy report has no input provenance")
+    observed = {
+        "manifest_sha256": sha256_file(args.manifest),
+        "official_embeddings_sha256": sha256_file(
+            args.token_dir / "official_embeddings_f32.npy"
+        ),
+        "rule_library_sha256": sha256_file(args.rule_library),
+    }
+    mismatch = {
+        key: {"declared": declared.get(key), "observed": value}
+        for key, value in observed.items()
+        if declared.get(key) != value
+    }
+    if mismatch:
+        raise RuntimeError(
+            "ChemAware policy inputs differ from the frozen replay provenance: "
+            + json.dumps(mismatch, sort_keys=True)
+        )
+    return observed
+
+
+def _embedding_norms(official: np.ndarray) -> np.ndarray:
+    norms = np.sqrt(np.einsum(
+        "ij,ij->i", official, official, dtype=np.float64, optimize=True,
+    ))
+    if not np.all(np.isfinite(norms)) or np.any(norms <= 0):
+        raise RuntimeError("ChemAware official token embeddings have invalid norms")
+    return norms
+
+
+def _normalized_global_for_query(
+    raw_global: np.ndarray,
+    body: dict[str, np.ndarray],
+    query: int,
+    row_position: dict[int, int],
+    official_norms: np.ndarray,
+) -> np.ndarray:
+    """Normalize token-cache dot products for a diagnostic comparison only."""
+    molecule_left, molecule_right = map(int, body["query_ptr"][query:query + 2])
+    edge_left = int(body["molecule_ptr"][molecule_left])
+    edge_right = int(body["molecule_ptr"][molecule_right])
+    reference_rows = body["pair_candidate_row"][edge_left:edge_right]
+    reference_positions = np.fromiter(
+        (row_position[int(row)] for row in reference_rows),
+        dtype=np.int64,
+        count=len(reference_rows),
+    )
+    query_position = row_position[int(body["query_row"][query])]
+    denominator = official_norms[reference_positions] * official_norms[query_position]
+    raw = np.asarray(raw_global, dtype=np.float64)
+    if raw.shape != denominator.shape:
+        raise RuntimeError(f"official score shape drifted at query {query}")
+    return (raw / denominator).astype(np.float32)
 
 
 def arguments() -> argparse.Namespace:
@@ -53,6 +116,7 @@ def main() -> None:
         expected_policy_sha256="",
     )
     policy, replay, policy_hash = _load_policy(policy_args)
+    policy_input_provenance = _verify_policy_inputs(args)
     if tuple(policy.get("control_rule_keys", ())) != (
         "rule_response_content_permuted",
         "rule_response_content_permuted_b",
@@ -98,6 +162,7 @@ def main() -> None:
         raise RuntimeError("ChemAware manifest does not align with frozen evidence")
 
     rows, official, row_position = _token_state(args.token_dir)
+    official_norms = _embedding_norms(official)
     variants = tuple(dict.fromkeys((
         "mass", str(policy["rule_key"]), *map(str, policy["control_rule_keys"]),
     )))
@@ -107,6 +172,11 @@ def main() -> None:
     valid = np.zeros(molecule_count, dtype=bool)
 
     query_count = len(body["query_row"])
+    maximum_raw_official_error = 0.0
+    maximum_normalized_official_error = 0.0
+    official_raw_numeric_mismatch_queries = 0
+    official_numeric_mismatch_queries = 0
+    official_molecule_top1_agreement_queries = 0
     for start in range(0, query_count, args.batch_queries):
         stop = min(query_count, start + args.batch_queries)
         query_ids = np.arange(start, stop, dtype=np.int64)
@@ -122,8 +192,36 @@ def main() -> None:
             edge_left = int(body["molecule_ptr"][molecule_left])
             edge_right = int(body["molecule_ptr"][molecule_right])
             observed = np.asarray(scored["global"][local], dtype=np.float32)
-            if not np.allclose(observed, expected_official[edge_left:edge_right], rtol=2e-5, atol=2e-6):
-                raise RuntimeError(f"official score alignment drifted at query {query}")
+            expected_block = expected_official[edge_left:edge_right]
+            maximum_raw_official_error = max(
+                maximum_raw_official_error,
+                float(np.max(np.abs(observed - expected_block), initial=0.0)),
+            )
+            if not np.allclose(observed, expected_block, rtol=2e-5, atol=2e-6):
+                official_raw_numeric_mismatch_queries += 1
+            alignment_values = _normalized_global_for_query(
+                observed, body, query, row_position, official_norms,
+            )
+            maximum_normalized_official_error = max(
+                maximum_normalized_official_error,
+                float(np.max(np.abs(alignment_values - expected_block), initial=0.0)),
+            )
+            if not np.allclose(
+                alignment_values, expected_block, rtol=2e-5, atol=2e-6,
+            ):
+                official_numeric_mismatch_queries += 1
+            local_pointer = (
+                body["molecule_ptr"][molecule_left:molecule_right + 1] - edge_left
+            ).astype(np.int64)
+            observed_molecule = np.maximum.reduceat(
+                alignment_values, local_pointer[:-1],
+            )
+            expected_molecule = np.maximum.reduceat(
+                expected_block, local_pointer[:-1],
+            )
+            official_molecule_top1_agreement_queries += int(
+                np.argmax(observed_molecule) == np.argmax(expected_molecule)
+            )
             correct = predictions["correct"]
             row_valid = np.asarray(correct["valid"][local], dtype=bool)
             proposed = np.asarray(correct["proposed_candidate"][local], dtype=np.int64)
@@ -188,9 +286,27 @@ def main() -> None:
         "valid_challengers": int(valid.sum()),
         "null_arms": ["zero_contrast", "reversed_contrast", "candidate_id_deranged"],
         "candidate_order_invariant": True,
+        "official_alignment_semantics": (
+            "candidate axis is established by exact graph hash and row/pointer arrays; "
+            "token raw-dot policy space is preserved; normalized historical official "
+            "scores are diagnostic only and cannot invalidate an already exact axis"
+        ),
+        "maximum_raw_official_error": maximum_raw_official_error,
+        "maximum_normalized_official_error": maximum_normalized_official_error,
+        "official_raw_numeric_mismatch_queries": (
+            official_raw_numeric_mismatch_queries
+        ),
+        "official_numeric_mismatch_queries": official_numeric_mismatch_queries,
+        "official_molecule_top1_agreement_queries": (
+            official_molecule_top1_agreement_queries
+        ),
+        "official_molecule_top1_agreement_rate": (
+            official_molecule_top1_agreement_queries / query_count
+        ),
         "baseline_candidate_semantics": "chemical no-op utility zero and chem_valid false",
         "evidence_sha256": sha256_file(evidence_file),
         "policy_sha256": policy_hash,
+        "verified_policy_input_provenance": policy_input_provenance,
         "output_sha256": sha256_file(args.output),
     }
     args.output.with_suffix(args.output.suffix + ".json").write_text(
