@@ -1,0 +1,93 @@
+{
+  "status": "MSV000095331_METRIC_ROBUST_ENTITY_FOLLOWUP_COMPLETE",
+  "dataset_role": "development_consumed_not_external_validation",
+  "analysis_role": "post_response_robustness_and_followup_not_metric_selection",
+  "fullmsg_metrics": [
+    "metric_fullmsg_raw_cosine",
+    "metric_fullmsg_study_centered_cosine",
+    "metric_fullmsg_diagonal_whitened_cosine",
+    "metric_fullmsg_simhash256"
+  ],
+  "denominators": {
+    "raw_fullmsg_top1_gain_contexts": 3,
+    "raw_fullmsg_changed_edge_context_instances": 746,
+    "raw_fullmsg_unique_changed_identity_pairs": 567,
+    "helpful_changed_edges": 398,
+    "harmful_changed_edges": 348,
+    "changed_actions_supported_by_all_four_metrics": 470,
+    "unique_changed_identity_pairs_supported_by_all_four_metrics": 351,
+    "helpful_actions_supported_by_all_four_metrics": 254,
+    "harmful_actions_supported_by_all_four_metrics": 216,
+    "shortlisted_edges": 30
+  },
+  "gain_context_top1_support": [
+    {
+      "query_contrast_id": "drug_mix_1_group_4_slow",
+      "candidate_study_id": "MSV000094899",
+      "candidate_contrast_id": "drug_sertraline",
+      "top1_metrics": 3,
+      "metrics_total": 4
+    },
+    {
+      "query_contrast_id": "drug_mix_1_group_3_medium_slow",
+      "candidate_study_id": "MSV000093571",
+      "candidate_contrast_id": "drug_sertraline",
+      "top1_metrics": 2,
+      "metrics_total": 4
+    },
+    {
+      "query_contrast_id": "drug_mix_1_full_syncom",
+      "candidate_study_id": "MSV000093571",
+      "candidate_contrast_id": "drug_sertraline",
+      "top1_metrics": 4,
+      "metrics_total": 4
+    }
+  ],
+  "inputs": {
+    "edge_attribution": {
+      "path": "data\\validation\\msv000095331_multiencoder_response_gain_attribution_v3_20261025\\top1_gain_edge_attribution.tsv.gz",
+      "sha256": "9916e50c978f4ddfe3bd92b196131aad2ad5a341ab010ed43794a13ba82fb5de"
+    },
+    "gain_contexts": {
+      "path": "data\\validation\\msv000095331_multiencoder_response_gain_attribution_v3_20261025\\top1_gain_contexts.tsv",
+      "sha256": "f974523d1a9c0ce96c64813073c8b94c199e00c2c544b288ebe5bfad504fe4e2"
+    },
+    "metric_decisions": {
+      "path": "data\\validation\\msv000095331_entity_method_increment_metric_variants_v1_20261025\\entity_method_decisions.tsv.gz",
+      "sha256": "d3ad9c3adf86bd9ca512192ed2c26ac2732cd835293358c305d7cb63f589272e"
+    },
+    "metric_overlap_results": {
+      "path": "data\\validation\\msv000095331_entity_method_increment_metric_variants_v1_20261025\\prespecified_overlap_results.tsv",
+      "sha256": "aabf9d58491cd297fe9207a81e4f8a35fad013bcceb3d1ef48c38c78aacd31c3"
+    }
+  },
+  "outputs": {
+    "gain_context_robustness": {
+      "path": "data\\validation\\msv000095331_metric_robust_entity_followup_v2_20261025\\gain_context_metric_robustness.tsv",
+      "sha256": "3cbc8a4b4962f12af1adc9b3dff3993359622d23d5a5dcc09b5f2bba52ff3474"
+    },
+    "changed_edge_robustness": {
+      "path": "data\\validation\\msv000095331_metric_robust_entity_followup_v2_20261025\\changed_edge_metric_robustness.tsv.gz",
+      "sha256": "746cc158f739dd3ada0d5b603dc6335952a640472bdef5ff12916cd1b9d985a5"
+    },
+    "followup_shortlist": {
+      "path": "data\\validation\\msv000095331_metric_robust_entity_followup_v2_20261025\\orthogonal_followup_shortlist.tsv",
+      "sha256": "152cd4c6a07ab416cb8bd42672819c87e6e9eca38233db9e2868bae646f838eb"
+    },
+    "action_support_distribution": {
+      "path": "data\\validation\\msv000095331_metric_robust_entity_followup_v2_20261025\\action_support_distribution.tsv",
+      "sha256": "309a67a607bc44ec43e3058a3d7e4702f929939c8c8d9432b18b92155bb8ea29"
+    },
+    "unique_pair_registry": {
+      "path": "data\\validation\\msv000095331_metric_robust_entity_followup_v2_20261025\\unique_identity_pair_followup_registry.tsv",
+      "sha256": "623a2ba60c1bd86751b8d4abd4e7d56a0bf6b0396a23c5b89313cd9f25f24d96"
+    }
+  },
+  "claim_boundary": [
+    "Metric variants were fixed label-free and are not selected by this analysis.",
+    "Robust identity actions remain unconfirmed identity hypotheses.",
+    "Biological responses are used only for frozen post-hoc attribution and prioritization.",
+    "Repeated microbial strata are contexts within one experiment, not replications.",
+    "The shortlist includes helpful and harmful actions and cannot be used for model fitting."
+  ]
+}

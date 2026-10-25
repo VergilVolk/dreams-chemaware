@@ -136,3 +136,43 @@ retrieval. They do not yet establish the molecular identities of those edges,
 independent-study replication, or a broad drug-mechanism claim. The five
 microbial strata are repeated contexts in one application, not five independent
 studies. This remains consumed development evidence.
+
+## Frozen-readout robustness (2026-10-25)
+
+Four label-free readouts of the same frozen FullMSG representation were used as
+perturbations, not selected using the response outcome: raw cosine,
+study-centered cosine, pooled diagonal-whitened cosine and SimHash-256. The
+purpose was to determine whether the raw-FullMSG biological gains and entity
+actions were tied to one exact cosine calculation.
+
+The three raw-FullMSG Top-1 gains had unequal but nonzero readout robustness:
+
+| Raw-FullMSG gain | FullMSG readouts retaining Top-1 |
+|---|---:|
+| mix-1 full SynCom -> sertraline, MSV000093571 | 4/4 |
+| mix-1 group-4 slow -> sertraline, MSV000094899 | 3/4 |
+| mix-1 group-3 medium-slow -> sertraline, MSV000093571 | 2/4 |
+
+The 746 changed edge-context instances corresponded to 567 unique identity
+hypotheses. Of those unique hypotheses, 351 (61.9%) retained the same FullMSG
+add/remove action under all four readouts. At the context-instance level,
+470/746 (63.0%) actions were supported by all four readouts, including 254/398
+helpful actions and 216/348 harmful actions. Thus a substantial portion of the
+entity changes is not a raw-cosine numerical accident, although the readouts
+share one representation and are not independent confirmations.
+
+The 567-pair registry separates 270 pairs that helped in every context in
+which they appeared, 225 that harmed in every such context, and 72 whose
+response contribution changed sign between microbial contexts. The latter are
+especially important falsification cases: a stable spectral identity action
+does not guarantee a stable biological contribution.
+
+No metric is promoted from this analysis. Raw cosine remains the frozen
+baseline, consistent with the label-free metric experiment. The robustness
+registry is used only to prioritize orthogonal examination of identity
+hypotheses, and includes favorable and unfavorable cases.
+
+Additional reproducible artifacts:
+
+- `tasks/build_msv000095331_metric_robust_entity_followup.py`
+- `data/validation/msv000095331_metric_robust_entity_followup_v2_20261025/`
