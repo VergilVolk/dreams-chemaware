@@ -164,7 +164,11 @@ python -m py_compile \
 python -u tasks/test_massspecgym_embedding_readouts.py
 
 if (( BUILD_CHEM_EVIDENCE == 1 )); then
-  POLICY_VALID=0
+  # Missing files are invalid.  Only the explicit report/hash contract below
+  # may set this to zero.  The previous zero initialization accidentally
+  # skipped the registered in-job rebuild when truthblind_policy.joblib was
+  # absent, then sent the missing path to the exporter.
+  POLICY_VALID=1
   if [[ -s "$POLICY_DIR/truthblind_policy.joblib" && -s "$POLICY_DIR/report.json" ]]; then
     set +e
     python - "$POLICY_DIR/report.json" <<'PY'
