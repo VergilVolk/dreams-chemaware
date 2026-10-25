@@ -71,6 +71,8 @@ def main() -> None:
         payload = {
             "arm": ARM_PROJECTED, "state_dict": model.state_dict(),
             "selection_class": "full_embedding_integration",
+            "non_promotable_control": ARM_SCALAR,
+            "representation_increment_verdict": "TEST_ONLY",
             "settings": settings.__dict__, "scalar_mean": np.zeros(30, np.float32),
             "scalar_scale": np.ones(30, np.float32), "scalar_feature_names": names,
             "encoder_names": settings.encoder_names,

@@ -66,7 +66,7 @@ Noise-initialized FullMSG continuation; a missing or substituted encoder is a
 hard input error. It reuses the existing six-million-edge WSE/P2b evidence and aligned V2 cache
 when present. If only the aligned V2 cache is absent, the same job regenerates
 that evidence from the existing policy and token assets; it does not ask for a
-second submission. It encodes four production checkpoints with two GPUs,
+second submission. It encodes four frozen checkpoints with two GPUs,
 trains the registered control and two integration realizations, and emits one
 fixed full-integration candidate. Only after that model is saved and refitted on the full development
 graph does the same allocation encode and score the fixed GNPS panels. The

@@ -501,6 +501,7 @@ def main() -> None:
         torch.save({
             "arm": winner, "state_dict": final_model.state_dict(),
             "selection_class": "full_embedding_integration",
+            "non_promotable_control": scalar_control,
             "representation_increment_verdict": representation_verdict,
             "settings": settings.__dict__, "scalar_mean": mean,
             "scalar_scale": scale, "scalar_feature_names": feature_names,

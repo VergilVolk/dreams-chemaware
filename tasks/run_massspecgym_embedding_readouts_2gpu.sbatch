@@ -244,6 +244,27 @@ if (( BUILD_CHEM_EVIDENCE == 1 )); then
   cp "$CHEM_EVIDENCE" "$OUT/conditional_null_chem_evidence.npz"
 fi
 
+# Fail before four GNPS encodings if the freshly trained artifact ever drifts
+# back to the scalar control or loses its full-integration contract.
+python - "$OUT/modeling/report.json" "$OUT/modeling/selected_readout.pt" <<'PY'
+import json, sys
+from pathlib import Path
+import torch
+report_path, model_path = map(Path, sys.argv[1:])
+report = json.loads(report_path.read_text())
+try:
+    payload = torch.load(model_path, map_location='cpu', weights_only=False)
+except TypeError:
+    payload = torch.load(model_path, map_location='cpu')
+allowed = {'projected_cosine', 'embedding_pair'}
+if (report.get('selection_class') != 'full_embedding_integration'
+        or report.get('selection') not in allowed
+        or payload.get('selection_class') != 'full_embedding_integration'
+        or payload.get('arm') != report.get('selection')):
+    raise SystemExit('UNIFIED_RANKER_FULL_INTEGRATION_PREFLIGHT_FAIL')
+print('UNIFIED_RANKER_FULL_INTEGRATION_PREFLIGHT_PASS')
+PY
+
 # A full-embedding arm (never the scalar control) and its full-development
 # refit now exist. GNPS becomes readable
 # only below this point; no result can flow back into fitting or arm selection.

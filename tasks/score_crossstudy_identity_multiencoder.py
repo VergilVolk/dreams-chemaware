@@ -207,6 +207,10 @@ def apply_unified_model(
         return full_output, {
             "model_path": str(model_path), "model_sha256": sha256(model_path),
             "arm": str(payload["arm"]), "encoder_names": list(encoder_names),
+            "selection_class": str(payload["selection_class"]),
+            "representation_increment_verdict": str(
+                payload["representation_increment_verdict"]
+            ),
             "scored_pairs": 0, "scored_queries": 0,
             "chemaware_v2": "unavailable_without_candidate_structures_exact_zero",
         }
@@ -272,6 +276,10 @@ def apply_unified_model(
     return full_output, {
         "model_path": str(model_path), "model_sha256": sha256(model_path),
         "arm": str(payload["arm"]), "encoder_names": list(encoder_names),
+        "selection_class": str(payload["selection_class"]),
+        "representation_increment_verdict": str(
+            payload["representation_increment_verdict"]
+        ),
         "scored_pairs": int(len(pairs)), "scored_queries": int(len(ordered_queries)),
         "missing_rule": "score only complete query candidate blocks; never shrink a query selectively",
         "chemaware_v2": "unavailable_without_candidate_structures_exact_zero",

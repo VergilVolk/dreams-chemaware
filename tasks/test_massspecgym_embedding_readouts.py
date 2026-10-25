@@ -94,6 +94,19 @@ def main() -> None:
     })
     assert selected == ARM_PAIR and selected in FULL_INTEGRATION_ARMS
     assert ARM_SCALAR not in FULL_INTEGRATION_ARMS
+    for invalid in (
+        {ARM_PROJECTED: {"recall1": .8, "mrr": .8}},
+        {
+            ARM_PROJECTED: {"recall1": np.nan, "mrr": .8},
+            ARM_PAIR: {"recall1": .8, "mrr": .8},
+        },
+    ):
+        try:
+            select_full_integration_arm(invalid)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("invalid full-integration metrics were accepted")
     print("PASS: MassSpecGym frozen embedding readout contracts")
 
 

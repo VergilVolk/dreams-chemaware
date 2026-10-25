@@ -167,7 +167,12 @@ def main() -> None:
         "status": "GNPS_UNIFIED_CANDIDATE_RANKER_FIXED_EVALUATION_COMPLETE",
         "selection_or_training_on_gnps": False,
         "model": {"path": str(args.model), "sha256": sha256_file(args.model),
-                  "arm": str(payload["arm"])},
+                  "arm": str(payload["arm"]),
+                  "selection_class": str(payload["selection_class"]),
+                  "representation_increment_verdict": str(
+                      payload["representation_increment_verdict"]
+                  ),
+                  "non_promotable_control": str(payload["non_promotable_control"])},
         "panels": {},
     }
     try:
