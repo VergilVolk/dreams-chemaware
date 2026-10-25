@@ -1,0 +1,135 @@
+{
+  "status": "MSV000095331_FULLMSG_ORTHOGONAL_VALIDATION_PACKET_COMPLETE",
+  "dataset_role": "development_consumed_not_external_validation",
+  "selection_rule": "all-four-readout action support, then top absolute response contribution within identity-evidence x response-contribution strata",
+  "per_stratum": 2,
+  "denominators": {
+    "robust_unique_identity_pairs_eligible": 351,
+    "selected_identity_pairs": 14,
+    "selection_strata": 8,
+    "selected_unique_spectra": 25,
+    "selected_response_context_instances": 24,
+    "library_evidence_rows": 5,
+    "common_identity_evidence_rows": 12,
+    "common_qualified_library_support_rows": 4,
+    "cross_library_conflicts": 1,
+    "within_study_selected_library_key_multiplicity_groups": 1
+  },
+  "stratum_counts": {
+    "both_library_supported__harmful_only": 1,
+    "both_library_supported__helpful_only": 1,
+    "both_unresolved__context_dependent": 2,
+    "both_unresolved__harmful_only": 2,
+    "both_unresolved__helpful_only": 2,
+    "one_library_supported__context_dependent": 2,
+    "one_library_supported__harmful_only": 2,
+    "one_library_supported__helpful_only": 2
+  },
+  "inputs": {
+    "unique_pair_registry": {
+      "path": "data\\validation\\msv000095331_metric_robust_entity_followup_v2_20261025\\unique_identity_pair_followup_registry.tsv",
+      "sha256": "623a2ba60c1bd86751b8d4abd4e7d56a0bf6b0396a23c5b89313cd9f25f24d96"
+    },
+    "changed_edge_robustness": {
+      "path": "data\\validation\\msv000095331_metric_robust_entity_followup_v2_20261025\\changed_edge_metric_robustness.tsv.gz",
+      "sha256": "746cc158f739dd3ada0d5b603dc6335952a640472bdef5ff12916cd1b9d985a5"
+    },
+    "identity_registry": {
+      "path": "data\\validation\\msv000095331_complete_identity_handoff_v3_20261023\\study_entity_registry.tsv.gz",
+      "sha256": "eabe1802fbb0a2ebfbd2d607c84b3606711f9aaea43bb3a131a5f9e3ffeadda8"
+    },
+    "source_mgf": {
+      "data\\reference\\msv000095331_drug_microbiome_20261023\\consensus.mgf": "f016291233c16b3dbec20a51ecb4307abdcb9ae3b77ceb8113fe2e78d4cabe04",
+      "data\\reference\\chemprop2_m1_20261011\\consensus.mgf": "49ab4ca3815e43c8110b263cc753cd858ed32a2eaf40b7a1fd67667c284ace7d",
+      "data\\reference\\chemprop_cross_design_20261011\\chemprop_45drug\\spectra\\specs_ms.mgf": "516a613773f0a0f307bcd7fd6362ce52cdecedf68dd39ca49aff4d59fa597886"
+    },
+    "library_sources": {
+      "MSV000095331": {
+        "path": "data\\reference\\msv000095331_drug_microbiome_20261023\\library_matches.tsv",
+        "sha256": "4e85734bd3b102941938dfbcd0a5f45658e6cdfd59b561e4df6d82120da50714"
+      },
+      "MSV000094899": {
+        "path": "data\\reference\\chemprop2_m1_20261011\\library_matches.tsv",
+        "sha256": "d2f239733310dc97e81ae26de5ecd0cfb4bef546dbc3a92b6a7171c67344dc7c"
+      },
+      "MSV000093571": {
+        "path": "data\\reference\\chemprop_cross_design_20261011\\chemprop_45drug\\DB_result\\669306e4edf8414c8999391c98463abc.tsv",
+        "sha256": "ab7e0aea99689067bf3299f194f9af2b20b0e1c800bbb9a804ba13a31eac17b8"
+      }
+    },
+    "common_identity_sources": {
+      "MSV000093571": {
+        "path": "data\\validation\\contrast_atlas_open_v9_common_identity_shards_20261023\\MSV000093571\\identity_partition.tsv.gz",
+        "sha256": "6ca8b40c000aa0910d9105370970844d9a06c27e46d79ce92a86703b95ea5631"
+      },
+      "MSV000094899": {
+        "path": "data\\validation\\contrast_atlas_open_v9_common_identity_shards_20261023\\MSV000094899\\identity_partition.tsv.gz",
+        "sha256": "dc8042431d4977cafae9d55b4f1ef227b312b2747ad907b8d40150d7f853b967"
+      }
+    },
+    "feature_metadata_sources": {
+      "MSV000093571": {
+        "path": "data\\reference\\chemprop_cross_design_20261011\\chemprop_45drug\\clusterinfo_summary\\2621b62320ea46e4a8d9c6f48f8267dc.tsv",
+        "sha256": "3c5ae96abedbd54eb1865fababa137e61aba776df1241993f0313a514532a2a3"
+      },
+      "MSV000094899": {
+        "path": "data\\reference\\chemprop2_m1_20261011\\quantification.csv",
+        "sha256": "15131ea1623e07f12ea9adfee78208cf2a8326a0cc799ed6669b7ef3dba37ab5"
+      },
+      "MSV000095331": {
+        "path": "data\\reference\\msv000095331_drug_microbiome_20261023\\quantification.csv",
+        "sha256": "f01a8dbfdf7a8ff2358b64aeaebefd3ebfd470e319a39f6e8f8a7c4e2d47e4f2"
+      }
+    }
+  },
+  "outputs": {
+    "selected_pairs": {
+      "path": "data\\validation\\msv000095331_fullmsg_validation_packet_v5_20261025\\selected_identity_pairs.tsv",
+      "sha256": "44583a744d4ca9fdac424e0275d61beb355d7402166659dbda56973d351b9d69"
+    },
+    "response_contexts": {
+      "path": "data\\validation\\msv000095331_fullmsg_validation_packet_v5_20261025\\selected_pair_response_contexts.tsv",
+      "sha256": "858176a8b7c5b616ce83f053726515a6db84b3c02148ccf880ffb94bfe3fbeef"
+    },
+    "spectrum_metadata": {
+      "path": "data\\validation\\msv000095331_fullmsg_validation_packet_v5_20261025\\selected_spectrum_metadata.tsv",
+      "sha256": "b29451534e437f0727b7981f5baa356939fb3f4efdf4cf588efbaa85ebb975d0"
+    },
+    "spectrum_peaks": {
+      "path": "data\\validation\\msv000095331_fullmsg_validation_packet_v5_20261025\\selected_spectrum_peaks.tsv.gz",
+      "sha256": "1c5afc7b5398d3987bd2147f80e70959d7ff17015009c38ee1e4fe2f3ee13173"
+    },
+    "spectra_mgf": {
+      "path": "data\\validation\\msv000095331_fullmsg_validation_packet_v5_20261025\\selected_spectra.mgf",
+      "sha256": "204a68239feaca682fe610beb6912cd86b609c7616c59e06aed000f252fcd120"
+    },
+    "native_library_evidence": {
+      "path": "data\\validation\\msv000095331_fullmsg_validation_packet_v5_20261025\\selected_source_native_library_evidence.tsv",
+      "sha256": "a16a390d5d41e970a7e3489bba53cddbc809a729b631923b3395634138313376"
+    },
+    "common_identity_evidence": {
+      "path": "data\\validation\\msv000095331_fullmsg_validation_packet_v5_20261025\\selected_common_identity_evidence.tsv",
+      "sha256": "ac611587a93935df7a36dbf9650e9928a25273893daa1e360caa8132cbad1b78"
+    },
+    "identity_evidence_comparison": {
+      "path": "data\\validation\\msv000095331_fullmsg_validation_packet_v5_20261025\\selected_identity_evidence_comparison.tsv",
+      "sha256": "3324d92e661ce8076de34c86894b26164afcc9ef1ae6806b9390503839512fd1"
+    },
+    "feature_metadata": {
+      "path": "data\\validation\\msv000095331_fullmsg_validation_packet_v5_20261025\\selected_feature_metadata.tsv",
+      "sha256": "4ea6742a9cf5a651a820ef03f04a48fd8d0c145ce47c709025998b00d4825056"
+    },
+    "within_study_library_multiplicity": {
+      "path": "data\\validation\\msv000095331_fullmsg_validation_packet_v5_20261025\\selected_within_study_library_multiplicity.tsv",
+      "sha256": "442eff6608a0a9d745f03b0c968ee37d0ce5164d84ca9a35336815bfb17fdff5"
+    }
+  },
+  "claim_boundary": [
+    "Selection is post-response and may prioritize validation but cannot train a model.",
+    "Four readouts share frozen embeddings and are not independent confirmations.",
+    "Library support on one or both ends does not confirm the cross-study identity edge.",
+    "Conflicting library candidates are preserved rather than collapsed to one name.",
+    "Helpful, harmful and context-dependent response cases are all represented.",
+    "Only orthogonal identity evidence may adjudicate these hypotheses."
+  ]
+}

@@ -1,0 +1,26 @@
+study_id	raw_entity_id	native_library_name	native_inchikey	native_score	native_shared_peaks	native_mz_error_ppm	native_library_source	common_identity_status	common_library_name	common_inchikey	common_wse	common_matched_peaks	common_library_quality	common_library_spectrum_id	cross_library_evidence_relation
+MSV000093571	505							unresolved_entity	5H,6H,7H,8H-imidazo[1,5-a]pyridine-1-carboxylic acid [M+H]+	KTNSTKIQHRRDKI-UHFFFAOYSA-N	0.6158767342567444	3	gold	CCMSLIB00012888346	common_below_threshold_candidate_only
+MSV000093571	5198							library_supported	2-hydroxytetradecanoic-acid_ethanolamine (known isomers: 2; isobaric peaks: 0) M+H	YDTCAYKTVIRECX-UHFFFAOYSA-N	0.8209646940231323	6	gold	CCMSLIB00015035256	common_only
+MSV000093571	6081							unresolved_entity	CHEMBL301782 [CCS=181.754] [M+H]+	UNCBFTIAWJTNTF-UHFFFAOYSA-N	0.16535717248916626	2	gold	CCMSLIB00016268864	common_below_threshold_candidate_only
+MSV000093571	640							unresolved_entity	Glutamic Acid-Isoleucine (known isomers: 3; isobaric peaks: 0) M+H	SNFUTDLOCQQRQD-ZKWXMUAHSA-N	0.3734348714351654	6	gold	CCMSLIB00015008569	common_below_threshold_candidate_only
+MSV000093571	6944							unresolved_entity	3-hydroxy-4-methoxycinnamic acid_2-hexanol (known isomers: 1; isobaric peaks: 0) M+H	DTJDMVFCKBXGSC-CSKARUKUSA-N	0.734667956829071	2	gold	CCMSLIB00015298260	common_below_threshold_candidate_only
+MSV000093571	7667							unresolved_entity	Tnp-351 [M+H]+	WLGCEMWNUHSIIS-UHFFFAOYSA-N	0.2551691234111786	1	gold	CCMSLIB00016149735	common_below_threshold_candidate_only
+MSV000093571	7740							library_supported	Bisphenol A_5-Aminoorotic Acid_3-(1H-1,2,3,4-tetrazol-1-yl) benzoic acid (known isomers: 0; isobaric peaks: 0) M+H	KNJOMBDJMQEFCF-UHFFFAOYSA-N	0.8186447620391846	7	gold	CCMSLIB00015343125	common_only
+MSV000093571	7823							unresolved_entity	Tnp-351 [M+H]+	WLGCEMWNUHSIIS-UHFFFAOYSA-N	0.2576609253883362	1	gold	CCMSLIB00016149735	common_below_threshold_candidate_only
+MSV000093571	8329							unresolved_entity	Cholylethanolamine_1-(tert-butoxycarbonyl)piperdine-3-carboxylic-acid (known isomers: 3; isobaric peaks: 0) M+H	ZJXCFRPQXZBFAM-DZFMQKBCSA-N	0.0	0	gold	CCMSLIB00015144631	common_below_threshold_candidate_only
+MSV000093571	908							unresolved_entity	pimelic-acid_(S)-2-amino-5-ureidopentanoic acid (known isomers: 4; isobaric peaks: 0) M+H	VYWUWTKRFHEPBK-VIFPVBQESA-N	0.23811914026737213	3	gold	CCMSLIB00015156742	common_below_threshold_candidate_only
+MSV000094899	1459	L-TYROSINE	OUYCCCASQSFEME-UHFFFAOYSA-N	0.853917	6	7.12323	data\reference\chemprop2_m1_20261011\library_matches.tsv	library_supported	but-2-ynoic-acid_L-proline (known isomers: 3; isobaric peaks: 1) M+H	JSZOTVZXMIPPRE-ZETCQYMHSA-N	0.7117955684661865	10	gold	CCMSLIB00015000270	conflicting_planar_inchikey
+MSV000094899	3448							library_supported	Pyroglutamic acid_L-leucine (known isomers: 2; isobaric peaks: 2) M+H	XXSAFGVAPGOYNT-YUMQZZPRSA-N	0.9037540555000305	8	gold	CCMSLIB00014933918	common_only
+MSV000095331	11091														no_library_evidence
+MSV000095331	12438	2573_Sertraline	VGKDLMBJGBXTGI-SJCJKPOMSA-N	0.988039	7	0.997043	data\reference\msv000095331_drug_microbiome_20261023\library_matches.tsv								native_only
+MSV000095331	12820														no_library_evidence
+MSV000095331	13514														no_library_evidence
+MSV000095331	13946	dibutyl phthalate	DOIRQSBPFJWKBE-UHFFFAOYSA-N	0.935839	6	2.51435	data\reference\msv000095331_drug_microbiome_20261023\library_matches.tsv								native_only
+MSV000095331	15301														no_library_evidence
+MSV000095331	17216														no_library_evidence
+MSV000095331	2369	Massbank:CE000230 Tyrosine	OUYCCCASQSFEME-UHFFFAOYSA-N	0.946167	5	0.0	data\reference\msv000095331_drug_microbiome_20261023\library_matches.tsv								native_only
+MSV000095331	2776														no_library_evidence
+MSV000095331	3062	Massbank:CE000230 Tyrosine	OUYCCCASQSFEME-UHFFFAOYSA-N	0.944913	5	0.0	data\reference\msv000095331_drug_microbiome_20261023\library_matches.tsv								native_only
+MSV000095331	4601														no_library_evidence
+MSV000095331	5634														no_library_evidence
+MSV000095331	8365														no_library_evidence

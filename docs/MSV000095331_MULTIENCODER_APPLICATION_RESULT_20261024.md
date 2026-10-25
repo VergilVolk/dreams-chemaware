@@ -176,3 +176,42 @@ Additional reproducible artifacts:
 
 - `tasks/build_msv000095331_metric_robust_entity_followup.py`
 - `data/validation/msv000095331_metric_robust_entity_followup_v2_20261025/`
+
+## Orthogonal-validation packet and identity-evidence conflict (2026-10-25)
+
+A balanced validation packet was frozen from the 351 unique identity actions
+supported by all four FullMSG readouts. Selection took at most two pairs from
+each observed combination of identity-evidence class and response-contribution
+class. It therefore includes helpful, harmful and context-dependent cases
+rather than only the largest favorable effects.
+
+The packet contains 14 cross-study identity hypotheses, 25 unique spectra and
+24 response-context instances across eight populated strata. It exports the
+original MS/MS peaks, precursor and feature metadata, retention time where
+available, response beta/SE contributions, source-native library matches and
+the independent common Gold/Silver library candidates.
+
+This packet exposed a concrete limitation of a binary `library_supported`
+field. `MSV000095331` entities `2369` and `3062` both have m/z approximately
+182.081 and both matched the same MassBank tyrosine spectrum in the source
+workflow, but their within-study retention times are 1.255 and 1.529 minutes.
+Both compete for `MSV000094899` entity `1459`. FullMSG adding the `2369 -> 1459`
+edge harmed the registered response, whereas removing `3062 -> 1459` helped it.
+Moreover, the source workflow calls candidate `1459` L-tyrosine, while the
+frozen common Gold/Silver search assigns its best qualifying candidate to a
+different planar InChIKey. This is one explicit cross-library structural
+conflict, not an identity truth.
+
+The consequence is methodological but bounded: response retrieval must retain
+the provenance and disagreement of identity evidence. `library_supported`
+remains useful for constructing matched controls, but it cannot be interpreted
+as a unique molecular structure or used by itself to adjudicate whether an
+encoder changed an entity correctly. Multiple same-mass, same-library-name
+features within one study also cannot be silently collapsed or forced through
+a one-to-one cross-study mapping without ion/RT evidence.
+
+The frozen packet is ready for orthogonal review; it is not fed back into model
+training or metric selection.
+
+- Packet builder: `tasks/build_msv000095331_fullmsg_validation_packet.py`
+- Final packet: `data/validation/msv000095331_fullmsg_validation_packet_v5_20261025/`
