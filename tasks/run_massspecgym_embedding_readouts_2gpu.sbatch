@@ -244,7 +244,8 @@ if (( BUILD_CHEM_EVIDENCE == 1 )); then
   cp "$CHEM_EVIDENCE" "$OUT/conditional_null_chem_evidence.npz"
 fi
 
-# The selected arm and full-development refit now exist. GNPS becomes readable
+# A full-embedding arm (never the scalar control) and its full-development
+# refit now exist. GNPS becomes readable
 # only below this point; no result can flow back into fitting or arm selection.
 encode_gnps() {
   local name="$1" checkpoint="$2" gpu="$3"
@@ -288,4 +289,4 @@ sha256sum "$NOISE" "$STAGE1" "$PHASEA" "$FULLMSG" \
   "$EVIDENCE/evidence.npz" "$CHEM_EVIDENCE" "$OUT/modeling/selected_readout.pt" \
   "$OUT/gnps_fixed_evaluation/report.json" \
   > "$OUT/SHA256SUMS.txt"
-echo "UNIFIED_CANDIDATE_RANKER_TRAIN_AND_FIXED_GNPS_EVALUATION_COMPLETE: $OUT"
+echo "FULL_EMBEDDING_UNIFIED_CANDIDATE_RANKER_AND_FIXED_GNPS_EVALUATION_COMPLETE: $OUT"

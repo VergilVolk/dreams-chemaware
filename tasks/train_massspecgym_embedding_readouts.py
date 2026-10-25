@@ -23,10 +23,11 @@ import torch
 from sklearn.metrics import average_precision_score, roc_auc_score
 
 from massspecgym_embedding_readout_core import (
-    ARMS, ARM_PAIR, ARM_PROJECTED, ARM_SCALAR, FrozenEmbeddingReadout,
+    ARMS, ARM_PAIR, ARM_PROJECTED, ARM_SCALAR, CONTROL_ARMS,
+    FULL_INTEGRATION_ARMS, REQUIRED_ENCODERS, FrozenEmbeddingReadout,
     ReadoutSettings, build_independent_scalar_features, hard_competitor_matrix, padded_candidate_matrix,
     fit_scalar_normalization, parse_named_paths, percentile_by_query, query_gap_column, rank_metrics,
-    strict_ranks,
+    select_full_integration_arm, strict_ranks,
 )
 from noise_final_core import CandidateGraph, sha256_file, stable_fold
 
@@ -320,6 +321,15 @@ def main() -> None:
     named = parse_named_paths(args.embedding)
     if args.noise_name not in named:
         raise RuntimeError(f"noise encoder {args.noise_name!r} is absent")
+    if set(named) != set(REQUIRED_ENCODERS):
+        missing = sorted(set(REQUIRED_ENCODERS) - set(named))
+        unexpected = sorted(set(named) - set(REQUIRED_ENCODERS))
+        raise RuntimeError(
+            "registered unified ranker requires the exact four encoders; "
+            f"missing={missing}, unexpected={unexpected}"
+        )
+    # Stable order is part of the saved-model contract, independent of CLI order.
+    named = {name: named[name] for name in REQUIRED_ENCODERS}
     graph = CandidateGraph(args.graph)
     evidence = load_evidence(args.evidence, graph)
     evidence_path = args.evidence / "evidence.npz" if args.evidence.is_dir() else args.evidence
@@ -456,7 +466,18 @@ def main() -> None:
             "micro_auprc": float(average_precision_score(graph.molecule_label[held_molecule_mask],
                                                           held_scores[arm][held_molecule_mask])),
         }
-    winner = max(ARMS, key=lambda arm: (metrics[arm]["recall1"], metrics[arm]["mrr"]))
+    winner = select_full_integration_arm(metrics)
+    scalar_control = ARM_SCALAR
+    full_vs_scalar_key = f"{winner}_vs_{scalar_control}"
+    full_vs_scalar = comparisons[full_vs_scalar_key]
+    full_delta = float(metrics[winner]["recall1"] - metrics[scalar_control]["recall1"])
+    full_ci_low = float(full_vs_scalar["paired_formula_ci"]["ci_low_pp"])
+    if full_delta > 0 and full_ci_low > 0:
+        representation_verdict = "FULL_EMBEDDING_INCREMENT_SUPPORTED_ON_HELD_DEVELOPMENT"
+    elif full_delta > 0:
+        representation_verdict = "FULL_EMBEDDING_POINT_GAIN_NOT_CONFIRMED"
+    else:
+        representation_verdict = "FULL_EMBEDDING_INCREMENT_NOT_SUPPORTED"
 
     # One final refit of the selected readout; no GNPS or application input is read.
     all_molecules = np.arange(len(scalar))
@@ -479,6 +500,8 @@ def main() -> None:
         )
         torch.save({
             "arm": winner, "state_dict": final_model.state_dict(),
+            "selection_class": "full_embedding_integration",
+            "representation_increment_verdict": representation_verdict,
             "settings": settings.__dict__, "scalar_mean": mean,
             "scalar_scale": scale, "scalar_feature_names": feature_names,
             "encoder_names": encoder_names,
@@ -493,12 +516,18 @@ def main() -> None:
                         "reference_edges": int(len(graph.pair_candidate_row)),
                         "split": "stable formula folds; encoder and head train folds 1-4, selection fold 0"},
             "selection": winner,
+            "selection_class": "full_embedding_integration",
+            "non_promotable_control": scalar_control,
+            "representation_increment_verdict": representation_verdict,
+            "selected_full_integration_vs_scalar_control": full_vs_scalar,
             "algorithm": (
                 "single candidate-level ranker over WSE, Noise V1, frozen P2b, "
                 "ChemAware V2 correct-vs-null evidence, and independent Noise/"
                 "Stage-1/Phase-A/FullMSG embedding geometry"
             ),
             "arms": list(ARMS),
+            "full_integration_arms": list(FULL_INTEGRATION_ARMS),
+            "control_arms": list(CONTROL_ARMS),
             "encoder_names": list(encoder_names),
             "chemical_evidence": {
                 "module": "ChemAware V2 continuous correct-vs-null residual",
@@ -511,7 +540,11 @@ def main() -> None:
                          "learning_rate": args.learning_rate,
                          "weight_decay": args.weight_decay,
                          "maximum_family_hard_negatives": args.maximum_negatives,
-                         "selection_rule": "highest complete held-fold-0 Recall@1, then MRR"},
+                         "selection_rule": (
+                             "highest held-fold-0 Recall@1 then MRR among projected_cosine "
+                             "and embedding_pair only; scalar_evidence is a non-promotable "
+                             "capacity-matched attribution control"
+                         )},
             "metrics": metrics, "comparisons": comparisons,
             "fold_reports": fold_reports,
             "gnps_access": "none", "application_response_access": "none",
@@ -534,6 +567,7 @@ def main() -> None:
         shutil.rmtree(staging, ignore_errors=True)
         raise
     print(json.dumps({"status": report["status"], "selection": winner,
+                      "representation_increment_verdict": representation_verdict,
                       "output": str(args.output)}), flush=True)
 
 

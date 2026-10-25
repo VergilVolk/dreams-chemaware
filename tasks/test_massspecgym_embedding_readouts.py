@@ -7,10 +7,11 @@ import torch
 from types import SimpleNamespace
 
 from massspecgym_embedding_readout_core import (
-    ARMS, FrozenEmbeddingReadout, ReadoutSettings, build_independent_scalar_features,
+    ARMS, ARM_PAIR, ARM_PROJECTED, ARM_SCALAR, FULL_INTEGRATION_ARMS,
+    FrozenEmbeddingReadout, ReadoutSettings, build_independent_scalar_features,
     fit_scalar_normalization, hard_competitor_matrix, masked_percentile_by_query,
     masked_query_gap_column, padded_candidate_matrix, percentile_by_query,
-    query_gap_column, strict_ranks,
+    query_gap_column, select_full_integration_arm, strict_ranks,
 )
 
 
@@ -85,6 +86,14 @@ def main() -> None:
         assert score.shape == (5,) and torch.isfinite(score).all()
         counts.append(model.trainable_parameters)
     assert all(count > 0 for count in counts)
+    # A stronger scalar control must not be mislabeled as the complete system.
+    selected = select_full_integration_arm({
+        ARM_SCALAR: {"recall1": 0.99, "mrr": 0.99},
+        ARM_PROJECTED: {"recall1": 0.80, "mrr": 0.90},
+        ARM_PAIR: {"recall1": 0.81, "mrr": 0.82},
+    })
+    assert selected == ARM_PAIR and selected in FULL_INTEGRATION_ARMS
+    assert ARM_SCALAR not in FULL_INTEGRATION_ARMS
     print("PASS: MassSpecGym frozen embedding readout contracts")
 
 

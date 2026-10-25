@@ -22,7 +22,8 @@ import torch
 
 from encode_pan_redu_panel_spectra import load_mgf
 from massspecgym_embedding_readout_core import (
-    FrozenEmbeddingReadout, ReadoutSettings, build_independent_scalar_features,
+    FULL_INTEGRATION_ARMS, REQUIRED_ENCODERS, FrozenEmbeddingReadout,
+    ReadoutSettings, build_independent_scalar_features,
 )
 from noise_gnps_article_spectral_scores import (
     P2B_WEIGHTS, frozen_p2b_pair_features,
@@ -183,6 +184,12 @@ def apply_unified_model(
     encoder_names = tuple(payload["encoder_names"])
     if encoder_names != settings.encoder_names:
         raise RuntimeError("unified model encoder registry drifted")
+    if str(payload["arm"]) not in FULL_INTEGRATION_ARMS:
+        raise RuntimeError("application deployment requires a full-embedding integration arm")
+    if payload.get("selection_class") != "full_embedding_integration":
+        raise RuntimeError("unified model lacks the full-integration selection contract")
+    if encoder_names != REQUIRED_ENCODERS:
+        raise RuntimeError("unified model does not contain the exact four registered encoders")
     missing = sorted(set(encoder_names) - set(caches))
     if missing:
         raise RuntimeError(f"unified model requires missing encoder caches: {missing}")

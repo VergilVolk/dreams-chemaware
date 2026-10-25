@@ -18,6 +18,35 @@ ARM_SCALAR = "scalar_evidence"
 ARM_PROJECTED = "projected_cosine"
 ARM_PAIR = "embedding_pair"
 ARMS = (ARM_SCALAR, ARM_PROJECTED, ARM_PAIR)
+FULL_INTEGRATION_ARMS = (ARM_PROJECTED, ARM_PAIR)
+CONTROL_ARMS = (ARM_SCALAR,)
+REQUIRED_ENCODERS = (
+    "noise_v1",
+    "chemaware_stage1",
+    "chemaware_phasea",
+    "noise_chemaware_fullmsg",
+)
+
+
+def select_full_integration_arm(metrics: dict[str, dict[str, float]]) -> str:
+    """Select only among readouts that consume every full embedding.
+
+    The capacity-matched scalar arm is an attribution control.  It must never
+    be emitted as the production model and then described as a dual-/multi-
+    encoder integration.
+    """
+    missing = [arm for arm in FULL_INTEGRATION_ARMS if arm not in metrics]
+    if missing:
+        raise ValueError(f"missing full-integration metrics: {missing}")
+    for arm in FULL_INTEGRATION_ARMS:
+        for metric in ("recall1", "mrr"):
+            value = float(metrics[arm][metric])
+            if not np.isfinite(value):
+                raise ValueError(f"non-finite {arm} {metric}")
+    return max(
+        FULL_INTEGRATION_ARMS,
+        key=lambda arm: (float(metrics[arm]["recall1"]), float(metrics[arm]["mrr"])),
+    )
 
 
 def parse_named_paths(values: list[str]) -> dict[str, list[str]]:

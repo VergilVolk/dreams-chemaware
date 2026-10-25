@@ -42,7 +42,10 @@ for report in Path('data/validation').glob('massspecgym_unified_ranker_run_*/mod
     except Exception:
         continue
     model = report.parent / 'selected_readout.pt'
-    if body.get('status') == 'MASSSPECGYM_UNIFIED_CANDIDATE_RANKER_COMPLETE' and model.is_file():
+    if (body.get('status') == 'MASSSPECGYM_UNIFIED_CANDIDATE_RANKER_COMPLETE'
+            and body.get('selection_class') == 'full_embedding_integration'
+            and body.get('selection') in {'projected_cosine', 'embedding_pair'}
+            and model.is_file()):
         matches.append(model)
 if not matches:
     raise SystemExit('APP_UNIFIED_RANKER_MODEL_NOT_FOUND')

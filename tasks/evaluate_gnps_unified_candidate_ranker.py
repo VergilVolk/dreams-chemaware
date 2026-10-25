@@ -20,8 +20,9 @@ from sklearn.metrics import average_precision_score, roc_auc_score
 from build_grand_unified_evidence_bundle import load_named_arrays
 from evaluate_gnps_gold_silver_10ppm_embeddings import graph_from_panel, load_embeddings
 from massspecgym_embedding_readout_core import (
-    FrozenEmbeddingReadout, ReadoutSettings, build_independent_scalar_features,
-    comparison, rank_metrics, strict_ranks,
+    FULL_INTEGRATION_ARMS, REQUIRED_ENCODERS, FrozenEmbeddingReadout,
+    ReadoutSettings, build_independent_scalar_features, comparison,
+    rank_metrics, strict_ranks,
 )
 from noise_final_core import sha256_file
 
@@ -53,6 +54,12 @@ def load_model(path: Path, device: torch.device):
     settings = ReadoutSettings(**payload["settings"])
     if tuple(payload["encoder_names"]) != settings.encoder_names:
         raise RuntimeError("selected model encoder registry drifted")
+    if str(payload["arm"]) not in FULL_INTEGRATION_ARMS:
+        raise RuntimeError("fixed GNPS evaluation requires a full-embedding integration arm")
+    if payload.get("selection_class") != "full_embedding_integration":
+        raise RuntimeError("selected model lacks the full-integration selection contract")
+    if settings.encoder_names != REQUIRED_ENCODERS:
+        raise RuntimeError("selected model does not contain the exact four registered encoders")
     model = FrozenEmbeddingReadout(str(payload["arm"]), settings)
     model.load_state_dict(payload["state_dict"], strict=True)
     return payload, model.to(device).eval(), settings
