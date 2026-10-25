@@ -14,11 +14,19 @@ import hashlib
 import json
 import math
 from pathlib import Path
+from types import SimpleNamespace
 
 import numpy as np
 import pandas as pd
+import torch
 
 from encode_pan_redu_panel_spectra import load_mgf
+from massspecgym_embedding_readout_core import (
+    FrozenEmbeddingReadout, ReadoutSettings, build_independent_scalar_features,
+)
+from noise_gnps_article_spectral_scores import (
+    P2B_WEIGHTS, frozen_p2b_pair_features,
+)
 
 
 NEW_STUDY = "MSV000095331"
@@ -137,6 +145,132 @@ def matched_peaks(left: np.ndarray, right: np.ndarray, tolerance: float) -> int:
     return total
 
 
+def frozen_p2b_block(
+    noise: np.ndarray, sqrt_cosine: np.ndarray, entropy: np.ndarray,
+    neutral_loss: np.ndarray,
+) -> np.ndarray:
+    """Apply the registered one-reference P2b support gate to one query."""
+    noise = np.asarray(noise, dtype=np.float64)
+    raw = np.stack((sqrt_cosine, entropy, neutral_loss), axis=1).clip(0, 1)
+    channels = np.column_stack((np.clip((noise + 1) / 2, 0, 1), raw))
+    fused = channels @ P2B_WEIGHTS
+
+    def unique_top(values: np.ndarray) -> int | None:
+        winners = np.flatnonzero(values >= float(np.max(values)) - 1e-12)
+        return int(winners[0]) if len(winners) == 1 else None
+
+    winner = unique_top(fused)
+    if winner is None:
+        return noise.astype(np.float32)
+    support = sum(unique_top(raw[:, column]) == winner for column in range(3))
+    baseline = unique_top(noise)
+    advantage = math.inf if baseline is None else (
+        0.0 if winner == baseline else float(fused[winner] - fused[baseline])
+    )
+    return (fused if support >= 1 and advantage >= -1e-12 else noise).astype(np.float32)
+
+
+def apply_unified_model(
+    pairs: pd.DataFrame, caches: dict[str, dict[str, np.ndarray]], model_path: Path,
+    device: torch.device,
+) -> tuple[np.ndarray, dict[str, object]]:
+    """Apply the selected MassSpecGym ranker without biological outcomes."""
+    try:
+        payload = torch.load(model_path, map_location="cpu", weights_only=False)
+    except TypeError:  # PyTorch before the weights_only keyword.
+        payload = torch.load(model_path, map_location="cpu")
+    settings = ReadoutSettings(**payload["settings"])
+    encoder_names = tuple(payload["encoder_names"])
+    if encoder_names != settings.encoder_names:
+        raise RuntimeError("unified model encoder registry drifted")
+    missing = sorted(set(encoder_names) - set(caches))
+    if missing:
+        raise RuntimeError(f"unified model requires missing encoder caches: {missing}")
+    model = FrozenEmbeddingReadout(str(payload["arm"]), settings)
+    model.load_state_dict(payload["state_dict"], strict=True)
+    model.to(device).eval()
+
+    required_columns = ["WSE_score", "P2b_score", *[f"{name}_score" for name in encoder_names]]
+    row_complete = pairs[required_columns].apply(pd.to_numeric, errors="coerce").notna().all(axis=1)
+    query_complete = row_complete.groupby(pairs["query_id"], sort=False).transform("all")
+    selected_indices = np.flatnonzero(query_complete.to_numpy(bool))
+    full_output = np.full(len(pairs), np.nan, dtype=np.float32)
+    pairs = pairs.iloc[selected_indices].copy().reset_index(drop=True)
+    if pairs.empty:
+        return full_output, {
+            "model_path": str(model_path), "model_sha256": sha256(model_path),
+            "arm": str(payload["arm"]), "encoder_names": list(encoder_names),
+            "scored_pairs": 0, "scored_queries": 0,
+            "chemaware_v2": "unavailable_without_candidate_structures_exact_zero",
+        }
+
+    ordered_queries = pairs["query_id"].drop_duplicates().astype(str).tolist()
+    counts = pairs.groupby("query_id", sort=False).size().reindex(ordered_queries).to_numpy(np.int64)
+    query_ptr = np.concatenate(([0], np.cumsum(counts)))
+    if int(query_ptr[-1]) != len(pairs):
+        raise RuntimeError("application candidate rows are not query-contiguous")
+    graph = SimpleNamespace(
+        query_ptr=query_ptr,
+        molecule_ptr=np.arange(len(pairs) + 1, dtype=np.int64),
+        molecule_label=np.zeros(len(pairs), dtype=np.int8),
+    )
+    encoder_scores = {
+        name: pd.to_numeric(pairs[f"{name}_score"], errors="raise").to_numpy(np.float64)
+        for name in encoder_names
+    }
+    evidence = {
+        "v1_cosine": encoder_scores["noise_v1"],
+        "weighted_entropy": pd.to_numeric(pairs["WSE_score"], errors="raise").to_numpy(float),
+        "p2b_fused": pd.to_numeric(pairs["P2b_score"], errors="raise").to_numpy(float),
+    }
+    unavailable_chemistry = {
+        "chem_valid": np.zeros(len(pairs), dtype=bool),
+        "candidate_utility_correct": np.zeros(len(pairs), dtype=np.float64),
+        "candidate_utility_zero": np.zeros(len(pairs), dtype=np.float64),
+        "candidate_utility_reversed": np.zeros(len(pairs), dtype=np.float64),
+        "candidate_utility_rotated": np.zeros(len(pairs), dtype=np.float64),
+    }
+    scalar, names = build_independent_scalar_features(
+        evidence, graph, encoder_scores, "noise_v1", unavailable_chemistry,
+    )
+    if list(names) != list(payload["scalar_feature_names"]):
+        raise RuntimeError("application scalar feature contract differs from selected model")
+    mean = np.asarray(payload["scalar_mean"], dtype=np.float32)
+    scale = np.asarray(payload["scalar_scale"], dtype=np.float32)
+
+    entity_ids = sorted(set(pairs["query_id"].astype(str)) | set(pairs["candidate_id"].astype(str)))
+    entity_index = {entity: index for index, entity in enumerate(entity_ids)}
+    banks = {
+        name: torch.as_tensor(
+            np.stack([caches[name][entity] for entity in entity_ids]).astype(np.float32),
+            device=device,
+        )
+        for name in encoder_names
+    }
+    query_rows = np.asarray([entity_index[value] for value in pairs["query_id"].astype(str)], dtype=np.int64)
+    candidate_rows = np.asarray([entity_index[value] for value in pairs["candidate_id"].astype(str)], dtype=np.int64)
+    reference_rows = np.repeat(candidate_rows[:, None], len(encoder_names), axis=1)
+    output = np.empty(len(pairs), dtype=np.float32)
+    with torch.inference_mode():
+        for left in range(0, len(pairs), 8192):
+            right = min(left + 8192, len(pairs))
+            scalar_tensor = torch.as_tensor((scalar[left:right] - mean) / scale, device=device)
+            output[left:right] = model(
+                scalar_tensor,
+                torch.as_tensor(query_rows[left:right], device=device),
+                torch.as_tensor(reference_rows[left:right], device=device),
+                banks,
+            ).float().cpu().numpy()
+    full_output[selected_indices] = output
+    return full_output, {
+        "model_path": str(model_path), "model_sha256": sha256(model_path),
+        "arm": str(payload["arm"]), "encoder_names": list(encoder_names),
+        "scored_pairs": int(len(pairs)), "scored_queries": int(len(ordered_queries)),
+        "missing_rule": "score only complete query candidate blocks; never shrink a query selectively",
+        "chemaware_v2": "unavailable_without_candidate_structures_exact_zero",
+    }
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--embedding", action="append", required=True,
@@ -144,6 +278,8 @@ def main() -> None:
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--precursor-ppm", type=float, default=10.0)
     parser.add_argument("--fragment-da", type=float, default=0.02)
+    parser.add_argument("--unified-model", type=Path)
+    parser.add_argument("--device", default="cuda")
     args = parser.parse_args()
     if args.output_dir.exists():
         raise FileExistsError(args.output_dir)
@@ -189,9 +325,6 @@ def main() -> None:
             block: list[dict[str, object]] = []
             for raw_candidate, (cand_mz, cand_peaks) in candidate_items[left:right]:
                 candidate_id = f"{candidate_study}::{raw_candidate}"
-                if any(query_id not in caches[name] or candidate_id not in caches[name]
-                       for name in methods):
-                    continue
                 wse = weighted_entropy_similarity(
                     prepare_spectrum(query_peaks.T),
                     prepare_spectrum(cand_peaks.T),
@@ -209,12 +342,43 @@ def main() -> None:
                     "edge_track": "precursor_compatible_identity_hypothesis",
                 }
                 for name in methods:
-                    record[f"{name}_score"] = float(np.dot(caches[name][query_id], caches[name][candidate_id]))
+                    if query_id in caches[name] and candidate_id in caches[name]:
+                        record[f"{name}_score"] = float(
+                            np.dot(caches[name][query_id], caches[name][candidate_id])
+                        )
+                    else:
+                        record[f"{name}_score"] = np.nan
+                sqrt_cosine, entropy, neutral_loss = frozen_p2b_pair_features(
+                    prepare_spectrum(query_peaks.T), query_mz,
+                    prepare_spectrum(cand_peaks.T), cand_mz,
+                    tolerance=args.fragment_da,
+                )
+                record["P2b_sqrt_cosine"] = sqrt_cosine
+                record["P2b_entropy"] = entropy
+                record["P2b_neutral_loss"] = neutral_loss
                 block.append(record)
             if block:
+                noise_method = "noise_v1"
+                if noise_method not in methods:
+                    raise RuntimeError("cross-study unified evidence requires noise_v1 embeddings")
+                noise = np.asarray([float(row[f"{noise_method}_score"]) for row in block])
+                p2b = np.full(len(block), np.nan, dtype=np.float32)
+                available = np.isfinite(noise)
+                if available.any():
+                    p2b[available] = frozen_p2b_block(
+                        noise[available],
+                        np.asarray([float(row["P2b_sqrt_cosine"]) for row in block])[available],
+                        np.asarray([float(row["P2b_entropy"]) for row in block])[available],
+                        np.asarray([float(row["P2b_neutral_loss"]) for row in block])[available],
+                    )
+                for record, value in zip(block, p2b, strict=True):
+                    record["P2b_score"] = float(value)
                 components = [np.asarray([float(row["WSE_score"]) for row in block])]
                 components.extend(np.asarray([float(row[f"{name}_score"]) for row in block]) for name in methods)
-                simple = np.mean(np.stack([minmax(value) for value in components]), axis=0)
+                component_matrix = np.stack(components)
+                simple = np.full(len(block), np.nan, dtype=np.float64)
+                if np.isfinite(component_matrix).all():
+                    simple = np.mean(np.stack([minmax(value) for value in components]), axis=0)
                 for record, value in zip(block, simple, strict=True):
                     record["simple_fusion_score"] = float(value)
                 rows.extend(block)
@@ -228,6 +392,14 @@ def main() -> None:
     queries = pd.DataFrame(query_rows)
     if not pairs.empty and pairs["candidate_pair_id"].duplicated().any():
         raise RuntimeError("duplicate directed identity pair")
+    unified_provenance = None
+    if args.unified_model is not None and not pairs.empty:
+        device = torch.device(args.device)
+        if device.type == "cuda" and not torch.cuda.is_available():
+            raise RuntimeError("unified application inference requested CUDA without an allocated GPU")
+        pairs["unified_candidate_ranker_score"], unified_provenance = apply_unified_model(
+            pairs, caches, args.unified_model, device,
+        )
     args.output_dir.mkdir(parents=True)
     compression = {"method": "gzip", "mtime": 0}
     pair_path = args.output_dir / "identity_candidate_scores.tsv.gz"
@@ -238,9 +410,12 @@ def main() -> None:
     long_rows: list[pd.DataFrame] = []
     score_columns = {
         "weighted_spectral_entropy": "WSE_score",
+        "p2b_noise_v1_frozen": "P2b_score",
         **{name: f"{name}_score" for name in methods},
         "simple_query_minmax_mean": "simple_fusion_score",
     }
+    if args.unified_model is not None:
+        score_columns["unified_candidate_ranker"] = "unified_candidate_ranker_score"
     for method, column in score_columns.items():
         block = pairs[["candidate_pair_id", "query_id", "candidate_id"]].copy()
         block["method_name"] = method
@@ -256,7 +431,7 @@ def main() -> None:
         "status": "CROSSSTUDY_IDENTITY_MULTIENCODER_COMPLETE",
         "labels_or_responses_accessed": False,
         "candidate_admission": "all precursor-compatible candidates; no spectral-score threshold",
-        "methods": ["weighted_spectral_entropy", *methods, "simple_query_minmax_mean"],
+        "methods": list(score_columns),
         "weighted_entropy_backend": weighted_entropy_backend(),
         "parameters": {"precursor_ppm": args.precursor_ppm, "fragment_da": args.fragment_da},
         "denominators": {
@@ -267,6 +442,7 @@ def main() -> None:
         "inputs": {
             "embeddings": {name: {"path": str(cache_paths[name]), "sha256": sha256(cache_paths[name])}
                            for name in methods},
+            "unified_model": unified_provenance,
             "mgfs": {study: {"path": str(path), "sha256": sha256(path)} for study, path in mgfs.items()},
         },
         "outputs": {
