@@ -13,7 +13,8 @@ from massspecgym_embedding_readout_core import (
     ReadoutSettings,
 )
 from score_crossstudy_identity_multiencoder import (
-    apply_unified_model, frozen_p2b_block, matched_peaks, minmax,
+    apply_unified_model, frozen_p2b_block, matched_peaks, minmax, peak_rows,
+    prepare_spectrum, valid_precursor_mz,
 )
 
 
@@ -23,6 +24,13 @@ def main() -> None:
     left = np.asarray([[100.000, 1.0], [150.000, 2.0], [200.000, 3.0]])
     right = np.asarray([[99.991, 1.0], [150.019, 2.0], [175.000, 3.0]])
     assert matched_peaks(left, right, 0.02) == 2
+    empty_rows = peak_rows(np.asarray([]))
+    assert empty_rows.shape == (0, 2)
+    assert prepare_spectrum(empty_rows.T).shape == (2, 0)
+    assert matched_peaks(empty_rows, right, 0.02) == 0
+    assert valid_precursor_mz(100.0)
+    assert not valid_precursor_mz(0.0)
+    assert not valid_precursor_mz(float("nan"))
     p2b = frozen_p2b_block(
         np.asarray([0.7, 0.6]), np.asarray([0.2, 0.9]),
         np.asarray([0.3, 0.1]), np.asarray([0.1, 0.8]),

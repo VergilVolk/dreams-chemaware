@@ -231,6 +231,19 @@ def main() -> None:
     fullmsg = overlap_deltas.loc[
         overlap_deltas["method_name"].eq("noise_chemaware_fullmsg")
     ].iloc[0]
+    unified_rows = overlap_deltas.loc[
+        overlap_deltas["method_name"].eq("unified_candidate_ranker")
+    ]
+    unified_result = None
+    if len(unified_rows):
+        unified = unified_rows.iloc[0]
+        unified_result = {
+            "registered_contexts": int(unified["registered_contexts"]),
+            "rank_improved_vs_noise": int(unified["rank_improved_vs_noise"]),
+            "rank_worsened_vs_noise": int(unified["rank_worsened_vs_noise"]),
+            "top1_gained_vs_noise": int(unified["top1_gained_vs_noise"]),
+            "top1_lost_vs_noise": int(unified["top1_lost_vs_noise"]),
+        }
     report = {
         "status": STATUS,
         "dataset_role": "development_consumed_not_external_validation",
@@ -263,6 +276,7 @@ def main() -> None:
                 "response ranks, but the observed Top-1 gains are repeated contexts "
                 "within one mixture and do not establish broad biological transfer."
             ),
+            "unified_candidate_ranker_vs_noise": unified_result,
         },
         "inputs": {
             "increment_report": {"path": str(report_path), "sha256": sha256(report_path)},
@@ -279,7 +293,7 @@ def main() -> None:
             "Candidate matches are mass-compatible identity hypotheses, not confirmed identities.",
             "No identity truth exists on this application panel; changes are not called corrections.",
             "Repeated microbial strata are contexts, not independent studies.",
-            "This run contains WSE and encoder scores, not B, P2b, V2, MSG rerankers or BioAware.",
+            "Methods present in this run are recorded in the source increment report; unavailable conditional evidence must not be inferred from a method name.",
             "Simple query-minmax averaging is an untrained comparator, not a selected final model.",
         ],
     }

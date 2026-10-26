@@ -1,0 +1,73 @@
+{
+  "status": "MSV000095331_MULTIENCODER_INCREMENT_SUMMARY_COMPLETE",
+  "dataset_role": "development_consumed_not_external_validation",
+  "selection_policy": "identity methods were fixed before biological response outcomes; response results are application evaluation only",
+  "fixed_denominators": {
+    "new_study_response_entities": 7338,
+    "new_study_response_contrasts": 20,
+    "candidate_response_contrasts": 24,
+    "directional_entity_queries_per_method": 38628,
+    "identity_candidate_pairs": 22046
+  },
+  "key_result": {
+    "fullmsg_vs_noise_forward_top1_changes": 432,
+    "fullmsg_vs_noise_forward_mutual_net": 12,
+    "fullmsg_prespecified_top1_gained_vs_noise": 3,
+    "fullmsg_prespecified_top1_lost_vs_noise": 0,
+    "interpretation": "FullMSG changes real entity decisions and improves some registered response ranks, but the observed Top-1 gains are repeated contexts within one mixture and do not establish broad biological transfer.",
+    "unified_candidate_ranker_vs_noise": {
+      "registered_contexts": 30,
+      "rank_improved_vs_noise": 15,
+      "rank_worsened_vs_noise": 12,
+      "top1_gained_vs_noise": 1,
+      "top1_lost_vs_noise": 0
+    }
+  },
+  "inputs": {
+    "increment_report": {
+      "path": "data\\validation\\msv000095331_entity_method_increment_unified_local_20261026\\report.json",
+      "sha256": "a470ffe78360fc3c0ebaeeceb4548fa53908a89b56c1fbcd1d55f1ee1d0fe95a"
+    },
+    "decisions": {
+      "path": "data\\validation\\msv000095331_entity_method_increment_unified_local_20261026\\entity_method_decisions.tsv.gz",
+      "sha256": "711ade1824bd058dfbd81d95e949161572511bc45b0c6cfb2a0f2f6b23a01740"
+    },
+    "prespecified_overlap": {
+      "path": "data\\validation\\msv000095331_entity_method_increment_unified_local_20261026\\prespecified_overlap_results.tsv",
+      "sha256": "c81f1f24e1f16dce2aa897ddfe8743b5b72a357fe1b7d852d8e36ca70fd72ed2"
+    }
+  },
+  "outputs": {
+    "method_coverage": {
+      "path": "data\\validation\\msv000095331_unified_increment_summary_local_20261026\\method_coverage.tsv",
+      "sha256": "0433b3187158bd3befd678bc591900fe7a2236ddb8bf9aa6c76694068e51caa6"
+    },
+    "pairwise_top1_agreement": {
+      "path": "data\\validation\\msv000095331_unified_increment_summary_local_20261026\\pairwise_top1_agreement.tsv",
+      "sha256": "496265ab66ec88fe42527593b6d8300e385beb7040d0081ff9be1d8b37ba5261"
+    },
+    "deltas_vs_noise": {
+      "path": "data\\validation\\msv000095331_unified_increment_summary_local_20261026\\deltas_vs_noise.tsv",
+      "sha256": "85b1e1087df1481df93a3b4a81a4f113c7e5c370cbe24671c999487fed3db87d"
+    },
+    "changed_queries_vs_noise": {
+      "path": "data\\validation\\msv000095331_unified_increment_summary_local_20261026\\changed_queries_vs_noise.tsv.gz",
+      "sha256": "96ec0e1928ec1dbf5719c77cf79601890fbba96a2ee806f417001404e0754d04"
+    },
+    "prespecified_rank_deltas": {
+      "path": "data\\validation\\msv000095331_unified_increment_summary_local_20261026\\prespecified_rank_deltas_vs_noise.tsv",
+      "sha256": "f175b40cdc44909da27ea8355e9735000341c0cfa61fb88b38b60ed5635aa074"
+    },
+    "prespecified_rank_comparison": {
+      "path": "data\\validation\\msv000095331_unified_increment_summary_local_20261026\\prespecified_rank_comparison.tsv",
+      "sha256": "abc6300af2437793e6eae41e1d5bf08dd693e5e6f29fb171c25b9b9d46b390de"
+    }
+  },
+  "claim_boundary": [
+    "Candidate matches are mass-compatible identity hypotheses, not confirmed identities.",
+    "No identity truth exists on this application panel; changes are not called corrections.",
+    "Repeated microbial strata are contexts, not independent studies.",
+    "Methods present in this run are recorded in the source increment report; unavailable conditional evidence must not be inferred from a method name.",
+    "Simple query-minmax averaging is an untrained comparator, not a selected final model."
+  ]
+}

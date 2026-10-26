@@ -1,0 +1,8 @@
+method_name	common_answered_queries	different_top1_vs_noise	different_top1_fraction	forward_different_top1_vs_noise	forward_mutual_top1_gained	forward_mutual_top1_lost	forward_mutual_top1_net
+chemaware_phasea	9163	1003	0.10946196660482375	433	366	348	18
+chemaware_stage1	9163	1037	0.11317254174397032	469	339	339	0
+noise_chemaware_fullmsg	9163	1077	0.11753792426061334	432	389	377	12
+p2b_noise_v1_frozen	9163	1204	0.13139801375095492	538	364	368	-4
+simple_query_minmax_mean	8498	613	0.07213461991056719	287	197	628	-431
+unified_candidate_ranker	8370	637	0.07610513739545997	334	170	652	-482
+weighted_spectral_entropy	7952	1442	0.1813380281690141	598	738	817	-79

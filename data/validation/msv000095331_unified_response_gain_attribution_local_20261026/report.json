@@ -1,0 +1,63 @@
+{
+  "status": "MSV000095331_MULTIENCODER_RESPONSE_GAIN_ATTRIBUTION_COMPLETE",
+  "dataset_role": "development_consumed_not_external_validation",
+  "reference_method": "noise_v1",
+  "methods_attributed": [
+    "unified_candidate_ranker"
+  ],
+  "denominators": {
+    "top1_gain_contexts": 1,
+    "changed_edges_in_gain_contexts": 211,
+    "helpful_changed_edges": 104,
+    "harmful_changed_edges": 107,
+    "both_unresolved_changed_edges": 194,
+    "changed_edges_touching_library_support": 17,
+    "changed_edges_on_published_product_queries": 0,
+    "helpful_changed_edges_both_unresolved": 96,
+    "helpful_changed_edges_touching_library_support": 8,
+    "helpful_gained_edges": 33,
+    "helpful_removed_edges": 71
+  },
+  "inputs": {
+    "rank_comparison": {
+      "path": "data\\validation\\msv000095331_unified_increment_summary_local_20261026\\prespecified_rank_comparison.tsv",
+      "sha256": "abc6300af2437793e6eae41e1d5bf08dd693e5e6f29fb171c25b9b9d46b390de"
+    },
+    "response_support": {
+      "path": "data\\validation\\msv000095331_entity_method_increment_unified_local_20261026\\entity_response_support.tsv.gz",
+      "sha256": "bf9637415f25222eea54d74ac7f71a1c507f03dfaa4117c5531db6137dba08d5"
+    },
+    "response_scores": {
+      "path": "data\\validation\\msv000095331_entity_method_increment_unified_local_20261026\\response_retrieval_scores.tsv.gz",
+      "sha256": "1c07f16f903b87fbcb738da8aa0d776d85d63d0d79eafdfd934c20ad8f7f2353"
+    },
+    "identity_pairs": {
+      "path": "data\\validation\\msv000095331_complete_identity_handoff_v3_20261023\\complete_identity_candidate_pairs.tsv.gz",
+      "sha256": "72de3fd1a7323b251461d399273d306bd093819a988ff5e60f9408938a93c4df"
+    },
+    "product_registry": {
+      "path": "data\\validation\\msv000095331_published_product_direction_check_v1_20261023\\prespecified_product_registry.tsv",
+      "sha256": "ed0cea0de73a1aa6645338d404c154f40b36b6357bb63c3dd88da224ee65d9b6"
+    }
+  },
+  "outputs": {
+    "top1_gain_contexts": {
+      "path": "data\\validation\\msv000095331_unified_response_gain_attribution_local_20261026\\top1_gain_contexts.tsv",
+      "sha256": "382f9a4cc961cb3262bbaf3c30a06e862653c5bbf4302d383b370664b4526413"
+    },
+    "edge_attribution": {
+      "path": "data\\validation\\msv000095331_unified_response_gain_attribution_local_20261026\\top1_gain_edge_attribution.tsv.gz",
+      "sha256": "762bd6dcfa1cb46faad95a07fc94172da8a45d6573bb6d2637cc2a35182c3542"
+    },
+    "representative_entities": {
+      "path": "data\\validation\\msv000095331_unified_response_gain_attribution_local_20261026\\representative_changed_entities.tsv",
+      "sha256": "9247e5e9374f09fab8af0f16111f248f9f44feead453a19812dbc3ccaf45ad5c"
+    }
+  },
+  "claim_boundary": [
+    "Biological responses were opened only for post-freeze evaluation and attribution.",
+    "An edge that improves a registered response rank is not thereby a correct molecular identity.",
+    "Repeated microbial strata are contexts within one experiment, not independent confirmations.",
+    "Representative entities are follow-up priorities and cannot be fed back into model selection."
+  ]
+}

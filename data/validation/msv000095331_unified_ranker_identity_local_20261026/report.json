@@ -1,0 +1,95 @@
+{
+  "status": "CROSSSTUDY_IDENTITY_MULTIENCODER_COMPLETE",
+  "labels_or_responses_accessed": false,
+  "candidate_admission": "all precursor-compatible candidates; no spectral-score threshold",
+  "methods": [
+    "weighted_spectral_entropy",
+    "p2b_noise_v1_frozen",
+    "noise_v1",
+    "chemaware_stage1",
+    "chemaware_phasea",
+    "noise_chemaware_fullmsg",
+    "simple_query_minmax_mean",
+    "unified_candidate_ranker"
+  ],
+  "weighted_entropy_backend": "dependency_free_weighted_entropy_v1",
+  "parameters": {
+    "precursor_ppm": 10.0,
+    "fragment_da": 0.02
+  },
+  "denominators": {
+    "directional_queries": 87646,
+    "queries_with_identity_candidates": 12073,
+    "identity_candidate_pairs": 24898
+  },
+  "inputs": {
+    "embeddings": {
+      "noise_v1": {
+        "path": "data\\validation\\msv000095331_integrated_multiencoder_identity_run_2404230\\noise_v1_embeddings.npz",
+        "sha256": "c60099bfbe72e7e5c1355937496a3efee4fc3bc62112bd7d43fd6676fec0750a"
+      },
+      "chemaware_stage1": {
+        "path": "data\\validation\\msv000095331_integrated_multiencoder_identity_run_2404230\\chemaware_stage1_embeddings.npz",
+        "sha256": "1f8049bf22ccab166faf7382135965423136f2a9683dc3d5f654e2f092ce0557"
+      },
+      "chemaware_phasea": {
+        "path": "data\\validation\\msv000095331_integrated_multiencoder_identity_run_2404230\\chemaware_phase_a_embeddings.npz",
+        "sha256": "6826aefce1421aad1c738c57445a36ed1c578fc76a18fdc02fa2df705f591967"
+      },
+      "noise_chemaware_fullmsg": {
+        "path": "data\\validation\\msv000095331_integrated_multiencoder_identity_run_2404230\\noise_chemaware_fullmsg_embeddings.npz",
+        "sha256": "ee822ea7e43e07afb67d8c1ce877e5868f3922a9a393853dc9cee77f935c78cb"
+      }
+    },
+    "unified_model": {
+      "model_path": "data\\validation\\massspecgym_unified_ranker_run_2409612\\modeling\\selected_readout.pt",
+      "model_sha256": "3c841bc57ee2664e87d8cb3418ab86452d2f24e479dae59a897dde596deeb79f",
+      "arm": "embedding_pair",
+      "encoder_names": [
+        "noise_v1",
+        "chemaware_stage1",
+        "chemaware_phasea",
+        "noise_chemaware_fullmsg"
+      ],
+      "selection_class": "full_embedding_integration",
+      "representation_increment_verdict": "FULL_EMBEDDING_POINT_GAIN_NOT_CONFIRMED",
+      "scored_pairs": 18347,
+      "scored_queries": 6391,
+      "missing_rule": "score only complete query candidate blocks; never shrink a query selectively",
+      "chemaware_v2": "unavailable_without_candidate_structures_exact_zero"
+    },
+    "mgfs": {
+      "MSV000095331": {
+        "path": "data\\reference\\msv000095331_drug_microbiome_20261023\\consensus.mgf",
+        "sha256": "f016291233c16b3dbec20a51ecb4307abdcb9ae3b77ceb8113fe2e78d4cabe04"
+      },
+      "MSV000094899": {
+        "path": "data\\reference\\chemprop2_m1_20261011\\consensus.mgf",
+        "sha256": "49ab4ca3815e43c8110b263cc753cd858ed32a2eaf40b7a1fd67667c284ace7d"
+      },
+      "MSV000096724": {
+        "path": "data\\reference\\chemprop_cross_design_20261011\\chemprop_23drug\\spectra\\specs_ms.mgf",
+        "sha256": "b54c361d415a452c47961666e9372467e5cb5065bed73c6b3fff2c4b4d5c8142"
+      },
+      "MSV000093571": {
+        "path": "data\\reference\\chemprop_cross_design_20261011\\chemprop_45drug\\spectra\\specs_ms.mgf",
+        "sha256": "516a613773f0a0f307bcd7fd6362ce52cdecedf68dd39ca49aff4d59fa597886"
+      }
+    }
+  },
+  "outputs": {
+    "candidate_scores": {
+      "path": "data\\validation\\msv000095331_unified_ranker_identity_local_20261026\\identity_candidate_scores.tsv.gz",
+      "sha256": "12e756c50222d2ebeeb96a73b6d268a36bd5ca53d454a4ff590c559191811f67"
+    },
+    "method_scores_long": {
+      "path": "data\\validation\\msv000095331_unified_ranker_identity_local_20261026\\method_scores_long.tsv.gz",
+      "sha256": "f70c59a3a8292fabfe292d92346aad95781707a8ff683470a7f77914c862b4a1"
+    },
+    "query_registry": {
+      "path": "data\\validation\\msv000095331_unified_ranker_identity_local_20261026\\directional_query_registry.tsv.gz",
+      "sha256": "1f6a45b5453ab8a09ef15c99aeaff3a377e5b05bb7b80b5d88177d9a40cbb12d"
+    }
+  },
+  "claim_boundary": "Identity-compatible candidate scoring only. Out-of-window chemical relationships, BioAware context and structure-dependent V2 evidence are separate tracks."
+}

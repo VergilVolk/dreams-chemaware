@@ -58,6 +58,20 @@ def prepare_spectrum(spectrum: np.ndarray, n_peaks: int = 100) -> np.ndarray:
     return values[:, np.argsort(values[0], kind="stable")]
 
 
+def peak_rows(peaks: np.ndarray) -> np.ndarray:
+    """Return MGF peaks as ``(peaks, 2)``, including an empty spectrum."""
+    values = np.asarray(peaks, dtype=np.float32)
+    if values.size == 0:
+        return np.empty((0, 2), dtype=np.float32)
+    if values.ndim != 2 or values.shape[0] != 2:
+        raise ValueError("MGF peak matrix must have shape (2, peaks)")
+    return values.T
+
+
+def valid_precursor_mz(value: float) -> bool:
+    return bool(np.isfinite(value) and value > 0)
+
+
 def _entropy_weight(intensity: np.ndarray) -> np.ndarray:
     values = np.asarray(intensity, dtype=np.float64)
     values /= max(float(values.sum()), 1e-15)
@@ -318,7 +332,7 @@ def main() -> None:
     for study, path in mgfs.items():
         ids, records = load_mgf(path, minimum_peaks=0, skip_ineligible=False)
         spectra[study] = {
-            str(entity): (float(record["precursor_mz"]), np.asarray(record["peaks"], dtype=np.float32).T)
+            str(entity): (float(record["precursor_mz"]), peak_rows(record["peaks"]))
             for entity, record in zip(ids, records, strict=True)
         }
 
@@ -327,16 +341,22 @@ def main() -> None:
     directions = [(NEW_STUDY, study) for study in CHEMPROP_MGF]
     directions += [(study, NEW_STUDY) for study in CHEMPROP_MGF]
     for query_study, candidate_study in directions:
-        candidate_items = sorted(spectra[candidate_study].items())
+        candidate_items = [
+            item for item in sorted(spectra[candidate_study].items())
+            if valid_precursor_mz(item[1][0])
+        ]
         candidate_mz = np.asarray([item[1][0] for item in candidate_items], dtype=float)
         order = np.argsort(candidate_mz, kind="mergesort")
         candidate_mz = candidate_mz[order]
         candidate_items = [candidate_items[index] for index in order]
         for raw_query, (query_mz, query_peaks) in sorted(spectra[query_study].items()):
             query_id = f"{query_study}::{raw_query}"
-            delta = query_mz * args.precursor_ppm * 1e-6
-            left = int(np.searchsorted(candidate_mz, query_mz - delta, side="left"))
-            right = int(np.searchsorted(candidate_mz, query_mz + delta, side="right"))
+            if valid_precursor_mz(query_mz):
+                delta = query_mz * args.precursor_ppm * 1e-6
+                left = int(np.searchsorted(candidate_mz, query_mz - delta, side="left"))
+                right = int(np.searchsorted(candidate_mz, query_mz + delta, side="right"))
+            else:
+                left = right = 0
             block: list[dict[str, object]] = []
             for raw_candidate, (cand_mz, cand_peaks) in candidate_items[left:right]:
                 candidate_id = f"{candidate_study}::{raw_candidate}"

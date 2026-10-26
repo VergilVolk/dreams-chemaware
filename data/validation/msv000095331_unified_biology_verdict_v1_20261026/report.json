@@ -1,0 +1,117 @@
+{
+  "status": "MSV000095331_UNIFIED_BIOLOGY_VERDICT_COMPLETE",
+  "dataset_role": "development_consumed_not_external_validation",
+  "fixed_denominators": {
+    "directional_queries_per_method": 38628,
+    "identity_candidate_pairs": 22046,
+    "registered_response_contexts": 30,
+    "microbial_contexts_per_mixture": 5,
+    "aggregate_mixture_study_units": 6
+  },
+  "unified_vs_noise": {
+    "raw_target_top1_contexts": {
+      "unified": 3,
+      "noise": 2
+    },
+    "raw_target_mean_rank": {
+      "unified": 10.066666666666666,
+      "noise": 11.033333333333333
+    },
+    "rank_contexts_improved_worsened_unchanged": [
+      15,
+      12,
+      3
+    ],
+    "target_score_contexts_higher_lower": [
+      11,
+      19
+    ],
+    "mean_target_score_delta": -0.0009956825505465098,
+    "matched_pair_contexts_lower": 30,
+    "mean_matched_pair_delta": -137.2,
+    "aggregate_target_top1_units": {
+      "unified": 1,
+      "noise": 2
+    },
+    "aggregate_target_mean_rank": {
+      "unified": 4.5,
+      "noise": 4.833333333333333
+    },
+    "aggregate_units_improved_worsened_unchanged": [
+      2,
+      1,
+      3
+    ]
+  },
+  "sole_raw_top1_gain": {
+    "query_contrast_id": "drug_mix_1_group_3_medium_slow",
+    "candidate_study_id": "MSV000093571",
+    "candidate_contrast_id": "drug_sertraline",
+    "rank_noise_to_unified": [
+      2.0,
+      1.0
+    ],
+    "target_score_noise_to_unified": [
+      0.0126953497963073,
+      0.0108298095480875
+    ],
+    "matched_pairs_noise_to_unified": [
+      568,
+      469
+    ],
+    "changed_edges": 211,
+    "helpful_harmful_changed_edges": [
+      104,
+      107
+    ],
+    "net_response_numerator_delta": -5.811241054699842
+  },
+  "verdict": "LOCAL_RANK_CHANGES_WITHOUT_CONTEXT_ROBUST_TOP1_OR_EVIDENCE_GAIN",
+  "inputs": {
+    "increment_report": {
+      "path": "data\\validation\\msv000095331_entity_method_increment_unified_local_20261026\\report.json",
+      "sha256": "a470ffe78360fc3c0ebaeeceb4548fa53908a89b56c1fbcd1d55f1ee1d0fe95a"
+    },
+    "overlap_results": {
+      "path": "data\\validation\\msv000095331_entity_method_increment_unified_local_20261026\\prespecified_overlap_results.tsv",
+      "sha256": "c81f1f24e1f16dce2aa897ddfe8743b5b72a357fe1b7d852d8e36ca70fd72ed2"
+    },
+    "context_summary": {
+      "path": "data\\validation\\msv000095331_context_robust_unified_local_20261026\\method_summary.tsv",
+      "sha256": "92f8272174485cb775ab951b23510a2806d6c5149f62740a8c40f48121cedf7f"
+    },
+    "context_targets": {
+      "path": "data\\validation\\msv000095331_context_robust_unified_local_20261026\\registered_target_results.tsv",
+      "sha256": "6dddd4cefd0bd3a73d363381d29b41f87c519bc3a4ec22e78e52fa4b9723a069"
+    },
+    "attribution_report": {
+      "path": "data\\validation\\msv000095331_unified_response_gain_attribution_local_20261026\\report.json",
+      "sha256": "93550ad7cfe5424c00c6fea2ebd443e9c634d64d6ae7682cbd495a34212c9569"
+    },
+    "top1_gain_context": {
+      "path": "data\\validation\\msv000095331_unified_response_gain_attribution_local_20261026\\top1_gain_contexts.tsv",
+      "sha256": "382f9a4cc961cb3262bbaf3c30a06e862653c5bbf4302d383b370664b4526413"
+    }
+  },
+  "outputs": {
+    "method_summary": {
+      "path": "data\\validation\\msv000095331_unified_biology_verdict_v1_20261026\\method_biology_summary.tsv",
+      "sha256": "33224c3dd16ad406e18f3e6352408cc8603b65077f6d22c506d555938ca1afdd"
+    },
+    "unified_context_deltas": {
+      "path": "data\\validation\\msv000095331_unified_biology_verdict_v1_20261026\\unified_vs_noise_contexts.tsv",
+      "sha256": "b44a954e4728e02b14637f59885e865c0d385f211c99ee73337879f2f9e26885"
+    },
+    "aggregate_targets": {
+      "path": "data\\validation\\msv000095331_unified_biology_verdict_v1_20261026\\aggregate_target_comparison.tsv",
+      "sha256": "34b4c90b577b231b30f68bf600bbb822f28e8a80675bb32f69e4bf8e8cf84ccf"
+    }
+  },
+  "claim_boundary": [
+    "The model and identity scores were frozen before biological responses were opened.",
+    "The application panel is consumed development evidence, not external validation.",
+    "Five microbial contexts per mixture are related strata, not independent studies.",
+    "A rank gain caused by stronger suppression of alternatives is not evidence that target response support increased.",
+    "ChemAware V2 structure evidence and BioAware sample events were unavailable in this application score."
+  ]
+}

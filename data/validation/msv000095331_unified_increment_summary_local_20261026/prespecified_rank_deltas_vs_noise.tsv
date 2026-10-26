@@ -1,0 +1,8 @@
+method_name	registered_contexts	rank_improved_vs_noise	rank_worsened_vs_noise	rank_unchanged_vs_noise	top1_gained_vs_noise	top1_lost_vs_noise	median_rank_delta_vs_noise	mean_response_score_delta_vs_noise
+chemaware_phasea	30	9	7	14	2	0	0.0	-0.00020075689072399322
+chemaware_stage1	30	7	15	8	0	0	-0.5	-0.0009674397198181825
+noise_chemaware_fullmsg	30	10	8	12	3	0	0.0	0.0005740253513428403
+p2b_noise_v1_frozen	30	9	12	9	0	0	0.0	-0.00215874317384046
+simple_query_minmax_mean	30	7	16	7	0	1	-1.0	-0.0021873086965865348
+unified_candidate_ranker	30	15	12	3	1	0	0.5	-0.0009956825505465098
+weighted_spectral_entropy	30	10	14	6	0	0	0.0	-0.0011539885767457231
