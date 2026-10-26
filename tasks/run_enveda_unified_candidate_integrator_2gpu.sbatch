@@ -48,6 +48,18 @@ GNPS_MSG="${NOISE_MSG_GNPS_CACHE:-data/validation/noise_msg_fusion_run_2349961/g
 
 OUT="data/validation/enveda_unified_candidate_integrator_run_${SLURM_JOB_ID}"
 SCRATCH="${SLURM_TMPDIR:-/tmp}/enveda_unified_${SLURM_JOB_ID}"
+REUSE_RUN="${ENVEDA_UNIFIED_REUSE_RUN:-}"
+
+ENVEDA_STAGE1_EMBEDDINGS="$OUT/inputs/enveda_chemaware_stage1_embeddings.npz"
+ENVEDA_PHASEA_EMBEDDINGS="$OUT/inputs/enveda_chemaware_phasea_embeddings.npz"
+ENVEDA_FULLMSG_EMBEDDINGS="$OUT/inputs/enveda_noise_chemaware_fullmsg_embeddings.npz"
+ENVEDA_MSG_CACHE="$OUT/inputs/enveda_msg_cache"
+if [[ -n "$REUSE_RUN" ]]; then
+  ENVEDA_STAGE1_EMBEDDINGS="$REUSE_RUN/inputs/enveda_chemaware_stage1_embeddings.npz"
+  ENVEDA_PHASEA_EMBEDDINGS="$REUSE_RUN/inputs/enveda_chemaware_phasea_embeddings.npz"
+  ENVEDA_FULLMSG_EMBEDDINGS="$REUSE_RUN/inputs/enveda_noise_chemaware_fullmsg_embeddings.npz"
+  ENVEDA_MSG_CACHE="$REUSE_RUN/inputs/enveda_msg_cache"
+fi
 
 # Locate complete artifact roots only.  Child score files are never treated as
 # independent caches.
@@ -164,6 +176,16 @@ required=(
   tasks/export_gnps_chemaware_continuous_null_evidence.py
   tasks/apply_noise_msg_fusion_to_gnps.py
 )
+if [[ -n "$REUSE_RUN" ]]; then
+  required+=(
+    "$ENVEDA_STAGE1_EMBEDDINGS" "${ENVEDA_STAGE1_EMBEDDINGS%.npz}.json"
+    "$ENVEDA_PHASEA_EMBEDDINGS" "${ENVEDA_PHASEA_EMBEDDINGS%.npz}.json"
+    "$ENVEDA_FULLMSG_EMBEDDINGS" "${ENVEDA_FULLMSG_EMBEDDINGS%.npz}.json"
+    "$ENVEDA_MSG_CACHE/report.json"
+    "$ENVEDA_MSG_CACHE/pair_scores_identity_disjoint.npy"
+    "$ENVEDA_MSG_CACHE/pair_scores_formula_disjoint.npy"
+  )
+fi
 missing=()
 for path in "${required[@]}"; do
   [[ -s "$path" ]] || missing+=("$path")
@@ -260,14 +282,103 @@ if tuple(policy.get('control_rule_keys', ())) != expected_controls:
 print('ENVEDA_UNIFIED_FROZEN_INPUT_PREFLIGHT_PASS')
 PY
 
+if [[ -n "$REUSE_RUN" ]]; then
+  # A failed later stage must not force three completed encoder passes and the
+  # frozen MSG application to run again.  Reuse is accepted only when every
+  # cache matches the current checkpoint bytes and exact Enveda candidate axis.
+  python - "$ENVEDA" "$ENVEDA_LAYER" "$MSG_MODEL_DIR" "$ENVEDA_MSG_CACHE" \
+    "$ENVEDA_STAGE1_EMBEDDINGS" chemaware_stage1 "$STAGE1" \
+    "$ENVEDA_PHASEA_EMBEDDINGS" chemaware_phasea "$PHASEA" \
+    "$ENVEDA_FULLMSG_EMBEDDINGS" noise_chemaware_fullmsg "$FULLMSG" <<'PY'
+import json
+from pathlib import Path
+import sys
+
+import numpy as np
+
+from encode_gnps_gold_silver_10ppm_checkpoint import required_rows
+from gnps_pair_score_cache import load_pair_score_cache, sha256_file
+
+benchmark, layer, msg_model, msg_cache = map(Path, sys.argv[1:5])
+specifications = sys.argv[5:]
+if len(specifications) != 9:
+    raise SystemExit('ENVEDA_UNIFIED_REUSE_ARGUMENT_CONTRACT_BROKEN')
+panels = ('identity_disjoint', 'formula_disjoint')
+expected_rows = required_rows(benchmark, 0, panels)
+expected_preprocessing = {
+    'n_highest_peaks': 100,
+    'precursor_intensity': 1.1,
+    'precision': 32,
+    'augmentation': False,
+}
+
+for offset in range(0, len(specifications), 3):
+    cache = Path(specifications[offset])
+    label = specifications[offset + 1]
+    checkpoint = Path(specifications[offset + 2])
+    sidecar = cache.with_suffix('.json')
+    report = json.loads(sidecar.read_text(encoding='utf-8'))
+    if report.get('status') != 'gnps_gold_silver_10ppm_checkpoint_encoding_complete':
+        raise SystemExit(f'ENVEDA_UNIFIED_REUSE_EMBEDDING_INCOMPLETE: {cache}')
+    if report.get('label') != label:
+        raise SystemExit(f'ENVEDA_UNIFIED_REUSE_EMBEDDING_LABEL_MISMATCH: {cache}')
+    if report.get('checkpoint_sha256') != sha256_file(checkpoint):
+        raise SystemExit(f'ENVEDA_UNIFIED_REUSE_EMBEDDING_CHECKPOINT_MISMATCH: {cache}')
+    expected_panel_hashes = {
+        name: sha256_file(benchmark / f'panel_{name}.npz') for name in panels
+    }
+    if report.get('panel_sha256') != expected_panel_hashes:
+        raise SystemExit(f'ENVEDA_UNIFIED_REUSE_EMBEDDING_PANEL_MISMATCH: {cache}')
+    if report.get('native_preprocessing') != expected_preprocessing:
+        raise SystemExit(f'ENVEDA_UNIFIED_REUSE_PREPROCESSING_MISMATCH: {cache}')
+    with np.load(cache, allow_pickle=False) as body:
+        rows = np.asarray(body['rows'], dtype=np.int64)
+        embeddings = np.asarray(body['embeddings'], dtype=np.float32)
+    if not np.array_equal(rows, expected_rows):
+        raise SystemExit(f'ENVEDA_UNIFIED_REUSE_EMBEDDING_AXIS_MISMATCH: {cache}')
+    if embeddings.shape != (len(expected_rows), 1024):
+        raise SystemExit(f'ENVEDA_UNIFIED_REUSE_EMBEDDING_SHAPE_MISMATCH: {cache}')
+    norms = np.linalg.norm(embeddings, axis=1)
+    if not np.all(np.isfinite(norms)) or np.max(np.abs(norms - 1.0)) > 2e-3:
+        raise SystemExit(f'ENVEDA_UNIFIED_REUSE_EMBEDDING_VALUES_INVALID: {cache}')
+
+msg_report, _ = load_pair_score_cache(msg_cache, benchmark)
+sources = msg_report.get('method', {}).get('sources', {})
+expected_sources = {
+    'score_bundle_sha256': sha256_file(layer / 'method_scores_unopened.npz'),
+    'official_embeddings_sha256': sha256_file(layer / 'official_embeddings.npz'),
+    'v1_embeddings_sha256': sha256_file(layer / 'noise_v1_embeddings.npz'),
+    'model_report_sha256': sha256_file(msg_model / 'report.json'),
+}
+if sources != expected_sources:
+    raise SystemExit('ENVEDA_UNIFIED_REUSE_MSG_PROVENANCE_MISMATCH')
+print('ENVEDA_UNIFIED_REUSE_INPUTS_VALIDATED')
+PY
+fi
+
 [[ ! -e "$OUT" ]] || { echo "ENVEDA_UNIFIED_OUTPUT_EXISTS: $OUT" >&2; exit 4; }
 mkdir -p "$OUT/inputs" "$OUT/gnps_inputs" "$SCRATCH"
 trap 'rm -rf -- "$SCRATCH"' EXIT
+if [[ -n "$REUSE_RUN" ]]; then
+  printf '%s\n' "$REUSE_RUN" > "$OUT/REUSED_ENVEDA_INPUTS.txt"
+  sha256sum \
+    "$ENVEDA_STAGE1_EMBEDDINGS" "${ENVEDA_STAGE1_EMBEDDINGS%.npz}.json" \
+    "$ENVEDA_PHASEA_EMBEDDINGS" "${ENVEDA_PHASEA_EMBEDDINGS%.npz}.json" \
+    "$ENVEDA_FULLMSG_EMBEDDINGS" "${ENVEDA_FULLMSG_EMBEDDINGS%.npz}.json" \
+    "$ENVEDA_MSG_CACHE/report.json" \
+    "$ENVEDA_MSG_CACHE/pair_scores_identity_disjoint.npy" \
+    "$ENVEDA_MSG_CACHE/pair_scores_formula_disjoint.npy" \
+    "$MSG_MODEL_DIR/fusion_model.joblib" "$MSG_MODEL_DIR/report.json" \
+    > "$OUT/REUSED_ENVEDA_INPUTS.sha256"
+fi
 
 python -m py_compile \
   tasks/enveda_unified_candidate_integrator_core.py \
   tasks/train_enveda_unified_candidate_integrator.py \
-  tasks/evaluate_enveda_integrator_on_gnps.py
+  tasks/evaluate_enveda_integrator_on_gnps.py \
+  tasks/build_gnps_chemaware_kernel_cache.py \
+  tasks/export_gnps_chemaware_continuous_null_evidence.py \
+  tasks/apply_noise_msg_fusion_to_gnps.py
 python -u tasks/test_enveda_unified_candidate_integrator.py
 
 encode_one() {
@@ -282,27 +393,32 @@ encode_one() {
 # The official fine-tuned DreaMS embedding baseline is already the
 # `official_dreams` channel in both frozen score bundles.  The SSL checkpoint
 # above supplies architecture only and is never reported as that baseline.
-encode_one "$ENVEDA" chemaware_stage1 "$STAGE1" \
-  "$OUT/inputs/enveda_chemaware_stage1_embeddings.npz" "${GPUS[0]}" & p0=$!
-encode_one "$ENVEDA" chemaware_phasea "$PHASEA" \
-  "$OUT/inputs/enveda_chemaware_phasea_embeddings.npz" "${GPUS[1]}" & p1=$!
-set +e; wait "$p0"; s0=$?; wait "$p1"; s1=$?; set -e
-(( s0 == 0 && s1 == 0 )) || { echo "ENVEDA_UNIFIED_ENCODING_FAILED: stage1/phasea=$s0/$s1" >&2; exit 6; }
+if [[ -z "$REUSE_RUN" ]]; then
+  encode_one "$ENVEDA" chemaware_stage1 "$STAGE1" \
+    "$ENVEDA_STAGE1_EMBEDDINGS" "${GPUS[0]}" & p0=$!
+  encode_one "$ENVEDA" chemaware_phasea "$PHASEA" \
+    "$ENVEDA_PHASEA_EMBEDDINGS" "${GPUS[1]}" & p1=$!
+  set +e; wait "$p0"; s0=$?; wait "$p1"; s1=$?; set -e
+  (( s0 == 0 && s1 == 0 )) || { echo "ENVEDA_UNIFIED_ENCODING_FAILED: stage1/phasea=$s0/$s1" >&2; exit 6; }
 
-encode_one "$ENVEDA" noise_chemaware_fullmsg "$FULLMSG" \
-  "$OUT/inputs/enveda_noise_chemaware_fullmsg_embeddings.npz" "${GPUS[0]}"
+  encode_one "$ENVEDA" noise_chemaware_fullmsg "$FULLMSG" \
+    "$ENVEDA_FULLMSG_EMBEDDINGS" "${GPUS[0]}"
 
-python -u tasks/apply_noise_msg_fusion_to_gnps.py \
-  --benchmark "$ENVEDA" \
-  --score-bundle "$ENVEDA_LAYER/method_scores_unopened.npz" \
-  --official-embeddings "$ENVEDA_LAYER/official_embeddings.npz" \
-  --v1-embeddings "$ENVEDA_LAYER/noise_v1_embeddings.npz" \
-  --model "$MSG_MODEL_DIR" --output "$OUT/inputs/enveda_msg_cache"
+  python -u tasks/apply_noise_msg_fusion_to_gnps.py \
+    --benchmark "$ENVEDA" \
+    --score-bundle "$ENVEDA_LAYER/method_scores_unopened.npz" \
+    --official-embeddings "$ENVEDA_LAYER/official_embeddings.npz" \
+    --v1-embeddings "$ENVEDA_LAYER/noise_v1_embeddings.npz" \
+    --model "$MSG_MODEL_DIR" --output "$ENVEDA_MSG_CACHE"
+else
+  echo "ENVEDA_UNIFIED_REUSING_VALIDATED_INPUTS: $REUSE_RUN"
+fi
 
 python -u tasks/build_gnps_chemaware_kernel_cache.py \
   --benchmark "$ENVEDA" \
   --official-embeddings "$ENVEDA_LAYER/official_embeddings.npz" \
   --output "$OUT/inputs/enveda_chem_tokens" --n-highest-peaks 100 \
+  --staging-dir "$SCRATCH/enveda_chem_tokens_build" \
   --panels identity_disjoint formula_disjoint \
   --expected-selected-rows 0 --expected-records 0
 
@@ -316,10 +432,10 @@ CUDA_VISIBLE_DEVICES="${GPUS[0]}" python -u tasks/export_gnps_chemaware_continuo
 CUDA_VISIBLE_DEVICES="${GPUS[0]}" python -u tasks/train_enveda_unified_candidate_integrator.py \
   --benchmark "$ENVEDA" \
   --score-bundle "$ENVEDA_LAYER/method_scores_unopened.npz" \
-  --msg-cache "$OUT/inputs/enveda_msg_cache" \
-  --stage1-embeddings "$OUT/inputs/enveda_chemaware_stage1_embeddings.npz" \
-  --phasea-embeddings "$OUT/inputs/enveda_chemaware_phasea_embeddings.npz" \
-  --fullmsg-embeddings "$OUT/inputs/enveda_noise_chemaware_fullmsg_embeddings.npz" \
+  --msg-cache "$ENVEDA_MSG_CACHE" \
+  --stage1-embeddings "$ENVEDA_STAGE1_EMBEDDINGS" \
+  --phasea-embeddings "$ENVEDA_PHASEA_EMBEDDINGS" \
+  --fullmsg-embeddings "$ENVEDA_FULLMSG_EMBEDDINGS" \
   --chem-dir "$OUT/inputs/enveda_continuous_chem" \
   --output "$OUT/modeling" --folds 5 --epochs 20 --batch-queries 256 \
   --hidden 16 --learning-rate 0.001 --weight-decay 0.0001 \
