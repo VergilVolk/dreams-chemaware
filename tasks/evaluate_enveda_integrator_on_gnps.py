@@ -100,7 +100,7 @@ def main() -> None:
             )
     common = set.intersection(*(set(method_scores[panel]) for panel in PANELS))
     preferred = (
-        "official_dreams", "official_massspecgym_dreams", WSE, "noise_v1",
+        "official_dreams", WSE, "noise_v1",
         "p2b_noise_v1_frozen", "noise_msg_fusion_stack_v1",
         "chemaware_stage1", "chemaware_phasea", "noise_chemaware_fullmsg",
         "B_gnps_nested_oof", CONTROL_ARM, PRIMARY_ARM,

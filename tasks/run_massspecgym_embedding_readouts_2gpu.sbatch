@@ -49,9 +49,7 @@ RULE_LIBRARY="${CHEMAWARE_RULE_LIBRARY:-dreams/models/chem_aware/chem_rules_data
 GNPS="${GNPS_BENCHMARK:-data/validation/gnps_gold_silver_10ppm_benchmark_v1}"
 GNPS_BASE_SCORES="${GNPS_SCORE_BUNDLE:-data/validation/noise_gnps_article_benchmark_run_2349091/method_scores.npz}"
 GNPS_CHEM_DIR="${GNPS_CONTINUOUS_CHEM_DIR:-data/validation/wse_conditional_residual_run_2376648/continuous_chem_evidence}"
-OFFICIAL_MSG_URL="https://huggingface.co/roman-bushuiev/DreaMS/resolve/c81a62766b10dd1d39fcda3edec5ef88623e5f6b/embedding_model_massspecgym.ckpt"
-OFFICIAL_MSG_SHA256="d9b4e8b920ff367370c5a3fa154eaa951f90bafa58d5224a594424d9c54b1832"
-OFFICIAL_MSG_SLIM_INPUT="${OFFICIAL_MASSSPECGYM_SLIM:-}"
+OFFICIAL_MSG_SLIM_INPUT="${OFFICIAL_MASSSPECGYM_SLIM:-data/validation/massspecgym_unified_ranker_run_2409612/checkpoints/official_massspecgym_slim.pt}"
 
 # Historical evidence is large and expensive, but already computed.  If the
 # canonical path moved, select the newest file-level artifact that declares the
@@ -188,7 +186,6 @@ required=(
   "$GNPS_CHEM_DIR/continuous_chem_formula_disjoint.npz"
   tasks/encode_noise_massspecgym_checkpoint.py
   tasks/encode_gnps_gold_silver_10ppm_checkpoint.py
-  tasks/prepare_official_embedding_checkpoint.py
   tasks/evaluate_gnps_unified_candidate_ranker.py
   tasks/massspecgym_embedding_readout_core.py
   tasks/train_massspecgym_embedding_readouts.py
@@ -221,22 +218,11 @@ trap cleanup_scratch EXIT
 # The official MassSpecGym-specialized DreaMS checkpoint is a formal GNPS
 # comparator only.  It is not fed to the fusion head because no matching OOF
 # predictions exist on the fusion-training side.
-if [[ -n "$OFFICIAL_MSG_SLIM_INPUT" ]]; then
-  [[ -f "$OFFICIAL_MSG_SLIM_INPUT" ]] || {
-    echo "UNIFIED_RANKER_OFFICIAL_MASSSPECGYM_SLIM_MISSING: $OFFICIAL_MSG_SLIM_INPUT" >&2
-    exit 2
-  }
-  OFFICIAL_MSG_SLIM="$OFFICIAL_MSG_SLIM_INPUT"
-else
-  OFFICIAL_MSG_NATIVE="$SCRATCH/embedding_model_massspecgym.ckpt"
-  OFFICIAL_MSG_SLIM="$SCRATCH/embedding_model_massspecgym_slim.pt"
-  curl --fail --location --retry 3 --retry-delay 5 \
-    "$OFFICIAL_MSG_URL" --output "$OFFICIAL_MSG_NATIVE"
-  echo "$OFFICIAL_MSG_SHA256  $OFFICIAL_MSG_NATIVE" | sha256sum --check --strict
-  python -u tasks/prepare_official_embedding_checkpoint.py \
-    --source "$OFFICIAL_MSG_NATIVE" --output "$OFFICIAL_MSG_SLIM"
-  rm -f -- "$OFFICIAL_MSG_NATIVE"
-fi
+[[ -s "$OFFICIAL_MSG_SLIM_INPUT" ]] || {
+  echo "UNIFIED_RANKER_OFFICIAL_MASSSPECGYM_SLIM_MISSING: $OFFICIAL_MSG_SLIM_INPUT" >&2
+  exit 2
+}
+OFFICIAL_MSG_SLIM="$OFFICIAL_MSG_SLIM_INPUT"
 
 python -m py_compile \
   tasks/massspecgym_embedding_readout_core.py \

@@ -45,7 +45,6 @@ POLICY_DIR="${CHEMAWARE_V2_POLICY_DIR:-data/validation/massspecgym_unified_ranke
 V2_POLICY_SHA256="${CHEMAWARE_V2_POLICY_SHA256:-dc9d76dc439fca40db88e3a95ca33e6b59438a92e6a80080d8df77e4615e5a4a}"
 MSG_MODEL_DIR="${NOISE_MSG_FUSION_MODEL:-data/validation/noise_msg_fusion_run_2349961/fusion_model}"
 GNPS_MSG="${NOISE_MSG_GNPS_CACHE:-data/validation/noise_msg_fusion_run_2349961/gnps_fusion_scores}"
-OFFICIAL_MSG_SLIM="${OFFICIAL_MASSSPECGYM_SLIM:-}"
 
 OUT="data/validation/enveda_unified_candidate_integrator_run_${SLURM_JOB_ID}"
 SCRATCH="${SLURM_TMPDIR:-/tmp}/enveda_unified_${SLURM_JOB_ID}"
@@ -139,11 +138,6 @@ PY
 )"
 fi
 
-if [[ -n "$OFFICIAL_MSG_SLIM" && ! -s "$OFFICIAL_MSG_SLIM" ]]; then
-  echo "ENVEDA_UNIFIED_OFFICIAL_MSG_EXPLICIT_PATH_INVALID: $OFFICIAL_MSG_SLIM" >&2
-  exit 4
-fi
-
 required=(
   "$ENVEDA/report.json" "$ENVEDA/checksums.sha256"
   "$ENVEDA/spectra.mgf" "$ENVEDA/manifest.csv.gz"
@@ -166,7 +160,6 @@ required=(
   tasks/evaluate_enveda_integrator_on_gnps.py
   tasks/test_enveda_unified_candidate_integrator.py
   tasks/encode_gnps_gold_silver_10ppm_checkpoint.py
-  tasks/prepare_official_embedding_checkpoint.py
   tasks/build_gnps_chemaware_kernel_cache.py
   tasks/export_gnps_chemaware_continuous_null_evidence.py
   tasks/apply_noise_msg_fusion_to_gnps.py
@@ -277,23 +270,6 @@ python -m py_compile \
   tasks/evaluate_enveda_integrator_on_gnps.py
 python -u tasks/test_enveda_unified_candidate_integrator.py
 
-# Official MassSpecGym fine-tuned DreaMS is a formal baseline, never a fusion
-# input.  Prefer an already prepared slim artifact; download only if absent.
-if [[ -z "$OFFICIAL_MSG_SLIM" ]]; then
-  official_native="$SCRATCH/embedding_model_massspecgym.ckpt"
-  OFFICIAL_MSG_SLIM="$OUT/inputs/official_massspecgym_slim.pt"
-  curl --fail --location --retry 3 --retry-delay 5 \
-    "https://huggingface.co/roman-bushuiev/DreaMS/resolve/c81a62766b10dd1d39fcda3edec5ef88623e5f6b/embedding_model_massspecgym.ckpt" \
-    --output "$official_native"
-  echo "d9b4e8b920ff367370c5a3fa154eaa951f90bafa58d5224a594424d9c54b1832  $official_native" \
-    | sha256sum --check --strict
-  python -u tasks/prepare_official_embedding_checkpoint.py \
-    --source "$official_native" --output "$OFFICIAL_MSG_SLIM"
-else
-  cp "$OFFICIAL_MSG_SLIM" "$OUT/inputs/official_massspecgym_slim.pt"
-  OFFICIAL_MSG_SLIM="$OUT/inputs/official_massspecgym_slim.pt"
-fi
-
 encode_one() {
   local benchmark="$1" name="$2" checkpoint="$3" output="$4" gpu="$5"
   CUDA_VISIBLE_DEVICES="$gpu" python -u tasks/encode_gnps_gold_silver_10ppm_checkpoint.py \
@@ -303,7 +279,9 @@ encode_one() {
     --panels identity_disjoint formula_disjoint
 }
 
-# Keep the four explicit two-GPU pairs short and auditable.
+# The official fine-tuned DreaMS embedding baseline is already the
+# `official_dreams` channel in both frozen score bundles.  The SSL checkpoint
+# above supplies architecture only and is never reported as that baseline.
 encode_one "$ENVEDA" chemaware_stage1 "$STAGE1" \
   "$OUT/inputs/enveda_chemaware_stage1_embeddings.npz" "${GPUS[0]}" & p0=$!
 encode_one "$ENVEDA" chemaware_phasea "$PHASEA" \
@@ -312,11 +290,7 @@ set +e; wait "$p0"; s0=$?; wait "$p1"; s1=$?; set -e
 (( s0 == 0 && s1 == 0 )) || { echo "ENVEDA_UNIFIED_ENCODING_FAILED: stage1/phasea=$s0/$s1" >&2; exit 6; }
 
 encode_one "$ENVEDA" noise_chemaware_fullmsg "$FULLMSG" \
-  "$OUT/inputs/enveda_noise_chemaware_fullmsg_embeddings.npz" "${GPUS[0]}" & p0=$!
-encode_one "$ENVEDA" official_massspecgym_dreams "$OFFICIAL_MSG_SLIM" \
-  "$OUT/inputs/enveda_official_massspecgym_embeddings.npz" "${GPUS[1]}" & p1=$!
-set +e; wait "$p0"; s0=$?; wait "$p1"; s1=$?; set -e
-(( s0 == 0 && s1 == 0 )) || { echo "ENVEDA_UNIFIED_ENCODING_FAILED: fullmsg/official-msg=$s0/$s1" >&2; exit 6; }
+  "$OUT/inputs/enveda_noise_chemaware_fullmsg_embeddings.npz" "${GPUS[0]}"
 
 python -u tasks/apply_noise_msg_fusion_to_gnps.py \
   --benchmark "$ENVEDA" \
@@ -347,7 +321,6 @@ CUDA_VISIBLE_DEVICES="${GPUS[0]}" python -u tasks/train_enveda_unified_candidate
   --phasea-embeddings "$OUT/inputs/enveda_chemaware_phasea_embeddings.npz" \
   --fullmsg-embeddings "$OUT/inputs/enveda_noise_chemaware_fullmsg_embeddings.npz" \
   --chem-dir "$OUT/inputs/enveda_continuous_chem" \
-  --comparator-embedding "official_massspecgym_dreams=$OUT/inputs/enveda_official_massspecgym_embeddings.npz" \
   --output "$OUT/modeling" --folds 5 --epochs 20 --batch-queries 256 \
   --hidden 16 --learning-rate 0.001 --weight-decay 0.0001 \
   --anchor-strength 0.01 --bootstrap-resamples 5000 --device cuda
@@ -361,11 +334,7 @@ set +e; wait "$p0"; s0=$?; wait "$p1"; s1=$?; set -e
 (( s0 == 0 && s1 == 0 )) || { echo "ENVEDA_UNIFIED_GNPS_ENCODING_FAILED: stage1/phasea=$s0/$s1" >&2; exit 7; }
 
 encode_one "$GNPS" noise_chemaware_fullmsg "$FULLMSG" \
-  "$OUT/gnps_inputs/noise_chemaware_fullmsg_embeddings.npz" "${GPUS[0]}" & p0=$!
-encode_one "$GNPS" official_massspecgym_dreams "$OFFICIAL_MSG_SLIM" \
-  "$OUT/gnps_inputs/official_massspecgym_embeddings.npz" "${GPUS[1]}" & p1=$!
-set +e; wait "$p0"; s0=$?; wait "$p1"; s1=$?; set -e
-(( s0 == 0 && s1 == 0 )) || { echo "ENVEDA_UNIFIED_GNPS_ENCODING_FAILED: fullmsg/official-msg=$s0/$s1" >&2; exit 7; }
+  "$OUT/gnps_inputs/noise_chemaware_fullmsg_embeddings.npz" "${GPUS[0]}"
 
 CUDA_VISIBLE_DEVICES="${GPUS[0]}" python -u tasks/evaluate_enveda_integrator_on_gnps.py \
   --benchmark "$GNPS" --checkpoint "$OUT/modeling/unified_candidate_integrator.pt" \
@@ -374,7 +343,6 @@ CUDA_VISIBLE_DEVICES="${GPUS[0]}" python -u tasks/evaluate_enveda_integrator_on_
   --phasea-embeddings "$OUT/gnps_inputs/chemaware_phasea_embeddings.npz" \
   --fullmsg-embeddings "$OUT/gnps_inputs/noise_chemaware_fullmsg_embeddings.npz" \
   --chem-dir "$GNPS_CHEM" \
-  --comparator-embedding "official_massspecgym_dreams=$OUT/gnps_inputs/official_massspecgym_embeddings.npz" \
   --comparator-score "B_gnps_nested_oof=$B_PREDICTIONS" \
   --output "$OUT/gnps_fixed_evaluation" --device cuda --bootstrap-resamples 5000
 

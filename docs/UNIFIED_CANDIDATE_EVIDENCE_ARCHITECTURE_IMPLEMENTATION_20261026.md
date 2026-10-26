@@ -29,11 +29,13 @@ primitive channels are not reintroduced beside them. ChemAware V2 enters as
 continuous correct-chemistry minus matched-null evidence with explicit
 availability. It is not the old hard promotion action.
 
-Official general DreaMS, official MassSpecGym-fine-tuned DreaMS, and the
-existing B ranker are formal comparators. They are not silently added to the
-integrator: general official evidence is already used inside the frozen MSG
-expert, while B reuses WSE/Noise/P2b/V2 and would duplicate the fitted inputs.
-RRF remains a retired audit result and is not in this fixed architecture.
+Official fine-tuned DreaMS (`embedding_model.ckpt`, represented by the
+`official_dreams` channel) and the existing B ranker are formal comparators.
+The raw SSL checkpoint supplies architecture only and is not substituted for
+the fine-tuned baseline. Official evidence is already used inside the frozen
+MSG expert, while B reuses WSE/Noise/P2b/V2 and would duplicate the fitted
+inputs. RRF remains a retired audit result and is not in this fixed
+architecture.
 
 ## Training and decision implementation
 
@@ -83,13 +85,18 @@ sbatch tasks/run_enveda_unified_candidate_integrator_2gpu.sbatch
 ```
 
 The job requests two GPUs and 20 CPU cores, reuses the existing Enveda
-official/Noise scoreblind caches, creates only the missing Stage-1, Phase-A,
-FullMSG, MSG and continuous-V2 evidence, fits the fixed model, then performs
+fine-tuned-official/Noise scoreblind caches, creates only the missing Stage-1,
+Phase-A, FullMSG, MSG and continuous-V2 evidence, fits the fixed model, then performs
 the fixed GNPS comparison. Reusable artifacts are accepted only when their
 frozen benchmark/cache contracts match; ambiguous fallback directories fail
 instead of selecting the newest one, and the B comparator must match every
 query and candidate axis rather than merely having the same length. Its result
 directory contains:
+
+The execution path performs no network download. `official_dreams` is reused
+from the frozen score bundles generated with the local official fine-tuned
+`embedding_model.ckpt`; the SSL architecture checkpoint is never substituted
+for that baseline.
 
 - `modeling/report.json`: Enveda OOF results and query-balanced accounting;
 - `modeling/candidate_predictions_oof.npz`: per-candidate OOF ledger;
