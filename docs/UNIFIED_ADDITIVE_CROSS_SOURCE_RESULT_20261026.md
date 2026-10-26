@@ -82,24 +82,20 @@ Not established:
    benefit; those require real sample context and independent downstream
    evidence.
 
-## Implemented next step
+## Completed bounded diagnostic
 
-Two changes are now bounded and executable:
+The no-query-context diagnostic completed as run `2413878`. It removed exactly
+31 query-constant columns and retained 23 candidate-varying evidence columns.
+Inputs, candidate axes, folds, upstream scores, optimization settings and seed
+were unchanged.
 
-1. `additive_linear_control` can be explicitly selected from the existing
-   checkpoint for the fixed application axis.  Omission of the option preserves
-   the original nonlinear primary, so the historical experiment is not
-   rewritten after seeing results.
-2. One nonlinear diagnostic removes exactly 31 columns that are constant for
-   all candidates of a query (three query-size fields, seven expert top gaps and
-   21 pairwise top-1 agreement fields).  It retains 23 candidate-varying
-   evidence columns, including the masked ChemAware V2 top-gap.  Every excluded
-   column is checked at runtime to be constant within every query.  No encoder,
-   score cache, candidate set, optimization setting or training budget changes.
-
-This diagnostic can test the domain-specific-gating hypothesis.  It cannot by
-itself prove that all query context is harmful, and it must not trigger a new
-architecture search.
+The reduced nonlinear head preserved Enveda OOF Recall@1 while improving fixed
+GNPS transfer by `+0.400/+0.570 pp` relative to the old nonlinear head. This
+recovered about 81--82% of the old nonlinear-to-Additive transfer gap. It did
+not outperform Additive on either GNPS panel, and its error-exchange risk and
+micro AUPRC were worse. The 23-feature Additive arm is therefore the current
+transferable application candidate. Full results and the leakage/axis audit
+are recorded in `UNIFIED_NO_QUERY_CONTEXT_DIAGNOSTIC_RESULT_20261026.md`.
 
 ## Execution
 
@@ -107,25 +103,22 @@ Application scoring with the already-fitted Additive arm:
 
 ```bash
 ENVEDA_INTEGRATOR_ARM=additive_linear_control \
-UNIFIED_RANKER_MODEL=data/validation/enveda_unified_candidate_integrator_run_2411772/modeling/unified_candidate_integrator.pt \
+UNIFIED_RANKER_MODEL=data/validation/enveda_no_query_context_diagnostic_run_2413878/modeling/unified_candidate_integrator.pt \
 sbatch tasks/run_msv000095331_integrated_multiencoder_identity.sbatch
 ```
 
-The single cached nonlinear diagnostic:
+The completed cached nonlinear diagnostic was launched with:
 
 ```bash
 sbatch tasks/run_enveda_no_query_context_diagnostic.sbatch
 ```
 
-The diagnostic job reuses the Enveda encoder/MSG caches, continuous chemistry,
-GNPS embeddings and GNPS B prediction ledger already present on the server.  It
-does not encode spectra, rebuild ChemAware evidence or access a new dataset.
+The diagnostic reused the Enveda encoder/MSG caches, continuous chemistry,
+GNPS embeddings and GNPS B prediction ledger. It did not encode spectra,
+rebuild ChemAware evidence or access a new dataset.
 
 ## Promotion rule
 
-Additive is the current transferable application candidate.  The no-context
-nonlinear arm replaces it only if the same fixed run shows that it retains the
-Enveda gain **and** removes the observed GNPS transfer loss.  Otherwise the
-diagnostic ends, Additive remains the decision layer, and the next scientific
-test is its effect on fixed entity matches and independently supported response
-recovery—not another fusion-head search.
+The promotion condition was not met. Additive remains the decision layer, and
+the next scientific test is its effect on fixed entity matches and
+independently supported response recovery--not another fusion-head search.
