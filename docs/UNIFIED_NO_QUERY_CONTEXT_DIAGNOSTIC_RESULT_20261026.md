@@ -27,7 +27,9 @@ Run: `data/validation/enveda_no_query_context_diagnostic_run_2413878`
 - GNPS identity: 10,995 queries, 87,518 candidate molecules.
 - GNPS formula: 5,261 queries, 24,401 candidate molecules.
 - Enveda training used five global formula folds.
-- GNPS was a fixed evaluation only: `training_or_selection_on_gnps=false`.
+- No parameter fitting occurred inside the fixed GNPS evaluator. GNPS was
+  already consumed and did influence the diagnostic direction and deployment
+  choice; it is development evidence, not an untouched confirmation set.
 - Query keys and formula groups never crossed Enveda folds.
 - All eight Enveda input hashes, all eight GNPS input hashes, candidate axes,
   labels, fold assignments, expert scores, hyperparameters and seed are

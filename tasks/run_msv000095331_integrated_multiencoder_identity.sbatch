@@ -3,6 +3,7 @@
 # Identity candidates are admitted by precursor compatibility, never by a
 # method score. BioAware joins later on the stable candidate_pair_id axis.
 #SBATCH --job-name=app_multi_encoder
+#SBATCH --partition=gpu
 #SBATCH --gpus=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=10
@@ -32,8 +33,10 @@ else
   MSG_MODEL_ARTIFACT="$MSG_FUSION_MODEL"
   MSG_MODEL_REPORT="$(dirname -- "$MSG_FUSION_MODEL")/report.json"
 fi
-UNIFIED_MODEL="${UNIFIED_RANKER_MODEL:-}"
+FIXED_ADDITIVE_MODEL="data/validation/enveda_no_query_context_diagnostic_run_2413878/modeling/unified_candidate_integrator.pt"
+UNIFIED_MODEL="${UNIFIED_RANKER_MODEL:-$FIXED_ADDITIVE_MODEL}"
 IDENTITY_HANDOFF="${IDENTITY_HANDOFF:-data/validation/msv000095331_complete_identity_handoff_v3_20261023}"
+REUSE_EMBEDDING_ROOT="${APPLICATION_EMBEDDING_CACHE_ROOT:-data/validation/msv000095331_integrated_multiencoder_identity_run_2404230}"
 # Optional semicolon-separated NAME=PATH::COLUMN specifications.  They are
 # required only when the selected unified payload declares auxiliary families.
 UNIFIED_AUXILIARY_SCORE_SPECS="${UNIFIED_AUXILIARY_SCORE_SPECS:-}"
@@ -45,50 +48,22 @@ MGF_45="data/reference/chemprop_cross_design_20261011/chemprop_45drug/spectra/sp
 OUT="data/validation/msv000095331_integrated_multiencoder_identity_run_${SLURM_JOB_ID}"
 SCRATCH="${SLURM_TMPDIR:-/tmp}/app_multi_encoder_${SLURM_JOB_ID}"
 
-if [[ -z "$UNIFIED_MODEL" || ! -f "$UNIFIED_MODEL" ]]; then
-  UNIFIED_MODEL="$(python - <<'PY'
-import json
-from pathlib import Path
-new=[]
-for report in Path('data/validation').glob(
-        'enveda_unified_candidate_integrator_run_*/modeling/report.json'):
-    try: body=json.loads(report.read_text())
-    except Exception: continue
-    model=report.parent/'unified_candidate_integrator.pt'
-    if body.get('status') == 'ENVEDA_UNIFIED_CANDIDATE_INTEGRATOR_META_DEVELOPMENT_COMPLETE' \
-            and model.is_file():
-        new.append(model)
-if new:
-    new.sort(key=lambda path:(path.stat().st_mtime_ns,str(path)))
-    print(new[-1])
-    raise SystemExit(0)
-matches = []
-for report in Path('data/validation').glob('massspecgym_unified_ranker_run_*/modeling/report.json'):
-    try:
-        body = json.loads(report.read_text())
-    except Exception:
-        continue
-    model = report.parent / 'selected_readout.pt'
-    if (body.get('status') == 'MASSSPECGYM_UNIFIED_CANDIDATE_RANKER_COMPLETE'
-            and body.get('selection_class') == 'full_embedding_integration'
-            and body.get('selection') in {'projected_cosine', 'embedding_pair'}
-            and model.is_file()):
-        matches.append(model)
-if not matches:
-    raise SystemExit('APP_UNIFIED_RANKER_MODEL_NOT_FOUND')
-matches.sort(key=lambda path: (path.stat().st_mtime_ns, str(path)))
-print(matches[-1])
-PY
-)"
+NOISE_EMBEDDING="$REUSE_EMBEDDING_ROOT/noise_v1_embeddings.npz"
+STAGE1_EMBEDDING="$REUSE_EMBEDDING_ROOT/chemaware_stage1_embeddings.npz"
+PHASEA_EMBEDDING="$REUSE_EMBEDDING_ROOT/chemaware_phase_a_embeddings.npz"
+FULLMSG_EMBEDDING="$REUSE_EMBEDDING_ROOT/noise_chemaware_fullmsg_embeddings.npz"
+REUSE_FROZEN_EMBEDDINGS=false
+if [[ -s "$NOISE_EMBEDDING" && -s "$STAGE1_EMBEDDING" \
+      && -s "$PHASEA_EMBEDDING" && -s "$FULLMSG_EMBEDDING" ]]; then
+  REUSE_FROZEN_EMBEDDINGS=true
 fi
 
 required=(
-  "$ARCH" "$NOISE" "$STAGE1" "$PHASEA" "$FULLMSG_CHEM" "$OFFICIAL" "$UNIFIED_MODEL"
+  "$ARCH" "$OFFICIAL" "$UNIFIED_MODEL"
   "$MGF_NEW" "$MGF_M1" "$MGF_23" "$MGF_45"
   "$IDENTITY_HANDOFF/complete_identity_candidate_pairs.tsv.gz"
   "$IDENTITY_HANDOFF/directional_query_registry.tsv.gz"
   "$IDENTITY_HANDOFF/wse_identity_inference_axis.npz"
-  tasks/prepare_official_embedding_checkpoint.py
   tasks/encode_crossstudy_mgfs_checkpoint.py
   tasks/massspecgym_embedding_readout_core.py
   tasks/enveda_unified_candidate_integrator_core.py
@@ -97,6 +72,14 @@ required=(
   tasks/score_crossstudy_identity_multiencoder.py
   tasks/test_crossstudy_identity_multiencoder.py
 )
+if [[ "$REUSE_FROZEN_EMBEDDINGS" == true ]]; then
+  required+=("$NOISE_EMBEDDING" "$STAGE1_EMBEDDING" "$PHASEA_EMBEDDING" "$FULLMSG_EMBEDDING")
+else
+  required+=(
+    "$NOISE" "$STAGE1" "$PHASEA" "$FULLMSG_CHEM"
+    tasks/prepare_official_embedding_checkpoint.py
+  )
+fi
 missing=()
 for path in "${required[@]}"; do
   [[ -s "$path" ]] || missing+=("$path")
@@ -115,6 +98,13 @@ except TypeError:
 print(body.get('schema','legacy_massspecgym_embedding_readout'))
 PY
 )"
+if [[ "$model_schema" == "enveda_unified_candidate_integrator_v1" \
+      && -z "$ENVEDA_INTEGRATOR_ARM" ]]; then
+  # The 23-feature learned Additive is the fixed cross-source deployment
+  # candidate.  The checkpoint's nonlinear primary remains available only
+  # when explicitly requested through ENVEDA_INTEGRATOR_ARM.
+  ENVEDA_INTEGRATOR_ARM="additive_linear_control"
+fi
 if [[ -n "$ENVEDA_INTEGRATOR_ARM" ]]; then
   python - "$UNIFIED_MODEL" "$ENVEDA_INTEGRATOR_ARM" <<'PY'
 import sys, torch
@@ -142,11 +132,6 @@ python -m py_compile \
   tasks/score_crossstudy_identity_multiencoder.py
 python -u tasks/test_crossstudy_identity_multiencoder.py
 
-python -u tasks/prepare_official_embedding_checkpoint.py \
-  --source "$STAGE1" --output "$SCRATCH/chemaware_stage1_slim.pt"
-python -u tasks/prepare_official_embedding_checkpoint.py \
-  --source "$PHASEA" --output "$SCRATCH/chemaware_phasea_slim.pt"
-
 study_args=(
   --study-mgf "MSV000095331=$MGF_NEW"
   --study-mgf "MSV000094899=$MGF_M1"
@@ -161,19 +146,32 @@ encode_one() {
     --encoder-name "$name" --output "$output" --device cuda --batch-size 128
 }
 
-encode_one noise_v1 "$NOISE" "$OUT/noise_v1_embeddings.npz"
-encode_one chemaware_stage1 "$SCRATCH/chemaware_stage1_slim.pt" "$OUT/chemaware_stage1_embeddings.npz"
-encode_one chemaware_phasea "$SCRATCH/chemaware_phasea_slim.pt" "$OUT/chemaware_phasea_embeddings.npz"
-encode_one noise_chemaware_fullmsg "$FULLMSG_CHEM" "$OUT/noise_chemaware_fullmsg_embeddings.npz"
-encode_one official_dreams "$OFFICIAL" "$OUT/official_dreams_embeddings.npz"
+if [[ "$REUSE_FROZEN_EMBEDDINGS" == true ]]; then
+  echo "APP_MULTI_ENCODER_REUSING_FROZEN_EMBEDDINGS: $REUSE_EMBEDDING_ROOT"
+else
+  python -u tasks/prepare_official_embedding_checkpoint.py \
+    --source "$STAGE1" --output "$SCRATCH/chemaware_stage1_slim.pt"
+  python -u tasks/prepare_official_embedding_checkpoint.py \
+    --source "$PHASEA" --output "$SCRATCH/chemaware_phasea_slim.pt"
+  NOISE_EMBEDDING="$OUT/noise_v1_embeddings.npz"
+  STAGE1_EMBEDDING="$OUT/chemaware_stage1_embeddings.npz"
+  PHASEA_EMBEDDING="$OUT/chemaware_phasea_embeddings.npz"
+  FULLMSG_EMBEDDING="$OUT/noise_chemaware_fullmsg_embeddings.npz"
+  encode_one noise_v1 "$NOISE" "$NOISE_EMBEDDING"
+  encode_one chemaware_stage1 "$SCRATCH/chemaware_stage1_slim.pt" "$STAGE1_EMBEDDING"
+  encode_one chemaware_phasea "$SCRATCH/chemaware_phasea_slim.pt" "$PHASEA_EMBEDDING"
+  encode_one noise_chemaware_fullmsg "$FULLMSG_CHEM" "$FULLMSG_EMBEDDING"
+fi
+OFFICIAL_EMBEDDING="$OUT/official_dreams_embeddings.npz"
+encode_one official_dreams "$OFFICIAL" "$OFFICIAL_EMBEDDING"
 
 score_args=(
   --identity-handoff "$IDENTITY_HANDOFF"
-  --embedding "noise_v1=$OUT/noise_v1_embeddings.npz"
-  --embedding "chemaware_stage1=$OUT/chemaware_stage1_embeddings.npz"
-  --embedding "chemaware_phasea=$OUT/chemaware_phasea_embeddings.npz"
-  --embedding "noise_chemaware_fullmsg=$OUT/noise_chemaware_fullmsg_embeddings.npz"
-  --baseline-embedding "official_dreams=$OUT/official_dreams_embeddings.npz"
+  --embedding "noise_v1=$NOISE_EMBEDDING"
+  --embedding "chemaware_stage1=$STAGE1_EMBEDDING"
+  --embedding "chemaware_phasea=$PHASEA_EMBEDDING"
+  --embedding "noise_chemaware_fullmsg=$FULLMSG_EMBEDDING"
+  --baseline-embedding "official_dreams=$OFFICIAL_EMBEDDING"
 )
 if [[ -s "$MSG_MODEL_ARTIFACT" && -s "$MSG_MODEL_REPORT" ]]; then
   score_args+=(--msg-fusion-model "$MSG_FUSION_MODEL")
@@ -194,11 +192,11 @@ python -u tasks/score_crossstudy_identity_multiencoder.py \
   --output-dir "$OUT/identity_scoring" --fragment-da 0.02
 
 sha256sum \
-  "$OUT/noise_v1_embeddings.npz" \
-  "$OUT/chemaware_stage1_embeddings.npz" \
-  "$OUT/chemaware_phasea_embeddings.npz" \
-  "$OUT/noise_chemaware_fullmsg_embeddings.npz" \
-  "$OUT/official_dreams_embeddings.npz" \
+  "$NOISE_EMBEDDING" \
+  "$STAGE1_EMBEDDING" \
+  "$PHASEA_EMBEDDING" \
+  "$FULLMSG_EMBEDDING" \
+  "$OFFICIAL_EMBEDDING" \
   "$OUT/identity_scoring/identity_candidate_scores.tsv.gz" \
   "$OUT/identity_scoring/method_scores_long.tsv.gz" \
   "$OUT/identity_scoring/directional_query_registry.tsv.gz" \

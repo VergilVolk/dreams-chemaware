@@ -26,6 +26,7 @@ from enveda_unified_candidate_integrator_core import (
     CHECKPOINT_SCHEMA as ENVEDA_INTEGRATOR_SCHEMA,
     PRIMARY_ARM as ENVEDA_PRIMARY_ARM,
     predict_from_payload as predict_enveda_integrator,
+    unavailable_chemaware,
 )
 from encode_pan_redu_panel_spectra import load_mgf
 from massspecgym_embedding_readout_core import (
@@ -489,14 +490,7 @@ def build_enveda_application_features(
             pairs["P2b_score"], errors="raise",
         ).to_numpy(np.float64),
     }
-    zeros = np.zeros(len(pairs), dtype=np.float64)
-    unavailable_chemistry = {
-        "chem_valid": np.zeros(len(pairs), dtype=bool),
-        "candidate_utility_correct": zeros.copy(),
-        "candidate_utility_zero": zeros.copy(),
-        "candidate_utility_reversed": zeros.copy(),
-        "candidate_utility_rotated": zeros.copy(),
-    }
+    unavailable_chemistry = unavailable_chemaware(len(pairs))
     return build_independent_scalar_features(
         evidence, graph, encoder_scores, "noise_v1", unavailable_chemistry,
         auxiliary_scores={MSG_FAMILY: msg},
@@ -515,6 +509,12 @@ def apply_enveda_unified_model(
         raise RuntimeError("Enveda integrator lacks candidate-evidence selection contract")
     if tuple(payload.get("encoder_names", ())) != tuple(REQUIRED_ENCODERS):
         raise RuntimeError("Enveda integrator encoder registry drifted")
+    if tuple(payload.get("optional_families", ())) != (
+        "chemaware_v2_continuous_null",
+    ) or payload.get("optional_v2_noop_helper") != (
+        "enveda_unified_candidate_integrator_core.unavailable_chemaware"
+    ):
+        raise RuntimeError("Enveda integrator V2-unavailable contract drifted")
     requested_arm = arm
     checkpoint_primary_arm = str(payload.get("primary_arm", ENVEDA_PRIMARY_ARM))
     arm = str(arm or checkpoint_primary_arm)
@@ -703,13 +703,7 @@ def apply_unified_model(
         "weighted_entropy": pd.to_numeric(selected_pairs["WSE_score"], errors="raise").to_numpy(float),
         "p2b_fused": pd.to_numeric(selected_pairs["P2b_score"], errors="raise").to_numpy(float),
     }
-    unavailable_chemistry = {
-        "chem_valid": np.zeros(len(selected_pairs), dtype=bool),
-        "candidate_utility_correct": np.zeros(len(selected_pairs), dtype=np.float64),
-        "candidate_utility_zero": np.zeros(len(selected_pairs), dtype=np.float64),
-        "candidate_utility_reversed": np.zeros(len(selected_pairs), dtype=np.float64),
-        "candidate_utility_rotated": np.zeros(len(selected_pairs), dtype=np.float64),
-    }
+    unavailable_chemistry = unavailable_chemaware(len(selected_pairs))
     selected_auxiliary = {
         name: np.asarray(supplied_auxiliary[name], dtype=np.float64)[selected_indices]
         for name in expected_auxiliary

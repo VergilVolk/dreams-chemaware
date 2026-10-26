@@ -185,6 +185,12 @@ def main() -> None:
         scalar, feature_names = build_enveda_application_features(
             selected, np.asarray([0, 2, 3]), msg_scores[[0, 1, 4]],
         )
+        v2_columns = [
+            index for index, name in enumerate(feature_names)
+            if name.startswith("chemaware_v2_")
+        ]
+        assert len(v2_columns) == 6
+        assert np.all(scalar[:, v2_columns] == 0)
         integrator_settings = IntegratorSettings(
             scalar_features=scalar.shape[1],
             anchor_index=feature_names.index("weighted_spectral_entropy"),
@@ -201,6 +207,10 @@ def main() -> None:
             "selection_class": "candidate_evidence_integration",
             "primary_arm": ENVEDA_PRIMARY_ARM,
             "encoder_names": REQUIRED_ENCODERS,
+            "optional_families": ("chemaware_v2_continuous_null",),
+            "optional_v2_noop_helper": (
+                "enveda_unified_candidate_integrator_core.unavailable_chemaware"
+            ),
             "scalar_feature_names": feature_names,
             "scalar_mean": np.zeros(scalar.shape[1], dtype=np.float32),
             "scalar_scale": np.ones(scalar.shape[1], dtype=np.float32),
@@ -341,6 +351,13 @@ def main() -> None:
             raise AssertionError("scalar control was accepted as unified deployment")
     assert scores.shape == (5,)
     assert provenance["chemaware_v2"].startswith("unavailable")
+    runner = Path(__file__).with_name(
+        "run_msv000095331_integrated_multiencoder_identity.sbatch"
+    ).read_text(encoding="utf-8")
+    assert "enveda_no_query_context_diagnostic_run_2413878" in runner
+    assert 'ENVEDA_INTEGRATOR_ARM="additive_linear_control"' in runner
+    assert "APP_MULTI_ENCODER_REUSING_FROZEN_EMBEDDINGS" in runner
+    assert "glob('enveda_unified_candidate_integrator_run_" not in runner
     print("PASS: cross-study identity multi-encoder contracts", flush=True)
 
 

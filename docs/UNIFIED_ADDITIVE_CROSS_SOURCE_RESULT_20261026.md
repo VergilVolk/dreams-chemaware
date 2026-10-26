@@ -25,30 +25,30 @@ external-generalization or SOTA claim.
 
 | Dataset and role | Queries | Official fine-tuned DreaMS | WSE | Additive | Nonlinear | Frozen B |
 |---|---:|---:|---:|---:|---:|---:|
-| Enveda identity, consumed fusion OOF | 25,000 | 53.100% | 73.028% | **77.616%** | 78.668% | 70.160% |
-| Enveda formula, consumed fusion OOF | 9,435 | 67.207% | 85.056% | **86.105%** | 86.900% | 82.830% |
-| GNPS identity, consumed fixed transfer | 10,995 | 85.357% | 87.367% | **88.231%** | 87.767% | 88.595% |
-| GNPS formula, consumed fixed transfer | 5,261 | 86.809% | 88.272% | **89.451%** | 88.842% | 89.850% |
+| Enveda identity, consumed fusion OOF | 25,000 | 53.100% | 73.028% | **77.592%** | 78.772% | 70.160% |
+| Enveda formula, consumed fusion OOF | 9,435 | 67.207% | 85.056% | **86.084%** | 86.953% | 82.830% |
+| GNPS identity, consumed fixed transfer | 10,995 | 85.357% | 87.367% | **88.249%** | 88.167% | 88.595% |
+| GNPS formula, consumed fixed transfer | 5,261 | 86.809% | 88.272% | **89.527%** | 89.413% | 89.850% |
 
 The official comparator above is the local official **fine-tuned embedding**
 checkpoint, not the unfine-tuned SSL backbone.
 
 The main transferable result is the Additive arm:
 
-- Enveda query-balanced unique-query Recall@1: 75.398% WSE to 79.336%
-  Additive, **+3.938 pp**.
-- Fixed Enveda-to-GNPS transfer: Additive exceeds WSE by **+0.864 pp** on
-  identity and **+1.179 pp** on formula.
+- Enveda query-balanced unique-query Recall@1: 75.398% WSE to 79.312%
+  Additive, **+3.914 pp**.
+- Fixed Enveda-to-GNPS transfer: Additive exceeds WSE by **+0.882 pp** on
+  identity and **+1.255 pp** on formula.
 - Relative to the official fine-tuned DreaMS comparator, Additive is
-  **+2.874 pp / +2.642 pp** on the two GNPS panels.
+  **+2.892 pp / +2.718 pp** on the two GNPS panels.
 
 Additive remains slightly below GNPS-trained B on GNPS, but the paired result
 does not establish a reliable loss:
 
 | GNPS panel | Additive - B | Corrected / introduced | Formula-cluster 95% CI |
 |---|---:|---:|---:|
-| identity, n=10,995 | -0.364 pp (-40 queries) | 248 / 288 | [-0.813, +0.091] pp |
-| formula, n=5,261 | -0.399 pp (-21 queries) | 142 / 163 | [-1.124, +0.338] pp |
+| identity, n=10,995 | -0.346 pp (-38 queries) | 248 / 286 | approximately [-0.812, +0.119] pp |
+| formula, n=5,261 | -0.323 pp (-17 queries) | 143 / 160 | approximately [-1.069, +0.414] pp |
 
 The reverse transfer is decisive in the other direction.  Frozen GNPS full-fit
 B, applied without retraining to Enveda, is below WSE by **-2.868 pp** on
@@ -102,10 +102,13 @@ are recorded in `UNIFIED_NO_QUERY_CONTEXT_DIAGNOSTIC_RESULT_20261026.md`.
 Application scoring with the already-fitted Additive arm:
 
 ```bash
-ENVEDA_INTEGRATOR_ARM=additive_linear_control \
-UNIFIED_RANKER_MODEL=data/validation/enveda_no_query_context_diagnostic_run_2413878/modeling/unified_candidate_integrator.pt \
 sbatch tasks/run_msv000095331_integrated_multiencoder_identity.sbatch
 ```
+
+The application script now defaults fail-closed to that exact checkpoint and
+the `additive_linear_control` arm. Environment overrides remain available for
+an explicitly named reproducibility run; it no longer silently selects the
+newest checkpoint in the directory.
 
 The completed cached nonlinear diagnostic was launched with:
 
