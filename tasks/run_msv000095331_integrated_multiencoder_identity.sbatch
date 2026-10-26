@@ -37,6 +37,7 @@ IDENTITY_HANDOFF="${IDENTITY_HANDOFF:-data/validation/msv000095331_complete_iden
 # Optional semicolon-separated NAME=PATH::COLUMN specifications.  They are
 # required only when the selected unified payload declares auxiliary families.
 UNIFIED_AUXILIARY_SCORE_SPECS="${UNIFIED_AUXILIARY_SCORE_SPECS:-}"
+ENVEDA_INTEGRATOR_ARM="${ENVEDA_INTEGRATOR_ARM:-}"
 MGF_NEW="data/reference/msv000095331_drug_microbiome_20261023/consensus.mgf"
 MGF_M1="data/reference/chemprop2_m1_20261011/consensus.mgf"
 MGF_23="data/reference/chemprop_cross_design_20261011/chemprop_23drug/spectra/specs_ms.mgf"
@@ -114,6 +115,19 @@ except TypeError:
 print(body.get('schema','legacy_massspecgym_embedding_readout'))
 PY
 )"
+if [[ -n "$ENVEDA_INTEGRATOR_ARM" ]]; then
+  python - "$UNIFIED_MODEL" "$ENVEDA_INTEGRATOR_ARM" <<'PY'
+import sys, torch
+try:
+    body = torch.load(sys.argv[1], map_location='cpu', weights_only=False)
+except TypeError:
+    body = torch.load(sys.argv[1], map_location='cpu')
+if body.get('schema') != 'enveda_unified_candidate_integrator_v1':
+    raise SystemExit('APP_ENVEDA_ARM_REQUIRES_ENVEDA_INTEGRATOR_CHECKPOINT')
+if sys.argv[2] not in body.get('arms', {}):
+    raise SystemExit(f'APP_ENVEDA_ARM_NOT_IN_CHECKPOINT: {sys.argv[2]}')
+PY
+fi
 if [[ "$model_schema" == "enveda_unified_candidate_integrator_v1" \
       && ( ! -s "$MSG_MODEL_ARTIFACT" || ! -s "$MSG_MODEL_REPORT" ) ]]; then
   echo "APP_UNIFIED_MSG_MODEL_MISSING: $MSG_FUSION_MODEL" >&2
@@ -169,6 +183,9 @@ if [[ -n "$UNIFIED_AUXILIARY_SCORE_SPECS" ]]; then
   for specification in "${auxiliary_specs[@]}"; do
     [[ -n "$specification" ]] && score_args+=(--auxiliary-score "$specification")
   done
+fi
+if [[ -n "$ENVEDA_INTEGRATOR_ARM" ]]; then
+  score_args+=(--enveda-integrator-arm "$ENVEDA_INTEGRATOR_ARM")
 fi
 
 python -u tasks/score_crossstudy_identity_multiencoder.py \

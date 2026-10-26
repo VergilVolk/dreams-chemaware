@@ -87,8 +87,6 @@ def main() -> None:
     payload = load_checkpoint(args.checkpoint)
     panels, panel_paths = _make_panels(args)
     feature_names = tuple(panels[PANELS[0]].feature_names)
-    if feature_names != tuple(payload.get("scalar_feature_names", ())):
-        raise RuntimeError("GNPS scalar feature contract differs from Enveda refit")
 
     method_scores: dict[str, dict[str, np.ndarray]] = {}
     for panel in PANELS:

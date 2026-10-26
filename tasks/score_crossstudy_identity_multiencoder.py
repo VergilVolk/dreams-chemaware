@@ -22,6 +22,7 @@ import torch
 import joblib
 
 from enveda_unified_candidate_integrator_core import (
+    ARMS as ENVEDA_INTEGRATOR_ARMS,
     CHECKPOINT_SCHEMA as ENVEDA_INTEGRATOR_SCHEMA,
     PRIMARY_ARM as ENVEDA_PRIMARY_ARM,
     predict_from_payload as predict_enveda_integrator,
@@ -507,15 +508,20 @@ def apply_enveda_unified_model(
     pairs: pd.DataFrame, payload: dict, model_path: Path, device: torch.device,
     query_ptr: np.ndarray, query_ids: np.ndarray,
     auxiliary_scores: dict[str, np.ndarray] | None,
+    arm: str | None = None,
 ) -> tuple[np.ndarray, dict[str, object]]:
     """Apply the consumed-Enveda scalar integrator to the fixed application axis."""
     if payload.get("selection_class") != "candidate_evidence_integration":
         raise RuntimeError("Enveda integrator lacks candidate-evidence selection contract")
     if tuple(payload.get("encoder_names", ())) != tuple(REQUIRED_ENCODERS):
         raise RuntimeError("Enveda integrator encoder registry drifted")
-    arm = str(payload.get("primary_arm", ENVEDA_PRIMARY_ARM))
-    if arm != ENVEDA_PRIMARY_ARM:
-        raise RuntimeError("Enveda integrator primary-arm contract drifted")
+    requested_arm = arm
+    checkpoint_primary_arm = str(payload.get("primary_arm", ENVEDA_PRIMARY_ARM))
+    arm = str(arm or checkpoint_primary_arm)
+    if arm not in ENVEDA_INTEGRATOR_ARMS:
+        raise RuntimeError(f"unknown Enveda integrator arm requested: {arm}")
+    if arm not in payload.get("arms", {}):
+        raise RuntimeError(f"Enveda integrator checkpoint does not contain requested arm: {arm}")
     supplied = auxiliary_scores or {}
     if set(supplied) != {MSG_FAMILY}:
         raise RuntimeError(
@@ -563,6 +569,8 @@ def apply_enveda_unified_model(
         "model_path": str(model_path),
         "model_sha256": sha256(model_path),
         "arm": arm,
+        "checkpoint_primary_arm": checkpoint_primary_arm,
+        "arm_selection_source": "explicit_cli" if requested_arm is not None else "checkpoint_primary",
         "selection_class": str(payload["selection_class"]),
         "encoder_names": list(REQUIRED_ENCODERS),
         "auxiliary_family_names": [MSG_FAMILY],
@@ -583,6 +591,7 @@ def apply_unified_model(
     pairs: pd.DataFrame, caches: dict[str, dict[str, np.ndarray]], model_path: Path,
     device: torch.device, query_ptr: np.ndarray, query_ids: np.ndarray,
     auxiliary_scores: dict[str, np.ndarray] | None = None,
+    enveda_integrator_arm: str | None = None,
 ) -> tuple[np.ndarray, dict[str, object]]:
     """Apply a selected MassSpecGym ranker on fixed composite query blocks."""
     try:
@@ -592,7 +601,11 @@ def apply_unified_model(
     if payload.get("schema") == ENVEDA_INTEGRATOR_SCHEMA:
         return apply_enveda_unified_model(
             pairs, payload, model_path, device, query_ptr, query_ids,
-            auxiliary_scores,
+            auxiliary_scores, arm=enveda_integrator_arm,
+        )
+    if enveda_integrator_arm is not None:
+        raise RuntimeError(
+            "--enveda-integrator-arm is only valid for an Enveda candidate-integrator checkpoint"
         )
     settings = ReadoutSettings(**payload["settings"])
     encoder_names = tuple(payload["encoder_names"])
@@ -789,6 +802,13 @@ def main() -> None:
         help="Frozen Noise-MSG fusion_model directory (or fusion_model.joblib)",
     )
     parser.add_argument("--unified-model", type=Path)
+    parser.add_argument(
+        "--enveda-integrator-arm", choices=ENVEDA_INTEGRATOR_ARMS,
+        help=(
+            "Explicit arm from an Enveda candidate-integrator checkpoint. "
+            "Omit to preserve the checkpoint's predeclared primary arm."
+        ),
+    )
     parser.add_argument("--device", default="cuda")
     args = parser.parse_args()
     if args.output_dir.exists():
@@ -931,6 +951,7 @@ def main() -> None:
         pairs["unified_candidate_ranker_score"], unified_provenance = apply_unified_model(
             pairs, caches, args.unified_model, device, query_ptr, query_ids,
             auxiliary_scores=auxiliary_scores,
+            enveda_integrator_arm=args.enveda_integrator_arm,
         )
     args.output_dir.mkdir(parents=True)
     compression = {"method": "gzip", "mtime": 0}

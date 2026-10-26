@@ -12,6 +12,7 @@ import tempfile
 
 from enveda_unified_candidate_integrator_core import (
     CHECKPOINT_SCHEMA as ENVEDA_INTEGRATOR_SCHEMA,
+    CONTROL_ARM as ENVEDA_CONTROL_ARM,
     PRIMARY_ARM as ENVEDA_PRIMARY_ARM,
     CandidateEvidenceIntegrator, IntegratorSettings,
 )
@@ -192,6 +193,9 @@ def main() -> None:
         integrator = CandidateEvidenceIntegrator(
             ENVEDA_PRIMARY_ARM, integrator_settings,
         )
+        additive = CandidateEvidenceIntegrator(
+            ENVEDA_CONTROL_ARM, integrator_settings,
+        )
         enveda_payload = {
             "schema": ENVEDA_INTEGRATOR_SCHEMA,
             "selection_class": "candidate_evidence_integration",
@@ -202,7 +206,10 @@ def main() -> None:
             "scalar_scale": np.ones(scalar.shape[1], dtype=np.float32),
             "anchor_index": integrator_settings.anchor_index,
             "hidden": integrator_settings.hidden,
-            "arms": {ENVEDA_PRIMARY_ARM: integrator.state_dict()},
+            "arms": {
+                ENVEDA_PRIMARY_ARM: integrator.state_dict(),
+                ENVEDA_CONTROL_ARM: additive.state_dict(),
+            },
         }
         enveda_path = Path(raw) / "enveda_integrator.pt"
         torch.save(enveda_payload, enveda_path)
@@ -213,9 +220,36 @@ def main() -> None:
         assert np.isfinite(enveda_scores[[0, 1, 4]]).all()
         assert np.isnan(enveda_scores[[2, 3]]).all()
         assert enveda_report["schema"] == ENVEDA_INTEGRATOR_SCHEMA
+        assert enveda_report["arm"] == ENVEDA_PRIMARY_ARM
+        assert enveda_report["arm_selection_source"] == "checkpoint_primary"
         assert enveda_report["scored_queries"] == 2
         assert "availability_0_continuous_0" in enveda_report["chemaware_v2"]
         assert enveda_report["bioaware"].startswith("not_supplied")
+        additive_scores, additive_report = apply_unified_model(
+            pairs, {}, enveda_path, torch.device("cpu"), query_ptr, query_ids,
+            auxiliary_scores={MSG_FAMILY: msg_scores},
+            enveda_integrator_arm=ENVEDA_CONTROL_ARM,
+        )
+        assert np.isfinite(additive_scores[[0, 1, 4]]).all()
+        assert np.isnan(additive_scores[[2, 3]]).all()
+        assert additive_report["arm"] == ENVEDA_CONTROL_ARM
+        assert additive_report["checkpoint_primary_arm"] == ENVEDA_PRIMARY_ARM
+        assert additive_report["arm_selection_source"] == "explicit_cli"
+        missing_additive = dict(enveda_payload)
+        missing_additive["arms"] = {ENVEDA_PRIMARY_ARM: integrator.state_dict()}
+        missing_additive_path = Path(raw) / "enveda_primary_only.pt"
+        torch.save(missing_additive, missing_additive_path)
+        try:
+            apply_unified_model(
+                pairs, {}, missing_additive_path, torch.device("cpu"),
+                query_ptr, query_ids,
+                auxiliary_scores={MSG_FAMILY: msg_scores},
+                enveda_integrator_arm=ENVEDA_CONTROL_ARM,
+            )
+        except RuntimeError as error:
+            assert "does not contain requested arm" in str(error)
+        else:
+            raise AssertionError("missing requested Enveda arm must fail closed")
         try:
             apply_unified_model(
                 pairs, {}, enveda_path, torch.device("cpu"), query_ptr, query_ids,

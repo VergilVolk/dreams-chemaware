@@ -15,6 +15,7 @@ import torch
 from enveda_unified_candidate_integrator_core import (
     CHECKPOINT_SCHEMA,
     CONTROL_ARM,
+    NO_QUERY_CONSTANT_CONTEXT_POLICY,
     PRIMARY_ARM,
     CandidateEvidenceIntegrator,
     IntegratorSettings,
@@ -22,6 +23,7 @@ from enveda_unified_candidate_integrator_core import (
     formula_fold,
     occurrence_weights,
     predict_from_payload,
+    query_constant_context_names,
     transform_features,
     unavailable_chemaware,
     validate_global_query_formula,
@@ -31,7 +33,8 @@ from enveda_unified_candidate_integrator_core import (
 from gnps_pair_score_cache import write_pair_score_cache
 from evaluate_enveda_integrator_on_gnps import main as evaluator_main
 from train_enveda_unified_candidate_integrator import (
-    PANELS, SCORE_METHODS, _group_occurrences, _make_panels, main as trainer_main,
+    PANELS, SCORE_METHODS, _apply_feature_policy, _group_occurrences,
+    _make_panels, main as trainer_main,
 )
 
 
@@ -248,6 +251,37 @@ def main() -> None:
     else:
         raise AssertionError("feature-order drift must fail closed")
 
+    full_names = (
+        "weighted_spectral_entropy", "query_molecules",
+        "chemaware_stage1_top_gap", "chemaware_v2_delta_top_gap",
+    )
+    excluded = query_constant_context_names(full_names)
+    assert excluded == ("query_molecules", "chemaware_stage1_top_gap")
+    selected_names = (
+        "weighted_spectral_entropy", "chemaware_v2_delta_top_gap",
+    )
+    selected_settings = IntegratorSettings(
+        scalar_features=2, anchor_index=0, hidden=4,
+    )
+    selected_model = CandidateEvidenceIntegrator(PRIMARY_ARM, selected_settings)
+    diagnostic_payload = {
+        "schema": CHECKPOINT_SCHEMA,
+        "scalar_feature_names": selected_names,
+        "feature_selection_policy": NO_QUERY_CONSTANT_CONTEXT_POLICY,
+        "excluded_scalar_feature_names": excluded,
+        "scalar_mean": np.zeros(2, dtype=np.float32),
+        "scalar_scale": np.ones(2, dtype=np.float32),
+        "anchor_index": 0,
+        "hidden": 4,
+        "arms": {PRIMARY_ARM: selected_model.state_dict()},
+    }
+    full_values = np.asarray([[0.3, 4.0, 0.2, -0.1]], dtype=np.float32)
+    diagnostic = predict_from_payload(diagnostic_payload, full_names, full_values)
+    direct_diagnostic = selected_model(
+        torch.as_tensor(full_values[:, [0, 3]]),
+    ).detach().numpy()
+    assert np.allclose(diagnostic, direct_diagnostic)
+
     with tempfile.TemporaryDirectory(prefix="enveda_integrator_contract_") as raw:
         fixture = _write_loader_fixture(Path(raw))
         comparator = Path(raw) / "candidate_predictions.npz"
@@ -272,6 +306,13 @@ def main() -> None:
         assert "weighted_spectral_entropy" in panels["identity_disjoint"].feature_names
         assert "chemaware_v2_available" in panels["identity_disjoint"].feature_names
         assert "B_gnps_nested_oof" in panels["identity_disjoint"].scores
+        diagnostic_panels, _ = _make_panels(fixture)
+        policy, excluded_names = _apply_feature_policy(diagnostic_panels, True)
+        assert policy == NO_QUERY_CONSTANT_CONTEXT_POLICY
+        assert len(excluded_names) == 31
+        assert len(diagnostic_panels["identity_disjoint"].feature_names) == 23
+        assert "weighted_spectral_entropy" in diagnostic_panels["identity_disjoint"].feature_names
+        assert "chemaware_v2_delta_top_gap" in diagnostic_panels["identity_disjoint"].feature_names
         drifted = Path(raw) / "candidate_predictions_drifted.npz"
         _write_comparator_archive(
             drifted, fixture.benchmark, drift_candidate_axis=True,

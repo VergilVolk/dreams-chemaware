@@ -22,6 +22,59 @@ PRIMARY_ARM = "nonlinear_reliability"
 CONTROL_ARM = "additive_linear_control"
 ARMS = (PRIMARY_ARM, CONTROL_ARM)
 CHECKPOINT_SCHEMA = "enveda_unified_candidate_integrator_v1"
+FULL_FEATURE_POLICY = "full_reliability_context_v1"
+NO_QUERY_CONSTANT_CONTEXT_POLICY = "exclude_query_constant_context_v1"
+
+
+def query_constant_context_names(feature_names: Iterable[str]) -> tuple[str, ...]:
+    """Return reliability/context columns constant inside a query block.
+
+    The ChemAware masked top-gap is deliberately excluded: it is zero on
+    unavailable candidates and can therefore vary within a query.  This
+    registry is used only by the one predeclared nonlinear diagnostic.
+    """
+    exact = {"query_molecules", "query_edges", "log_query_edges"}
+    output = []
+    for raw in feature_names:
+        name = str(raw)
+        if (
+            name in exact
+            or (name.startswith("reliability_") and name.endswith("_top1_agree"))
+            or (name.endswith("_top_gap") and name != "chemaware_v2_delta_top_gap")
+        ):
+            output.append(name)
+    return tuple(output)
+
+
+def features_for_payload(
+    payload: dict,
+    feature_names: Iterable[str],
+    scalar_features: np.ndarray,
+) -> tuple[tuple[str, ...], np.ndarray]:
+    """Align full inference features to an explicitly saved feature policy.
+
+    Ordinary checkpoints remain fail-closed on feature drift.  The sole
+    exception is a checkpoint that records the no-query-context diagnostic
+    policy and its exact excluded-feature registry.
+    """
+    observed = tuple(map(str, feature_names))
+    expected = tuple(map(str, payload.get("scalar_feature_names", ())))
+    values = np.asarray(scalar_features, dtype=np.float32)
+    if values.ndim != 2 or values.shape[1] != len(observed):
+        raise RuntimeError("deployment scalar feature axis is malformed")
+    if observed == expected:
+        return observed, values
+    if payload.get("feature_selection_policy") != NO_QUERY_CONSTANT_CONTEXT_POLICY:
+        raise RuntimeError("deployment scalar feature contract drifted")
+    excluded = tuple(map(str, payload.get("excluded_scalar_feature_names", ())))
+    if excluded != query_constant_context_names(observed):
+        raise RuntimeError("diagnostic excluded-feature registry drifted")
+    excluded_set = set(excluded)
+    keep = [index for index, name in enumerate(observed) if name not in excluded_set]
+    selected = tuple(observed[index] for index in keep)
+    if selected != expected:
+        raise RuntimeError("diagnostic scalar feature contract drifted")
+    return selected, values[:, keep]
 
 
 def unavailable_chemaware(candidate_count: int) -> dict[str, np.ndarray]:
@@ -285,12 +338,12 @@ def predict_from_payload(
     device: torch.device | str = "cpu",
 ) -> np.ndarray:
     """Use the exact saved training transform for GNPS or application inference."""
-    observed = tuple(map(str, feature_names))
+    observed, selected = features_for_payload(payload, feature_names, scalar_features)
     expected = tuple(map(str, payload.get("scalar_feature_names", ())))
     if observed != expected:
         raise RuntimeError("deployment scalar feature contract drifted")
     transformed = transform_features(
-        scalar_features,
+        selected,
         np.asarray(payload["scalar_mean"], dtype=np.float32),
         np.asarray(payload["scalar_scale"], dtype=np.float32),
     )

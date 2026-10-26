@@ -11,7 +11,9 @@ total weight one.
 The predeclared primary is one small nonlinear reliability head.  A linear
 additive head with identical scalar inputs is a capacity-lower comparator,
 not a capacity-matched mechanism proof; the OOF table is not used to choose
-between architectures.
+between architectures inside this experiment.  Both fitted arms remain in
+the checkpoint so a later, explicitly declared development decision can
+deploy either arm without retraining or changing the candidate axis.
 """
 from __future__ import annotations
 
@@ -33,6 +35,8 @@ from enveda_unified_candidate_integrator_core import (
     ARMS,
     CHECKPOINT_SCHEMA,
     CONTROL_ARM,
+    FULL_FEATURE_POLICY,
+    NO_QUERY_CONSTANT_CONTEXT_POLICY,
     PRIMARY_ARM,
     CandidateEvidenceIntegrator,
     IntegratorSettings,
@@ -40,6 +44,7 @@ from enveda_unified_candidate_integrator_core import (
     fit_weighted_normalization,
     formula_fold,
     occurrence_weights,
+    query_constant_context_names,
     transform_features,
     validate_global_query_formula,
     weighted_listwise_loss,
@@ -120,6 +125,13 @@ def arguments() -> argparse.Namespace:
     parser.add_argument("--weight-decay", type=float, default=1e-4)
     parser.add_argument("--anchor-strength", type=float, default=1e-2)
     parser.add_argument("--bootstrap-resamples", type=int, default=10_000)
+    parser.add_argument(
+        "--exclude-query-constant-context", action="store_true",
+        help=(
+            "Run the single predeclared nonlinear diagnostic without the 31 "
+            "query-constant reliability/context columns. No other setting changes."
+        ),
+    )
     parser.add_argument(
         "--device", default="cuda" if torch.cuda.is_available() else "cpu",
     )
@@ -475,6 +487,39 @@ def _occurrences(panels: dict[str, PanelData]) -> list[tuple[str, int]]:
     ]
 
 
+def _apply_feature_policy(
+    panels: dict[str, PanelData], exclude_query_constant_context: bool,
+) -> tuple[str, tuple[str, ...]]:
+    """Apply the one fixed query-context diagnostic before any fitting."""
+    if not exclude_query_constant_context:
+        return FULL_FEATURE_POLICY, ()
+    names = tuple(panels[PANELS[0]].feature_names)
+    excluded = query_constant_context_names(names)
+    if len(excluded) != 31:
+        raise RuntimeError(
+            f"query-constant diagnostic expected 31 columns, found {len(excluded)}"
+        )
+    excluded_set = set(excluded)
+    keep = np.asarray([name not in excluded_set for name in names], dtype=bool)
+    retained = tuple(name for name in names if name not in excluded_set)
+    if WSE not in retained or len(retained) != len(names) - 31:
+        raise RuntimeError("query-constant diagnostic feature contract is malformed")
+    for panel in panels.values():
+        if tuple(panel.feature_names) != names:
+            raise RuntimeError("panel feature contracts drifted before diagnostic filtering")
+        for feature in excluded:
+            column = panel.scalar[:, names.index(feature)]
+            for left, right in zip(panel.query_ptr[:-1], panel.query_ptr[1:]):
+                block = column[int(left):int(right)]
+                if not np.all(block == block[0]):
+                    raise RuntimeError(
+                        f"declared query-constant feature varies within {panel.name}: {feature}"
+                    )
+        panel.scalar = panel.scalar[:, keep]
+        panel.feature_names = retained
+    return NO_QUERY_CONSTANT_CONTEXT_POLICY, excluded
+
+
 def _group_occurrences(
     panels: dict[str, PanelData], occurrences: list[tuple[str, int]],
 ) -> list[list[tuple[str, int]]]:
@@ -750,6 +795,9 @@ def main() -> None:
     if args.device.startswith("cuda") and not torch.cuda.is_available():
         raise RuntimeError("CUDA requested but unavailable")
     panels, panel_paths = _make_panels(args)
+    feature_policy, excluded_feature_names = _apply_feature_policy(
+        panels, args.exclude_query_constant_context,
+    )
     feature_names = panels[PANELS[0]].feature_names
     anchor_index = feature_names.index(WSE)
     occurrences = _occurrences(panels)
@@ -879,6 +927,8 @@ def main() -> None:
                 WSE, "p2b_noise_v1_frozen", MSG, "chemaware_v2_continuous_null",
             ),
             "scalar_feature_names": feature_names,
+            "feature_selection_policy": feature_policy,
+            "excluded_scalar_feature_names": excluded_feature_names,
             "scalar_mean": final_mean,
             "scalar_scale": final_scale,
             "reliability_context": True,
@@ -953,8 +1003,8 @@ def main() -> None:
             "primary_model": PRIMARY_ARM,
             "control_model": CONTROL_ARM,
             "architecture_selection": (
-                "primary nonlinear arm predeclared before OOF; additive arm is a non-promotable "
-                "capacity-lower comparator, not a capacity-matched mechanism proof; no OOF arm picking"
+                "primary nonlinear arm predeclared before OOF; additive arm is a capacity-lower "
+                "comparator, not a capacity-matched mechanism proof; no arm picking inside this OOF run"
             ),
             "panels": panel_reports,
             "query_balanced_joint": joint,
@@ -984,7 +1034,9 @@ def main() -> None:
                 "encoder_names": list(ENCODERS),
                 "auxiliary_families": [WSE, "p2b_noise_v1_frozen", MSG, "chemaware_v2_continuous_null"],
                 "scalar_feature_names": list(feature_names),
-                "reliability_context": True,
+                "feature_selection_policy": feature_policy,
+                "excluded_scalar_feature_names": list(excluded_feature_names),
+                "reliability_context": not args.exclude_query_constant_context,
                 "p2b_input_once": True,
                 "msg_input_once_as_frozen_composite": True,
                 "official_models_are_comparators_only": True,
