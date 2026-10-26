@@ -41,7 +41,8 @@ STAGE1="${CHEMAWARE_STAGE1_CHECKPOINT:-data/validation/chemaware_high_coverage_n
 PHASEA="${CHEMAWARE_PHASEA_CHECKPOINT:-data/validation/chemaware_online_role_budget_native/run_2345481/phasea_reproduction_gate/chemaware_phasea_max_boundary_step2000.ckpt}"
 FULLMSG="${NOISE_CHEMAWARE_FULLMSG_CHECKPOINT:-data/validation/noise_chemaware_full_massspecgym_native/run_2401890/checkpoint/noise_chemaware_fullmsg_slim.pt}"
 RULE_LIBRARY="${CHEMAWARE_RULE_LIBRARY:-dreams/models/chem_aware/chem_rules_data.json}"
-POLICY_DIR="${CHEMAWARE_V2_POLICY_DIR:-data/validation/chemaware_multinull_deployment_safe_full_20260919}"
+POLICY_DIR="${CHEMAWARE_V2_POLICY_DIR:-data/validation/massspecgym_unified_ranker_run_2409612/rebuilt_multinull_v2_policy}"
+V2_POLICY_SHA256="${CHEMAWARE_V2_POLICY_SHA256:-dc9d76dc439fca40db88e3a95ca33e6b59438a92e6a80080d8df77e4615e5a4a}"
 MSG_MODEL_DIR="${NOISE_MSG_FUSION_MODEL:-data/validation/noise_msg_fusion_run_2349961/fusion_model}"
 GNPS_MSG="${NOISE_MSG_GNPS_CACHE:-data/validation/noise_msg_fusion_run_2349961/gnps_fusion_scores}"
 OFFICIAL_MSG_SLIM="${OFFICIAL_MASSSPECGYM_SLIM:-}"
@@ -70,15 +71,40 @@ PY
 fi
 
 if [[ ! -s "$POLICY_DIR/truthblind_policy.joblib" || ! -s "$POLICY_DIR/report.json" ]]; then
-  POLICY_DIR="$(python - <<'PY'
+  POLICY_DIR="$(python - "$V2_POLICY_SHA256" <<'PY'
+import hashlib
+import json
 from pathlib import Path
+import sys
+
+import joblib
+
+expected_hash = sys.argv[1]
+expected_controls = (
+    'rule_response_content_permuted',
+    'rule_response_content_permuted_b',
+    'rule_response_content_permuted_c',
+)
 matches=[]
 for policy in Path('data/validation').glob('**/truthblind_policy.joblib'):
-    if (policy.parent/'report.json').is_file(): matches.append(policy.parent)
-if len(matches) != 1:
-    detail='\n'.join(map(str,matches)) or '<none>'
-    raise SystemExit(f'ENVEDA_UNIFIED_V2_POLICY_AMBIGUOUS: expected one fallback, found {len(matches)}\n{detail}')
-print(matches[0])
+    report_path = policy.parent / 'report.json'
+    if not report_path.is_file():
+        continue
+    digest = hashlib.sha256(policy.read_bytes()).hexdigest()
+    report = json.loads(report_path.read_text(encoding='utf-8'))
+    if digest != expected_hash or report.get('frozen_truthblind_policy', {}).get('sha256') != digest:
+        continue
+    payload = joblib.load(policy)
+    if payload.get('schema') != 'chemaware_truthblind_candidate_policy_v1':
+        continue
+    if tuple(payload.get('control_rule_keys', ())) != expected_controls:
+        continue
+    matches.append(policy.parent)
+if not matches:
+    raise SystemExit(f'ENVEDA_UNIFIED_EXACT_V2_POLICY_NOT_FOUND: sha256={expected_hash}')
+# Multiple recovered copies with the same byte hash are the same frozen model,
+# not competing policies.  Choose a deterministic path without inspecting data.
+print(sorted(matches, key=str)[0])
 PY
 )"
 fi
@@ -157,7 +183,8 @@ fi
 # Fail before any GPU encoding if a reusable policy, model, score bundle or
 # candidate graph is not the exact frozen family declared above.
 python - "$ENVEDA" "$ENVEDA_LAYER" "$GNPS" "$GNPS_BASE" \
-  "$GNPS_BASE_SHA256" "$GNPS_MSG" "$MSG_MODEL_DIR" "$POLICY_DIR" "$RULE_LIBRARY" <<'PY'
+  "$GNPS_BASE_SHA256" "$GNPS_MSG" "$MSG_MODEL_DIR" "$POLICY_DIR" \
+  "$V2_POLICY_SHA256" "$RULE_LIBRARY" <<'PY'
 import argparse
 import hashlib
 import json
@@ -171,8 +198,8 @@ from export_chemaware_v2_grand_fusion_scores import _load_policy
 from gnps_pair_score_cache import load_pair_score_cache
 from noise_msg_pair_evidence_core import MOLECULE_FEATURES
 
-enveda, layer, gnps, gnps_base, expected_gnps_sha, gnps_msg, msg_model, policy_dir, rules = (
-    Path(value) if index != 4 else value
+enveda, layer, gnps, gnps_base, expected_gnps_sha, gnps_msg, msg_model, policy_dir, expected_policy_sha, rules = (
+    Path(value) if index not in (4, 8) else value
     for index, value in enumerate(sys.argv[1:])
 )
 
@@ -226,7 +253,8 @@ if tuple(msg_payload.get('feature_names', ())) != tuple(MOLECULE_FEATURES):
     raise SystemExit('ENVEDA_UNIFIED_MSG_FEATURE_CONTRACT_MISMATCH')
 
 policy_args = argparse.Namespace(
-    policy_dir=policy_dir, rule_library=rules, expected_policy_sha256='',
+    policy_dir=policy_dir, rule_library=rules,
+    expected_policy_sha256=expected_policy_sha,
 )
 policy, _, _ = _load_policy(policy_args)
 expected_controls = (
