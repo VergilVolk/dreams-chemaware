@@ -38,7 +38,16 @@ def test_action_transfer_preserves_selector_and_tracks_effect() -> None:
         query = np.asarray(scored["query"] if "query" in scored else [0, 1, 2])
         selected = np.asarray([1, 1, 0], dtype=np.int16)[query]
         abstained = np.asarray([False, False, True])[query]
-        return {"selected_candidate": selected, "abstained": abstained}
+        valid = np.ones((len(query), 2), dtype=bool)
+        benefit_residual = np.asarray([[.1, .3], [.2, .4], [.5, .1]], dtype=float)[query]
+        harm_residual = np.asarray([[.0, .1], [.1, .0], [.2, .1]], dtype=float)[query]
+        utility = benefit_residual - 2.0 * harm_residual
+        return {
+            "selected_candidate": selected, "abstained": abstained,
+            "valid": valid, "utility": utility,
+            "benefit_residual": benefit_residual,
+            "harm_residual": harm_residual,
+        }
 
     old_score = exporter.score_queries_truthblind
     old_predict = exporter.predict_truthblind_policy
@@ -47,7 +56,7 @@ def test_action_transfer_preserves_selector_and_tracks_effect() -> None:
     try:
         scores, counts, ledger = exporter._promote_frozen_actions(
             body=body,
-            policy={"control_rule_keys": []},
+            policy={"control_rule_keys": [], "dose": 1.0, "risk_penalty": 2.0},
             cache=object(),
             official=np.empty((0, 0), dtype=np.float32),
             row_position={},
@@ -71,6 +80,11 @@ def test_action_transfer_preserves_selector_and_tracks_effect() -> None:
     assert ledger["selected_candidate"].tolist() == [1, 1, -1]
     assert ledger["changed_deployment_top1"].tolist() == [True, False, False]
     assert ledger["output_top_candidate"].tolist() == [1, 1, 0]
+    assert ledger["candidate_valid"].all()
+    assert np.allclose(
+        ledger["candidate_chemical_residual"],
+        [.1, .1, 0.0, .4, .1, -.1],
+    )
     assert scores[1] > scores[0]
     assert np.array_equal(scores[2:4], deployment[2:4])
     assert np.array_equal(scores[4:], deployment[4:])

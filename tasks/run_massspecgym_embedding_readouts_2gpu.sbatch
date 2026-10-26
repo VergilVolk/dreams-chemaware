@@ -1,7 +1,8 @@
 #!/bin/bash
 # Unified ranker mainline: encode four existing checkpoints, combine WSE,
 # Noise, frozen P2b, ChemAware V2 and complete embedding geometry, then select
-# one capacity-controlled candidate ranker on MassSpecGym alone.
+# one capacity-controlled candidate ranker on MassSpecGym alone. Full-vector
+# and scalar implementations compete fairly inside this one architecture.
 #SBATCH --job-name=unified_ranker
 #SBATCH --partition=gpu
 #SBATCH --gpus=2
@@ -34,6 +35,9 @@ PHASEA="${CHEMAWARE_PHASEA_CHECKPOINT:-data/validation/chemaware_online_role_bud
 FULLMSG_RUN="${FULLMSG_RUN:-data/validation/noise_chemaware_full_massspecgym_native/run_2401890}"
 FULLMSG="${FULLMSG_CHECKPOINT:-$FULLMSG_RUN/checkpoint/noise_chemaware_fullmsg_slim.pt}"
 EVIDENCE="${MSG_PAIR_EVIDENCE:-data/validation/noise_msg_fusion_run_2349961/evidence}"
+MSG_MODEL_DIR="${NOISE_MSG_FUSION_MODEL:-data/validation/noise_msg_fusion_run_2349961/fusion_model}"
+MSG_GNPS="${NOISE_MSG_GNPS_CACHE:-data/validation/noise_msg_fusion_run_2349961/gnps_fusion_scores}"
+B_PREDICTIONS="${B_GNPS_OOF_PREDICTIONS:-data/validation/B_dual_encoder_multireranker_run_2400157/modeling_nested_oof/candidate_predictions.npz}"
 CHEM_EVIDENCE="${CHEMAWARE_V2_MSG_EVIDENCE:-}"
 OUT="data/validation/massspecgym_unified_ranker_run_${SLURM_JOB_ID}"
 SCRATCH_BASE="${SLURM_TMPDIR:-/tmp}"
@@ -45,6 +49,9 @@ RULE_LIBRARY="${CHEMAWARE_RULE_LIBRARY:-dreams/models/chem_aware/chem_rules_data
 GNPS="${GNPS_BENCHMARK:-data/validation/gnps_gold_silver_10ppm_benchmark_v1}"
 GNPS_BASE_SCORES="${GNPS_SCORE_BUNDLE:-data/validation/noise_gnps_article_benchmark_run_2349091/method_scores.npz}"
 GNPS_CHEM_DIR="${GNPS_CONTINUOUS_CHEM_DIR:-data/validation/wse_conditional_residual_run_2376648/continuous_chem_evidence}"
+OFFICIAL_MSG_URL="https://huggingface.co/roman-bushuiev/DreaMS/resolve/c81a62766b10dd1d39fcda3edec5ef88623e5f6b/embedding_model_massspecgym.ckpt"
+OFFICIAL_MSG_SHA256="d9b4e8b920ff367370c5a3fa154eaa951f90bafa58d5224a594424d9c54b1832"
+OFFICIAL_MSG_SLIM_INPUT="${OFFICIAL_MASSSPECGYM_SLIM:-}"
 
 # Historical evidence is large and expensive, but already computed.  If the
 # canonical path moved, select the newest file-level artifact that declares the
@@ -74,6 +81,48 @@ print(matches[-1])
 PY
 )"
   echo "Reusing relocated scalar evidence: $EVIDENCE"
+fi
+
+# Reuse the historical MSG expert as one complete reranker family.  Discover
+# only artifact roots, never child score files (the latter caused the earlier
+# four-candidate ambiguity).
+if [[ ! -f "$MSG_MODEL_DIR/oof_pair_scores.npz" || ! -f "$MSG_GNPS/report.json" ]]; then
+  MSG_RUN="$(python - <<'PY'
+import json
+from pathlib import Path
+matches = []
+for report in Path('data/validation').glob('noise_msg_fusion_run_*/fusion_model/report.json'):
+    try:
+        body = json.loads(report.read_text(encoding='utf-8'))
+    except Exception:
+        continue
+    root = report.parent.parent
+    if (body.get('status') == 'NOISE_MSG_FUSION_FROZEN'
+            and (root / 'fusion_model/oof_pair_scores.npz').is_file()
+            and (root / 'gnps_fusion_scores/report.json').is_file()):
+        matches.append(root)
+if not matches:
+    raise SystemExit('UNIFIED_RANKER_MISSING_COMPLETE_MSG_ARTIFACT')
+matches.sort(key=lambda p: (p.stat().st_mtime_ns, str(p)))
+print(matches[-1])
+PY
+)"
+  MSG_MODEL_DIR="$MSG_RUN/fusion_model"
+  MSG_GNPS="$MSG_RUN/gnps_fusion_scores"
+  echo "Reusing complete MSG expert: $MSG_RUN"
+fi
+
+if [[ ! -f "$B_PREDICTIONS" ]]; then
+  B_PREDICTIONS="$(python - <<'PY'
+from pathlib import Path
+matches = list(Path('data/validation').glob(
+    'B_dual_encoder_multireranker_run_*/modeling_nested_oof/candidate_predictions.npz'))
+if not matches:
+    raise SystemExit('UNIFIED_RANKER_MISSING_B_OOF_REFERENCE')
+matches.sort(key=lambda p: (p.stat().st_mtime_ns, str(p)))
+print(matches[-1])
+PY
+)"
 fi
 
 BUILD_CHEM_EVIDENCE=0
@@ -130,6 +179,8 @@ fi
 required=(
   "$DATA" "$GRAPH" "$ARCH" "$NOISE" "$STAGE1" "$PHASEA" "$FULLMSG"
   "$EVIDENCE/evidence.npz" "$EVIDENCE/report.json"
+  "$MSG_MODEL_DIR/oof_pair_scores.npz" "$MSG_MODEL_DIR/report.json"
+  "$MSG_GNPS/report.json" "$B_PREDICTIONS"
   "$GNPS/spectra.mgf" "$GNPS/manifest.csv.gz"
   "$GNPS/panel_identity_disjoint.npz" "$GNPS/panel_formula_disjoint.npz"
   "$GNPS_BASE_SCORES"
@@ -137,6 +188,7 @@ required=(
   "$GNPS_CHEM_DIR/continuous_chem_formula_disjoint.npz"
   tasks/encode_noise_massspecgym_checkpoint.py
   tasks/encode_gnps_gold_silver_10ppm_checkpoint.py
+  tasks/prepare_official_embedding_checkpoint.py
   tasks/evaluate_gnps_unified_candidate_ranker.py
   tasks/massspecgym_embedding_readout_core.py
   tasks/train_massspecgym_embedding_readouts.py
@@ -165,6 +217,26 @@ fi
 mkdir -p "$SCRATCH"
 cleanup_scratch() { rm -rf -- "$SCRATCH"; }
 trap cleanup_scratch EXIT
+
+# The official MassSpecGym-specialized DreaMS checkpoint is a formal GNPS
+# comparator only.  It is not fed to the fusion head because no matching OOF
+# predictions exist on the fusion-training side.
+if [[ -n "$OFFICIAL_MSG_SLIM_INPUT" ]]; then
+  [[ -f "$OFFICIAL_MSG_SLIM_INPUT" ]] || {
+    echo "UNIFIED_RANKER_OFFICIAL_MASSSPECGYM_SLIM_MISSING: $OFFICIAL_MSG_SLIM_INPUT" >&2
+    exit 2
+  }
+  OFFICIAL_MSG_SLIM="$OFFICIAL_MSG_SLIM_INPUT"
+else
+  OFFICIAL_MSG_NATIVE="$SCRATCH/embedding_model_massspecgym.ckpt"
+  OFFICIAL_MSG_SLIM="$SCRATCH/embedding_model_massspecgym_slim.pt"
+  curl --fail --location --retry 3 --retry-delay 5 \
+    "$OFFICIAL_MSG_URL" --output "$OFFICIAL_MSG_NATIVE"
+  echo "$OFFICIAL_MSG_SHA256  $OFFICIAL_MSG_NATIVE" | sha256sum --check --strict
+  python -u tasks/prepare_official_embedding_checkpoint.py \
+    --source "$OFFICIAL_MSG_NATIVE" --output "$OFFICIAL_MSG_SLIM"
+  rm -f -- "$OFFICIAL_MSG_NATIVE"
+fi
 
 python -m py_compile \
   tasks/massspecgym_embedding_readout_core.py \
@@ -293,6 +365,7 @@ encode_checkpoint noise_chemaware_fullmsg "$FULLMSG"
 CUDA_VISIBLE_DEVICES="${GPUS[0]}" python -u tasks/train_massspecgym_embedding_readouts.py \
   --graph "$GRAPH" --data "$DATA" --evidence "$EVIDENCE" \
   --chem-evidence "$CHEM_EVIDENCE" \
+  --msg-oof "$MSG_MODEL_DIR/oof_pair_scores.npz" \
   --embedding "noise_v1=$SCRATCH/noise_v1_0.npz" \
   --embedding "noise_v1=$SCRATCH/noise_v1_1.npz" \
   --embedding "chemaware_stage1=$SCRATCH/chemaware_stage1_0.npz" \
@@ -305,8 +378,9 @@ CUDA_VISIBLE_DEVICES="${GPUS[0]}" python -u tasks/train_massspecgym_embedding_re
   --epochs 3 --batch-queries 256 --learning-rate 0.0003 \
   --weight-decay 0.0001 --projection-dimension 16 \
   --maximum-negatives 6 --bootstrap-resamples 5000
-# Fail before four GNPS encodings if the freshly trained artifact ever drifts
-# back to the scalar control or loses its full-integration contract.
+# Fail before GNPS encodings if the freshly trained artifact loses the unified
+# input/selection contract. Scalar is a valid winner because it still consumes
+# all four encoder similarities plus WSE, P2b, MSG and ChemAware V2.
 python - "$OUT/modeling/report.json" "$OUT/modeling/selected_readout.pt" <<'PY'
 import json, sys
 from pathlib import Path
@@ -317,17 +391,17 @@ try:
     payload = torch.load(model_path, map_location='cpu', weights_only=False)
 except TypeError:
     payload = torch.load(model_path, map_location='cpu')
-allowed = {'projected_cosine', 'embedding_pair'}
-if (report.get('selection_class') != 'full_embedding_integration'
+allowed = {'scalar_evidence', 'projected_cosine', 'embedding_pair'}
+if (report.get('selection_class') != 'candidate_evidence_integration'
         or report.get('selection') not in allowed
-        or payload.get('selection_class') != 'full_embedding_integration'
+        or payload.get('selection_class') != 'candidate_evidence_integration'
         or payload.get('arm') != report.get('selection')):
-    raise SystemExit('UNIFIED_RANKER_FULL_INTEGRATION_PREFLIGHT_FAIL')
-print('UNIFIED_RANKER_FULL_INTEGRATION_PREFLIGHT_PASS')
+    raise SystemExit('UNIFIED_RANKER_SELECTION_PREFLIGHT_FAIL')
+print('UNIFIED_RANKER_SELECTION_PREFLIGHT_PASS')
 PY
 
-# A full-embedding arm (never the scalar control) and its full-development
-# refit now exist. GNPS becomes readable
+# The selected unified arm and its MassSpecGym development refit now exist.
+# GNPS becomes readable
 # only below this point; no result can flow back into fitting or arm selection.
 encode_gnps() {
   local name="$1" checkpoint="$2" gpu="$3"
@@ -356,10 +430,13 @@ if (( gs0 != 0 || gs1 != 0 )); then
   echo "UNIFIED_RANKER_GNPS_ENCODING_FAILED: phasea/fullmsg=$gs0/$gs1" >&2
   exit 7
 fi
+encode_gnps official_massspecgym_dreams "$OFFICIAL_MSG_SLIM" "${GPUS[0]}"
 
 CUDA_VISIBLE_DEVICES="${GPUS[0]}" python -u tasks/evaluate_gnps_unified_candidate_ranker.py \
   --benchmark "$GNPS" --model "$OUT/modeling/selected_readout.pt" \
-  --base-scores "$GNPS_BASE_SCORES" --chem-dir "$GNPS_CHEM_DIR" \
+  --base-scores "$GNPS_BASE_SCORES" --msg-score-cache "$MSG_GNPS" \
+  --b-predictions "$B_PREDICTIONS" --chem-dir "$GNPS_CHEM_DIR" \
+  --official-massspecgym-embedding "$SCRATCH/gnps_official_massspecgym_dreams.npz" \
   --embedding "noise_v1=$SCRATCH/gnps_noise_v1.npz" \
   --embedding "chemaware_stage1=$SCRATCH/gnps_chemaware_stage1.npz" \
   --embedding "chemaware_phasea=$SCRATCH/gnps_chemaware_phasea.npz" \
@@ -367,8 +444,13 @@ CUDA_VISIBLE_DEVICES="${GPUS[0]}" python -u tasks/evaluate_gnps_unified_candidat
   --output "$OUT/gnps_fixed_evaluation" --device cuda --bootstrap-resamples 5000
 
 cp "$SCRATCH"/*.json "$OUT/"
+mkdir -p "$OUT/checkpoints"
+cp "$OFFICIAL_MSG_SLIM" "$OUT/checkpoints/official_massspecgym_slim.pt"
 sha256sum "$NOISE" "$STAGE1" "$PHASEA" "$FULLMSG" \
-  "$EVIDENCE/evidence.npz" "$CHEM_EVIDENCE" "$OUT/modeling/selected_readout.pt" \
+  "$EVIDENCE/evidence.npz" "$MSG_MODEL_DIR/oof_pair_scores.npz" \
+  "$MSG_GNPS/report.json" "$B_PREDICTIONS" "$CHEM_EVIDENCE" \
+  "$OUT/checkpoints/official_massspecgym_slim.pt" \
+  "$OUT/modeling/selected_readout.pt" \
   "$OUT/gnps_fixed_evaluation/report.json" \
   > "$OUT/SHA256SUMS.txt"
 echo "FULL_EMBEDDING_UNIFIED_CANDIDATE_RANKER_AND_FIXED_GNPS_EVALUATION_COMPLETE: $OUT"

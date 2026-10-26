@@ -11,7 +11,7 @@ from massspecgym_embedding_readout_core import (
     FrozenEmbeddingReadout, ReadoutSettings, build_independent_scalar_features,
     fit_scalar_normalization, hard_competitor_matrix, masked_percentile_by_query,
     masked_query_gap_column, padded_candidate_matrix, percentile_by_query,
-    query_gap_column, select_full_integration_arm, strict_ranks,
+    query_gap_column, select_unified_arm, strict_ranks,
 )
 
 
@@ -68,6 +68,17 @@ def main() -> None:
     mean, scale = fit_scalar_normalization(features, names, np.arange(len(features)))
     normalized = (features - mean) / scale
     assert np.all(normalized[np.ix_(unavailable, chem_columns)] == 0)
+    reliability_features, reliability_names = build_independent_scalar_features(
+        evidence, graph,
+        {"noise_v1": values, "chemaware": values * 0.9}, "noise_v1",
+        auxiliary_scores={"noise_msg_reranker": values * 0.7},
+        include_reliability_context=True,
+    )
+    assert reliability_features.shape[0] == len(values)
+    assert reliability_names.count("noise_msg_reranker") == 1
+    assert "reliability_noise_msg_reranker_chemaware_top1_agree" in reliability_names
+    assert "reliability_top1_vote_fraction" in reliability_names
+    assert "noise_v1_weighted_spectral_entropy_top1_agree" not in reliability_names
 
     settings = ReadoutSettings(
         scalar_features=4, encoder_names=("noise_v1", "fullmsg"),
@@ -86,13 +97,14 @@ def main() -> None:
         assert score.shape == (5,) and torch.isfinite(score).all()
         counts.append(model.trainable_parameters)
     assert all(count > 0 for count in counts)
-    # A stronger scalar control must not be mislabeled as the complete system.
-    selected = select_full_integration_arm({
+    # Full vectors are an implementation option, not a required badge.  If
+    # complete scalar evidence wins, the architecture must select it.
+    selected = select_unified_arm({
         ARM_SCALAR: {"recall1": 0.99, "mrr": 0.99},
         ARM_PROJECTED: {"recall1": 0.80, "mrr": 0.90},
         ARM_PAIR: {"recall1": 0.81, "mrr": 0.82},
     })
-    assert selected == ARM_PAIR and selected in FULL_INTEGRATION_ARMS
+    assert selected == ARM_SCALAR
     assert ARM_SCALAR not in FULL_INTEGRATION_ARMS
     for invalid in (
         {ARM_PROJECTED: {"recall1": .8, "mrr": .8}},
@@ -102,11 +114,11 @@ def main() -> None:
         },
     ):
         try:
-            select_full_integration_arm(invalid)
+            select_unified_arm(invalid)
         except ValueError:
             pass
         else:
-            raise AssertionError("invalid full-integration metrics were accepted")
+            raise AssertionError("invalid unified metrics were accepted")
     print("PASS: MassSpecGym frozen embedding readout contracts")
 
 

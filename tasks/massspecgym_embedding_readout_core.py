@@ -28,25 +28,30 @@ REQUIRED_ENCODERS = (
 )
 
 
-def select_full_integration_arm(metrics: dict[str, dict[str, float]]) -> str:
-    """Select only among readouts that consume every full embedding.
+def select_unified_arm(metrics: dict[str, dict[str, float]]) -> str:
+    """Select the best fixed-input integrator, preferring simplicity on ties.
 
-    The capacity-matched scalar arm is an attribution control.  It must never
-    be emitted as the production model and then described as a dual-/multi-
-    encoder integration.
+    Every arm receives all four encoder similarity scores plus WSE, P2b, MSG
+    and ChemAware V2.  Projected/pair arms additionally read complete frozen
+    embeddings.  A scalar winner is therefore still the complete architecture;
+    it means only that full vectors did not justify their extra complexity.
     """
-    missing = [arm for arm in FULL_INTEGRATION_ARMS if arm not in metrics]
+    missing = [arm for arm in ARMS if arm not in metrics]
     if missing:
         raise ValueError(f"missing full-integration metrics: {missing}")
-    for arm in FULL_INTEGRATION_ARMS:
+    for arm in ARMS:
         for metric in ("recall1", "mrr"):
             value = float(metrics[arm][metric])
             if not np.isfinite(value):
                 raise ValueError(f"non-finite {arm} {metric}")
     return max(
-        FULL_INTEGRATION_ARMS,
+        ARMS,
         key=lambda arm: (float(metrics[arm]["recall1"]), float(metrics[arm]["mrr"])),
     )
+
+
+# Compatibility for older import sites; new code should use the accurate name.
+select_full_integration_arm = select_unified_arm
 
 
 def parse_named_paths(values: list[str]) -> dict[str, list[str]]:
@@ -160,8 +165,21 @@ def build_independent_scalar_features(
     evidence: dict[str, np.ndarray], graph,
     encoder_scores: dict[str, np.ndarray], noise_name: str,
     chemical: dict[str, np.ndarray] | None = None,
+    auxiliary_scores: dict[str, np.ndarray] | None = None,
+    include_reliability_context: bool = False,
 ) -> tuple[np.ndarray, list[str]]:
-    """One feature block per evidence family, without P2b double counting."""
+    """One feature block per evidence family, without P2b double counting.
+
+    ``auxiliary_scores`` is reserved for complete candidate-level experts whose
+    training/evaluation lineage is already fixed (currently the historical
+    Noise-MSG reranker).  It deliberately accepts the final expert score only:
+    the MSG input channels are not appended again beside the already-composite
+    MSG output.
+
+    ``include_reliability_context`` adds only label-blind disagreement summaries.
+    It is opt-in so checkpoints produced before the reliability-stacking update
+    remain loadable with their exact feature contract.
+    """
     family_edges = {
         "noise_v1": np.asarray(evidence["v1_cosine"], dtype=np.float64),
         "weighted_spectral_entropy": np.asarray(evidence["weighted_entropy"], dtype=np.float64),
@@ -171,6 +189,13 @@ def build_independent_scalar_features(
         name: np.maximum.reduceat(values, graph.molecule_ptr[:-1])
         for name, values in family_edges.items()
     }
+    for name, values in (auxiliary_scores or {}).items():
+        if name in family or name in encoder_scores:
+            raise ValueError(f"duplicate evidence family: {name}")
+        value = np.asarray(values, dtype=np.float64)
+        if value.shape != (len(graph.molecule_label),) or not np.all(np.isfinite(value)):
+            raise RuntimeError(f"auxiliary candidate evidence is malformed: {name}")
+        family[name] = value
     columns: list[np.ndarray] = []
     names: list[str] = []
     for name, values in family.items():
@@ -186,17 +211,18 @@ def build_independent_scalar_features(
     for name, values in family.items():
         context.append(query_gap_column(values, graph.query_ptr)[:, None])
         context_names.append(f"{name}_top_gap")
-    family_names = tuple(family)
-    for left_index, left in enumerate(family_names):
-        for right in family_names[left_index + 1:]:
-            agree = np.empty(len(graph.molecule_label), dtype=np.float64)
-            for start, stop in zip(graph.query_ptr[:-1], graph.query_ptr[1:]):
-                start, stop = int(start), int(stop)
-                left_top = int(np.argmax(family[left][start:stop]))
-                right_top = int(np.argmax(family[right][start:stop]))
-                agree[start:stop] = float(left_top == right_top)
-            context.append(agree[:, None])
-            context_names.append(f"{left}_{right}_top1_agree")
+    if not include_reliability_context:
+        family_names = tuple(family)
+        for left_index, left in enumerate(family_names):
+            for right in family_names[left_index + 1:]:
+                agree = np.empty(len(graph.molecule_label), dtype=np.float64)
+                for start, stop in zip(graph.query_ptr[:-1], graph.query_ptr[1:]):
+                    start, stop = int(start), int(stop)
+                    left_top = int(np.argmax(family[left][start:stop]))
+                    right_top = int(np.argmax(family[right][start:stop]))
+                    agree[start:stop] = float(left_top == right_top)
+                context.append(agree[:, None])
+                context_names.append(f"{left}_{right}_top1_agree")
     columns.extend(context)
     names.extend(context_names)
     for name, scores in encoder_scores.items():
@@ -208,6 +234,56 @@ def build_independent_scalar_features(
             query_gap_column(scores, graph.query_ptr)[:, None],
         ))
         names.extend((f"{name}_cosine", f"{name}_percentile", f"{name}_top_gap"))
+    if include_reliability_context:
+        # These label-blind columns expose *where* experts disagree without
+        # selecting an oracle expert at inference time.  Whether their training
+        # rows are upstream-model-external is a property of the caller's
+        # dataset contract (Enveda qualifies for the enumerated project
+        # fine-tunes; historical MassSpecGym does not).
+        reliability = dict(family)
+        reliability.update({
+            name: np.asarray(scores, dtype=np.float64)
+            for name, scores in encoder_scores.items()
+            if name != noise_name
+        })
+        reliability_names = tuple(reliability)
+        percentiles = {
+            name: percentile_by_query(values, graph.query_ptr)
+            for name, values in reliability.items()
+        }
+        for left_index, left in enumerate(reliability_names):
+            for right in reliability_names[left_index + 1:]:
+                agree = np.empty(len(graph.molecule_label), dtype=np.float64)
+                for start, stop in zip(graph.query_ptr[:-1], graph.query_ptr[1:]):
+                    start, stop = int(start), int(stop)
+                    left_top = int(np.argmax(reliability[left][start:stop]))
+                    right_top = int(np.argmax(reliability[right][start:stop]))
+                    agree[start:stop] = float(left_top == right_top)
+                columns.append(agree[:, None])
+                names.append(f"reliability_{left}_{right}_top1_agree")
+        stacked_percentiles = np.stack(
+            [percentiles[name] for name in reliability_names], axis=1,
+        )
+        vote_fraction = np.zeros(len(graph.molecule_label), dtype=np.float64)
+        for start, stop in zip(graph.query_ptr[:-1], graph.query_ptr[1:]):
+            start, stop = int(start), int(stop)
+            votes = np.zeros(stop - start, dtype=np.float64)
+            for name in reliability_names:
+                local = reliability[name][start:stop]
+                winners = np.flatnonzero(local == np.max(local))
+                if len(winners) == 1:
+                    votes[int(winners[0])] += 1.0
+            vote_fraction[start:stop] = votes / len(reliability_names)
+        columns.extend((
+            vote_fraction[:, None],
+            np.mean(stacked_percentiles, axis=1)[:, None],
+            np.std(stacked_percentiles, axis=1)[:, None],
+        ))
+        names.extend((
+            "reliability_top1_vote_fraction",
+            "reliability_mean_percentile",
+            "reliability_percentile_std",
+        ))
     if chemical is not None:
         valid = np.asarray(chemical["chem_valid"], dtype=bool)
         correct = np.asarray(chemical["candidate_utility_correct"], dtype=np.float64)

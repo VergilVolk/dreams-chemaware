@@ -1,11 +1,12 @@
 #!/usr/bin/env python
-"""Train three frozen-encoder candidate readouts on MassSpecGym.
+"""Train one candidate-evidence integrator without mislabelling upstream OOF.
 
-The encoders were trained only on formula folds 1--4.  Heads therefore train
-on the same 65,286-query side and are selected once on the complete 18,333-
-query outer fold 0.  Calling predictions for folds 1--4 OOF would be false:
-their embeddings were already trained with those formulas.  GNPS and
-application responses are not accepted by this entry point.
+Noise, ChemAware and FullMSG used different historical training roles, and
+FullMSG consumed almost all MassSpecGym formulas.  Formula-grouped
+cross-fitting below is therefore OOF for the fusion head only, not for every
+upstream expert.  The historical MSG input itself comes from its registered
+formula-OOF artifact.  No MassSpecGym result is described as external; fixed
+GNPS is read only after the head and arm have been selected.
 """
 from __future__ import annotations
 
@@ -27,7 +28,7 @@ from massspecgym_embedding_readout_core import (
     FULL_INTEGRATION_ARMS, REQUIRED_ENCODERS, FrozenEmbeddingReadout,
     ReadoutSettings, build_independent_scalar_features, hard_competitor_matrix, padded_candidate_matrix,
     fit_scalar_normalization, parse_named_paths, percentile_by_query, query_gap_column, rank_metrics,
-    select_full_integration_arm, strict_ranks,
+    select_unified_arm, strict_ranks,
 )
 from noise_final_core import CandidateGraph, sha256_file, stable_fold
 
@@ -36,6 +37,8 @@ FOLDS = 5
 HELD_FOLD = 0
 FOLD_SEED = 20260825
 TRAIN_SEED = 20261025
+META_FOLDS = 5
+META_FOLD_SEED = 20261026
 
 
 def load_complete_embeddings(paths: list[Path], rows: int) -> np.ndarray:
@@ -72,6 +75,7 @@ def arguments() -> argparse.Namespace:
     parser.add_argument("--data", type=Path, required=True)
     parser.add_argument("--evidence", type=Path, required=True)
     parser.add_argument("--chem-evidence", type=Path, required=True)
+    parser.add_argument("--msg-oof", type=Path, required=True)
     parser.add_argument("--embedding", action="append", required=True, metavar="NAME=NPZ")
     parser.add_argument("--noise-name", default="noise_v1")
     parser.add_argument("--output", type=Path, required=True)
@@ -121,6 +125,23 @@ def load_chemical_evidence(path: Path, evidence_path: Path, graph: CandidateGrap
            for name in required[:-1]):
         raise RuntimeError("ChemAware V2 candidate axis differs from corrected graph")
     return chemical
+
+
+def load_msg_oof(
+    path: Path, evidence_path: Path, graph: CandidateGraph,
+) -> np.ndarray:
+    """Load the historical MSG formula-OOF expert on the common edge axis."""
+    with np.load(path, allow_pickle=False) as body:
+        required = {"pair_scores", "evidence_sha256"}
+        if not required.issubset(body.files):
+            raise RuntimeError("MSG OOF artifact misses its score/provenance arrays")
+        pair_scores = np.asarray(body["pair_scores"], dtype=np.float32)
+        evidence_sha = str(np.asarray(body["evidence_sha256"]).item())
+    if evidence_sha != sha256_file(evidence_path):
+        raise RuntimeError("MSG OOF scores are not aligned to scalar evidence")
+    if pair_scores.shape != (len(graph.pair_candidate_row),) or not np.all(np.isfinite(pair_scores)):
+        raise RuntimeError("MSG OOF pair-score axis is malformed")
+    return np.maximum.reduceat(pair_scores, graph.molecule_ptr[:-1]).astype(np.float32)
 
 
 def edge_cosines(
@@ -334,6 +355,17 @@ def main() -> None:
     evidence = load_evidence(args.evidence, graph)
     evidence_path = args.evidence / "evidence.npz" if args.evidence.is_dir() else args.evidence
     chemical = load_chemical_evidence(args.chem_evidence, evidence_path, graph)
+    msg_oof = load_msg_oof(args.msg_oof, evidence_path, graph)
+    if "official_cosine" not in evidence:
+        raise RuntimeError("pair evidence misses official fine-tuned DreaMS cosine")
+    official_dreams = np.maximum.reduceat(
+        np.asarray(evidence["official_cosine"], dtype=np.float32),
+        graph.molecule_ptr[:-1],
+    ).astype(np.float32)
+    # Official DreaMS remains a formal comparator.  MSG is the only auxiliary
+    # fusion family because it is a complete registered reranker; adding the
+    # official score separately would duplicate evidence already inside MSG.
+    auxiliary_scores = {"noise_msg_reranker": msg_oof}
     with h5py.File(args.data, "r") as handle:
         n_rows = len(handle["spectrum"])
     device = torch.device("cuda:0")
@@ -358,6 +390,8 @@ def main() -> None:
 
     scalar, feature_names = build_independent_scalar_features(
         evidence, graph, encoder_scores, args.noise_name, chemical,
+        auxiliary_scores=auxiliary_scores,
+        include_reliability_context=True,
     )
     encoder_names = tuple(named)
     reference_rows = np.stack([references[name] for name in encoder_names], axis=1)
@@ -373,7 +407,8 @@ def main() -> None:
     score_families = [
         np.maximum.reduceat(np.asarray(evidence[name], dtype=np.float64), graph.molecule_ptr[:-1])
         for name in ("weighted_entropy", "p2b_fused")
-    ] + [encoder_scores[name] for name in encoder_names]
+    ] + [auxiliary_scores[name] for name in auxiliary_scores]
+    score_families.extend(encoder_scores[name] for name in encoder_names)
     train_matrix, train_mask = hard_competitor_matrix(
         graph.query_ptr, score_families, args.maximum_negatives,
     )
@@ -388,38 +423,64 @@ def main() -> None:
     held_scores = {arm: np.full(len(graph.molecule_label), np.nan, dtype=np.float32) for arm in ARMS}
     fold_reports: list[dict] = []
     parameter_counts: dict[str, int] = {}
-    train_queries = np.flatnonzero(query_folds != HELD_FOLD)
+    noise_backbone_train_queries = np.flatnonzero(query_folds != HELD_FOLD)
     held_queries = np.flatnonzero(query_folds == HELD_FOLD)
-    train_molecules = np.flatnonzero(query_folds[molecule_query] != HELD_FOLD)
     held_molecule_mask = query_folds[molecule_query] == HELD_FOLD
     held_ptr = np.concatenate(([0], np.cumsum(np.diff(graph.query_ptr)[held_queries])))
-    mean, scale = fit_scalar_normalization(scalar, feature_names, train_molecules)
+    meta_folds = np.asarray([
+        stable_fold(str(formula), META_FOLDS, META_FOLD_SEED)
+        for formula in graph.query_formula
+    ], dtype=np.int8)
     for arm_index, arm in enumerate(ARMS):
-        model = fit_one(
-            arm, settings, train_queries, train_matrix, train_mask, scalar,
-            mean, scale, molecule_query, graph, reference_rows, banks, device,
-            args, TRAIN_SEED + arm_index,
-        )
-        parameter_counts[arm] = model.trainable_parameters
-        predicted = predict_queries(
-            model, held_queries, full_matrix, full_mask, scalar, mean, scale,
-            molecule_query, graph, reference_rows, banks, device,
-            args.batch_queries,
-        )
-        held_scores[arm][held_molecule_mask] = predicted[held_molecule_mask]
-        ranks = strict_ranks(predicted[held_molecule_mask], held_ptr)
-        fold_reports.append({"fold": HELD_FOLD, "arm": arm,
-                             "held_queries": int(len(held_queries)),
-                             "metrics": rank_metrics(ranks, graph.query_has_near[held_queries])})
-        print(json.dumps(fold_reports[-1]), flush=True)
-        del model
-        torch.cuda.empty_cache()
+        for meta_fold in range(META_FOLDS):
+            meta_train = held_queries[meta_folds[held_queries] != meta_fold]
+            meta_held = held_queries[meta_folds[held_queries] == meta_fold]
+            if len(meta_train) == 0 or len(meta_held) == 0:
+                raise RuntimeError(f"empty reliability-stacking fold: {meta_fold}")
+            train_molecules = np.flatnonzero(
+                (query_folds[molecule_query] == HELD_FOLD)
+                & (meta_folds[molecule_query] != meta_fold)
+            )
+            meta_held_molecules = (
+                (query_folds[molecule_query] == HELD_FOLD)
+                & (meta_folds[molecule_query] == meta_fold)
+            )
+            mean, scale = fit_scalar_normalization(scalar, feature_names, train_molecules)
+            model = fit_one(
+                arm, settings, meta_train, train_matrix, train_mask, scalar,
+                mean, scale, molecule_query, graph, reference_rows, banks, device,
+                args, TRAIN_SEED + arm_index * 100 + meta_fold,
+            )
+            parameter_counts[arm] = model.trainable_parameters
+            predicted = predict_queries(
+                model, meta_held, full_matrix, full_mask, scalar, mean, scale,
+                molecule_query, graph, reference_rows, banks, device,
+                args.batch_queries,
+            )
+            held_scores[arm][meta_held_molecules] = predicted[meta_held_molecules]
+            meta_ptr = np.concatenate((
+                [0], np.cumsum(np.diff(graph.query_ptr)[meta_held]),
+            ))
+            ranks = strict_ranks(predicted[meta_held_molecules], meta_ptr)
+            fold_reports.append({
+                "fusion_development_fold": HELD_FOLD,
+                "meta_fold": meta_fold,
+                "arm": arm,
+                "training_queries": int(len(meta_train)),
+                "held_queries": int(len(meta_held)),
+                "metrics": rank_metrics(ranks, graph.query_has_near[meta_held]),
+            })
+            print(json.dumps(fold_reports[-1]), flush=True)
+            del model
+            torch.cuda.empty_cache()
     if any(not np.all(np.isfinite(scores[held_molecule_mask])) for scores in held_scores.values()):
-        raise RuntimeError("held-fold score coverage is incomplete")
+        raise RuntimeError("fusion-head OOF score coverage is incomplete")
 
     references_scores = {
         "weighted_spectral_entropy": score_families[0],
         "p2b_noise_v1_frozen": score_families[1],
+        "official_dreams": official_dreams,
+        **auxiliary_scores,
         **encoder_scores,
     }
     metrics = {arm: rank_metrics(strict_ranks(scores[held_molecule_mask], held_ptr),
@@ -466,11 +527,17 @@ def main() -> None:
             "micro_auprc": float(average_precision_score(graph.molecule_label[held_molecule_mask],
                                                           held_scores[arm][held_molecule_mask])),
         }
-    winner = select_full_integration_arm(metrics)
+    winner = select_unified_arm(metrics)
     scalar_control = ARM_SCALAR
-    full_vs_scalar_key = f"{winner}_vs_{scalar_control}"
+    best_full_arm = max(
+        FULL_INTEGRATION_ARMS,
+        key=lambda arm: (float(metrics[arm]["recall1"]), float(metrics[arm]["mrr"])),
+    )
+    full_vs_scalar_key = f"{best_full_arm}_vs_{scalar_control}"
     full_vs_scalar = comparisons[full_vs_scalar_key]
-    full_delta = float(metrics[winner]["recall1"] - metrics[scalar_control]["recall1"])
+    full_delta = float(
+        metrics[best_full_arm]["recall1"] - metrics[scalar_control]["recall1"]
+    )
     full_ci_low = float(full_vs_scalar["paired_formula_ci"]["ci_low_pp"])
     if full_delta > 0 and full_ci_low > 0:
         representation_verdict = "FULL_EMBEDDING_INCREMENT_SUPPORTED_ON_HELD_DEVELOPMENT"
@@ -479,11 +546,12 @@ def main() -> None:
     else:
         representation_verdict = "FULL_EMBEDDING_INCREMENT_NOT_SUPPORTED"
 
-    # One final refit of the selected readout; no GNPS or application input is read.
-    all_molecules = np.arange(len(scalar))
-    mean, scale = fit_scalar_normalization(scalar, feature_names, all_molecules)
+    # One final refit on the same head-development side.  This does not turn
+    # upstream in-training encoder predictions into OOF predictions.
+    meta_molecules = np.flatnonzero(held_molecule_mask)
+    mean, scale = fit_scalar_normalization(scalar, feature_names, meta_molecules)
     final_model = fit_one(
-        winner, settings, np.arange(graph.n_queries), train_matrix, train_mask,
+        winner, settings, held_queries, train_matrix, train_mask,
         scalar, mean, scale, molecule_query, graph, reference_rows, banks, device,
         args, TRAIN_SEED + 999,
     )
@@ -500,36 +568,47 @@ def main() -> None:
         )
         torch.save({
             "arm": winner, "state_dict": final_model.state_dict(),
-            "selection_class": "full_embedding_integration",
-            "non_promotable_control": scalar_control,
+            "selection_class": "candidate_evidence_integration",
+            "scalar_evidence_arm": scalar_control,
             "representation_increment_verdict": representation_verdict,
+            "best_full_embedding_arm": best_full_arm,
             "settings": settings.__dict__, "scalar_mean": mean,
             "scalar_scale": scale, "scalar_feature_names": feature_names,
             "encoder_names": encoder_names,
+            "auxiliary_family_names": tuple(auxiliary_scores),
+            "reliability_context": True,
+            "stacking_protocol": "fusion_head_outer0_inner_formula_oof",
         }, staging / "selected_readout.pt")
         report = {
             "status": "MASSSPECGYM_UNIFIED_CANDIDATE_RANKER_COMPLETE",
             "dataset": {"name": "MassSpecGym corrected 10ppm candidate graph",
                         "role": "development", "total_queries": graph.n_queries,
-                        "train_queries": int(len(train_queries)),
-                        "held_queries": int(len(held_queries)), "held_fold": HELD_FOLD,
+                        "noise_backbone_train_queries": int(len(noise_backbone_train_queries)),
+                        "fusion_meta_queries": int(len(held_queries)),
+                        "fusion_development_outer_fold": HELD_FOLD,
                         "candidate_molecules": int(len(graph.molecule_label)),
                         "reference_edges": int(len(graph.pair_candidate_row)),
-                        "split": "stable formula folds; encoder and head train folds 1-4, selection fold 0"},
+                        "split": (
+                            "fusion head uses five-fold formula OOF inside Noise fold 0; "
+                            "upstream encoders have heterogeneous, explicitly non-OOF lineage"
+                        )},
             "selection": winner,
-            "selection_class": "full_embedding_integration",
-            "non_promotable_control": scalar_control,
+            "selection_class": "candidate_evidence_integration",
+            "scalar_evidence_arm": scalar_control,
             "representation_increment_verdict": representation_verdict,
+            "best_full_embedding_arm": best_full_arm,
             "selected_full_integration_vs_scalar_control": full_vs_scalar,
             "algorithm": (
                 "single candidate-level ranker over WSE, Noise V1, frozen P2b, "
-                "ChemAware V2 correct-vs-null evidence, and independent Noise/"
-                "Stage-1/Phase-A/FullMSG embedding geometry"
+                "historical Noise-MSG, ChemAware V2 correct-vs-null evidence, "
+                "and independent Noise/Stage-1/Phase-A/FullMSG representation evidence; "
+                "official fine-tuned DreaMS is retained as a comparator, not duplicated input"
             ),
             "arms": list(ARMS),
             "full_integration_arms": list(FULL_INTEGRATION_ARMS),
             "control_arms": list(CONTROL_ARMS),
             "encoder_names": list(encoder_names),
+            "auxiliary_family_names": list(auxiliary_scores),
             "chemical_evidence": {
                 "module": "ChemAware V2 continuous correct-vs-null residual",
                 "available_candidates": int(np.asarray(chemical["chem_valid"]).sum()),
@@ -541,10 +620,14 @@ def main() -> None:
                          "learning_rate": args.learning_rate,
                          "weight_decay": args.weight_decay,
                          "maximum_family_hard_negatives": args.maximum_negatives,
+                         "stacking_protocol": (
+                             "formula-grouped inner five-fold OOF trains/evaluates the fusion "
+                             "head; it is not claimed as upstream-expert OOF"
+                         ),
+                         "meta_fold_seed": META_FOLD_SEED,
                          "selection_rule": (
-                             "highest held-fold-0 Recall@1 then MRR among projected_cosine "
-                             "and embedding_pair only; scalar_evidence is a non-promotable "
-                             "capacity-matched attribution control"
+                             "highest fusion-head inner-OOF Recall@1 then MRR across scalar, "
+                             "projected-cosine and embedding-pair arms; scalar wins ties"
                          )},
             "metrics": metrics, "comparisons": comparisons,
             "fold_reports": fold_reports,
@@ -554,12 +637,14 @@ def main() -> None:
                 "data_sha256": sha256_file(args.data),
                 "evidence_sha256": sha256_file(evidence_path),
                 "chem_evidence_sha256": sha256_file(args.chem_evidence),
+                "msg_oof_sha256": sha256_file(args.msg_oof),
                 "embedding_shards": {name: [sha256_file(path) for path in paths]
                                      for name, paths in embedding_paths.items()},
             },
             "claim_limit": (
-                "MassSpecGym development selection. Folds 1-4 are not called OOF "
-                "because the frozen encoders trained on them; GNPS remains fixed evaluation."
+                "MassSpecGym development selection. OOF applies to the fusion head only; "
+                "historical experts used heterogeneous, partly overlapping training roles. "
+                "GNPS is a fixed consumed evaluation, not final external evidence."
             ),
         }
         (staging / "report.json").write_text(json.dumps(report, indent=2), encoding="utf-8")

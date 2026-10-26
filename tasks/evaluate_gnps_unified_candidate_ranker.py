@@ -19,8 +19,9 @@ from sklearn.metrics import average_precision_score, roc_auc_score
 
 from build_grand_unified_evidence_bundle import load_named_arrays
 from evaluate_gnps_gold_silver_10ppm_embeddings import graph_from_panel, load_embeddings
+from gnps_pair_score_cache import load_pair_score_cache
 from massspecgym_embedding_readout_core import (
-    FULL_INTEGRATION_ARMS, REQUIRED_ENCODERS, FrozenEmbeddingReadout,
+    ARMS, REQUIRED_ENCODERS, FrozenEmbeddingReadout,
     ReadoutSettings, build_independent_scalar_features, comparison,
     rank_metrics, strict_ranks,
 )
@@ -29,7 +30,8 @@ from noise_final_core import sha256_file
 
 PANELS = ("identity_disjoint", "formula_disjoint")
 BASELINE_NAMES = (
-    "weighted_spectral_entropy", "noise_v1", "p2b_noise_v1_frozen",
+    "official_dreams", "weighted_spectral_entropy", "noise_v1",
+    "p2b_noise_v1_frozen",
 )
 
 
@@ -38,6 +40,9 @@ def arguments() -> argparse.Namespace:
     parser.add_argument("--benchmark", type=Path, required=True)
     parser.add_argument("--model", type=Path, required=True)
     parser.add_argument("--base-scores", type=Path, required=True)
+    parser.add_argument("--msg-score-cache", type=Path, required=True)
+    parser.add_argument("--b-predictions", type=Path)
+    parser.add_argument("--official-massspecgym-embedding", type=Path)
     parser.add_argument("--chem-dir", type=Path, required=True)
     parser.add_argument("--embedding", action="append", required=True, metavar="NAME=NPZ")
     parser.add_argument("--output", type=Path, required=True)
@@ -54,10 +59,10 @@ def load_model(path: Path, device: torch.device):
     settings = ReadoutSettings(**payload["settings"])
     if tuple(payload["encoder_names"]) != settings.encoder_names:
         raise RuntimeError("selected model encoder registry drifted")
-    if str(payload["arm"]) not in FULL_INTEGRATION_ARMS:
-        raise RuntimeError("fixed GNPS evaluation requires a full-embedding integration arm")
-    if payload.get("selection_class") != "full_embedding_integration":
-        raise RuntimeError("selected model lacks the full-integration selection contract")
+    if str(payload["arm"]) not in ARMS:
+        raise RuntimeError("fixed GNPS evaluation received an unknown integration arm")
+    if payload.get("selection_class") != "candidate_evidence_integration":
+        raise RuntimeError("selected model lacks the unified integration selection contract")
     if settings.encoder_names != REQUIRED_ENCODERS:
         raise RuntimeError("selected model does not contain the exact four registered encoders")
     model = FrozenEmbeddingReadout(str(payload["arm"]), settings)
@@ -116,6 +121,30 @@ def load_chemical(path: Path, graph) -> dict[str, np.ndarray]:
     }
 
 
+def load_b_reference(path: Path, panel: str, graph) -> np.ndarray:
+    prefix = "identity" if panel == "identity_disjoint" else "formula"
+    with np.load(path, allow_pickle=False) as body:
+        required = {
+            f"{prefix}__query_ptr", f"{prefix}__labels",
+            f"{prefix}__formula", f"{prefix}__B",
+        }
+        if not required.issubset(body.files):
+            raise RuntimeError(f"B reference misses {panel} arrays")
+        if not np.array_equal(body[f"{prefix}__query_ptr"], graph.query_ptr):
+            raise RuntimeError(f"B query axis differs for {panel}")
+        if not np.array_equal(body[f"{prefix}__labels"], graph.molecule_label):
+            raise RuntimeError(f"B label axis differs for {panel}")
+        if not np.array_equal(
+            np.asarray(body[f"{prefix}__formula"]).astype("U"),
+            np.asarray(graph.query_formula).astype("U"),
+        ):
+            raise RuntimeError(f"B formula axis differs for {panel}")
+        scores = np.asarray(body[f"{prefix}__B"], dtype=np.float32)
+    if scores.shape != (len(graph.molecule_label),) or not np.all(np.isfinite(scores)):
+        raise RuntimeError(f"B scores are malformed for {panel}")
+    return scores
+
+
 def metrics(scores: np.ndarray, graph) -> dict:
     ranks = strict_ranks(scores, graph.query_ptr)
     output = rank_metrics(ranks, graph.query_has_near)
@@ -161,6 +190,11 @@ def main() -> None:
     base_by_panel = {
         panel: load_named_arrays(args.base_scores, panel) for panel in PANELS
     }
+    msg_report, msg_edges = load_pair_score_cache(args.msg_score_cache, args.benchmark)
+    official_massspecgym = (
+        load_embeddings(args.official_massspecgym_embedding, manifest_rows)
+        if args.official_massspecgym_embedding is not None else None
+    )
 
     staging = Path(tempfile.mkdtemp(prefix=f".{args.output.name}.", dir=args.output.parent))
     report = {
@@ -172,7 +206,7 @@ def main() -> None:
                   "representation_increment_verdict": str(
                       payload["representation_increment_verdict"]
                   ),
-                  "non_promotable_control": str(payload["non_promotable_control"])},
+                  "scalar_evidence_arm": str(payload["scalar_evidence_arm"])},
         "panels": {},
     }
     try:
@@ -201,8 +235,16 @@ def main() -> None:
             chemical = load_chemical(
                 args.chem_dir / f"continuous_chem_{panel}.npz", graph,
             )
+            auxiliary = {
+                "noise_msg_reranker": np.maximum.reduceat(
+                    np.asarray(msg_edges[panel], dtype=np.float32),
+                    graph.molecule_ptr[:-1],
+                ),
+            }
             scalar, names = build_independent_scalar_features(
                 evidence, graph, encoder_scores, "noise_v1", chemical,
+                auxiliary_scores=auxiliary,
+                include_reliability_context=bool(payload.get("reliability_context", False)),
             )
             if list(names) != list(payload["scalar_feature_names"]):
                 raise RuntimeError("GNPS scalar feature contract differs from selected model")
@@ -225,6 +267,16 @@ def main() -> None:
                 )
                 for name in BASELINE_NAMES
             }
+            baselines["noise_msg_reranker"] = auxiliary["noise_msg_reranker"]
+            if official_massspecgym is not None:
+                official_score, _, _ = embedding_molecule_evidence(
+                    graph, official_massspecgym[0], official_massspecgym[1],
+                )
+                baselines["official_massspecgym_dreams"] = official_score
+            if args.b_predictions is not None:
+                baselines["B_gnps_nested_oof"] = load_b_reference(
+                    args.b_predictions, panel, graph,
+                )
             panel_metrics = {"unified_candidate_ranker": metrics(scores, graph)}
             panel_metrics.update({name: metrics(values, graph) for name, values in baselines.items()})
             comparisons = {
@@ -248,15 +300,27 @@ def main() -> None:
             )
         report["provenance"] = {
             "base_scores_sha256": sha256_file(args.base_scores),
+            "msg_score_cache_report_sha256": sha256_file(
+                args.msg_score_cache / "report.json"
+            ),
+            "b_predictions_sha256": (
+                sha256_file(args.b_predictions) if args.b_predictions is not None else None
+            ),
+            "official_massspecgym_embedding_sha256": (
+                sha256_file(args.official_massspecgym_embedding)
+                if args.official_massspecgym_embedding is not None else None
+            ),
             "embedding_sha256": {name: sha256_file(path) for name, path in embedding_paths.items()},
             "chemistry_sha256": {
                 panel: sha256_file(args.chem_dir / f"continuous_chem_{panel}.npz")
                 for panel in PANELS
             },
+            "msg_method": msg_report.get("method"),
         }
         report["claim_limit"] = (
-            "Fixed GNPS evaluation after MassSpecGym-only arm selection and refit; "
-            "the evaluator performs no fit, threshold search, routing or model selection."
+            "Fixed consumed-GNPS evaluation after MassSpecGym-only head selection and refit; "
+            "the evaluator performs no fit, threshold search, routing or model selection. "
+            "This is development benchmarking, not untouched external confirmation."
         )
         (staging / "report.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
         args.output.parent.mkdir(parents=True, exist_ok=True)

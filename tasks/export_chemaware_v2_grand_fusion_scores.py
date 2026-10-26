@@ -155,6 +155,12 @@ def _promote_frozen_actions(
     output_top = np.empty(query_count, dtype=np.int32)
     abstained = np.empty(query_count, dtype=bool)
     changed_top1 = np.zeros(query_count, dtype=bool)
+    molecule_count = int(body["query_ptr"][-1])
+    candidate_valid = np.zeros(molecule_count, dtype=bool)
+    candidate_total_utility = np.zeros(molecule_count, dtype=np.float32)
+    candidate_chemical_residual = np.zeros(molecule_count, dtype=np.float32)
+    dose = float(policy["dose"])
+    risk_penalty = float(policy["risk_penalty"])
     if deployment_base is not None:
         deployment_base = np.asarray(deployment_base, dtype=np.float32)
         if deployment_base.ndim != 1 or len(deployment_base) != edge_count:
@@ -187,6 +193,27 @@ def _promote_frozen_actions(
             pointer = np.asarray(scored["reference_ptr"][local], dtype=np.int64)
             selector_molecule = np.maximum.reduceat(selector_values, pointer[:-1])
             deployment_molecule = np.maximum.reduceat(values, pointer[:-1])
+            width = molecule_right - molecule_left
+            local_valid = np.asarray(predictions["valid"][local, :width], dtype=bool)
+            local_total = np.asarray(predictions["utility"][local, :width], dtype=np.float32)
+            local_residual = dose * (
+                np.asarray(predictions["benefit_residual"][local, :width], dtype=np.float32)
+                - risk_penalty * np.asarray(
+                    predictions["harm_residual"][local, :width], dtype=np.float32,
+                )
+            )
+            if not (
+                local_valid.shape == local_total.shape == local_residual.shape == (width,)
+            ):
+                raise RuntimeError(f"ChemAware candidate utility shape drifted at query {query}")
+            if not np.all(np.isfinite(local_total[local_valid])) or not np.all(
+                np.isfinite(local_residual[local_valid])
+            ):
+                raise RuntimeError(f"ChemAware candidate utility is non-finite at query {query}")
+            candidate_valid[molecule_left:molecule_right] = local_valid
+            valid_rows = molecule_left + np.flatnonzero(local_valid)
+            candidate_total_utility[valid_rows] = local_total[local_valid]
+            candidate_chemical_residual[valid_rows] = local_residual[local_valid]
             official_top[query] = int(np.argmax(selector_molecule))
             deployment_top[query] = int(np.argmax(deployment_molecule))
             abstained[query] = bool(predictions["abstained"][local])
@@ -237,6 +264,13 @@ def _promote_frozen_actions(
         "deployment_top_candidate": deployment_top,
         "output_top_candidate": output_top,
         "changed_deployment_top1": changed_top1,
+        # Candidate-level continuous evidence for downstream integration.  The
+        # chemical residual subtracts the nuisance-only prediction implicitly:
+        # dose*(benefit_residual-risk_penalty*harm_residual).  Missing candidates
+        # remain exact zero and carry candidate_valid=False.
+        "candidate_valid": candidate_valid,
+        "candidate_total_utility": candidate_total_utility,
+        "candidate_chemical_residual": candidate_chemical_residual,
     }
     return output, counts, ledger
 
