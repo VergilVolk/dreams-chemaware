@@ -1,0 +1,70 @@
+{
+  "schema": "full23_v11_promotion_verdict_v1",
+  "date": "2026-10-27",
+  "run_id": "full23_multireference_readout_run_2420264",
+  "implementation_commit": "5d17fc12a47246e9e37df3a8b330caee8cc11000",
+  "dataset_roles": {
+    "enveda180": "consumed meta-development fitting only",
+    "gnps_gold_silver": "consumed development adjudication"
+  },
+  "contract": {
+    "schema": "full23_anchored_multireference_readout_v2_bounded",
+    "score": "full23_v1 + B*tanh(raw_residual/B)",
+    "residual_bound_per_candidate": 0.6255066394805908,
+    "maximum_pairwise_shift": 1.2510132789611816,
+    "bound_source": "Enveda-180 five-fold formula-OOF Full23 parent only",
+    "gnps_accessed_for_bound": false,
+    "parameters_per_arm": 71809
+  },
+  "decision": {
+    "selected": "full23_v1",
+    "promotion_from_full23_v1": false,
+    "multi_reference_content_supported": false,
+    "released_checkpoint_sha256": "7f1309e2a89ef3640d9b6871a821df6866f2528e629547075d5305ab6707d717"
+  },
+  "panels": {
+    "identity_disjoint": {
+      "queries": 10995,
+      "full23_v1_recall1": 0.8824920418371988,
+      "top1_recall1": 0.8811277853569804,
+      "top1_delta_pp": -0.1364256480218281,
+      "top1_corrected": 31,
+      "top1_introduced": 46,
+      "top1_formula_cluster_ci_pp": [-0.28915641850453155, 0.009162900875573227],
+      "top3_recall1": 0.8806730331969077,
+      "top3_delta_pp": -0.18190086402910413,
+      "top3_corrected": 39,
+      "top3_introduced": 59,
+      "top3_formula_cluster_ci_pp": [-0.3644074255305861, -0.009032342863837337]
+    },
+    "formula_disjoint": {
+      "queries": 5261,
+      "full23_v1_recall1": 0.8952670594943927,
+      "top1_recall1": 0.8933662801748717,
+      "top1_delta_pp": -0.19007793195210038,
+      "top1_corrected": 14,
+      "top1_introduced": 24,
+      "top1_formula_cluster_ci_pp": [-0.4176197586788328, 0.019410503665634276],
+      "top3_recall1": 0.8924158905151112,
+      "top3_delta_pp": -0.28511689792815054,
+      "top3_corrected": 15,
+      "top3_introduced": 30,
+      "top3_formula_cluster_ci_pp": [-0.5581681494199053, -0.01914965939254775]
+    }
+  },
+  "mechanism": {
+    "top3_vs_top1_supported": false,
+    "top3_vs_reference_permutation_supported": false,
+    "conclusion": "bounded residual reduced harmful exchanges but did not add transferable full-vector or multi-reference ranking information beyond Full23 v1"
+  },
+  "source_reports": {
+    "modeling": {
+      "path": "data/validation/full23_multireference_readout_run_2420264/modeling/report.json",
+      "sha256": "e7cf2613021eb780fa29127e19a435cc231c2717e7f82c8f5bbd311a6daadbf0"
+    },
+    "gnps_development_adjudication": {
+      "path": "data/validation/full23_multireference_readout_run_2420264/gnps_development_adjudication/report.json",
+      "sha256": "adbcbb5fcbdc78a2980c96e894173e6c5afdbb65a6b21689871ba7b9cd9da457"
+    }
+  }
+}

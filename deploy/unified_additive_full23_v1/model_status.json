@@ -1,0 +1,75 @@
+{
+  "schema": "unified_additive_full23_model_status_v1",
+  "date": "2026-10-27",
+  "model": "Unified Additive Full23 v1",
+  "status": "frozen_transferable_development_candidate",
+  "checkpoint_sha256": "7f1309e2a89ef3640d9b6871a821df6866f2528e629547075d5305ab6707d717",
+  "decision_arm": "additive_linear_control",
+  "decision_parameters": 24,
+  "candidate_features": 23,
+  "required_evidence": [
+    "noise_v1",
+    "weighted_spectral_entropy",
+    "p2b_noise_v1_frozen",
+    "noise_msg_fusion_stack_v1",
+    "chemaware_stage1",
+    "chemaware_phasea",
+    "noise_chemaware_fullmsg"
+  ],
+  "optional_evidence": {
+    "chemaware_v2_continuous_null": "real only with registered candidate structures and policy; otherwise exact unavailable no-op"
+  },
+  "excluded_or_downstream": {
+    "official_finetuned_dreams": "comparison baseline and indirect dependency, not a duplicated direct expert",
+    "rrf": "retired audit-only",
+    "bioaware": "downstream only when real sample-event context is present",
+    "open_set_acceptance": "not implemented; input-missing abstention and singleton_hypothesis are not no-match calibration"
+  },
+  "dataset_roles": {
+    "enveda180": "consumed meta-development/fitting",
+    "gnps_gold_silver": "consumed development/adjudication",
+    "untouched_external_confirmation": "absent"
+  },
+  "gnps_development": {
+    "identity": {
+      "queries": 10995,
+      "recall1": 0.8824920418371988,
+      "mrr": 0.9237918445162012
+    },
+    "formula": {
+      "queries": 5261,
+      "recall1": 0.8952670594943927,
+      "mrr": 0.9368151602330116
+    }
+  },
+  "successor_experiments": {
+    "full23_v11_bounded_multireference": {
+      "run": "full23_multireference_readout_run_2420264",
+      "status": "not_promoted",
+      "selected": "full23_v1",
+      "multi_reference_content_supported": false,
+      "verdict": "docs/FULL23_V11_PROMOTION_VERDICT_20261027.json"
+    }
+  },
+  "inference_contract": {
+    "profile": "decision_layer",
+    "entrypoint": "tasks/unified_additive_release.py",
+    "input": "complete aligned query/candidate blocks with seven required score channels and an explicit V2 mode",
+    "zero_candidates": "preserved as no_candidates",
+    "single_candidate": "scored but labelled singleton_hypothesis, not calibrated acceptance",
+    "missing_required_evidence": "whole nonempty query abstains; candidates are never selectively removed",
+    "raw_spectrum_runtime": "external upstream assets; not fully embedded in this small package"
+  },
+  "application_status": {
+    "runner": "tasks/run_msv000095331_integrated_multiencoder_identity.sbatch",
+    "evidence_adapter": "tasks/build_full23_application_evidence.py",
+    "portable_replay_verifier": "tasks/verify_full23_application_replay.py",
+    "fixed_identity_axis_candidates": 22046,
+    "fixed_identity_axis_query_blocks": 38628,
+    "decision_layer_ready": true,
+    "true_full23_application_result": "pending",
+    "known_local_blocker": "frozen Noise-MSG fusion_model.joblib and report.json must be present on the execution host",
+    "relation_axis_boundary": "the 20,485 all-world cross-mass relation edges are not the Full23 identity axis"
+  },
+  "claim_boundary": "The model is the current released closed-set development ranker. It is not untouched external SOTA evidence, an open-set identity probability, or a BioAware result."
+}

@@ -1,6 +1,6 @@
 # 生物应用 agent 下一阶段任务：从大图转向可复现实体响应
 
-下达日期：2026-10-27。依据：最新 `bd3cd0e` 固定边应用结果、截至 `5d17fc1` 的 v1.1 有界修订与同日竞争研究报告。无界 v1.1 已有负结果，有界修订尚未晋级；应用主线仍使用 v1。本任务继续利用已有 15 sources / 51 contrasts，不启动无目标扩库。
+下达日期：2026-10-27；同日按 `run_2420264` 更新。依据：最新 `bd3cd0e` 固定边应用结果、v1.1 bounded 最终裁决与同日竞争研究报告。v1.1 bounded 已完成且不晋级；应用主线确定使用 Full23 v1。本任务继续利用已有 15 sources / 51 contrasts，不启动无目标扩库。
 
 ## B0：保留真实进展与明确主终点
 
@@ -22,7 +22,9 @@
 
 **新轴：模型无关身份候选发现。** 只在当前资产内按预设 precursor/adduct/polarity 等合法条件构建 complete candidate blocks。先保存轴/分母/hash，后评分，后关联响应。它评估旧图漏掉的连接，不覆盖旧实验结果。与算法 agent 对齐 query/candidate/reference/pair ID；旧 22,046 对 handoff 不自动等于新轴。
 
-Full23 的 query-local 特征必须使用完整候选块，不能在 mutual Top-1 表上把每条边伪装成 singleton query。v1 先做，v1.1 尚无晋级结果，不让应用等待。所有方法都在相同轴和 eligible universe 上比较；不让 WSE 或其他单模型阈值决定竞争方法准入。
+Full23 的 query-local 特征必须使用完整候选块，不能在 mutual Top-1 表上把每条边伪装成 singleton query。正式应用只使用 Full23 v1；v1.1 已不晋级。所有方法都在相同轴和 eligible universe 上比较；不让 WSE 或其他单模型阈值决定竞争方法准入。
+
+算法端确认：22,046 条 same-observed-precursor 10-ppm pair 是 Full23 身份轴；20,485 条 all-world unique edge 是跨质量关系轴，二者不得混用。此前本地 `unified_ranker` 结果来自旧 full-embedding readout，不是 Full23 v1。生物端必须等待发布 wrapper 的 `candidate_scores.npz` 与 `query_registry.npz`，按 `candidate_pair_id` join，并保留 `no_candidates / singleton_hypothesis / missing_required_evidence / scored` 四种状态；有限 singleton 分数不等于身份接受。
 
 不同前体的 **relation 轨**独立保留。此处边是化学关系假说，需 analog 方法、片段/中性丢失/家族证据；禁止传递聚类后默认整组件同一分子。关系图可以做家族响应，但不能合并各分子 beta 后声称同实体复现。
 
