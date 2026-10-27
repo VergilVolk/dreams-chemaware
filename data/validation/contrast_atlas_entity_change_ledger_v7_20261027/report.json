@@ -1,0 +1,48 @@
+{
+  "schema": "contrast_atlas_entity_change_ledger_v1",
+  "status": "CANDIDATE_AXIS_LEDGER_COMPLETE_FULL23_APPLICATION_PENDING",
+  "data_role": "development_consumed",
+  "denominators": {
+    "old_all_world_unique_edges": 20485,
+    "new_canonical_identity_candidates": 145665,
+    "union_entity_pairs": 157704,
+    "candidate_axis_change": {
+      "relation_track_only_not_identity_loss": 11997,
+      "gained_complete_block_identity_candidate": 137219,
+      "retained_identity_candidate": 8446,
+      "lost_identity_candidate_explicit_ion_conflict": 42
+    },
+    "registered_response_evidence_rows": 126139
+  },
+  "method_availability": {
+    "old_fragment_cosine": "available_on_old_fixed_edges",
+    "official_dreams": "available_on_old_fixed_edges",
+    "chemaware_stage1": "available_on_old_fixed_edges",
+    "noise": "not_delivered_on_new_complete_blocks",
+    "wse": "not_delivered_on_new_complete_blocks",
+    "full23_v1": "not_delivered_on_new_complete_blocks",
+    "full23_v1_1": "experimental_not_delivered_on_new_complete_blocks"
+  },
+  "interpretation": [
+    "Gained/lost/retained refer to candidate-axis membership, not a correct or incorrect model decision.",
+    "Legacy nonmass edges remain relation hypotheses and are not counted as lost molecular identities.",
+    "Registered response signs are descriptive consumed evidence; no relation supplies signed entity-level truth.",
+    "The ledger is ready for an exact-key append of complete-block WSE, Noise, Full23 v1 and later v1.1 scores.",
+    "Complete-block method scores are directional because block normalization and rank context can differ by query direction; they must never be collapsed into one undirected value."
+  ],
+  "provenance": {
+    "old_handoff_sha256": "9b6eae168eefab7451d29603ac3090bf285f8d2d1e6b40a746baec3f454a2590",
+    "new_axis_report_sha256": "90262298a0234bb009b94ae3686f1eefb04799ac9153f5ecb130dab08f51585c",
+    "new_axis_pairs_sha256": "741f3a6a4735d100121c16ec095d59eda872fe0cdde8c38cd25fe903c22994e2",
+    "official_scores_sha256": "d5482fb07d17f3e0f28f8aa28286758d8d9dbb4196d629003e9e7f039d513bff",
+    "stage1_scores_sha256": "40cca1a3a3d75d31a9ff1ed95542d37d1a3eedf1356ff35030ab5dc09057fc6c",
+    "response_entities_sha256": "6f6fa005983b9172c4f2cb7aa055feedd2165de90b6ce7c482eaa56af6b8de75",
+    "common_identity_partition_sha256": "239af73938fc03056406afea8fc3d17fa29d761735a5e96e23e0efb8e8e395b2",
+    "registered_relations_sha256": "8fba3fe5652773c68740d5237e02d0db314a2185b3c12c7581c3c9e4ced4014c",
+    "implementation_sha256": "abe39256fcdcc57cb30b11151c03f5000b08168df30370dab390bd2dd9fb2811"
+  },
+  "outputs": {
+    "entity_change_ledger.tsv.gz": "169f61a0ea808df9c79f26cc0e11f4207a0c462ad545835aee9d968555c92fd3",
+    "registered_response_evidence.tsv.gz": "7c1a2a3c543ad1ddf6cad75ce6b3c7edcc89daa8da650533b3b838de27db714b"
+  }
+}

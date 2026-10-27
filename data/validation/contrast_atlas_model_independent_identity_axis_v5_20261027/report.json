@@ -1,0 +1,72 @@
+{
+  "schema": "contrast_atlas_model_independent_identity_axis_v1",
+  "status": "DEVELOPMENT_CONSUMED_MODEL_INDEPENDENT_IDENTITY_AXIS_FROZEN",
+  "data_role": "development_consumed",
+  "candidate_definition": {
+    "precursor_tolerance_ppm": 10.0,
+    "source_disjoint": true,
+    "model_scores_read": false,
+    "response_table_read_for_entity_lineage": true,
+    "response_beta_se_or_relation_truth_used_for_admission": false,
+    "explicit_conflicts_excluded": [
+      "charge",
+      "polarity",
+      "adduct"
+    ],
+    "missing_ion_chemistry": "retained and labelled unresolved",
+    "block_rule": "all eligible candidates in every query-by-target-source block; no top-k preselection",
+    "block_indexing": "zero-based contiguous query_block_index; candidate offsets are half-open [start,end) into directed_complete_candidate_pairs.tsv.gz"
+  },
+  "denominators": {
+    "studies": 15,
+    "entities": 54861,
+    "query_target_source_blocks": 768054,
+    "nonempty_candidate_blocks": 139129,
+    "abstain_no_candidate_blocks": 628925,
+    "mass_window_directed_pairs_before_explicit_conflicts": 297370,
+    "explicit_conflict_pairs_excluded": 6040,
+    "directed_candidate_pairs": 291330,
+    "compatibility_grades": {
+      "same_mz_charge_compatible_adduct_unresolved": 145480,
+      "same_mz_charge_unresolved_adduct_unresolved": 145850
+    }
+  },
+  "claim_boundary": [
+    "This is an observed-precursor candidate axis, not a confirmed molecular-identity graph.",
+    "Adduct metadata are absent for the frozen response spectra, so cross-adduct neutral-mass identity is not claimed.",
+    "Charge or polarity missingness is retained and labelled rather than silently treated as compatibility.",
+    "Isomers, in-source fragments, isotopes, and ion-family redundancy remain possible.",
+    "Every nonempty candidate block must be scored in full by a downstream model; singleton or mutual-top1 preselection is forbidden.",
+    "No beta, SE, phenotype, registered relation, or identity truth was used to construct this axis."
+  ],
+  "provenance": {
+    "response_entities_sha256": "6f6fa005983b9172c4f2cb7aa055feedd2165de90b6ce7c482eaa56af6b8de75",
+    "common_identity_partition_sha256": "239af73938fc03056406afea8fc3d17fa29d761735a5e96e23e0efb8e8e395b2",
+    "collection_report_sha256": "4f814846a205052f43225b3ba7c547faf8718c2fffbc830fb02437e5d6587e32",
+    "source_report_sha256": "87d57cc04b90cfc8a01d50c96f1619675ba0d2117f7dbbb8be9115f95fba8db0",
+    "implementation_sha256": "fa43cdd1e7c2804df6289a82049e39321826674a75212978fc196f4696900798",
+    "mgf_sha256_by_study": {
+      "IBD200_GROUP": "6aeba8b4c1e9cc94e127985cc18bde9a4d1df8c99030d470d4cec888bc5465e6",
+      "MSV000083077": "8833c9a4a80b2ac508875395ff9e3750075e2616dc42532d55875a63ce33a8c8",
+      "MSV000084112": "5831e21a5e519903802aab5ae29da92e363ebb674e4a27142193260627443a8f",
+      "MSV000084794": "8792840ee815c63028047cede2d646edc79529eebb0b9e9d81e0f3bc382afb91",
+      "MSV000086360": "4295507c6fe553ec73e3b301002e06d8c9a5efcaba52b3016bae81bff9cf543f",
+      "MSV000088023": "59ceb4d533b480760bf93c47dc9213de44e271d0fd521b7e8ecdf67615d5fada",
+      "MSV000090788": "57cc380fac1563bfdf736c3208a4cad09f6ce39b991bbd4363b083bb1b93c659",
+      "MSV000090804": "37e8cf36f37b9a0cc9fc25f1dee1bbe718c04f6f4b8cae9cbf9a43b7c6fdd9e6",
+      "MSV000092887": "b3e8b5c40d70ee17739310d4268b08aa33bc9720fc91aafd1985a290f1cc71e3",
+      "MSV000093571": "516a613773f0a0f307bcd7fd6362ce52cdecedf68dd39ca49aff4d59fa597886",
+      "MSV000094899": "49ab4ca3815e43c8110b263cc753cd858ed32a2eaf40b7a1fd67667c284ace7d",
+      "MSV000096564": "2b8892c89650f774704c556f1fc0287afcfed38879488cdf9b959b65e4ec1e46",
+      "MSV000096724": "b54c361d415a452c47961666e9372467e5cb5065bed73c6b3fff2c4b4d5c8142",
+      "MSV000097426": "eb6b4517c2ad70b718c5384ff7378e24e650a4ef8333669df84de95a436f8b42",
+      "MSV000097610": "c628ce08fc8215942469ec8fb193c6b3c189484032f83cc9ba9b190281c64fd1"
+    }
+  },
+  "outputs": {
+    "observed_ion_registry.tsv.gz": "81c6251a29d5abc5c1ac1135ca57f6c749a8a0c4ee7c6985fbea01ae8e484b52",
+    "directed_complete_candidate_pairs.tsv.gz": "741f3a6a4735d100121c16ec095d59eda872fe0cdde8c38cd25fe903c22994e2",
+    "query_target_source_blocks.tsv.gz": "8108c15bee5884f9ae662d22efb09e432740ba176ba194c2c142610ed4b16ffd",
+    "study_observed_ion_coverage.tsv": "104a66474682f863249c0ae7c18cf72793fe5d079261726a641187b70633f20e"
+  }
+}

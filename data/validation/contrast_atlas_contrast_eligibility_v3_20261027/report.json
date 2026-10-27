@@ -1,0 +1,56 @@
+{
+  "schema": "contrast_atlas_contrast_eligibility_v1",
+  "status": "DEVELOPMENT_CONSUMED_CONTRAST_ELIGIBILITY_COMPLETE",
+  "data_role": "development_consumed",
+  "frozen_collection": "data\\validation\\contrast_atlas_open_response_collection_v9_frozenbase_chemprop_20261023",
+  "denominators": {
+    "source_families": 15,
+    "study_level_contrasts": 51,
+    "response_rows": 238412,
+    "canonical_registered_relation_units": 21,
+    "canonical_primary_relation_units": 17,
+    "cross_project_primary_pair_edges": 5,
+    "primary_relation_connected_components": 14,
+    "cross_project_primary_connected_components": 2,
+    "registered_directional_rows": 42,
+    "contrasts_with_primary_registered_target": 30,
+    "contrasts_with_signed_truth": 0,
+    "external_validation_contrasts": 0,
+    "primary_biological_discovery_contrasts": 0,
+    "chemprop_directional_rows": 24,
+    "chemprop_unique_drug_units": 12
+  },
+  "hard_findings": [
+    "The collection contains 51 contrast rows, not 51 independent studies or validation units.",
+    "The 24 directional ChemProp retrieval relations arise from 12 shared-drug units within one broader project.",
+    "The five cross-project primary pair edges collapse to two connected source-family components (HFD and IBD); they are not five independent validations.",
+    "The frozen-base collection has 238,412 response rows and preserves the 662-entity Plate3 adult-IBD correction.",
+    "Known/unresolved counts use the common GNPS Gold/Silver partition (979/53,882), never source-native labels.",
+    "No registered relation supplies confirmed signed metabolite-level truth.",
+    "Acquisition polarity, instrument, and chromatography are not harmonized in the frozen response collection and cannot be used implicitly as matched design variables."
+  ],
+  "claim_boundary": [
+    "This registry records what the frozen local artifacts establish; it does not replace public-study protocol review.",
+    "Missing instrument, polarity, chromatography, medication, assignment, or pairing metadata remain missing and are never imputed.",
+    "A contrast row is not an independent replication unit when it shares participants, cultures, source family, or parent project with another row.",
+    "All listed sources are development/consumed.",
+    "A registered relevance relation is an unsigned retrieval target, not a molecular-identity or mechanistic truth.",
+    "Unregistered cross-study pairs are unadjudicated and never counted as confirmed negatives.",
+    "Same-entity response pooling remains conditional on a separately calibrated identity link; chemical-relation edges never pool beta or SE."
+  ],
+  "provenance": {
+    "collection_report_sha256": "4f814846a205052f43225b3ba7c547faf8718c2fffbc830fb02437e5d6587e32",
+    "response_entities_sha256": "6f6fa005983b9172c4f2cb7aa055feedd2165de90b6ce7c482eaa56af6b8de75",
+    "contrast_manifest_sha256": "a3b46e4dcacd65a5845e7b319db3decff8cbe64a242ec65116ff7dd48fc5089c",
+    "source_manifest_sha256": "5b9e2e02eebb34bba6c54a6000b7ea0bbdf3132f3376a9ddfeb17b8e84311448",
+    "registered_relations_sha256": "8fba3fe5652773c68740d5237e02d0db314a2185b3c12c7581c3c9e4ced4014c",
+    "common_identity_partition_sha256": "239af73938fc03056406afea8fc3d17fa29d761735a5e96e23e0efb8e8e395b2",
+    "design_registry_sha256": "7417e371f84462fba91c5b33ba3cb9862ae9c6695f6756c4b22cb16ce1a1149e",
+    "contract_sha256": "fc11d2efffa281383ffa1795cfc9445f13682169c0163fb820a290059db44bbb",
+    "implementation_sha256": "0af7766fb32d304529cef7ca2d9bcf8a64739e592831f29542c934b1461da4aa"
+  },
+  "outputs": {
+    "contrast_eligibility.tsv": "359740f2ddf4089693de9b1a04c99904b858557c0d976ec4a4f3b1d5cfe9ba55",
+    "registered_relation_independence.tsv": "d36abf67e5e326bf7fd5183db0da3f671dacddba6a0228f3fd1a268df5036d2f"
+  }
+}

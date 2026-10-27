@@ -1,0 +1,127 @@
+{
+  "schema": "contrast_atlas_ibd_decision_blocks_v1",
+  "data_role": "development_consumed",
+  "candidate_sets": [
+    {
+      "candidate_set_id": "stercobilin_like_mz595_response_hypothesis",
+      "scientific_role": "unresolved_discovery_hypothesis",
+      "claim_label": "stercobilin-like; exact identity unconfirmed",
+      "entities": [
+        "IBD200_GROUP::1041",
+        "MSV000097610::16870",
+        "MSV000096564::13749"
+      ],
+      "expected_common_identity_status": "unresolved_entity",
+      "manual_evidence": [
+        "IBD200_GROUP::1041 and MSV000097610::16870 had the same legacy GNPS Bronze Stercobilin planar-key hypothesis; Bronze is outside the current common Gold/Silver identity policy.",
+        "MSV000096564::13749 and MSV000097610::16870 are a legacy mutual-top1 edge with fragment cosine 0.9485567212.",
+        "The three effect scales differ and must not be inverse-variance pooled."
+      ],
+      "required_next_evidence": [
+        "score every candidate in the frozen complete query-target-source blocks with WSE, Noise and Full23 v1",
+        "orthogonal identity review with retention time and reference or standard spectrum",
+        "one unconsumed fecal cohort with preregistered direction and medication, age, activity and batch adjustment"
+      ]
+    },
+    {
+      "candidate_set_id": "deoxycholic_acid_5asa_identity_disambiguation",
+      "scientific_role": "identity_disambiguation_positive_control_not_disease_mechanism",
+      "claim_label": "deoxycholic-acid-5-ASA identity candidate; medication-exposure confounded",
+      "entities": [
+        "MSV000097610::37125",
+        "IBD200_GROUP::1547",
+        "IBD200_GROUP::1527"
+      ],
+      "expected_identity_pair": [
+        "MSV000097610::37125",
+        "IBD200_GROUP::1547"
+      ],
+      "known_competitor": "IBD200_GROUP::1527",
+      "manual_evidence": [
+        "The expected pair shares the full InChIKey QLCGWJXUZVMSLH-SUMDJKQASA-N under source annotation review.",
+        "IBD200_GROUP::1527 is a same-mass chenodeoxy-5-ASA competitor with a different InChIKey.",
+        "IBD200_GROUP::1547 is strongly associated with current 5-ASA exposure, so this is not an IBD-mechanism endpoint."
+      ],
+      "required_next_evidence": [
+        "complete-block WSE, Noise and Full23 v1 ranking for pediatric query MSV000097610::37125 against all eligible adult candidates",
+        "medication-adjusted pediatric entity response before any disease interpretation"
+      ]
+    }
+  ],
+  "supporting_evidence_sources": [
+    {
+      "evidence_id": "legacy_adult_stercobilin_bronze_annotation",
+      "path": "data/reference/contrast_atlas_ibd_cross_study_20261014/adult_ibd200_annotations.tsv",
+      "sha256": "61a7325e9c7b224970b224247170c8447003954a84216aafd447b0766109c869",
+      "record_key": "#Scan#=1041",
+      "decompressed_line": 189,
+      "supports": "legacy Bronze Stercobilin label TYOWQSLRVAUSMI-UHFFFAOYSA-N; outside current Gold/Silver policy"
+    },
+    {
+      "evidence_id": "legacy_pediatric_stercobilin_bronze_annotation",
+      "path": "data/reference/contrast_atlas_ibd_cross_study_20261014/pediatric_paper_annotations.tsv",
+      "sha256": "8b84c68ee3827556de8382971dd845507a9d02acdf8df18c29bdc41d60e37b5b",
+      "record_key": "#Scan#=16870",
+      "decompressed_line": 285,
+      "supports": "legacy Bronze Stercobilin label TYOWQSLRVAUSMI-UHFFFAOYSA-N; outside current Gold/Silver policy"
+    },
+    {
+      "evidence_id": "legacy_stercobilin_identity_ledger",
+      "path": "data/validation/contrast_atlas_exact_identity_calibration_v3_replay_20261019/shared_identity_members.tsv.gz",
+      "sha256": "9808d65e84ae6bb0da10a1ae7268469a68a3e66ccc024d3e13c0608c92888b44",
+      "record_key": "IBD200_GROUP::1041;MSV000097610::16870",
+      "decompressed_lines": [125, 126],
+      "supports": "lineage from both legacy annotations to planar key TYOWQSLRVAUSMI"
+    },
+    {
+      "evidence_id": "adult_5asa_identity_competition",
+      "path": "data/validation/contrast_atlas_open_v9_common_identity_shards_20261023/IBD200_GROUP/identity_partition.tsv.gz",
+      "sha256": "8fdfdbeb0013e79db462955a0758943668cc2cfc56450d3ae64b07dad17703f1",
+      "record_key": "IBD200_GROUP::1547;IBD200_GROUP::1527",
+      "decompressed_lines": [471, 473],
+      "supports": "Gold full-InChIKey identities distinguish the expected 5-ASA conjugate from the same-mass chenodeoxycholic-acid-5-ASA competitor"
+    },
+    {
+      "evidence_id": "pediatric_5asa_identity_anchor",
+      "path": "data/validation/contrast_atlas_open_v9_common_identity_shards_20261023/MSV000097610/identity_partition.tsv.gz",
+      "sha256": "f85f4d244eaee9728dfeece01e1c4f18bee4eafac059148266ab75dd3c1f68cf",
+      "record_key": "MSV000097610::37125",
+      "decompressed_line": 4250,
+      "supports": "Gold full InChIKey QLCGWJXUZVMSLH-SUMDJKQASA-N shared with adult entity 1547"
+    },
+    {
+      "evidence_id": "adult_5asa_effect_implementation",
+      "path": "tasks/run_ibd_cross_study_contrast_query.py",
+      "sha256": "1bbf0b596557beb383431000f372ef381e91ced616f3d21443c8b1e29f2139b4",
+      "record_key": "contrast definition lines 113-115; robust-CLR/Welch calls lines 410,420",
+      "supports": "frozen implementation used for the descriptive current-5-ASA effect recomputation"
+    },
+    {
+      "evidence_id": "adult_5asa_effect_quant",
+      "path": "data/reference/contrast_atlas_ibd_cross_study_20261014/adult_ibd200_gnps_quant.csv",
+      "sha256": "515c4821d9b0b86322cd7d6493ae9a5345a4541babbf189214e97719ed1e05fb",
+      "record_key": "row ID=1547",
+      "source_line": 927,
+      "supports": "quantitative input for beta=1.0835322432 and SE=0.3117611440"
+    },
+    {
+      "evidence_id": "adult_5asa_effect_metadata",
+      "path": "data/reference/contrast_atlas_ibd_cross_study_20261014/adult_ibd200_metadata.tsv",
+      "sha256": "8b5ab6e63dbb55f059ee3e14fe2d200c8e3040d6a9646d79cb4b9441d07dae03",
+      "record_key": "Diagnosis in {CD,UC}; Current-5-ASA=1 versus 0",
+      "supports": "31 versus 25 labelled samples; all 56 are UC because the medication field is missing for CD"
+    },
+    {
+      "evidence_id": "adult_5asa_effect_spectrum",
+      "path": "data/reference/contrast_atlas_ibd_cross_study_20261014/adult_ibd200_consensus.mgf",
+      "sha256": "6aeba8b4c1e9cc94e127985cc18bde9a4d1df8c99030d470d4cec888bc5465e6",
+      "record_key": "entity 1547 consensus spectrum",
+      "supports": "spectrum input lineage for the medication-confounded identity-control entity"
+    }
+  ],
+  "claim_boundary": [
+    "These are frozen development candidates, not external biological validation.",
+    "Candidate-axis membership is not identity truth and response concordance is not allowed to select the spectral winner.",
+    "A chemical-relation edge never pools beta or SE across different entities."
+  ]
+}

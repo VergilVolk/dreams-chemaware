@@ -1,0 +1,209 @@
+{
+  "schema": "contrast_atlas_design_registry_v1",
+  "data_role": "development_consumed",
+  "default_measurement_metadata": {
+    "polarity": "not_harmonized_in_frozen_response_collection",
+    "instrument": "not_harmonized_in_frozen_response_collection",
+    "chromatography": "not_harmonized_in_frozen_response_collection"
+  },
+  "sources": {
+    "MSV000097426": {
+      "biological_unit": "individual mouse",
+      "unit_identifier_traceability": "raw mzML filenames and frozen sample manifest",
+      "study_design": "controlled two-group diet experiment",
+      "repeated_measures": "none documented in frozen effect object",
+      "time_or_dose": "HFD versus NFD endpoint; duration and dose not carried into the frozen collection",
+      "covariates": "none in Welch endpoint model",
+      "intentional_drug_exposure": false,
+      "causal_status": "intervention design, but assignment/randomization evidence is not carried into the frozen collection",
+      "design_provenance": "data/validation/msv000097426_hfd_contrast_effects_20261014_v1/report.json"
+    },
+    "MSV000084112": {
+      "biological_unit": "human participant",
+      "unit_identifier_traceability": "raw mzML filenames and frozen sample manifest",
+      "study_design": "cross-sectional 2x2 obesity-by-type-1-diabetes design",
+      "repeated_measures": "none",
+      "time_or_dose": "single observational sampling",
+      "covariates": "sex and centered age; full obesity-by-diabetes interaction",
+      "intentional_drug_exposure": false,
+      "causal_status": "observational",
+      "design_provenance": "data/validation/msv000084112_matched_contrast_effects_20261014_v1/report.json"
+    },
+    "MSV000083077": {
+      "biological_unit": "human participant",
+      "unit_identifier_traceability": "raw mzML filenames and frozen sample manifest",
+      "study_design": "cross-sectional obesity-by-depressive-symptom design",
+      "repeated_measures": "none",
+      "time_or_dose": "single observational sampling",
+      "covariates": "sex, z-scored age, acquisition plate, estimable race, and obesity-by-depression interaction",
+      "intentional_drug_exposure": false,
+      "causal_status": "observational",
+      "design_provenance": "data/validation/msv000083077_saliva_contrast_effects_20261014_v1/report.json"
+    },
+    "MSV000088023": {
+      "biological_unit": "individual mouse",
+      "unit_identifier_traceability": "source response artifact retains feature effects but unit identifiers are not carried into the collection",
+      "study_design": "sex-by-diet factorial experiment",
+      "repeated_measures": "none documented",
+      "time_or_dose": "HFD versus normal-diet endpoint; duration not carried into the collection",
+      "covariates": "sex and diet strata",
+      "intentional_drug_exposure": false,
+      "causal_status": "intervention design, but assignment/randomization evidence is not carried into the frozen collection",
+      "design_provenance": "data/validation/msv000088023_hfd_unknown_response_20261014_v3/report.json"
+    },
+    "MSV000090788": {
+      "biological_unit": "human participant",
+      "unit_identifier_traceability": "author FBMN metadata and response-object provenance",
+      "study_design": "atopic-dermatitis lesional/nonlesional paired sampling plus independent healthy participants",
+      "repeated_measures": "paired lesional and nonlesional sites within 30 AD participants; healthy comparisons are unpaired",
+      "time_or_dose": "single observational sampling",
+      "covariates": "pairing for lesion-versus-nonlesion; no harmonized medication adjustment",
+      "intentional_drug_exposure": false,
+      "causal_status": "observational",
+      "design_provenance": "data/validation/public_fbmn_ad_response_objects_20261016_v2/report.json"
+    },
+    "MSV000097610": {
+      "biological_unit": "human participant",
+      "unit_identifier_traceability": "author metadata and frozen rCLR response artifact",
+      "study_design": "pediatric VEO-IBD case-control",
+      "repeated_measures": "none documented",
+      "time_or_dose": "single observational sampling",
+      "covariates": "none in frozen Welch effect; treatment exposure is not harmonized",
+      "intentional_drug_exposure": false,
+      "causal_status": "observational",
+      "design_provenance": "data/validation/contrast_atlas_ibd_source_artifacts_20261019_v1/report.json"
+    },
+    "IBD200_GROUP": {
+      "biological_unit": "human participant",
+      "unit_identifier_traceability": "adult IBD metadata with Plate3 restriction",
+      "study_design": "adult IBD case-control restricted to Plate3",
+      "repeated_measures": "none",
+      "time_or_dose": "single observational sampling",
+      "covariates": "Plate3 restriction removes perfect healthy-control/plate confounding; no harmonized medication adjustment",
+      "intentional_drug_exposure": false,
+      "causal_status": "observational sensitivity panel, not an independent cohort",
+      "design_provenance": "data/validation/contrast_atlas_open_response_collection_ibd200_plate3_v2_20261020/report.json"
+    },
+    "MSV000090804": {
+      "biological_unit": "independent bacterial culture replicate",
+      "unit_identifier_traceability": "author FBMN metadata and frozen design hashes",
+      "study_design": "controlled genetic and lanthanide-availability perturbations",
+      "repeated_measures": "none documented",
+      "time_or_dose": "50 nM versus 2 uM Nd2O3 for the nutrient contrast; fixed 2 uM background for genetic contrasts",
+      "covariates": "contrast-specific genotype or nutrient level",
+      "intentional_drug_exposure": false,
+      "causal_status": "controlled perturbation; report permits intervention interpretation",
+      "design_provenance": "data/validation/public_fbmn_systematic_response_panel_v6_20261022/report.json"
+    },
+    "MSV000086360": {
+      "biological_unit": "independent plant-tissue sample",
+      "unit_identifier_traceability": "author FBMN metadata and frozen design hashes",
+      "study_design": "balanced Bacillus subtilis intervention within root, stem, and leaf",
+      "repeated_measures": "tissue strata are separate contrast axes; cross-tissue unit dependence is not encoded in the frozen collection",
+      "time_or_dose": "endpoint treatment versus control; duration/dose not carried into the collection",
+      "covariates": "tissue-specific contrasts",
+      "intentional_drug_exposure": false,
+      "causal_status": "controlled intervention; report permits intervention interpretation",
+      "design_provenance": "data/validation/public_fbmn_systematic_response_panel_v6_20261022/report.json"
+    },
+    "MSV000084794": {
+      "biological_unit": "human participant",
+      "unit_identifier_traceability": "author FBMN metadata and frozen design hashes",
+      "study_design": "industrialized-versus-traditional population context",
+      "repeated_measures": "none",
+      "time_or_dose": "single observational sampling",
+      "covariates": "no harmonized adjustment in the frozen response object",
+      "intentional_drug_exposure": false,
+      "causal_status": "observational descriptive context only",
+      "design_provenance": "data/validation/public_fbmn_systematic_response_panel_v6_20261022/report.json"
+    },
+    "MSV000096564": {
+      "biological_unit": "human participant",
+      "unit_identifier_traceability": "author metadata; three technical files median-collapsed per participant",
+      "study_design": "baseline Crohn-disease case-control before diet intervention",
+      "repeated_measures": "later timepoints excluded; three technical files collapsed within participant",
+      "time_or_dose": "T1 baseline only",
+      "covariates": "active and remission Crohn disease combined; no treatment-effect interpretation",
+      "intentional_drug_exposure": false,
+      "causal_status": "observational baseline contrast",
+      "design_provenance": "data/validation/msv000096564_baseline_ibd_response_v1_20261022/report.json"
+    },
+    "MSV000092887": {
+      "biological_unit": "age/sex-matched participant pair",
+      "unit_identifier_traceability": "78 biological files organized as 39 matched pairs",
+      "study_design": "paired COVID-versus-age/sex-matched-control plasma comparison",
+      "repeated_measures": "pair-matched, not longitudinal",
+      "time_or_dose": "single observational sampling",
+      "covariates": "age/sex matching encoded by pair",
+      "intentional_drug_exposure": false,
+      "causal_status": "observational",
+      "design_provenance": "data/validation/contrast_atlas_msv000092887_open_source_v1_20261022/report.json"
+    },
+    "MSV000094899": {
+      "biological_unit": "microbial-culture replicate",
+      "unit_identifier_traceability": "frozen quantification matrix and sample metadata used to estimate each drug response",
+      "study_design": "drug-specific microbial-versus-abiotic time response",
+      "repeated_measures": "T2-minus-T0 response within experimental arm; exact pairing key is not carried into the collection",
+      "time_or_dose": "T2 minus T0 with matched abiotic subtraction",
+      "covariates": "abiotic control and baseline subtraction",
+      "intentional_drug_exposure": true,
+      "causal_status": "controlled microbial transformation assay; all drugs share one broader project",
+      "design_provenance": "data/validation/contrast_atlas_chemprop_sources_v1_20261023/MSV000094899/report.json"
+    },
+    "MSV000096724": {
+      "biological_unit": "microbial-culture replicate",
+      "unit_identifier_traceability": "frozen quantification matrix and sample metadata used to estimate each drug response",
+      "study_design": "23-drug endpoint microbial-versus-abiotic assay",
+      "repeated_measures": "T2-minus-T0 response within experimental arm; exact pairing key is not carried into the collection",
+      "time_or_dose": "endpoint T2 minus T0 with matched abiotic subtraction",
+      "covariates": "abiotic control and baseline subtraction",
+      "intentional_drug_exposure": true,
+      "causal_status": "controlled microbial transformation assay; two replicates per registered drug and same broader project as the other ChemProp accessions",
+      "design_provenance": "data/validation/contrast_atlas_chemprop_sources_v1_20261023/MSV000096724/report.json"
+    },
+    "MSV000093571": {
+      "biological_unit": "microbial-culture replicate",
+      "unit_identifier_traceability": "frozen quantification matrix and sample metadata used to estimate each drug response",
+      "study_design": "45-drug endpoint microbial-versus-abiotic assay",
+      "repeated_measures": "T2-minus-T0 response within experimental arm; exact pairing key is not carried into the collection",
+      "time_or_dose": "endpoint T2 minus T0 with matched abiotic subtraction",
+      "covariates": "abiotic control and baseline subtraction",
+      "intentional_drug_exposure": true,
+      "causal_status": "controlled microbial transformation assay; three replicates per registered drug and same broader project as the other ChemProp accessions",
+      "design_provenance": "data/validation/contrast_atlas_chemprop_sources_v1_20261023/MSV000093571/report.json"
+    }
+  },
+  "contrast_overrides": {
+    "MSV000090788::lesion_vs_nonlesion_paired": {
+      "independence_note": "30 paired within-person differences; participant is the independent unit"
+    },
+    "MSV000090788::lesion_vs_healthy": {
+      "independence_note": "30 AD participants versus 30 independent healthy participants"
+    },
+    "MSV000090788::nonlesion_vs_healthy": {
+      "independence_note": "30 AD participants versus 30 independent healthy participants"
+    },
+    "IBD200_GROUP::adult_all_ibd_vs_healthy": {
+      "independence_note": "36 adult IBD and 19 healthy participants on Plate3; the historical 158-versus-19, 177-participant effect is invalid for disease interpretation",
+      "effect_input_override": "data/validation/contrast_atlas_open_response_collection_ibd200_plate3_v2_20261020/response_entities.tsv.gz",
+      "effect_report_override": "data/validation/contrast_atlas_open_response_collection_ibd200_plate3_v2_20261020/report.json"
+    },
+    "MSV000096564::baseline_ibd_vs_control": {
+      "independence_note": "11 Crohn-disease and 11 control participants after within-participant technical collapse"
+    },
+    "MSV000092887::covid_vs_age_sex_matched_control_abundance": {
+      "independence_note": "39 matched-pair differences from 78 participants"
+    }
+  },
+  "project_dependence_groups": {
+    "MSV000094899": "CHEMPROP_SHARED_PARENT_PROJECT",
+    "MSV000096724": "CHEMPROP_SHARED_PARENT_PROJECT",
+    "MSV000093571": "CHEMPROP_SHARED_PARENT_PROJECT"
+  },
+  "claim_boundary": [
+    "This registry records what the frozen local artifacts establish; it does not replace public-study protocol review.",
+    "Missing instrument, polarity, chromatography, medication, assignment, or pairing metadata remain missing and are never imputed.",
+    "A contrast row is not an independent replication unit when it shares participants, cultures, source family, or parent project with another row.",
+    "All listed sources are development/consumed."
+  ]
+}
