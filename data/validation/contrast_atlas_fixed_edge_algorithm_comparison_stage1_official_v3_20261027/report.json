@@ -1,0 +1,75 @@
+{
+  "status": "CONTRAST_ATLAS_FIXED_EDGE_ALGORITHM_COMPARISON_COMPLETE",
+  "data_role": "development_consumed",
+  "baseline_method": "fragment_cosine",
+  "methods": [
+    "fragment_cosine",
+    "fragment_coverage_matched",
+    "official_dreams",
+    "chemaware_stage1"
+  ],
+  "denominators": {
+    "registered_rows_per_method": 378,
+    "open_top_hit_rows_per_method": 918,
+    "registered_relation_delta_rows": 1134,
+    "open_top_hit_delta_rows": 2754
+  },
+  "interpretation_boundary": [
+    "Registered relations are consumed development controls, not sealed truth.",
+    "Candidate edges and response effects are identical across methods; only fixed-edge strength changes.",
+    "Open top-hit changes are unadjudicated hypotheses and are not counted as corrections.",
+    "All-versus-known is a within-panel information comparison, not proof that unresolved entities are correctly identified."
+  ],
+  "inputs": {
+    "fragment_cosine": {
+      "run_dir": "data\\validation\\contrast_atlas_open_local_edge_enrichment_v5_20261027",
+      "report_sha256": "20dd1091f99f5ddecb9da2126bad71f4594dd6e422be275357fc3cc3a357d551",
+      "registered_sha256": "5be8d0d136dce36b573afa596c7d3e6913db2b1e0cad3c81bac2e2a1be059819",
+      "top_hits_sha256": "1a169f6fe5caf505d0a6081b2994dee29be05498523cf143ae62630b91f5b374"
+    },
+    "fragment_coverage_matched": {
+      "run_dir": "data\\validation\\contrast_atlas_open_local_edge_enrichment_fragment_matched_stage1_v1_20261027",
+      "report_sha256": "fc7c96d776102ea168fa20c4f3695663c5e2fd41a272c0d176be8f8c082328f1",
+      "registered_sha256": "7e7867301265df127022d4fffede543d0836de020d62432df9142f4402621481",
+      "top_hits_sha256": "83c06e7922a38c9c6499dfcfcbaaaa746070e19714b76616b73bba989a564fc0"
+    },
+    "official_dreams": {
+      "run_dir": "data\\validation\\contrast_atlas_open_local_edge_enrichment_official_v1_20261027",
+      "report_sha256": "379405cb604fff1570fa0f104d6b4a51611118a3d28cbf32911f71f62996c646",
+      "registered_sha256": "633452a909c18b3127b3d63c73a99d236e3d5e22f0ea56d436d90c75a7640e2a",
+      "top_hits_sha256": "ea9ad3ae1b06e47689e51e9f54f8ced80516431a15d859f811b798da6d6c55cc"
+    },
+    "chemaware_stage1": {
+      "run_dir": "data\\validation\\contrast_atlas_open_local_edge_enrichment_stage1_v1_20261027",
+      "report_sha256": "d00027ae41e7d489f536330d45ae40c4322aa1c354556c294dc64c81057ad0df",
+      "registered_sha256": "a9f319dea298deb6366fb0a32efca58f50846f73dfe61144ce1662ed4af788eb",
+      "top_hits_sha256": "23a9a422038b7231130a0b71ac06bad44769a73eb280c9c8eef029615186878e"
+    }
+  },
+  "outputs": {
+    "summary": {
+      "path": "data\\validation\\contrast_atlas_fixed_edge_algorithm_comparison_stage1_official_v3_20261027\\registered_performance_by_method.tsv",
+      "sha256": "6a12b3af495ef691fa819cb00706c3d7fa8290e8f2de7409656836d86f32cd51"
+    },
+    "relation_deltas": {
+      "path": "data\\validation\\contrast_atlas_fixed_edge_algorithm_comparison_stage1_official_v3_20261027\\registered_relation_deltas.tsv",
+      "sha256": "1223848e5598d2423f19462a4d53d3f4ac8d1a6cf1cb742e6fd8fda0048b2cd7"
+    },
+    "open_changes": {
+      "path": "data\\validation\\contrast_atlas_fixed_edge_algorithm_comparison_stage1_official_v3_20261027\\open_top_hit_changes.tsv.gz",
+      "sha256": "7a26cbeb72d9ee0713d55bd3a3472a26707bdedad64320fe052c58f044a7446b"
+    },
+    "world_increment": {
+      "path": "data\\validation\\contrast_atlas_fixed_edge_algorithm_comparison_stage1_official_v3_20261027\\all_vs_known_registered_increment.tsv",
+      "sha256": "b6ee3651c3df1e5aea450664974087885b724c108991a7f609ddd6a38d9b5b45"
+    },
+    "paired_cluster": {
+      "path": "data\\validation\\contrast_atlas_fixed_edge_algorithm_comparison_stage1_official_v3_20261027\\paired_cluster_rank_comparison.tsv",
+      "sha256": "c38994acb832785055623b8710b3652f71610fb57621310b04271a888847e3c3"
+    },
+    "paired_world": {
+      "path": "data\\validation\\contrast_atlas_fixed_edge_algorithm_comparison_stage1_official_v3_20261027\\paired_world_rank_comparison.tsv",
+      "sha256": "360ec0fbddf7b02a408c41efcf86dcd745ecb752cc65e6e786ab65c4e67bce05"
+    }
+  }
+}
