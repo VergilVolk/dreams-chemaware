@@ -87,7 +87,8 @@ def main() -> None:
 
     anchor = np.asarray([0.2, 0.8], dtype=np.float32)
     settings = MultiReferenceSettings()
-    model = Full23AnchoredMultiReferenceReadout(settings)
+    residual_bound = 0.625
+    model = Full23AnchoredMultiReferenceReadout(settings, residual_bound)
     query = np.stack([index.query_positions] * len(ENCODER_NAMES), axis=1)
     references = np.stack([index.reference_positions] * len(ENCODER_NAMES), axis=1)
     masks = np.stack([index.reference_mask] * len(ENCODER_NAMES), axis=1)
@@ -98,6 +99,11 @@ def main() -> None:
     )
     # Zero-initialized residual means the new model begins exactly at Full23 v1.
     assert torch.equal(model(*tensors), torch.as_tensor(anchor))
+    cap_model = Full23AnchoredMultiReferenceReadout(settings, residual_bound)
+    with torch.no_grad():
+        cap_model.residual_head[-1].bias.fill_(100.0)
+    capped = cap_model(*tensors) - tensors[0]
+    assert torch.allclose(capped, torch.full_like(capped, residual_bound), atol=1e-6)
     top1 = arm_mask(masks, TOP1_ARM)
     assert np.all(top1[:, :, 0]) and not np.any(top1[:, :, 1:])
     assert np.array_equal(arm_mask(masks, TOPK_ARM), masks)
@@ -107,6 +113,7 @@ def main() -> None:
     for parameter in model.parameters():
         torch.nn.init.normal_(parameter, mean=0.0, std=0.1)
     original = model(*tensors)
+    assert torch.all(torch.abs(original - tensors[0]) <= residual_bound + 1e-7)
     permuted_references = references.copy()
     permuted_masks = masks.copy()
     permuted_references[:, :, [0, 1]] = permuted_references[:, :, [1, 0]]
@@ -129,11 +136,22 @@ def main() -> None:
         "official_embedding_direct_input": False,
         "full23_anchor_has_indirect_official_dependency": True,
         "top_k": 3,
+        "residual_bound": residual_bound,
+        "residual_bound_rule": trainer.RESIDUAL_BOUND_RULE,
+        "residual_transform": trainer.RESIDUAL_TRANSFORM,
         "settings": settings.__dict__,
         "arms": {arm: model.state_dict() for arm in ARMS},
     }
     restored = model_from_payload(payload, TOPK_ARM)
     assert torch.allclose(restored(*tensors), original, atol=1e-7, rtol=0.0)
+    legacy = dict(payload)
+    legacy.pop("residual_bound")
+    try:
+        model_from_payload(legacy, TOPK_ARM)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("legacy unbounded checkpoint must fail closed")
 
     # The fixed fitting loop consumes the same candidate/reference axes end to end.
     base = SimpleNamespace(
@@ -153,6 +171,7 @@ def main() -> None:
         [(panel, 0) for panel in PANELS],
         banks,
         SimpleNamespace(device="cpu"),
+        residual_bound,
     )
     assert len(history) == trainer.EPOCHS and np.all(np.isfinite(history))
     assert fitted.trainable_parameters == model.trainable_parameters
@@ -160,7 +179,7 @@ def main() -> None:
     try:
         Full23AnchoredMultiReferenceReadout(MultiReferenceSettings(
             encoder_names=ENCODER_NAMES + ("official_dreams",),
-        ))
+        ), residual_bound)
     except ValueError:
         pass
     else:
@@ -210,6 +229,26 @@ def main() -> None:
             trainer.FULL23_OOF_SHA256 = original_sha
         assert set(loaded) == set(PANELS)
         assert all(np.array_equal(values, [1.5, -0.5]) for values in loaded.values())
+
+    # The two panels share one Enveda-only capacity calibration. With parent
+    # error deficit 2 and correct-parent margin 4, max pairwise shift is 2 and
+    # each candidate residual is hard-capped at 1.
+    calibration_panels = {
+        panel_name: trainer.RepresentationPanel(
+            base=SimpleNamespace(
+                query_ptr=np.asarray([0, 2, 4], dtype=np.int64),
+                labels=np.asarray([1, 0, 1, 0], dtype=np.int8),
+                query_weights=np.asarray([0.5, 0.5], dtype=np.float32),
+            ),
+            anchor=np.asarray([0.0, 2.0, 4.0, 0.0], dtype=np.float32),
+            topk={},
+        )
+        for panel_name in PANELS
+    }
+    bound, calibration = trainer.calibrate_training_residual_bound(calibration_panels)
+    assert bound == 1.0
+    assert calibration["maximum_pairwise_shift"] == 2.0
+    assert calibration["gnps_accessed"] is False
 
     # Promotion is conjunctive across both consumed GNPS panels.
     metrics = {

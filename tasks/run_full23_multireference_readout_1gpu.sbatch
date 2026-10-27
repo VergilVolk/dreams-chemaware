@@ -1,8 +1,8 @@
 #!/bin/bash
-# One bounded Full23 v1.1 experiment. The frozen Full23 v1 remains the anchor;
+# One hard-bounded Full23 v1.1 contract repair. Full23 v1 remains the anchor;
 # four project embeddings add one multi-reference representation residual.
 # No encoder, WSE, P2b, MSG or V2 artifact is regenerated.
-#SBATCH --job-name=full23_multiref
+#SBATCH --job-name=full23_boundfix
 #SBATCH --partition=gpu
 #SBATCH --gpus=1
 #SBATCH --ntasks=1
@@ -136,4 +136,4 @@ sha256sum \
   "$OUT/gnps_development_adjudication/candidate_predictions_identity_disjoint.npz" \
   "$OUT/gnps_development_adjudication/candidate_predictions_formula_disjoint.npz" \
   > "$OUT/SHA256SUMS.txt"
-echo "FULL23_V11_MULTIREFERENCE_COMPLETE: $OUT"
+echo "FULL23_V11_BOUNDED_MULTIREFERENCE_CONTRACT_REPAIR_COMPLETE: $OUT"

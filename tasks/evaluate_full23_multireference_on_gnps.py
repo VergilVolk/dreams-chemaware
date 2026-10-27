@@ -17,6 +17,8 @@ import torch
 from full23_multireference_readout_core import (
     ARMS,
     ENCODER_NAMES,
+    RESIDUAL_BOUND_RULE,
+    RESIDUAL_TRANSFORM,
     SCHEMA,
     TOP1_ARM,
     TOPK_ARM,
@@ -194,6 +196,7 @@ def _validate_readout_checkpoint(readout: dict) -> None:
         "anchor_strength": ANCHOR_STRENGTH,
         "seed": TRAIN_SEED,
         "unique_query_occurrence_weighting": True,
+        "gnps_used_for_residual_bound": False,
     }
     training = readout.get("training", {})
     drifted = {
@@ -211,6 +214,46 @@ def _validate_readout_checkpoint(readout: dict) -> None:
         f"settings.{key}": {"expected": value, "observed": settings.get(key)}
         for key, value in expected_settings.items() if settings.get(key) != value
     })
+    bound = float(readout.get("residual_bound", float("nan")))
+    if not np.isfinite(bound) or bound <= 0:
+        drifted["residual_bound"] = {
+            "expected": "finite positive", "observed": bound,
+        }
+    if readout.get("residual_bound_rule") != RESIDUAL_BOUND_RULE:
+        drifted["residual_bound_rule"] = {
+            "expected": RESIDUAL_BOUND_RULE,
+            "observed": readout.get("residual_bound_rule"),
+        }
+    if readout.get("residual_transform") != RESIDUAL_TRANSFORM:
+        drifted["residual_transform"] = {
+            "expected": RESIDUAL_TRANSFORM,
+            "observed": readout.get("residual_transform"),
+        }
+    calibration = readout.get("residual_bound_calibration", {})
+    if calibration.get("gnps_accessed") is not False:
+        drifted["residual_bound_calibration.gnps_accessed"] = {
+            "expected": False, "observed": calibration.get("gnps_accessed"),
+        }
+    if calibration.get("rule") != RESIDUAL_BOUND_RULE:
+        drifted["residual_bound_calibration.rule"] = {
+            "expected": RESIDUAL_BOUND_RULE, "observed": calibration.get("rule"),
+        }
+    if not np.isclose(
+        float(calibration.get("residual_bound_per_candidate", float("nan"))),
+        bound, rtol=0.0, atol=1e-12,
+    ):
+        drifted["residual_bound_calibration.bound"] = {
+            "expected": bound,
+            "observed": calibration.get("residual_bound_per_candidate"),
+        }
+    if not np.isclose(
+        float(calibration.get("maximum_pairwise_shift", float("nan"))),
+        2.0 * bound, rtol=0.0, atol=1e-12,
+    ):
+        drifted["residual_bound_calibration.maximum_pairwise_shift"] = {
+            "expected": 2.0 * bound,
+            "observed": calibration.get("maximum_pairwise_shift"),
+        }
     if drifted:
         raise RuntimeError(f"multi-reference registered recipe drifted: {drifted}")
 

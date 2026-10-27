@@ -32,6 +32,8 @@ from evaluate_gnps_gold_silver_10ppm_embeddings import load_embeddings
 from full23_multireference_readout_core import (
     ARMS,
     ENCODER_NAMES,
+    RESIDUAL_BOUND_RULE,
+    RESIDUAL_TRANSFORM,
     SCHEMA,
     TOP_K,
     Full23AnchoredMultiReferenceReadout,
@@ -314,16 +316,124 @@ def _pack(
     )
 
 
+def _weighted_quantile(
+    values: np.ndarray, weights: np.ndarray, quantile: float,
+) -> float:
+    """Inverse empirical CDF with positive occurrence-balancing weights."""
+    values = np.asarray(values, dtype=np.float64)
+    weights = np.asarray(weights, dtype=np.float64)
+    if (
+        values.ndim != 1 or weights.shape != values.shape or not len(values)
+        or not np.all(np.isfinite(values)) or not np.all(np.isfinite(weights))
+        or np.any(weights <= 0) or not 0 <= quantile <= 1
+    ):
+        raise ValueError("invalid weighted-quantile input")
+    order = np.argsort(values, kind="stable")
+    ordered_values = values[order]
+    cumulative = np.cumsum(weights[order])
+    target = quantile * float(cumulative[-1])
+    index = min(int(np.searchsorted(cumulative, target, side="left")), len(values) - 1)
+    return float(ordered_values[index])
+
+
+def calibrate_training_residual_bound(
+    panels: dict[str, RepresentationPanel],
+) -> tuple[float, dict]:
+    """Fix one shared hard bound from Enveda OOF parent decisions only.
+
+    The maximum pairwise shift is the smaller of (i) the weighted median
+    positive deficit of parent errors and (ii) the weighted Q25 margin of
+    correct parent decisions. This preserves useful correction reach while
+    structurally protecting the high-margin majority. No GNPS value is read.
+    """
+    deficits: list[float] = []
+    deficit_weights: list[float] = []
+    correct_margins: list[float] = []
+    correct_weights: list[float] = []
+    zero_deficit_errors = 0
+    panel_counts: dict[str, dict[str, int]] = {}
+    for panel_name, panel in panels.items():
+        positive_errors = 0
+        correct = 0
+        for query in range(len(panel.base.query_ptr) - 1):
+            left, right = map(int, panel.base.query_ptr[query:query + 2])
+            score = np.asarray(panel.anchor[left:right], dtype=np.float64)
+            label = np.asarray(panel.base.labels[left:right], dtype=bool)
+            if int(np.sum(label)) != 1 or len(score) < 2 or not np.all(np.isfinite(score)):
+                raise RuntimeError(
+                    "bound calibration requires one positive and finite competition"
+                )
+            weight = float(panel.base.query_weights[query])
+            order = np.argsort(-score, kind="stable")
+            if label[int(order[0])]:
+                correct += 1
+                correct_margins.append(float(score[order[0]] - score[order[1]]))
+                correct_weights.append(weight)
+            else:
+                deficit = float(score[order[0]] - score[label][0])
+                if deficit > 0:
+                    positive_errors += 1
+                    deficits.append(deficit)
+                    deficit_weights.append(weight)
+                else:
+                    zero_deficit_errors += 1
+        panel_counts[panel_name] = {
+            "queries": int(len(panel.base.query_ptr) - 1),
+            "correct_parent_queries": correct,
+            "positive_deficit_parent_errors": positive_errors,
+        }
+    deficit_array = np.asarray(deficits, dtype=np.float64)
+    deficit_weight_array = np.asarray(deficit_weights, dtype=np.float64)
+    margin_array = np.asarray(correct_margins, dtype=np.float64)
+    margin_weight_array = np.asarray(correct_weights, dtype=np.float64)
+    if not len(deficit_array) or not len(margin_array):
+        raise RuntimeError("Enveda OOF parent lacks bound-calibration decisions")
+    error_median = _weighted_quantile(deficit_array, deficit_weight_array, 0.5)
+    correct_q25 = _weighted_quantile(margin_array, margin_weight_array, 0.25)
+    pairwise_capacity = min(error_median, correct_q25)
+    residual_bound = 0.5 * pairwise_capacity
+    if not np.isfinite(residual_bound) or residual_bound <= 0:
+        raise RuntimeError("training-derived residual bound is invalid")
+    return residual_bound, {
+        "rule": RESIDUAL_BOUND_RULE,
+        "source": "Enveda-180 five-fold formula-OOF Full23 parent only",
+        "gnps_accessed": False,
+        "residual_bound_per_candidate": residual_bound,
+        "maximum_pairwise_shift": pairwise_capacity,
+        "weighted_parent_error_deficit": {
+            "q25": _weighted_quantile(deficit_array, deficit_weight_array, 0.25),
+            "median": error_median,
+            "q75": _weighted_quantile(deficit_array, deficit_weight_array, 0.75),
+        },
+        "weighted_correct_parent_margin": {
+            "q25": correct_q25,
+            "median": _weighted_quantile(margin_array, margin_weight_array, 0.5),
+            "q75": _weighted_quantile(margin_array, margin_weight_array, 0.75),
+        },
+        "weighted_error_reachable_fraction": float(np.average(
+            deficit_array <= pairwise_capacity, weights=deficit_weight_array,
+        )),
+        "weighted_correct_decision_structurally_protected_fraction": float(np.average(
+            margin_array > pairwise_capacity, weights=margin_weight_array,
+        )),
+        "zero_deficit_tie_errors": zero_deficit_errors,
+        "panel_counts": panel_counts,
+    }
+
+
 def _fit_arm(
     arm: str,
     panels: dict[str, RepresentationPanel],
     occurrences: list[tuple[str, int]],
     banks: dict[str, torch.Tensor],
     args: argparse.Namespace,
+    residual_bound: float,
 ) -> tuple[Full23AnchoredMultiReferenceReadout, list[float]]:
     # Same initialization and batch order make Top-1 vs Top-3 capacity matched.
     _seed(TRAIN_SEED, args.device)
-    model = Full23AnchoredMultiReferenceReadout(MultiReferenceSettings()).to(args.device)
+    model = Full23AnchoredMultiReferenceReadout(
+        MultiReferenceSettings(), residual_bound,
+    ).to(args.device)
     optimizer = torch.optim.AdamW(
         model.parameters(), lr=LEARNING_RATE, weight_decay=WEIGHT_DECAY,
     )
@@ -455,6 +565,11 @@ def main() -> None:
         raise RuntimeError("benchmark manifest row registry is not contiguous")
     cpu_banks = _load_banks(args, len(manifest))
     panels = _make_representation_panels(args, full23, cpu_banks)
+    residual_bound, residual_bound_calibration = calibrate_training_residual_bound(panels)
+    print(json.dumps({
+        "status": "FULL23_BOUNDED_RESIDUAL_CALIBRATED_FROM_ENVEDA_OOF",
+        **residual_bound_calibration,
+    }), flush=True)
     occurrences = _occurrences({name: panel.base for name, panel in panels.items()})
     bank_dtype = torch.float16 if args.device.startswith("cuda") else torch.float32
     gpu_banks = {
@@ -468,7 +583,7 @@ def main() -> None:
     histories: dict[str, list[float]] = {}
     for arm in ARMS:
         models[arm], histories[arm] = _fit_arm(
-            arm, panels, occurrences, gpu_banks, args,
+            arm, panels, occurrences, gpu_banks, args, residual_bound,
         )
 
     args.output.parent.mkdir(parents=True, exist_ok=True)
@@ -486,7 +601,11 @@ def main() -> None:
             "top_k": TOP_K,
             "topk_selection": "per-encoder raw cosine; stable row-id tie break; no duplication",
             "pooling": "masked_mean_plus_max_of_16d_pair_tokens",
-            "residual": "unbounded_single_residual_with_query_balanced_l2_penalty",
+            "residual": "shared_training_calibrated_bound_times_tanh_raw_residual",
+            "residual_bound": residual_bound,
+            "residual_bound_rule": RESIDUAL_BOUND_RULE,
+            "residual_transform": RESIDUAL_TRANSFORM,
+            "residual_bound_calibration": residual_bound_calibration,
             "settings": settings.__dict__,
             "arms": {
                 arm: {key: value.detach().cpu() for key, value in model.state_dict().items()}
@@ -504,13 +623,14 @@ def main() -> None:
                 "anchor_strength": ANCHOR_STRENGTH,
                 "seed": TRAIN_SEED,
                 "unique_query_occurrence_weighting": True,
+                "gnps_used_for_residual_bound": False,
             },
             "reference_registry_sha256": registry_hashes,
             "upstream_sha256": _training_input_hashes(args),
         }
         torch.save(checkpoint, staging / "full23_multireference_readout.pt")
         report = {
-            "status": "FULL23_MULTIREFERENCE_READOUT_TRAINING_COMPLETE",
+            "status": "FULL23_BOUNDED_MULTIREFERENCE_READOUT_TRAINING_COMPLETE",
             "dataset": {
                 "name": "Enveda-180",
                 "role": "consumed meta-development fitting only",
@@ -533,6 +653,10 @@ def main() -> None:
             "matched_parameter_counts": (
                 models[ARMS[0]].trainable_parameters == models[ARMS[1]].trainable_parameters
             ),
+            "residual_bound": residual_bound,
+            "residual_bound_rule": RESIDUAL_BOUND_RULE,
+            "residual_transform": RESIDUAL_TRANSFORM,
+            "residual_bound_calibration": residual_bound_calibration,
             "training_history": histories,
             "reference_registry_sha256": registry_hashes,
             "reference_multiplicity": _reference_multiplicity(panels),
@@ -550,7 +674,7 @@ def main() -> None:
         shutil.rmtree(staging, ignore_errors=True)
         raise
     print(json.dumps({
-        "status": "FULL23_MULTIREFERENCE_READOUT_TRAINING_COMPLETE",
+        "status": "FULL23_BOUNDED_MULTIREFERENCE_READOUT_TRAINING_COMPLETE",
         "output": str(args.output),
     }), flush=True)
 

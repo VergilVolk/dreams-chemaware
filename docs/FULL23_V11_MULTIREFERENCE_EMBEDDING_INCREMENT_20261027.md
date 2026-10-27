@@ -71,7 +71,33 @@ cannot read Full23 percentiles, margins or query-level expert agreement, so its
 increment tests information retained in the frozen embeddings rather than a
 second rendering of the scalar integrator. The final score is:
 
-`frozen Full23 v1 score + embedding residual`.
+`frozen Full23 v1 score + B * tanh(raw embedding residual / B)`.
+
+`B` is shared by the Top-1 and Top-3 arms and is fixed before GNPS access. Its
+maximum pairwise correction, `2B`, is the smaller of (i) the occurrence-
+balanced median positive gap by which the Enveda five-fold OOF Full23 parent
+ranks a wrong candidate above the true candidate and (ii) the corresponding
+Q25 margin of correct parent decisions. This keeps a meaningful fraction of
+training-parent errors reachable while structurally protecting the high-margin
+majority. It is one deterministic Enveda-training calibration, not a residual-
+bound grid. Dividing the raw head by `B` preserves unit slope at zero, so the
+repair changes tail capacity without silently changing the initial optimizer.
+
+For the pinned Enveda OOF parent ledger, this rule gives
+`B=0.6255066395` Full23-score units and maximum pairwise shift
+`2B=1.2510132790`. On that training ledger, 50.01% of positive parent-error
+deficits are structurally reachable while 81.93% of correct parent decisions
+are structurally protected. These are capacity diagnostics, not performance
+claims.
+
+The first server realization (`run_2419582`) accidentally implemented an
+unbounded residual plus an L2 penalty despite this section's bounded contract.
+Its negative GNPS outcome therefore diagnoses that unbounded implementation;
+it does not adjudicate the intended bounded method. Schema
+`full23_anchored_multireference_readout_v2_bounded` rejects that legacy
+checkpoint. The contract-repair run changes only the tail transform and its
+training-only bound; all data, frozen encoders, head widths, initialization,
+batch order, optimizer and evaluation rules remain fixed.
 
 The last residual layer is initialized to zero, so the exact initial ranking is
 Full23 v1. No encoder, WSE, P2b, MSG or V2 model is retrained.

@@ -19,12 +19,16 @@ from massspecgym_embedding_readout_core import REQUIRED_ENCODERS
 from noise_corrected_fullgraph_evaluation import expanded_indices, score_embeddings
 
 
-SCHEMA = "full23_anchored_multireference_readout_v1"
+SCHEMA = "full23_anchored_multireference_readout_v2_bounded"
 TOP1_ARM = "top1_embedding_residual_control"
 TOPK_ARM = "top3_multireference_embedding_residual"
 ARMS = (TOP1_ARM, TOPK_ARM)
 ENCODER_NAMES = tuple(REQUIRED_ENCODERS)
 TOP_K = 3
+RESIDUAL_BOUND_RULE = (
+    "half_min_weighted_median_parent_error_deficit_and_q25_correct_margin_v1"
+)
+RESIDUAL_TRANSFORM = "B*tanh(raw/B)"
 
 
 def _positions(rows: np.ndarray, requested: np.ndarray, label: str) -> np.ndarray:
@@ -129,9 +133,9 @@ class MultiReferenceSettings:
 
 
 class Full23AnchoredMultiReferenceReadout(nn.Module):
-    """One residual over four frozen-encoder multi-reference sets."""
+    """One hard-bounded residual over four frozen-encoder reference sets."""
 
-    def __init__(self, settings: MultiReferenceSettings):
+    def __init__(self, settings: MultiReferenceSettings, residual_bound: float):
         super().__init__()
         if tuple(settings.encoder_names) != ENCODER_NAMES:
             raise ValueError(
@@ -141,7 +145,10 @@ class Full23AnchoredMultiReferenceReadout(nn.Module):
             raise ValueError("invalid registered multi-reference settings")
         if settings.projection_dimension < 1 or settings.fusion_hidden < 1:
             raise ValueError("invalid readout width")
+        if not np.isfinite(residual_bound) or residual_bound <= 0:
+            raise ValueError("residual bound must be finite and positive")
         self.settings = settings
+        self.residual_bound = float(residual_bound)
         self.projections = nn.ModuleDict({
             name: nn.Linear(
                 settings.embedding_dimension, settings.projection_dimension, bias=False,
@@ -199,7 +206,10 @@ class Full23AnchoredMultiReferenceReadout(nn.Module):
             maximum = token.masked_fill(~mask, torch.finfo(token.dtype).min).max(dim=1).values
             pooled.extend((mean, maximum))
         joined = torch.cat(pooled, dim=1)
-        return self.residual_head(joined).squeeze(-1)
+        raw = self.residual_head(joined).squeeze(-1)
+        # Division by the bound preserves unit slope at zero, so the contract
+        # repair changes only tail capacity rather than the initial optimizer.
+        return self.residual_bound * torch.tanh(raw / self.residual_bound)
 
     def forward(
         self,
@@ -242,7 +252,12 @@ def model_from_payload(
         raise RuntimeError("multi-reference production settings drifted")
     if set(payload.get("arms", {})) != set(ARMS):
         raise RuntimeError("multi-reference arm registry drifted")
-    model = Full23AnchoredMultiReferenceReadout(settings)
+    residual_bound = float(payload.get("residual_bound", float("nan")))
+    if payload.get("residual_bound_rule") != RESIDUAL_BOUND_RULE:
+        raise RuntimeError("multi-reference residual-bound rule drifted")
+    if payload.get("residual_transform") != RESIDUAL_TRANSFORM:
+        raise RuntimeError("multi-reference residual transform drifted")
+    model = Full23AnchoredMultiReferenceReadout(settings, residual_bound)
     model.load_state_dict(payload["arms"][arm])
     return model.to(device).eval()
 
