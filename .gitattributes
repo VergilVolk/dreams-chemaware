@@ -8,3 +8,10 @@
 # MGF files are provenance-bearing numeric artifacts; newline conversion would
 # invalidate their recorded SHA-256 even though the payload is line-oriented.
 *.mgf    -text
+
+# Frozen validation artifacts carry recorded SHA-256 values.  Preserve their
+# exact bytes on Windows so checkout does not invalidate the manifests.
+data/validation/contrast_atlas_contrast_eligibility_v3_20261027/** binary
+data/validation/contrast_atlas_model_independent_identity_axis_v5_20261027/** binary
+data/validation/contrast_atlas_entity_change_ledger_v7_20261027/** binary
+data/validation/contrast_atlas_ibd_decision_blocks_v5_20261027/** binary
