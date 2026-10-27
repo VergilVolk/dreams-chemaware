@@ -1,0 +1,239 @@
+{
+  "schema": "dreams_unified_additive_full23_v1",
+  "release_date": "2026-10-27",
+  "scientific_role": "frozen transferable development candidate; not untouched external SOTA evidence",
+  "bundle_layers": {
+    "profile": "decision_layer",
+    "decision_layer": "embedded and directly runnable on the frozen candidate-evidence contract",
+    "raw_spectrum_runtime": "external large assets listed below; every required asset must be present and hash-validated"
+  },
+  "runtime_profiles": {
+    "decision_layer": {
+      "required": ["Python >=3.10", "numpy", "torch"],
+      "tested_environment": {
+        "python": "3.11.9",
+        "numpy": "2.4.6",
+        "torch": "2.14.0+cpu"
+      },
+      "scope": "score already-aligned candidate evidence"
+    },
+    "raw_spectrum_runtime": {
+      "known_locked_constraints_not_complete_dependency_lock": [
+        "Python 3.11",
+        "ms_entropy==1.5.2 official wheel",
+        "numpy==1.26.4 for the frozen V2 policy environment",
+        "scikit-learn==1.7.2 for the frozen V2 policy environment",
+        "PyTorch and the repository DreaMS/Lightning stack for encoder inference",
+        "joblib and the registered RDKit/chemical-rule stack for MSG and V2 evidence"
+      ],
+      "scope": "generate WSE, encoder, MSG and V2 evidence from spectra/structures",
+      "included": false,
+      "complete_dependency_lock": false,
+      "validated_by_this_bundle": false
+    }
+  },
+  "decision_layer": {
+    "checkpoint": "assets/unified_candidate_integrator.pt",
+    "sha256": "7f1309e2a89ef3640d9b6871a821df6866f2528e629547075d5305ab6707d717",
+    "checkpoint_schema": "enveda_unified_candidate_integrator_v1",
+    "arm": "additive_linear_control",
+    "feature_selection_policy": "exclude_query_constant_context_v1",
+    "parameters": 24,
+    "anchor_feature": "weighted_spectral_entropy",
+    "anchor_index": 2
+  },
+  "required_candidate_evidence": [
+    "noise_v1",
+    "weighted_spectral_entropy",
+    "p2b_noise_v1_frozen",
+    "noise_msg_fusion_stack_v1",
+    "chemaware_stage1",
+    "chemaware_phasea",
+    "noise_chemaware_fullmsg"
+  ],
+  "optional_candidate_evidence": [
+    "chemaware_v2_continuous_null"
+  ],
+  "scalar_feature_names": [
+    "noise_v1",
+    "noise_v1_percentile",
+    "weighted_spectral_entropy",
+    "weighted_spectral_entropy_percentile",
+    "p2b_noise_v1_frozen",
+    "p2b_noise_v1_frozen_percentile",
+    "noise_msg_fusion_stack_v1",
+    "noise_msg_fusion_stack_v1_percentile",
+    "chemaware_stage1_cosine",
+    "chemaware_stage1_percentile",
+    "chemaware_phasea_cosine",
+    "chemaware_phasea_percentile",
+    "noise_chemaware_fullmsg_cosine",
+    "noise_chemaware_fullmsg_percentile",
+    "reliability_top1_vote_fraction",
+    "reliability_mean_percentile",
+    "reliability_percentile_std",
+    "chemaware_v2_available",
+    "chemaware_v2_correct_minus_zero",
+    "chemaware_v2_correct_minus_worst_null",
+    "chemaware_v2_null_spread",
+    "chemaware_v2_delta_percentile",
+    "chemaware_v2_delta_top_gap"
+  ],
+  "selection_evidence": {
+    "scope": "immutable source reports copied verbatim from the two runs that selected and decomposed Full23 Additive",
+    "reports": [
+      {
+        "role": "Enveda meta-development selection report",
+        "path": "evidence/selection_modeling_report.json",
+        "sha256": "7b2c1bc1077ab429e5a745890368446510b6eecf4e5235628da07c29ef1ecb07"
+      },
+      {
+        "role": "fixed GNPS development-transfer report for the selected model",
+        "path": "evidence/selection_gnps_fixed_evaluation_report.json",
+        "sha256": "78d9826ba2ccd7bf729d2d98c8f8b5495ce34843af1de802d5176a9bd00eefe1"
+      },
+      {
+        "role": "Enveda strict-refit component-ablation report",
+        "path": "evidence/strict_refit_enveda_report.json",
+        "sha256": "e1e63397f60ca999263ca640a245ae52a35a35b7933d8197cd0b66170409b613"
+      },
+      {
+        "role": "fixed GNPS strict-refit component-ablation report",
+        "path": "evidence/strict_refit_gnps_report.json",
+        "sha256": "80a12d48d054608c150ad03382d498b9fcb7d6b45a910c591902e1ece70dfc95"
+      }
+    ]
+  },
+  "upstream_assets": {
+    "dreams_ssl_architecture": {
+      "role": "architecture scaffold used when loading the frozen encoder checkpoints",
+      "path": "dreams/models/pretrained/ssl_model_server.pt",
+      "sha256": "9884b62ecadf4bd441d22fec79b6787e5ffef168e15e7d8d5804dbdea08b38b2"
+    },
+    "official_finetuned_dreams_comparator": {
+      "role": "comparison baseline and indirect Noise-MSG/V2 geometry dependency; not a direct Full23 feature",
+      "path": "data/e1/official_embedding_slim.pt",
+      "canonical_container_sha256": "8928f908606c0bd652c5a4107d3c35102f660622958c225a1f625abe4b1ba245",
+      "local_repacked_container_sha256": "e6ae44c8e05c954d403222dd2ef410be24c5fb41b4a0f6e0783b4863da410f97",
+      "semantic_tensor_sha256": "64c6a6e7f27946d424fe045b3b6faaf901aa700ef0a1a6cb289393146c149520"
+    },
+    "noise_v1": {
+      "role": "required shared representation backbone",
+      "path": "data/validation/noise_relation_t1_t3_run_2347055/checkpoint/primary_seed_3407_slim.pt",
+      "sha256": "01ac8c7bfa75d89862e0b1eb2b5ffb297955cffae471fd483ad6c38d13f33beb",
+      "fixed_panel_encoder": "tasks/encode_gnps_gold_silver_10ppm_checkpoint.py",
+      "fixed_panel_encoder_sha256": "6c8a21ea7028fe2f5be4e7f347cfc22dc8f6927be65143f871e76ba991d58c7c"
+    },
+    "chemaware_stage1": {
+      "role": "required representation expert",
+      "path": "data/validation/chemaware_high_coverage_native/run_2340721_resume_2340524/training/best.ckpt",
+      "sha256": "09c419dcabf2ff424fe38bb33eaefcd25ccab0b6d125daf03b7959c25fff5838",
+      "optional_slim_derivative_path": "data/validation/contrast_atlas_fixed_edge_encoder_cache_v1_20261027/chemaware_stage1_slim.pt",
+      "optional_slim_derivative_sha256": "dd2646152d585d02d21eb39e3b8c0faa255df26596ecd4ca9e9da8f3321f44e2"
+    },
+    "chemaware_phasea": {
+      "role": "required representation expert",
+      "path": "data/validation/chemaware_online_role_budget_native/run_2345481/phasea_reproduction_gate/chemaware_phasea_max_boundary_step2000.ckpt",
+      "sha256": "a8428329ca1d12bfe735f3f8b848ed020a8db18d0a654d4f62cdbeb006e61135"
+    },
+    "noise_chemaware_fullmsg": {
+      "role": "required representation expert",
+      "path": "data/validation/noise_chemaware_full_massspecgym_native/run_2401890/checkpoint/noise_chemaware_fullmsg_slim.pt",
+      "sha256": "4f61a4efefe734b2c6bc66c06b315c37164b67e0f424208c3b8c7f81e6618130"
+    },
+    "weighted_spectral_entropy": {
+      "role": "required direct spectral evidence",
+      "implementation": "tasks/noise_gnps_article_spectral_scores.py",
+      "implementation_sha256": "ff2a8ad8a1ff0ec7edf2f882f5e201b34792a3db52993910cd8c7c787488caf2",
+      "fixed_bundle_builder": "tasks/build_noise_gnps_article_score_bundle.py",
+      "fixed_bundle_builder_sha256": "a36168fa993980fd4b6ddc3e64cf7d97a70d110f58491b13f7b4bf4f2642bee7",
+      "backend": "ms_entropy==1.5.2 official wheel",
+      "parameters": {
+        "fragment_tolerance_da": 0.02,
+        "clean_spectra": true,
+        "noise_threshold": 0.01,
+        "max_peak_num": 100
+      }
+    },
+    "p2b_noise_v1_frozen": {
+      "role": "required composite; input exactly once",
+      "implementation": "tasks/noise_gnps_article_spectral_scores.py",
+      "implementation_sha256": "ff2a8ad8a1ff0ec7edf2f882f5e201b34792a3db52993910cd8c7c787488caf2",
+      "frozen_metadata": "data/validation/noise_gnps_article_benchmark_run_2349091/method_scores.npz.json",
+      "frozen_metadata_sha256": "3aef04b5a71f855abe128245d740789066a0d7d88e3c1fd1c6245083c124789a",
+      "channel_order": ["noise_v1", "sqrt_cosine", "unweighted_entropy", "neutral_loss_sqrt_cosine"],
+      "weights": [0.1, 0.0, 0.1, 0.8],
+      "normalization": "absolute",
+      "minimum_classical_support": 1,
+      "minimum_advantage": 0.0,
+      "tie_epsilon": 1e-12,
+      "fallback": "noise_v1"
+    },
+    "noise_msg_fusion_stack_v1": {
+      "role": "required composite; input exactly once",
+      "path": "data/validation/noise_msg_fusion_run_2349961/fusion_model/fusion_model.joblib",
+      "sha256": "d257c5b03185953e3098bc82a7d268ec4037df5dee15d4f4ee6d415c23466062",
+      "report_path": "data/validation/noise_msg_fusion_run_2349961/fusion_model/report.json",
+      "report_sha256": "00b07bebb084c10b57849ccb4b9fea8bca0cac5d1d6b18f9951fff883c4094aa",
+      "application": "tasks/apply_noise_msg_fusion_to_gnps.py",
+      "application_sha256": "f26c19cf5cf4ee771f86807c4cc74b937035ea7a56b9c20173a8f049b3d8dbd5",
+      "feature_core": "tasks/noise_msg_pair_evidence_core.py",
+      "feature_core_sha256": "0eec2ee4ae5caca3a6e1a6eacf1d47618d9b2d3fb2a2f2a2de58c4e06a2c27b5"
+    },
+    "chemaware_v2_continuous_null": {
+      "role": "optional continuous candidate chemistry; exact no-op when unavailable",
+      "path": "data/validation/massspecgym_unified_ranker_run_2409612/rebuilt_multinull_v2_policy/truthblind_policy.joblib",
+      "sha256": "dc9d76dc439fca40db88e3a95ca33e6b59438a92e6a80080d8df77e4615e5a4a",
+      "report_path": "data/validation/massspecgym_unified_ranker_run_2409612/rebuilt_multinull_v2_policy/report.json",
+      "report_sha256": "b97dd5fb8578ab6653ae1535e309e87cb85b867f848dbfaaa4af0126d2edb91c",
+      "rule_library_path": "dreams/models/chem_aware/chem_rules_data.json",
+      "rule_library_sha256": "d66c085e8718c14eeebc6e99959ba54741e44726421d5d7d36ac7d684e63a498",
+      "token_builder": "tasks/build_gnps_chemaware_kernel_cache.py",
+      "token_builder_sha256": "109d43b8a43614c35e22b7913839c876c1ecad4f52f7cbb8fdbd86a1d4c489e8",
+      "continuous_exporter": "tasks/export_gnps_chemaware_continuous_null_evidence.py",
+      "continuous_exporter_sha256": "e5fb021ad1dc79e15ebbd0426efd26c3d486c7985bdb939af7ffe0f3aec70e0e",
+      "policy_adapter": "tasks/export_chemaware_v2_grand_fusion_scores.py",
+      "policy_adapter_sha256": "a194ea899ee893350a7ed32a62ef810c888d16cd0c792ed2577999b71df87070"
+    }
+  },
+  "raw_evidence_generation_lineage": {
+    "orchestrator": {
+      "path": "tasks/run_enveda_unified_candidate_integrator_2gpu.sbatch",
+      "sha256": "cd8b1ca9438004e179a26adde6d281caccff839ea8ce04e1ee6369110427e82f"
+    },
+    "encoder_application": {
+      "path": "tasks/encode_gnps_gold_silver_10ppm_checkpoint.py",
+      "sha256": "6c8a21ea7028fe2f5be4e7f347cfc22dc8f6927be65143f871e76ba991d58c7c"
+    },
+    "integrator_training": {
+      "path": "tasks/train_enveda_unified_candidate_integrator.py",
+      "sha256": "552119aa0572197f6963c5ce3cc1507e55b3873d921cc6f843f2c05739218f2a"
+    },
+    "fixed_gnps_evaluation": {
+      "path": "tasks/evaluate_enveda_integrator_on_gnps.py",
+      "sha256": "e541c9944810fecfaf607346014360487430606460f447f811bfac21e252c944"
+    }
+  },
+  "excluded_from_full23": {
+    "rrf": "retired audit-only reranker",
+    "bioaware": "separate downstream module requiring real sample-event context",
+    "official_finetuned_dreams": "comparison baseline, not duplicated beside Noise V1"
+  },
+  "runtime_sources": [
+    "tasks/unified_additive_release.py",
+    "tasks/enveda_unified_candidate_integrator_core.py",
+    "tasks/massspecgym_embedding_readout_core.py",
+    "tasks/test_unified_additive_release.py",
+    "tasks/validate_unified_additive_release_bundle.py"
+  ],
+  "runtime_source_sha256_at_freeze": [
+    {
+      "path": "tasks/enveda_unified_candidate_integrator_core.py",
+      "sha256": "b8c86591b1314321ad113440d8796b3deefefa96a874474a520335e3eab46a79"
+    },
+    {
+      "path": "tasks/massspecgym_embedding_readout_core.py",
+      "sha256": "213bbd4b687b560c948247e6c325ab712fceaef558cb56cff00cf28c951a1833"
+    }
+  ]
+}

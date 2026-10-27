@@ -1,0 +1,45 @@
+{
+  "schema": "unified_additive_candidate_evidence_v1",
+  "evidence_sha256": "REPLACE_WITH_SHA256_OF_CANDIDATE_EVIDENCE_NPZ",
+  "required_score_names": [
+    "noise_v1",
+    "weighted_spectral_entropy",
+    "p2b_noise_v1_frozen",
+    "noise_msg_fusion_stack_v1",
+    "chemaware_stage1",
+    "chemaware_phasea",
+    "noise_chemaware_fullmsg"
+  ],
+  "upstream_artifacts": {
+    "candidate_axis": {
+      "path": "REPLACE_WITH_SOURCE_AXIS_PATH",
+      "sha256": "REPLACE_WITH_SOURCE_AXIS_SHA256"
+    },
+    "noise_v1": {
+      "sha256": "01ac8c7bfa75d89862e0b1eb2b5ffb297955cffae471fd483ad6c38d13f33beb"
+    },
+    "weighted_spectral_entropy": {
+      "sha256": "REPLACE_WITH_WSE_SCORE_CACHE_OR_IMPLEMENTATION_SHA256"
+    },
+    "p2b_noise_v1_frozen": {
+      "sha256": "REPLACE_WITH_P2B_SCORE_CACHE_OR_IMPLEMENTATION_SHA256"
+    },
+    "chemaware_stage1": {
+      "sha256": "09c419dcabf2ff424fe38bb33eaefcd25ccab0b6d125daf03b7959c25fff5838"
+    },
+    "chemaware_phasea": {
+      "sha256": "a8428329ca1d12bfe735f3f8b848ed020a8db18d0a654d4f62cdbeb006e61135"
+    },
+    "noise_chemaware_fullmsg": {
+      "sha256": "4f61a4efefe734b2c6bc66c06b315c37164b67e0f424208c3b8c7f81e6618130"
+    },
+    "noise_msg_fusion_stack_v1": {
+      "sha256": "d257c5b03185953e3098bc82a7d268ec4037df5dee15d4f4ee6d415c23466062"
+    },
+    "chemaware_v2_continuous_null": {
+      "mode": "unavailable",
+      "sha256": "b8c86591b1314321ad113440d8796b3deefefa96a874474a520335e3eab46a79",
+      "contract": "enveda_unified_candidate_integrator_core.unavailable_chemaware"
+    }
+  }
+}
