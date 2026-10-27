@@ -1,0 +1,13 @@
+method	evidence_track	registered_relations	all_rank_better_than_known	all_rank_worse_than_known	all_rank_same_as_known	median_all_minus_known_rank
+fragment_cosine	combined_mutual	34	16	14	4	0.0
+fragment_cosine	nonmass_chemical_relation_hypothesis	34	14	18	2	1.0
+fragment_cosine	same_precursor_10ppm_identity_hypothesis	34	15	10	5	-0.5
+fragment_coverage_matched	combined_mutual	34	16	14	4	0.0
+fragment_coverage_matched	nonmass_chemical_relation_hypothesis	34	16	15	3	0.0
+fragment_coverage_matched	same_precursor_10ppm_identity_hypothesis	34	15	10	5	-1.0
+official_dreams	combined_mutual	34	15	14	5	0.0
+official_dreams	nonmass_chemical_relation_hypothesis	34	21	11	2	-2.5
+official_dreams	same_precursor_10ppm_identity_hypothesis	34	16	10	4	-1.0
+chemaware_stage1	combined_mutual	34	16	14	4	0.0
+chemaware_stage1	nonmass_chemical_relation_hypothesis	34	22	11	1	-2.0
+chemaware_stage1	same_precursor_10ppm_identity_hypothesis	34	15	11	4	-0.5

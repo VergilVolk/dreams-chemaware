@@ -45,6 +45,13 @@ TRACKS = (
     "nonmass_chemical_relation_hypothesis",
 )
 FACES = ("similar", "opposite")
+EDGE_KEY_COLUMNS = [
+    "left_study_id",
+    "right_study_id",
+    "evidence_world",
+    "left_entity_id",
+    "right_entity_id",
+]
 
 
 @dataclass
@@ -269,6 +276,73 @@ def canonical_mutual_edges(
     return table.reset_index(drop=True)
 
 
+def apply_algorithm_edge_scores(
+    mutual_edges: pd.DataFrame,
+    score_path: Path,
+    score_column: str,
+    missing_policy: str,
+) -> tuple[pd.DataFrame, dict[str, object]]:
+    """Replace edge strength without changing the exact frozen pair axis."""
+    usecols = [*EDGE_KEY_COLUMNS, score_column]
+    scores = pd.read_csv(
+        score_path, sep="\t", dtype={key: str for key in EDGE_KEY_COLUMNS}
+    )
+    missing_columns = set(usecols) - set(scores.columns)
+    if missing_columns:
+        raise RuntimeError(f"algorithm score table lacks columns: {sorted(missing_columns)}")
+    scores = scores[usecols].copy()
+    if scores.duplicated(EDGE_KEY_COLUMNS).any():
+        raise RuntimeError("algorithm score table contains duplicate frozen edge keys")
+    if mutual_edges.duplicated(EDGE_KEY_COLUMNS).any():
+        raise RuntimeError("canonical mutual edge table contains duplicate keys")
+
+    base_index = pd.MultiIndex.from_frame(mutual_edges[EDGE_KEY_COLUMNS])
+    score_index = pd.MultiIndex.from_frame(scores[EDGE_KEY_COLUMNS])
+    if len(base_index) != len(score_index) or set(base_index) != set(score_index):
+        absent = len(set(base_index) - set(score_index))
+        outside = len(set(score_index) - set(base_index))
+        raise RuntimeError(
+            f"algorithm score axis differs from frozen edges: absent={absent}, outside={outside}"
+        )
+    ordered = scores.set_index(EDGE_KEY_COLUMNS).loc[base_index, score_column]
+    raw = pd.to_numeric(ordered, errors="coerce").to_numpy(float)
+    available = np.isfinite(raw)
+    if missing_policy == "error" and not available.all():
+        raise RuntimeError(f"algorithm score is missing for {int((~available).sum())} edge rows")
+    if missing_policy == "base":
+        replacement = np.where(
+            available,
+            raw,
+            mutual_edges["chemical_similarity"].to_numpy(float),
+        )
+    elif missing_policy in {"zero", "error"}:
+        replacement = np.where(available, raw, 0.0)
+    else:
+        raise ValueError(missing_policy)
+
+    result = mutual_edges.copy()
+    result["base_chemical_similarity"] = result["chemical_similarity"].to_numpy(float)
+    result["algorithm_score_raw"] = raw
+    result["algorithm_score_available"] = available
+    # Response strength is non-negative. Negative embedding cosine therefore
+    # means no support on this fixed edge, not evidence for reverse biology.
+    result["chemical_similarity"] = np.clip(replacement, 0.0, 1.0)
+    provenance = {
+        "path": str(score_path),
+        "sha256": sha256(score_path),
+        "score_column": score_column,
+        "score_transform": "clip_to_[0,1]; negative cosine supplies zero support",
+        "missing_policy": missing_policy,
+        "edge_rows": len(result),
+        "edge_rows_available": int(available.sum()),
+        "edge_rows_unavailable": int((~available).sum()),
+        "all_world_unique_edges_available": int(
+            (available & result["evidence_world"].eq("all").to_numpy()).sum()
+        ),
+    }
+    return result, provenance
+
+
 def track_mask(block: pd.DataFrame, track: str) -> np.ndarray:
     if track == "combined_mutual":
         return np.ones(len(block), dtype=bool)
@@ -451,6 +525,11 @@ def score_open_candidates(
                             "evidence_world": str(world),
                             "evidence_track": track,
                             "mutual_edges": int(len(block)),
+                            "weighted_evidence_edges": int(
+                                np.count_nonzero(
+                                    block["chemical_similarity"].to_numpy(float) > 0
+                                )
+                            ),
                             "same_direction_dual_fdr_edges": int(same[li, ri]),
                             "opposite_direction_dual_fdr_edges": int(opposite[li, ri]),
                             "same_direction_strength": float(same_strength[li, ri]),
@@ -590,7 +669,10 @@ def top_hits(
             p_column = f"{face}_query_maxT_p"
             score_column = f"{face}_z"
             support = int(hit[support_column])
-            if not bool(hit["score_available"]) or int(hit["mutual_edges"]) < minimum_support:
+            if (
+                not bool(hit["score_available"])
+                or int(hit["weighted_evidence_edges"]) < minimum_support
+            ):
                 call = "abstain_insufficient_evidence"
             elif float(hit[p_column]) <= query_alpha and float(hit[score_column]) > 0:
                 call = f"{face}_response"
@@ -606,6 +688,7 @@ def top_hits(
                 "candidate_contrast_id": hit["candidate_contrast_id"],
                 "candidate_universe_size": int(hit["candidate_universe_size"]),
                 "mutual_edges": int(hit["mutual_edges"]),
+                "weighted_evidence_edges": int(hit["weighted_evidence_edges"]),
                 "dual_fdr_support_edges": support,
                 "enrichment_z": float(hit[score_column]),
                 "candidate_empirical_p": float(hit[f"{face}_candidate_p"]),
@@ -636,6 +719,7 @@ def audit_registered_relations(
                 "evidence_world",
                 "evidence_track",
                 "mutual_edges",
+                "weighted_evidence_edges",
                 "same_direction_dual_fdr_edges",
                 "opposite_direction_dual_fdr_edges",
                 "similar_z",
@@ -764,11 +848,27 @@ def main() -> None:
     parser.add_argument("--minimum-support", type=int, default=3)
     parser.add_argument("--precursor-ppm", type=float, default=10.0)
     parser.add_argument("--top-evidence-per-hit", type=int, default=10)
+    parser.add_argument(
+        "--algorithm-edge-scores",
+        type=Path,
+        help="Optional exact-axis score table; it may reweight but not add/drop edges",
+    )
+    parser.add_argument("--algorithm-score-column")
+    parser.add_argument("--algorithm-method-name", default="base_fragment_cosine")
+    parser.add_argument(
+        "--missing-algorithm-score",
+        choices=["zero", "base", "error"],
+        default="zero",
+    )
     args = parser.parse_args()
     if args.output_dir.exists():
         raise FileExistsError(args.output_dir)
     if args.permutations < 19:
         raise ValueError("at least 19 permutations are required for alpha 0.05")
+    if (args.algorithm_edge_scores is None) != (args.algorithm_score_column is None):
+        raise ValueError(
+            "--algorithm-edge-scores and --algorithm-score-column must be supplied together"
+        )
 
     paths = {
         "entities": args.collection / "response_entities.tsv.gz",
@@ -818,6 +918,21 @@ def main() -> None:
     mutual_edges = canonical_mutual_edges(
         paths["edges"], precursors, args.precursor_ppm
     )
+    algorithm_score_provenance: dict[str, object] = {
+        "method_name": args.algorithm_method_name,
+        "score_source": "upstream fragment cosine frozen before response scoring",
+        "edge_rows": len(mutual_edges),
+        "edge_rows_available": len(mutual_edges),
+        "edge_rows_unavailable": 0,
+    }
+    if args.algorithm_edge_scores is not None:
+        mutual_edges, replacement = apply_algorithm_edge_scores(
+            mutual_edges,
+            args.algorithm_edge_scores,
+            args.algorithm_score_column,
+            args.missing_algorithm_score,
+        )
+        algorithm_score_provenance.update(replacement)
 
     undirected, nulls = score_open_candidates(profiles, donors, mutual_edges)
     ledger = make_directed_ledger(undirected, nulls, contrasts)
@@ -876,7 +991,11 @@ def main() -> None:
         "data_role": "development_consumed",
         "method": {
             "unit": "study-level directed response contrast",
-            "chemical_graph": "upstream phenotype-blind mutual top-1 fragment-cosine graph",
+            "chemical_graph": (
+                "upstream phenotype-blind mutual top-1 fragment-cosine graph; "
+                "the exact edge set is fixed while the named algorithm may replace edge strength"
+            ),
+            "edge_strength_method": args.algorithm_method_name,
             "response_evidence": "continuous beta/sqrt(beta^2+SE^2) on each endpoint; same and opposite sign energies kept separate",
             "local_support": "mutual spectral edges contribute locally; absent edges remain zero and distinct entities are never merged",
             "null": "whole multi-contrast entity response profiles reassigned within study and common identity stratum",
@@ -902,6 +1021,7 @@ def main() -> None:
                 "a replacement spectral model may update score/evidence columns on these exact keys; "
                 "it may not add or remove pairs when testing algorithm contribution to the fixed response task"
             ),
+            "applied_score": algorithm_score_provenance,
         },
         "denominators": {
             "independent_studies": int(contrasts["study_id"].nunique()),
@@ -937,6 +1057,7 @@ def main() -> None:
         "claim_boundary": [
             "All 15 sources and all 51 contrasts are development/consumed; this is not sealed external validation.",
             "No registered relation supplies signed metabolite-level truth; similar/opposite calls are calibrated hypotheses, not confirmed mechanisms.",
+            "A learned embedding score reweights a graph admitted by the upstream fragment-cosine mutual-neighbour rule; this run does not test learned-model candidate recall.",
             "No calibrated match means no candidate passed this finite-power rule; it is not evidence that no biological relation exists.",
             "Unresolved means lacking support under the common strict library policy, not a novel or unique molecule.",
             "The 10-ppm track is a same-precursor identity hypothesis; isomers and ion-family redundancy remain possible.",
@@ -949,6 +1070,11 @@ def main() -> None:
             "registered_relations_sha256": sha256(paths["relations"]),
             "identity_partition_sha256": sha256(args.identity_partition),
             "frozen_edges_sha256": sha256(paths["edges"]),
+            **(
+                {"algorithm_edge_scores_sha256": sha256(args.algorithm_edge_scores)}
+                if args.algorithm_edge_scores is not None
+                else {}
+            ),
             "score_sha256_before_registered_relations": score_hash_before_truth,
             **{name: sha256(path) for name, path in outputs.items()},
             "implementation_sha256": sha256(Path(__file__)),

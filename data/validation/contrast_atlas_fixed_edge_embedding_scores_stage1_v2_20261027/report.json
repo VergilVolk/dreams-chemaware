@@ -1,0 +1,41 @@
+{
+  "status": "CONTRAST_ATLAS_FIXED_EDGE_EMBEDDING_SCORES_COMPLETE",
+  "data_role": "development_consumed",
+  "labels_responses_or_relations_accessed": false,
+  "candidate_contract": "exact input edge rows and join keys; no edge added or removed",
+  "denominators": {
+    "edge_rows": 41082,
+    "all_world_unique_edges": 20485
+  },
+  "methods": {
+    "chemaware_stage1": {
+      "embedding_entities": 32850,
+      "edge_rows_scored": 38475,
+      "edge_rows_unavailable": 2607,
+      "all_world_unique_edges_scored": 19181,
+      "score_min": -0.06791604310274124,
+      "score_median": 0.6366198062896729,
+      "score_max": 0.9993814826011658,
+      "caches": [
+        {
+          "path": "data\\validation\\msv000095331_integrated_multiencoder_identity_run_2404230\\chemaware_stage1_embeddings.npz",
+          "sha256": "1f8049bf22ccab166faf7382135965423136f2a9683dc3d5f654e2f092ce0557"
+        },
+        {
+          "path": "data\\validation\\contrast_atlas_fixed_edge_encoder_cache_v1_20261027\\chemaware_stage1_missing_endpoints.npz",
+          "sha256": "7fb085387b84ff9ed338563edbebc6c373588165d95e726398283a8b9597d3c7"
+        }
+      ]
+    }
+  },
+  "inputs": {
+    "edge_handoff": {
+      "path": "data\\validation\\contrast_atlas_open_local_edge_enrichment_v5_20261027\\frozen_mutual_edge_algorithm_handoff.tsv.gz",
+      "sha256": "9b6eae168eefab7451d29603ac3090bf285f8d2d1e6b40a746baec3f454a2590"
+    }
+  },
+  "output": {
+    "path": "data\\validation\\contrast_atlas_fixed_edge_embedding_scores_stage1_v2_20261027\\fixed_edge_embedding_scores.tsv.gz",
+    "sha256": "40cca1a3a3d75d31a9ff1ed95542d37d1a3eedf1356ff35030ab5dc09057fc6c"
+  }
+}

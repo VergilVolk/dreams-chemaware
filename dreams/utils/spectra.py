@@ -7,7 +7,10 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import rdkit.Chem.Descriptors as rdkitDescriptors
 from matchms import Spectrum
-from matchms.similarity import ModifiedCosine
+try:
+    from matchms.similarity import ModifiedCosine
+except ImportError:  # matchms >= 0.30 split the implementation by matcher
+    from matchms.similarity import ModifiedCosineGreedy as ModifiedCosine
 import matplotlib
 import matplotlib.cm as cm
 import matplotlib.colors as mcolors

@@ -1,0 +1,81 @@
+{
+  "status": "CONTRAST_ATLAS_FIXED_EDGE_EMBEDDING_SCORES_COMPLETE",
+  "data_role": "development_consumed",
+  "labels_responses_or_relations_accessed": false,
+  "candidate_contract": "exact input edge rows and join keys; no edge added or removed",
+  "denominators": {
+    "edge_rows": 41082,
+    "all_world_unique_edges": 20485
+  },
+  "methods": {
+    "official_dreams": {
+      "embedding_entities": 40182,
+      "edge_rows_scored": 38475,
+      "edge_rows_unavailable": 2607,
+      "all_world_unique_edges_scored": 19181,
+      "score_min": -0.13242757320404053,
+      "score_median": 0.5867141485214233,
+      "score_max": 0.9995689392089844,
+      "caches": [
+        {
+          "path": "D:\\DreaMS\\data\\validation\\contrast_atlas_open_v8_official_embedding_shards_20261022\\IBD200_GROUP\\IBD200_GROUP.npz",
+          "sha256": "1aedd647e7a8e183681cf1e812e86a83c3145c0269f63566ca1e2b05f4c41032"
+        },
+        {
+          "path": "D:\\DreaMS\\data\\validation\\contrast_atlas_open_v8_official_embedding_shards_20261022\\MSV000084112\\MSV000084112.npz",
+          "sha256": "44cc7719a1f304b2e90109da7e7c961fe9d71d6b9b0c9461ed2c9509005669ff"
+        },
+        {
+          "path": "D:\\DreaMS\\data\\validation\\contrast_atlas_open_v8_official_embedding_shards_20261022\\MSV000084794\\MSV000084794.npz",
+          "sha256": "32dc2fe0177d8962d985ce4ff8b4423c95cd0e9f6c2f985e7f042969b277fc9c"
+        },
+        {
+          "path": "D:\\DreaMS\\data\\validation\\contrast_atlas_open_v8_official_embedding_shards_20261022\\MSV000086360\\MSV000086360.npz",
+          "sha256": "9d3128b60e2b0422ccd65da358ebbb78e9eedc2d44a623463766ddd3c55ef284"
+        },
+        {
+          "path": "D:\\DreaMS\\data\\validation\\contrast_atlas_open_v8_official_embedding_shards_20261022\\MSV000088023\\MSV000088023.npz",
+          "sha256": "cedea19cd43013015f71b7f11f1a71044cd6a131701ede18b74634ab7cbc5597"
+        },
+        {
+          "path": "D:\\DreaMS\\data\\validation\\contrast_atlas_open_v8_official_embedding_shards_20261022\\MSV000090788\\MSV000090788.npz",
+          "sha256": "9540acec433a6cf50b843acc0bbf8d015770e5ac36b54d4bbfe778f415f55174"
+        },
+        {
+          "path": "D:\\DreaMS\\data\\validation\\contrast_atlas_open_v8_official_embedding_shards_20261022\\MSV000090804\\MSV000090804.npz",
+          "sha256": "c546fdfd4557416af1c4cba62d1c774fb6e3e3601ee645d95c28de29424db8f7"
+        },
+        {
+          "path": "D:\\DreaMS\\data\\validation\\contrast_atlas_open_v8_official_embedding_shards_20261022\\MSV000092887\\MSV000092887.npz",
+          "sha256": "2c9a87b0ff1a8e8c69401d817da7fd130677c21f83973b6d7319233dfe2d177d"
+        },
+        {
+          "path": "D:\\DreaMS\\data\\validation\\contrast_atlas_open_v8_official_embedding_shards_20261022\\MSV000096564\\MSV000096564.npz",
+          "sha256": "53597f78735fe1a8dd011d579168cfe4b1037355275bd2ebe31e7802e536398a"
+        },
+        {
+          "path": "D:\\DreaMS\\data\\validation\\contrast_atlas_open_v8_official_embedding_shards_20261022\\MSV000097426\\MSV000097426.npz",
+          "sha256": "80b5e6d4aef579b771d1733de6a81b6a54716a28818f154e2356d6dcf32d1e0e"
+        },
+        {
+          "path": "D:\\DreaMS\\data\\validation\\contrast_atlas_open_response_embeddings_official_v1_20261019\\MSV000083077.npz",
+          "sha256": "86719f24dbdd59b2081c3e91c590a890a4337a74c4fef848b19e5c6cb2e9f89d"
+        },
+        {
+          "path": "D:\\DreaMS\\data\\validation\\contrast_atlas_fixed_edge_encoder_cache_v1_20261027\\official_dreams_missing_endpoints.npz",
+          "sha256": "52d4b240351d940651e2f6aa11933bf0a0589fb575466f0b7bcb692e253612d4"
+        }
+      ]
+    }
+  },
+  "inputs": {
+    "edge_handoff": {
+      "path": "data\\validation\\contrast_atlas_open_local_edge_enrichment_v5_20261027\\frozen_mutual_edge_algorithm_handoff.tsv.gz",
+      "sha256": "9b6eae168eefab7451d29603ac3090bf285f8d2d1e6b40a746baec3f454a2590"
+    }
+  },
+  "output": {
+    "path": "data\\validation\\contrast_atlas_fixed_edge_embedding_scores_official_v1_20261027\\fixed_edge_embedding_scores.tsv.gz",
+    "sha256": "d5482fb07d17f3e0f28f8aa28286758d8d9dbb4196d629003e9e7f039d513bff"
+  }
+}

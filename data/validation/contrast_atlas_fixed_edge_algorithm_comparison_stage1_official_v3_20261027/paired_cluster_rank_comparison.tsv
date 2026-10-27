@@ -1,0 +1,157 @@
+reference_method	method	relation_class	evidence_world	evidence_track	undirected_relation_units	units_rank_improved	units_rank_worsened	units_rank_unchanged	median_rank_delta	one_sided_sign_p	one_sided_wilcoxon_p
+fragment_cosine	fragment_coverage_matched	consumed_exact_drug_cross_design	all	combined_mutual	12	0	2	10	0.0	1.0	1.0
+fragment_cosine	fragment_coverage_matched	consumed_exact_drug_cross_design	all	nonmass_chemical_relation_hypothesis	12	6	4	2	-0.25	0.376953125	0.34375
+fragment_cosine	fragment_coverage_matched	consumed_exact_drug_cross_design	all	same_precursor_10ppm_identity_hypothesis	12	3	0	9	0.0	0.125	0.125
+fragment_cosine	fragment_coverage_matched	consumed_exact_drug_cross_design	known	combined_mutual	12	0	0	12	0.0		
+fragment_cosine	fragment_coverage_matched	consumed_exact_drug_cross_design	known	nonmass_chemical_relation_hypothesis	12	0	0	12	0.0		
+fragment_cosine	fragment_coverage_matched	consumed_exact_drug_cross_design	known	same_precursor_10ppm_identity_hypothesis	12	0	0	12	0.0		
+fragment_cosine	fragment_coverage_matched	consumed_exact_drug_cross_design	unresolved	combined_mutual	12	1	2	9	0.0	0.875	0.875
+fragment_cosine	fragment_coverage_matched	consumed_exact_drug_cross_design	unresolved	nonmass_chemical_relation_hypothesis	12	5	4	3	0.0	0.5	0.150390625
+fragment_cosine	fragment_coverage_matched	consumed_exact_drug_cross_design	unresolved	same_precursor_10ppm_identity_hypothesis	12	0	2	10	0.0	1.0	1.0
+fragment_cosine	fragment_coverage_matched	prespecified_exact_intervention_family	all	combined_mutual	2	1	0	1	-0.25	0.5	0.5
+fragment_cosine	fragment_coverage_matched	prespecified_exact_intervention_family	all	nonmass_chemical_relation_hypothesis	2	1	1	0	0.25	0.75	0.75
+fragment_cosine	fragment_coverage_matched	prespecified_exact_intervention_family	all	same_precursor_10ppm_identity_hypothesis	2	0	0	2	0.0		
+fragment_cosine	fragment_coverage_matched	prespecified_exact_intervention_family	known	combined_mutual	2	0	0	2	0.0		
+fragment_cosine	fragment_coverage_matched	prespecified_exact_intervention_family	known	nonmass_chemical_relation_hypothesis	2	0	0	2	0.0		
+fragment_cosine	fragment_coverage_matched	prespecified_exact_intervention_family	unresolved	combined_mutual	2	1	0	1	-0.25	0.5	0.5
+fragment_cosine	fragment_coverage_matched	prespecified_exact_intervention_family	unresolved	nonmass_chemical_relation_hypothesis	2	0	0	2	0.0		
+fragment_cosine	fragment_coverage_matched	prespecified_exact_intervention_family	unresolved	same_precursor_10ppm_identity_hypothesis	2	0	0	2	0.0		
+fragment_cosine	fragment_coverage_matched	prespecified_near_exact_condition_family	all	combined_mutual	3	2	1	0	-1.0	0.5	0.625
+fragment_cosine	fragment_coverage_matched	prespecified_near_exact_condition_family	all	nonmass_chemical_relation_hypothesis	3	2	1	0	-1.5	0.5	0.25
+fragment_cosine	fragment_coverage_matched	prespecified_near_exact_condition_family	all	same_precursor_10ppm_identity_hypothesis	3	0	2	1	0.5	1.0	1.0
+fragment_cosine	fragment_coverage_matched	prespecified_near_exact_condition_family	known	combined_mutual	3	0	0	3	0.0		
+fragment_cosine	fragment_coverage_matched	prespecified_near_exact_condition_family	known	nonmass_chemical_relation_hypothesis	3	0	0	3	0.0		
+fragment_cosine	fragment_coverage_matched	prespecified_near_exact_condition_family	known	same_precursor_10ppm_identity_hypothesis	3	0	0	3	0.0		
+fragment_cosine	fragment_coverage_matched	prespecified_near_exact_condition_family	unresolved	combined_mutual	3	1	2	0	0.5	0.875	0.875
+fragment_cosine	fragment_coverage_matched	prespecified_near_exact_condition_family	unresolved	nonmass_chemical_relation_hypothesis	3	1	2	0	1.0	0.875	0.875
+fragment_cosine	fragment_coverage_matched	prespecified_near_exact_condition_family	unresolved	same_precursor_10ppm_identity_hypothesis	3	1	1	1	0.0	0.75	0.75
+fragment_cosine	official_dreams	consumed_exact_drug_cross_design	all	combined_mutual	12	1	3	8	0.0	0.9375	0.9375
+fragment_cosine	official_dreams	consumed_exact_drug_cross_design	all	nonmass_chemical_relation_hypothesis	12	10	2	0	-1.25	0.019287109375	0.005615234375
+fragment_cosine	official_dreams	consumed_exact_drug_cross_design	all	same_precursor_10ppm_identity_hypothesis	12	1	0	11	0.0	0.5	0.5
+fragment_cosine	official_dreams	consumed_exact_drug_cross_design	known	combined_mutual	12	7	2	3	-0.5	0.08984375	0.05859375
+fragment_cosine	official_dreams	consumed_exact_drug_cross_design	known	nonmass_chemical_relation_hypothesis	12	5	4	3	0.0	0.5	0.3203125
+fragment_cosine	official_dreams	consumed_exact_drug_cross_design	known	same_precursor_10ppm_identity_hypothesis	12	3	3	6	0.0	0.65625	0.171875
+fragment_cosine	official_dreams	consumed_exact_drug_cross_design	unresolved	combined_mutual	12	1	2	9	0.0	0.875	0.875
+fragment_cosine	official_dreams	consumed_exact_drug_cross_design	unresolved	nonmass_chemical_relation_hypothesis	12	8	1	3	-0.75	0.01953125	0.03125
+fragment_cosine	official_dreams	consumed_exact_drug_cross_design	unresolved	same_precursor_10ppm_identity_hypothesis	12	2	2	8	0.0	0.6875	0.75
+fragment_cosine	official_dreams	prespecified_exact_intervention_family	all	combined_mutual	2	0	1	1	0.25	1.0	1.0
+fragment_cosine	official_dreams	prespecified_exact_intervention_family	all	nonmass_chemical_relation_hypothesis	2	2	0	0	-4.75	0.25	0.25
+fragment_cosine	official_dreams	prespecified_exact_intervention_family	all	same_precursor_10ppm_identity_hypothesis	2	2	0	0	-1.0	0.25	0.25
+fragment_cosine	official_dreams	prespecified_exact_intervention_family	known	combined_mutual	2	1	0	1	-0.5	0.5	0.5
+fragment_cosine	official_dreams	prespecified_exact_intervention_family	known	nonmass_chemical_relation_hypothesis	2	1	0	1	-0.5	0.5	0.5
+fragment_cosine	official_dreams	prespecified_exact_intervention_family	unresolved	combined_mutual	2	0	1	1	0.5	1.0	1.0
+fragment_cosine	official_dreams	prespecified_exact_intervention_family	unresolved	nonmass_chemical_relation_hypothesis	2	2	0	0	-3.75	0.25	0.25
+fragment_cosine	official_dreams	prespecified_exact_intervention_family	unresolved	same_precursor_10ppm_identity_hypothesis	2	1	1	0	0.0	0.75	0.75
+fragment_cosine	official_dreams	prespecified_near_exact_condition_family	all	combined_mutual	3	2	1	0	-0.5	0.5	0.375
+fragment_cosine	official_dreams	prespecified_near_exact_condition_family	all	nonmass_chemical_relation_hypothesis	3	2	1	0	-2.0	0.5	0.25
+fragment_cosine	official_dreams	prespecified_near_exact_condition_family	all	same_precursor_10ppm_identity_hypothesis	3	0	2	1	0.5	1.0	1.0
+fragment_cosine	official_dreams	prespecified_near_exact_condition_family	known	combined_mutual	3	2	1	0	-1.0	0.5	0.375
+fragment_cosine	official_dreams	prespecified_near_exact_condition_family	known	nonmass_chemical_relation_hypothesis	3	1	2	0	3.0	0.875	0.875
+fragment_cosine	official_dreams	prespecified_near_exact_condition_family	known	same_precursor_10ppm_identity_hypothesis	3	0	2	1	1.0	1.0	1.0
+fragment_cosine	official_dreams	prespecified_near_exact_condition_family	unresolved	combined_mutual	3	2	1	0	-0.5	0.5	0.375
+fragment_cosine	official_dreams	prespecified_near_exact_condition_family	unresolved	nonmass_chemical_relation_hypothesis	3	2	1	0	-1.0	0.5	0.375
+fragment_cosine	official_dreams	prespecified_near_exact_condition_family	unresolved	same_precursor_10ppm_identity_hypothesis	3	0	2	1	0.5	1.0	1.0
+fragment_cosine	chemaware_stage1	consumed_exact_drug_cross_design	all	combined_mutual	12	1	3	8	0.0	0.9375	0.9375
+fragment_cosine	chemaware_stage1	consumed_exact_drug_cross_design	all	nonmass_chemical_relation_hypothesis	12	7	3	2	-0.75	0.171875	0.0302734375
+fragment_cosine	chemaware_stage1	consumed_exact_drug_cross_design	all	same_precursor_10ppm_identity_hypothesis	12	2	0	10	0.0	0.25	0.25
+fragment_cosine	chemaware_stage1	consumed_exact_drug_cross_design	known	combined_mutual	12	7	2	3	-0.5	0.08984375	0.060546875
+fragment_cosine	chemaware_stage1	consumed_exact_drug_cross_design	known	nonmass_chemical_relation_hypothesis	12	5	5	2	0.0	0.623046875	0.68359375
+fragment_cosine	chemaware_stage1	consumed_exact_drug_cross_design	known	same_precursor_10ppm_identity_hypothesis	12	7	0	5	-0.5	0.0078125	0.0078125
+fragment_cosine	chemaware_stage1	consumed_exact_drug_cross_design	unresolved	combined_mutual	12	1	2	9	0.0	0.875	0.875
+fragment_cosine	chemaware_stage1	consumed_exact_drug_cross_design	unresolved	nonmass_chemical_relation_hypothesis	12	7	4	1	-1.25	0.2744140625	0.09130859375
+fragment_cosine	chemaware_stage1	consumed_exact_drug_cross_design	unresolved	same_precursor_10ppm_identity_hypothesis	12	2	1	9	0.0	0.5	0.625
+fragment_cosine	chemaware_stage1	prespecified_exact_intervention_family	all	combined_mutual	2	0	0	2	0.0		
+fragment_cosine	chemaware_stage1	prespecified_exact_intervention_family	all	nonmass_chemical_relation_hypothesis	2	2	0	0	-2.75	0.25	0.25
+fragment_cosine	chemaware_stage1	prespecified_exact_intervention_family	all	same_precursor_10ppm_identity_hypothesis	2	2	0	0	-1.0	0.25	0.25
+fragment_cosine	chemaware_stage1	prespecified_exact_intervention_family	known	combined_mutual	2	1	0	1	-0.5	0.5	0.5
+fragment_cosine	chemaware_stage1	prespecified_exact_intervention_family	known	nonmass_chemical_relation_hypothesis	2	1	1	0	0.0	0.75	0.75
+fragment_cosine	chemaware_stage1	prespecified_exact_intervention_family	unresolved	combined_mutual	2	0	1	1	0.25	1.0	1.0
+fragment_cosine	chemaware_stage1	prespecified_exact_intervention_family	unresolved	nonmass_chemical_relation_hypothesis	2	2	0	0	-2.25	0.25	0.25
+fragment_cosine	chemaware_stage1	prespecified_exact_intervention_family	unresolved	same_precursor_10ppm_identity_hypothesis	2	0	2	0	0.75	1.0	1.0
+fragment_cosine	chemaware_stage1	prespecified_near_exact_condition_family	all	combined_mutual	3	1	1	1	0.0	0.75	0.5
+fragment_cosine	chemaware_stage1	prespecified_near_exact_condition_family	all	nonmass_chemical_relation_hypothesis	3	2	1	0	-3.5	0.5	0.25
+fragment_cosine	chemaware_stage1	prespecified_near_exact_condition_family	all	same_precursor_10ppm_identity_hypothesis	3	0	1	2	0.0	1.0	1.0
+fragment_cosine	chemaware_stage1	prespecified_near_exact_condition_family	known	combined_mutual	3	2	1	0	-1.0	0.5	0.25
+fragment_cosine	chemaware_stage1	prespecified_near_exact_condition_family	known	nonmass_chemical_relation_hypothesis	3	1	2	0	3.0	0.875	0.875
+fragment_cosine	chemaware_stage1	prespecified_near_exact_condition_family	known	same_precursor_10ppm_identity_hypothesis	3	0	2	1	1.5	1.0	1.0
+fragment_cosine	chemaware_stage1	prespecified_near_exact_condition_family	unresolved	combined_mutual	3	3	0	0	-0.5	0.125	0.125
+fragment_cosine	chemaware_stage1	prespecified_near_exact_condition_family	unresolved	nonmass_chemical_relation_hypothesis	3	2	1	0	-1.0	0.5	0.375
+fragment_cosine	chemaware_stage1	prespecified_near_exact_condition_family	unresolved	same_precursor_10ppm_identity_hypothesis	3	0	2	1	1.0	1.0	1.0
+fragment_coverage_matched	official_dreams	consumed_exact_drug_cross_design	all	combined_mutual	12	2	2	8	0.0	0.6875	0.75
+fragment_coverage_matched	official_dreams	consumed_exact_drug_cross_design	all	nonmass_chemical_relation_hypothesis	12	10	1	1	-1.5	0.005859375	0.00146484375
+fragment_coverage_matched	official_dreams	consumed_exact_drug_cross_design	all	same_precursor_10ppm_identity_hypothesis	12	1	2	9	0.0	0.875	0.875
+fragment_coverage_matched	official_dreams	consumed_exact_drug_cross_design	known	combined_mutual	12	7	2	3	-0.5	0.08984375	0.05859375
+fragment_coverage_matched	official_dreams	consumed_exact_drug_cross_design	known	nonmass_chemical_relation_hypothesis	12	5	4	3	0.0	0.5	0.3203125
+fragment_coverage_matched	official_dreams	consumed_exact_drug_cross_design	known	same_precursor_10ppm_identity_hypothesis	12	3	3	6	0.0	0.65625	0.171875
+fragment_coverage_matched	official_dreams	consumed_exact_drug_cross_design	unresolved	combined_mutual	12	2	1	9	0.0	0.5	0.5
+fragment_coverage_matched	official_dreams	consumed_exact_drug_cross_design	unresolved	nonmass_chemical_relation_hypothesis	12	9	2	1	-1.25	0.03271484375	0.044921875
+fragment_coverage_matched	official_dreams	consumed_exact_drug_cross_design	unresolved	same_precursor_10ppm_identity_hypothesis	12	3	1	8	0.0	0.3125	0.3125
+fragment_coverage_matched	official_dreams	prespecified_exact_intervention_family	all	combined_mutual	2	0	1	1	0.5	1.0	1.0
+fragment_coverage_matched	official_dreams	prespecified_exact_intervention_family	all	nonmass_chemical_relation_hypothesis	2	2	0	0	-5.0	0.25	0.25
+fragment_coverage_matched	official_dreams	prespecified_exact_intervention_family	all	same_precursor_10ppm_identity_hypothesis	2	2	0	0	-1.0	0.25	0.25
+fragment_coverage_matched	official_dreams	prespecified_exact_intervention_family	known	combined_mutual	2	1	0	1	-0.5	0.5	0.5
+fragment_coverage_matched	official_dreams	prespecified_exact_intervention_family	known	nonmass_chemical_relation_hypothesis	2	1	0	1	-0.5	0.5	0.5
+fragment_coverage_matched	official_dreams	prespecified_exact_intervention_family	unresolved	combined_mutual	2	0	1	1	0.75	1.0	1.0
+fragment_coverage_matched	official_dreams	prespecified_exact_intervention_family	unresolved	nonmass_chemical_relation_hypothesis	2	2	0	0	-3.75	0.25	0.25
+fragment_coverage_matched	official_dreams	prespecified_exact_intervention_family	unresolved	same_precursor_10ppm_identity_hypothesis	2	1	1	0	0.0	0.75	0.75
+fragment_coverage_matched	official_dreams	prespecified_near_exact_condition_family	all	combined_mutual	3	1	1	1	0.0	0.75	0.5
+fragment_coverage_matched	official_dreams	prespecified_near_exact_condition_family	all	nonmass_chemical_relation_hypothesis	3	2	0	1	-0.5	0.25	0.25
+fragment_coverage_matched	official_dreams	prespecified_near_exact_condition_family	all	same_precursor_10ppm_identity_hypothesis	3	1	1	1	0.0	0.75	0.75
+fragment_coverage_matched	official_dreams	prespecified_near_exact_condition_family	known	combined_mutual	3	2	1	0	-1.0	0.5	0.375
+fragment_coverage_matched	official_dreams	prespecified_near_exact_condition_family	known	nonmass_chemical_relation_hypothesis	3	1	2	0	3.0	0.875	0.875
+fragment_coverage_matched	official_dreams	prespecified_near_exact_condition_family	known	same_precursor_10ppm_identity_hypothesis	3	0	2	1	1.0	1.0	1.0
+fragment_coverage_matched	official_dreams	prespecified_near_exact_condition_family	unresolved	combined_mutual	3	2	0	1	-1.0	0.25	0.25
+fragment_coverage_matched	official_dreams	prespecified_near_exact_condition_family	unresolved	nonmass_chemical_relation_hypothesis	3	3	0	0	-1.5	0.125	0.125
+fragment_coverage_matched	official_dreams	prespecified_near_exact_condition_family	unresolved	same_precursor_10ppm_identity_hypothesis	3	0	1	2	0.0	1.0	1.0
+fragment_coverage_matched	chemaware_stage1	consumed_exact_drug_cross_design	all	combined_mutual	12	2	3	7	0.0	0.8125	0.8125
+fragment_coverage_matched	chemaware_stage1	consumed_exact_drug_cross_design	all	nonmass_chemical_relation_hypothesis	12	10	1	1	-1.75	0.005859375	0.00439453125
+fragment_coverage_matched	chemaware_stage1	consumed_exact_drug_cross_design	all	same_precursor_10ppm_identity_hypothesis	12	1	1	10	0.0	0.75	0.75
+fragment_coverage_matched	chemaware_stage1	consumed_exact_drug_cross_design	known	combined_mutual	12	7	2	3	-0.5	0.08984375	0.060546875
+fragment_coverage_matched	chemaware_stage1	consumed_exact_drug_cross_design	known	nonmass_chemical_relation_hypothesis	12	5	5	2	0.0	0.623046875	0.68359375
+fragment_coverage_matched	chemaware_stage1	consumed_exact_drug_cross_design	known	same_precursor_10ppm_identity_hypothesis	12	7	0	5	-0.5	0.0078125	0.0078125
+fragment_coverage_matched	chemaware_stage1	consumed_exact_drug_cross_design	unresolved	combined_mutual	12	1	1	10	0.0	0.75	0.75
+fragment_coverage_matched	chemaware_stage1	consumed_exact_drug_cross_design	unresolved	nonmass_chemical_relation_hypothesis	12	9	2	1	-2.0	0.03271484375	0.0361328125
+fragment_coverage_matched	chemaware_stage1	consumed_exact_drug_cross_design	unresolved	same_precursor_10ppm_identity_hypothesis	12	3	0	9	0.0	0.125	0.125
+fragment_coverage_matched	chemaware_stage1	prespecified_exact_intervention_family	all	combined_mutual	2	0	1	1	0.25	1.0	1.0
+fragment_coverage_matched	chemaware_stage1	prespecified_exact_intervention_family	all	nonmass_chemical_relation_hypothesis	2	2	0	0	-3.0	0.25	0.25
+fragment_coverage_matched	chemaware_stage1	prespecified_exact_intervention_family	all	same_precursor_10ppm_identity_hypothesis	2	2	0	0	-1.0	0.25	0.25
+fragment_coverage_matched	chemaware_stage1	prespecified_exact_intervention_family	known	combined_mutual	2	1	0	1	-0.5	0.5	0.5
+fragment_coverage_matched	chemaware_stage1	prespecified_exact_intervention_family	known	nonmass_chemical_relation_hypothesis	2	1	1	0	0.0	0.75	0.75
+fragment_coverage_matched	chemaware_stage1	prespecified_exact_intervention_family	unresolved	combined_mutual	2	0	2	0	0.5	1.0	1.0
+fragment_coverage_matched	chemaware_stage1	prespecified_exact_intervention_family	unresolved	nonmass_chemical_relation_hypothesis	2	2	0	0	-2.25	0.25	0.25
+fragment_coverage_matched	chemaware_stage1	prespecified_exact_intervention_family	unresolved	same_precursor_10ppm_identity_hypothesis	2	0	2	0	0.75	1.0	1.0
+fragment_coverage_matched	chemaware_stage1	prespecified_near_exact_condition_family	all	combined_mutual	3	1	2	0	0.5	0.875	0.625
+fragment_coverage_matched	chemaware_stage1	prespecified_near_exact_condition_family	all	nonmass_chemical_relation_hypothesis	3	2	0	1	-2.0	0.25	0.25
+fragment_coverage_matched	chemaware_stage1	prespecified_near_exact_condition_family	all	same_precursor_10ppm_identity_hypothesis	3	2	0	1	-0.5	0.25	0.25
+fragment_coverage_matched	chemaware_stage1	prespecified_near_exact_condition_family	known	combined_mutual	3	2	1	0	-1.0	0.5	0.25
+fragment_coverage_matched	chemaware_stage1	prespecified_near_exact_condition_family	known	nonmass_chemical_relation_hypothesis	3	1	2	0	3.0	0.875	0.875
+fragment_coverage_matched	chemaware_stage1	prespecified_near_exact_condition_family	known	same_precursor_10ppm_identity_hypothesis	3	0	2	1	1.5	1.0	1.0
+fragment_coverage_matched	chemaware_stage1	prespecified_near_exact_condition_family	unresolved	combined_mutual	3	2	0	1	-2.0	0.25	0.25
+fragment_coverage_matched	chemaware_stage1	prespecified_near_exact_condition_family	unresolved	nonmass_chemical_relation_hypothesis	3	3	0	0	-1.0	0.125	0.125
+fragment_coverage_matched	chemaware_stage1	prespecified_near_exact_condition_family	unresolved	same_precursor_10ppm_identity_hypothesis	3	0	1	2	0.0	1.0	1.0
+official_dreams	chemaware_stage1	consumed_exact_drug_cross_design	all	combined_mutual	12	1	1	10	0.0	0.75	0.5
+official_dreams	chemaware_stage1	consumed_exact_drug_cross_design	all	nonmass_chemical_relation_hypothesis	12	5	5	2	0.0	0.623046875	0.744140625
+official_dreams	chemaware_stage1	consumed_exact_drug_cross_design	all	same_precursor_10ppm_identity_hypothesis	12	1	0	11	0.0	0.5	0.5
+official_dreams	chemaware_stage1	consumed_exact_drug_cross_design	known	combined_mutual	12	3	3	6	0.0	0.65625	0.5
+official_dreams	chemaware_stage1	consumed_exact_drug_cross_design	known	nonmass_chemical_relation_hypothesis	12	2	5	5	0.0	0.9375	0.9609375
+official_dreams	chemaware_stage1	consumed_exact_drug_cross_design	known	same_precursor_10ppm_identity_hypothesis	12	6	1	5	-0.25	0.0625	0.0546875
+official_dreams	chemaware_stage1	consumed_exact_drug_cross_design	unresolved	combined_mutual	12	1	2	9	0.0	0.875	0.875
+official_dreams	chemaware_stage1	consumed_exact_drug_cross_design	unresolved	nonmass_chemical_relation_hypothesis	12	5	5	2	0.0	0.623046875	0.51953125
+official_dreams	chemaware_stage1	consumed_exact_drug_cross_design	unresolved	same_precursor_10ppm_identity_hypothesis	12	1	0	11	0.0	0.5	0.5
+official_dreams	chemaware_stage1	prespecified_exact_intervention_family	all	combined_mutual	2	1	0	1	-0.25	0.5	0.5
+official_dreams	chemaware_stage1	prespecified_exact_intervention_family	all	nonmass_chemical_relation_hypothesis	2	0	2	0	2.0	1.0	1.0
+official_dreams	chemaware_stage1	prespecified_exact_intervention_family	all	same_precursor_10ppm_identity_hypothesis	2	0	0	2	0.0		
+official_dreams	chemaware_stage1	prespecified_exact_intervention_family	known	combined_mutual	2	0	0	2	0.0		
+official_dreams	chemaware_stage1	prespecified_exact_intervention_family	known	nonmass_chemical_relation_hypothesis	2	0	1	1	0.5	1.0	1.0
+official_dreams	chemaware_stage1	prespecified_exact_intervention_family	unresolved	combined_mutual	2	1	1	0	-0.25	0.75	0.5
+official_dreams	chemaware_stage1	prespecified_exact_intervention_family	unresolved	nonmass_chemical_relation_hypothesis	2	0	2	0	1.5	1.0	1.0
+official_dreams	chemaware_stage1	prespecified_exact_intervention_family	unresolved	same_precursor_10ppm_identity_hypothesis	2	1	1	0	0.75	0.75	0.75
+official_dreams	chemaware_stage1	prespecified_near_exact_condition_family	all	combined_mutual	3	0	2	1	0.5	1.0	1.0
+official_dreams	chemaware_stage1	prespecified_near_exact_condition_family	all	nonmass_chemical_relation_hypothesis	3	2	0	1	-0.5	0.25	0.25
+official_dreams	chemaware_stage1	prespecified_near_exact_condition_family	all	same_precursor_10ppm_identity_hypothesis	3	2	0	1	-0.5	0.25	0.25
+official_dreams	chemaware_stage1	prespecified_near_exact_condition_family	known	combined_mutual	3	1	1	1	0.0	0.75	0.75
+official_dreams	chemaware_stage1	prespecified_near_exact_condition_family	known	nonmass_chemical_relation_hypothesis	3	1	1	1	0.0	0.75	0.5
+official_dreams	chemaware_stage1	prespecified_near_exact_condition_family	known	same_precursor_10ppm_identity_hypothesis	3	1	1	1	0.0	0.75	0.75
+official_dreams	chemaware_stage1	prespecified_near_exact_condition_family	unresolved	combined_mutual	3	2	0	1	-1.0	0.25	0.25
+official_dreams	chemaware_stage1	prespecified_near_exact_condition_family	unresolved	nonmass_chemical_relation_hypothesis	3	0	2	1	0.5	1.0	1.0
+official_dreams	chemaware_stage1	prespecified_near_exact_condition_family	unresolved	same_precursor_10ppm_identity_hypothesis	3	0	1	2	0.0	1.0	1.0
