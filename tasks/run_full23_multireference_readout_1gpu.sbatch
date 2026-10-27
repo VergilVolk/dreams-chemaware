@@ -78,13 +78,28 @@ fi
 python - "$FULL23" <<'PY'
 from pathlib import Path
 import sys
+from full23_multireference_readout_core import (
+    RESIDUAL_BOUND_RULE, RESIDUAL_TRANSFORM, SCHEMA,
+)
 from unified_additive_release import CHECKPOINT_SHA256, sha256_file, validate_checkpoint
 path = Path(sys.argv[1])
 validate_checkpoint(path)
 observed = sha256_file(path)
 if observed != CHECKPOINT_SHA256:
     raise SystemExit(f"FULL23_V1_SHA256_MISMATCH: {observed}")
+expected_schema = "full23_anchored_multireference_readout_v2_bounded"
+expected_rule = "half_min_weighted_median_parent_error_deficit_and_q25_correct_margin_v1"
+if SCHEMA != expected_schema or RESIDUAL_BOUND_RULE != expected_rule:
+    raise SystemExit(
+        "FULL23_BOUNDED_CODE_PREFLIGHT_FAIL: "
+        f"schema={SCHEMA!r} rule={RESIDUAL_BOUND_RULE!r}"
+    )
+if RESIDUAL_TRANSFORM != "B*tanh(raw/B)":
+    raise SystemExit(
+        f"FULL23_BOUNDED_CODE_PREFLIGHT_FAIL: transform={RESIDUAL_TRANSFORM!r}"
+    )
 print("FULL23_V1_ANCHOR_PREFLIGHT_PASS")
+print("FULL23_BOUNDED_CODE_PREFLIGHT_PASS")
 PY
 
 python -m py_compile \
