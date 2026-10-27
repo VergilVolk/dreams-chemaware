@@ -8,6 +8,10 @@ search is part of this round. The next computation measures which evidence
 families make the fitted combination non-replaceable and applies that exact
 model to the fixed biological candidate axis.
 
+The strict contribution matrix has now completed as server run `2415768`.
+Its results, benchmark sampling analysis and scientific decision are recorded
+in `docs/UNIFIED_ADDITIVE_STRICT_REFIT_ABLATION_RESULT_20261027.md`.
+
 Enveda-180 and GNPS are both consumed development resources. The work below can
 establish component contribution and deployment behavior, but it cannot by
 itself establish final external generalization or a field-wide SOTA claim.
