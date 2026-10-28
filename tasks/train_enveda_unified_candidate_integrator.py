@@ -124,6 +124,13 @@ def arguments() -> argparse.Namespace:
     parser.add_argument("--learning-rate", type=float, default=1e-3)
     parser.add_argument("--weight-decay", type=float, default=1e-4)
     parser.add_argument("--anchor-strength", type=float, default=1e-2)
+    parser.add_argument(
+        "--center-residual-penalty", action="store_true",
+        help=(
+            "Regularize only within-query residual variation. The historical "
+            "Full23 v1 absolute-residual penalty remains the default for replay."
+        ),
+    )
     parser.add_argument("--bootstrap-resamples", type=int, default=10_000)
     parser.add_argument(
         "--exclude-query-constant-context", action="store_true",
@@ -618,6 +625,7 @@ def _fit_arm(
             residual = model.residual(tensor)
             loss = loss + args.anchor_strength * weighted_query_residual_penalty(
                 residual, ptr, weights,
+                center_within_query=args.center_residual_penalty,
             )
             optimizer.zero_grad(set_to_none=True)
             loss.backward()
@@ -960,6 +968,12 @@ def main() -> None:
                 "learning_rate": args.learning_rate,
                 "weight_decay": args.weight_decay,
                 "anchor_strength": args.anchor_strength,
+                "anchor_penalty": (
+                    "query_centered_residual_mse"
+                    if args.center_residual_penalty
+                    else "absolute_residual_mse"
+                ),
+                "query_centered_anchor_penalty": bool(args.center_residual_penalty),
                 "seed": args.seed,
                 "hyperparameter_scan": False,
             },
@@ -1052,6 +1066,12 @@ def main() -> None:
                 "batch_unit": "unique query key with indivisible cross-panel occurrences",
                 "learning_rate": args.learning_rate, "weight_decay": args.weight_decay,
                 "anchor_strength": args.anchor_strength, "seed": args.seed,
+                "anchor_penalty": (
+                    "query_centered_residual_mse"
+                    if args.center_residual_penalty
+                    else "absolute_residual_mse"
+                ),
+                "query_centered_anchor_penalty": bool(args.center_residual_penalty),
                 "hyperparameter_scan": False,
             },
             "input_sha256": {

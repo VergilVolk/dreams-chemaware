@@ -1,11 +1,11 @@
 #!/usr/bin/env python
-"""Apply the Enveda-fitted candidate integrator once to consumed GNPS.
+"""Apply one explicitly selected Enveda-fitted arm once to consumed GNPS.
 
 No parameter, normalization statistic, feature choice, threshold or model arm
-is fitted here.  The nonlinear primary arm was declared before Enveda OOF and
-is always the deployed arm; the lower-capacity additive model is reported only
-as a fixed comparison.  GNPS therefore remains a consumed, read-only
-development benchmark rather than a selection surface.
+is fitted here.  The historical default remains the predeclared nonlinear
+primary, while a caller may explicitly preselect the additive arm for a later
+fixed experiment.  GNPS remains a consumed, read-only development benchmark
+rather than a selection surface.
 """
 from __future__ import annotations
 
@@ -40,6 +40,15 @@ def arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--benchmark", type=Path, required=True)
     parser.add_argument("--checkpoint", type=Path, required=True)
+    parser.add_argument(
+        "--deployed-arm", choices=(PRIMARY_ARM, CONTROL_ARM), default=PRIMARY_ARM,
+        help="Arm fixed before this GNPS evaluation; no selection occurs here.",
+    )
+    parser.add_argument(
+        "--baseline-checkpoint", type=Path,
+        help="Optional frozen Full23 checkpoint scored on the identical candidate axis.",
+    )
+    parser.add_argument("--baseline-name", default="full23_v1_frozen")
     parser.add_argument("--score-bundle", type=Path, required=True)
     parser.add_argument("--msg-cache", type=Path, required=True)
     parser.add_argument("--stage1-embeddings", type=Path, required=True)
@@ -85,6 +94,13 @@ def main() -> None:
     if args.device.startswith("cuda") and not torch.cuda.is_available():
         raise RuntimeError("fixed GNPS evaluation requested CUDA without an allocated GPU")
     payload = load_checkpoint(args.checkpoint)
+    baseline_payload = (
+        load_checkpoint(args.baseline_checkpoint)
+        if args.baseline_checkpoint is not None
+        else None
+    )
+    if args.baseline_name in (PRIMARY_ARM, CONTROL_ARM):
+        raise ValueError("baseline-name collides with a fitted arm")
     panels, panel_paths = _make_panels(args)
     feature_names = tuple(panels[PANELS[0]].feature_names)
 
@@ -96,12 +112,18 @@ def main() -> None:
                 payload, feature_names, panels[panel].scalar,
                 arm=arm, device=args.device,
             )
+        if baseline_payload is not None:
+            method_scores[panel][args.baseline_name] = predict_from_payload(
+                baseline_payload, feature_names, panels[panel].scalar,
+                arm=CONTROL_ARM, device=args.device,
+            )
     common = set.intersection(*(set(method_scores[panel]) for panel in PANELS))
     preferred = (
         "official_dreams", WSE, "noise_v1",
         "p2b_noise_v1_frozen", "noise_msg_fusion_stack_v1",
         "chemaware_stage1", "chemaware_phasea", "noise_chemaware_fullmsg",
         "B_gnps_nested_oof", CONTROL_ARM, PRIMARY_ARM,
+        args.baseline_name,
     )
     ordered = [name for name in preferred if name in common]
     ordered.extend(sorted(common - set(ordered)))
@@ -126,11 +148,22 @@ def main() -> None:
                 for index, baseline in enumerate(ordered)
                 if baseline != PRIMARY_ARM
             }
+            control_comparisons = {
+                f"{CONTROL_ARM}_vs_{baseline}": _comparison(
+                    method_scores[panel_name][CONTROL_ARM],
+                    method_scores[panel_name][baseline], panel,
+                    args.bootstrap_resamples,
+                    20271029 + panel_index * 1000 + index,
+                )
+                for index, baseline in enumerate(ordered)
+                if baseline != CONTROL_ARM
+            }
             panel_reports[panel_name] = {
                 "queries": int(len(panel.query_ptr) - 1),
                 "candidate_molecules": int(len(panel.labels)),
                 "metrics": metrics,
                 "fixed_primary_comparisons": comparisons,
+                "fixed_control_comparisons": control_comparisons,
             }
             np.savez_compressed(
                 staging / f"candidate_scores_{panel_name}.npz",
@@ -155,8 +188,22 @@ def main() -> None:
                 "path": str(args.checkpoint),
                 "sha256": sha256_file(args.checkpoint),
                 "training_role": payload.get("training", {}).get("role"),
-                "deployed_arm": PRIMARY_ARM,
-                "additive_arm_role": "capacity-lower fixed comparator; never selected here",
+                "deployed_arm": args.deployed_arm,
+                "additive_arm_role": (
+                    "explicitly preselected before this fixed GNPS evaluation"
+                    if args.deployed_arm == CONTROL_ARM
+                    else "capacity-lower fixed comparator; never selected here"
+                ),
+                "baseline_checkpoint": (
+                    {
+                        "path": str(args.baseline_checkpoint),
+                        "sha256": sha256_file(args.baseline_checkpoint),
+                        "arm": CONTROL_ARM,
+                        "method_name": args.baseline_name,
+                    }
+                    if args.baseline_checkpoint is not None
+                    else None
+                ),
             },
             "panels": panel_reports,
             "query_balanced_joint": joint,
@@ -189,7 +236,7 @@ def main() -> None:
         raise
     print(json.dumps({
         "status": report["status"],
-        "deployed_arm": PRIMARY_ARM,
+        "deployed_arm": args.deployed_arm,
         "output": str(args.output),
     }, indent=2), flush=True)
 

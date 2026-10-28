@@ -228,6 +228,19 @@ def main() -> None:
     )
     # Query MSEs are 5 and 4; query-balanced result is (0.5*5+1*4)/1.5.
     assert np.isclose(float(penalty), 13.0 / 3.0)
+    centered = weighted_query_residual_penalty(
+        torch.tensor([1.0, 3.0, 2.0, 2.0]),
+        np.asarray([0, 2, 4]), np.asarray([0.5, 1.0]),
+        center_within_query=True,
+    )
+    # Query variances are 1 and 0; weighted result is (0.5*1+1*0)/1.5.
+    assert np.isclose(float(centered), 1.0 / 3.0)
+    shifted = weighted_query_residual_penalty(
+        torch.tensor([101.0, 103.0, -8.0, -8.0]),
+        np.asarray([0, 2, 4]), np.asarray([0.5, 1.0]),
+        center_within_query=True,
+    )
+    assert torch.isclose(centered, shifted)
 
     payload = {
         "schema": CHECKPOINT_SCHEMA,
@@ -339,6 +352,7 @@ def main() -> None:
             "--output", str(output),
             "--folds", "2", "--epochs", "1", "--batch-queries", "8",
             "--hidden", "4", "--bootstrap-resamples", "100", "--device", "cpu",
+            "--center-residual-penalty",
         ]
         try:
             trainer_main()
@@ -360,12 +374,16 @@ def main() -> None:
         assert saved["primary_residual_bound"] is None
         assert saved["optional_families"] == ("chemaware_v2_continuous_null",)
         assert "noise_msg_fusion_stack_v1" in saved["required_families"]
+        assert saved["training"]["anchor_penalty"] == "query_centered_residual_mse"
+        assert saved["training"]["query_centered_anchor_penalty"] is True
 
         fixed_output = Path(raw) / "fixed_evaluation"
         sys.argv = [
             "evaluate_enveda_integrator_on_gnps.py",
             "--benchmark", str(fixture.benchmark),
             "--checkpoint", str(output / "unified_candidate_integrator.pt"),
+            "--deployed-arm", CONTROL_ARM,
+            "--baseline-checkpoint", str(output / "unified_candidate_integrator.pt"),
             "--score-bundle", str(fixture.score_bundle),
             "--msg-cache", str(fixture.msg_cache),
             "--stage1-embeddings", str(fixture.stage1_embeddings),
@@ -383,7 +401,13 @@ def main() -> None:
             (fixed_output / "report.json").read_text(encoding="utf-8")
         )
         assert fixed_report["training_or_selection_on_gnps"] is False
-        assert fixed_report["checkpoint"]["deployed_arm"] == PRIMARY_ARM
+        assert fixed_report["checkpoint"]["deployed_arm"] == CONTROL_ARM
+        assert fixed_report["checkpoint"]["baseline_checkpoint"]["arm"] == CONTROL_ARM
+        for panel in PANELS:
+            comparison = fixed_report["panels"][panel]["fixed_control_comparisons"][
+                f"{CONTROL_ARM}_vs_full23_v1_frozen"
+            ]
+            assert comparison["corrected"] == comparison["introduced"] == 0
 
     print("PASS: Enveda unified candidate integrator contracts")
 
