@@ -189,6 +189,7 @@ def build_profile_reassignments(
 def load_precursors(
     alignment_report: dict[str, object],
     registry: pd.DataFrame,
+    source_root: Path = Path("."),
 ) -> tuple[dict[tuple[str, str], float], list[dict[str, object]]]:
     output: dict[tuple[str, str], float] = {}
     summaries: list[dict[str, object]] = []
@@ -197,6 +198,8 @@ def load_precursors(
         block = registry.loc[registry["study_id"].eq(study)]
         raw_to_entity = dict(zip(block["raw_entity_id"], block["entity_id"]))
         path = Path(str(source["mgf_path"]))
+        if not path.is_absolute():
+            path = source_root / path
         found = 0
         for metadata, _peaks in iter_mgf(path):
             raw_id = spectrum_id(metadata)
@@ -841,6 +844,12 @@ def main() -> None:
     parser.add_argument("--identity-partition", required=True, type=Path)
     parser.add_argument("--alignment-dir", required=True, type=Path)
     parser.add_argument("--output-dir", required=True, type=Path)
+    parser.add_argument(
+        "--source-root",
+        type=Path,
+        default=Path("."),
+        help="Root used to resolve relative MGF paths recorded in the frozen source manifest.",
+    )
     parser.add_argument("--permutations", type=int, default=256)
     parser.add_argument("--seed", type=int, default=20261027)
     parser.add_argument("--effect-fdr", type=float, default=0.05)
@@ -913,14 +922,21 @@ def main() -> None:
     profiles = build_profiles(effects, contrasts, args.effect_fdr)
     donors = build_profile_reassignments(profiles, args.permutations, args.seed)
     precursors, precursor_summary = load_precursors(
-        alignment_report, raw_registry
+        alignment_report, raw_registry, args.source_root
     )
     mutual_edges = canonical_mutual_edges(
         paths["edges"], precursors, args.precursor_ppm
     )
+    graph_description = str(alignment_report.get(
+        "chemical_graph",
+        (
+            "upstream phenotype-blind mutual top-1 fragment-cosine graph; "
+            "the exact edge set is fixed while the named algorithm may replace edge strength"
+        ),
+    ))
     algorithm_score_provenance: dict[str, object] = {
         "method_name": args.algorithm_method_name,
-        "score_source": "upstream fragment cosine frozen before response scoring",
+        "score_source": graph_description,
         "edge_rows": len(mutual_edges),
         "edge_rows_available": len(mutual_edges),
         "edge_rows_unavailable": 0,
@@ -975,13 +991,16 @@ def main() -> None:
     for (world, track), block in primary_registered.groupby(
         ["evidence_world", "evidence_track"], sort=True
     ):
+        median_rank = block["best_face_rank"].median()
         relation_summary.append({
             "evidence_world": world,
             "evidence_track": track,
             "registered_directional_relations": int(len(block)),
             "best_face_top1": int(block["best_face_rank"].eq(1).sum()),
             "best_face_top5": int(block["best_face_rank"].le(5).sum()),
-            "median_best_face_rank": float(block["best_face_rank"].median()),
+            "median_best_face_rank": (
+                None if pd.isna(median_rank) else float(median_rank)
+            ),
             "query_maxT_005": int(block["best_face_query_maxT_p"].le(args.query_alpha).sum()),
         })
 
@@ -991,10 +1010,7 @@ def main() -> None:
         "data_role": "development_consumed",
         "method": {
             "unit": "study-level directed response contrast",
-            "chemical_graph": (
-                "upstream phenotype-blind mutual top-1 fragment-cosine graph; "
-                "the exact edge set is fixed while the named algorithm may replace edge strength"
-            ),
+            "chemical_graph": graph_description,
             "edge_strength_method": args.algorithm_method_name,
             "response_evidence": "continuous beta/sqrt(beta^2+SE^2) on each endpoint; same and opposite sign energies kept separate",
             "local_support": "mutual spectral edges contribute locally; absent edges remain zero and distinct entities are never merged",
@@ -1057,7 +1073,10 @@ def main() -> None:
         "claim_boundary": [
             "All 15 sources and all 51 contrasts are development/consumed; this is not sealed external validation.",
             "No registered relation supplies signed metabolite-level truth; similar/opposite calls are calibrated hypotheses, not confirmed mechanisms.",
-            "A learned embedding score reweights a graph admitted by the upstream fragment-cosine mutual-neighbour rule; this run does not test learned-model candidate recall.",
+            (
+                "This run consumes the exact upstream response-blind graph described in method.chemical_graph; "
+                "its retrieval claims do not extend beyond that candidate-admission contract."
+            ),
             "No calibrated match means no candidate passed this finite-power rule; it is not evidence that no biological relation exists.",
             "Unresolved means lacking support under the common strict library policy, not a novel or unique molecule.",
             "The 10-ppm track is a same-precursor identity hypothesis; isomers and ion-family redundancy remain possible.",

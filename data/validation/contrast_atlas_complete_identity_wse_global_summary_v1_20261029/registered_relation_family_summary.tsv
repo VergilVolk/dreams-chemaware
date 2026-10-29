@@ -1,0 +1,13 @@
+evidence_world	relation_class	canonical_relations	directional_relations	directional_available	directional_top1	directional_top5	directional_median_rank_available	directional_query_maxT_005	canonical_any_direction_top1	canonical_both_directions_top1	canonical_any_direction_top5	canonical_both_directions_top5	canonical_any_direction_maxT_005	canonical_both_directions_maxT_005
+all	consumed_exact_drug_cross_design	12	24	24	3	18	4.0	24	2	1	11	7	12	12
+all	posthoc_registered_cross_source_obesity_family	4	8	8	2	3	9.5	2	1	1	2	1	1	1
+all	prespecified_exact_intervention_family	2	4	4	0	0	14.5	0	0	0	0	0	0	0
+all	prespecified_near_exact_condition_family	3	6	6	0	2	9.0	4	0	0	1	1	2	2
+known	consumed_exact_drug_cross_design	12	24	24	3	9	7.5	2	2	1	6	3	1	1
+known	posthoc_registered_cross_source_obesity_family	4	8	8	1	4	6.0	1	1	0	3	1	1	0
+known	prespecified_exact_intervention_family	2	4	0	0	0		0	0	0	0	0	0	0
+known	prespecified_near_exact_condition_family	3	6	6	2	2	14.0	1	1	1	1	1	1	0
+unresolved	consumed_exact_drug_cross_design	12	24	24	3	17	4.0	24	2	1	11	6	12	12
+unresolved	posthoc_registered_cross_source_obesity_family	4	8	8	2	3	11.5	2	1	1	2	1	1	1
+unresolved	prespecified_exact_intervention_family	2	4	4	0	0	13.0	0	0	0	0	0	0	0
+unresolved	prespecified_near_exact_condition_family	3	6	6	0	2	8.0	2	0	0	2	0	1	1

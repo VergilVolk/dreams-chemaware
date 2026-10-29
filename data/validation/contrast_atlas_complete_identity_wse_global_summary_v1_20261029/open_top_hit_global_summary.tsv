@@ -1,0 +1,7 @@
+evidence_world	response_face	query_contrasts	calibrated_calls	no_calibrated_match	insufficient_evidence_abstentions	candidate_parent_projects	chemprop_candidate_hits	nonchemprop_queries	nonchemprop_to_chemprop_hits	chemprop_queries	chemprop_to_chemprop_hits	largest_single_candidate_contrast_hub
+all	opposite	51	47	4	0	7	38	27	15	24	23	8
+all	similar	51	49	2	0	6	38	27	14	24	24	11
+known	opposite	51	17	33	1	6	24	27	12	24	12	9
+known	similar	51	16	32	3	9	22	27	5	24	17	6
+unresolved	opposite	51	46	5	0	7	38	27	15	24	23	8
+unresolved	similar	51	49	2	0	8	35	27	11	24	24	11
