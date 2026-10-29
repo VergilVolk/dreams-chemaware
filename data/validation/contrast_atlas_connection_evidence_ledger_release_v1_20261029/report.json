@@ -1,0 +1,54 @@
+{
+  "claim_boundaries": [
+    "Identity-track rows are same-precursor reciprocal spectral identity hypotheses, not confirmed molecular structures.",
+    "method_evidence_weight is a WSE or legacy fragment-cosine evidence weight, never a probability.",
+    "Endpoint beta and SE values remain study-specific; the ledger never meta-analyses effects across distinct entities.",
+    "The optional different-mass relation axis is exploratory, describes distinct entities, and is never merged into identity evidence.",
+    "Contribution conservation reproduces a frozen score calculation; it does not validate a biological connection.",
+    "Registered relations and outcome truth are not read by this materialisation step."
+  ],
+  "data_role": "development_consumed",
+  "denominators": {
+    "common_identity_partition": {
+      "library_supported": 979,
+      "unresolved_entity": 53882
+    },
+    "response_rows": 238412,
+    "unique_study_entities": 54861
+  },
+  "identity_axis": {
+    "axis": "identity",
+    "connection_rows_directed_in_frozen_score_table": 6858,
+    "connection_rows_undirected": 3429,
+    "conservation": {
+      "max_abs_opposite_strength_difference": 3.410605131648481e-13,
+      "max_abs_same_strength_difference": 2.2737367544323206e-13
+    },
+    "edge_contribution_rows": 1315906,
+    "method_edges": 67465,
+    "outputs": {
+      "connection_edge_contributions.tsv.gz": "0db6dc4ddbd8504907edd89adddbddaeb9d6ae7b650bf3b4415e0a969c108438",
+      "identity_connection_strengths.tsv.gz": "c18dc6063519834826a95b78f2f391eca816de8bb1f8b89c9ba9943258077a23",
+      "method_entity_edges.tsv.gz": "88a6cef766bc15b903c40d6aa665e36aa7ea01fa297993fdcd56aa2819acf3b0"
+    },
+    "world_edge_counts": {
+      "all": 34219,
+      "known": 918,
+      "unresolved": 32328
+    }
+  },
+  "legacy_relation_axis": null,
+  "operation": "deterministic materialisation of frozen response effects, entity edges, and per-edge response contributions; no permutation or model rerun",
+  "provenance": {
+    "implementation_sha256": "748201070392052860e25579e9374d1aeee66c15132e8b17941db3e8ca947456",
+    "inputs": {
+      "data\\validation\\contrast_atlas_complete_identity_wse_open_retrieval_v3_20261029\\frozen_mutual_edge_algorithm_handoff.tsv.gz": "b6c3bc09b16e4860ea81c2929a7b281042f1dcd8e20265b890c2226a22244862",
+      "data\\validation\\contrast_atlas_complete_identity_wse_open_retrieval_v3_20261029\\open_local_edge_candidate_scores.tsv.gz": "ab8dbdb51e64719474fea50f04a801cb1c301ce6180fad5d86439f99e6770d15",
+      "data\\validation\\contrast_atlas_open_response_collection_v9_frozenbase_chemprop_20261023\\response_entities.tsv.gz": "6f6fa005983b9172c4f2cb7aa055feedd2165de90b6ce7c482eaa56af6b8de75",
+      "data\\validation\\contrast_atlas_open_v9_frozenbase_common_identity_20261023\\identity_partition.tsv.gz": "239af73938fc03056406afea8fc3d17fa29d761735a5e96e23e0efb8e8e395b2"
+    },
+    "response_effects.tsv.gz": "22dd9c4e4d4a45ea051fdf52d424010306caacd21c68b7e6cbe715705a11ba20"
+  },
+  "schema": "contrast_atlas_connection_evidence_ledger_v1",
+  "status": "DEVELOPMENT_CONSUMED_COMPLETE_TRACEABLE_LEDGER_BUILT"
+}

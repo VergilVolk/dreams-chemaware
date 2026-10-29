@@ -1,0 +1,21 @@
+{
+  "axis": "legacy_relation",
+  "connection_rows_directed_in_frozen_score_table": 6858,
+  "connection_rows_undirected": 3429,
+  "conservation": {
+    "max_abs_opposite_strength_difference": 4.263256414560601e-14,
+    "max_abs_same_strength_difference": 2.842170943040401e-14
+  },
+  "edge_contribution_rows": 315584,
+  "method_edges": 23989,
+  "outputs": {
+    "legacy_relation_connection_strengths.tsv.gz": "9a935abf57d0aa7cd8114b4b721ff6934151e488763d63a0c0204a5ec9daeddd",
+    "legacy_relation_edge_contributions.tsv.gz": "6fe78c7d0564413edf9599d35be2869dbeab616c6dbb36039df2887771c63864",
+    "legacy_relation_edges.tsv.gz": "3fec93cb0e4b4b33ddd25b22f62e7ad93b1c9338f7ca8a49631d03d7b244221a"
+  },
+  "world_edge_counts": {
+    "all": 11997,
+    "known": 272,
+    "unresolved": 11720
+  }
+}

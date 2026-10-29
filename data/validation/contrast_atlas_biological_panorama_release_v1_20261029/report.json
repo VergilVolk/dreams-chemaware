@@ -1,0 +1,301 @@
+{
+  "schema": "contrast_atlas_biological_panorama_v1",
+  "status": "DEVELOPMENT_CONSUMED_BIOLOGICAL_PANORAMA_COMPLETE",
+  "data_role": "development_consumed",
+  "scale": {
+    "sources": 15,
+    "contrasts": 51,
+    "effects": 238412,
+    "entities": 54861,
+    "registered_relations": 42,
+    "operational_dependence_groups": 13,
+    "candidate_contrast_directions": 2286,
+    "identity_candidate_score_rows": 6858,
+    "face_connection_rows": 306,
+    "combined_query_world_rows": 153,
+    "traceable_support_rows": 2881
+  },
+  "contrast_composition": {
+    "species": [
+      {
+        "species": "human-derived gut microbial community",
+        "contrasts": 24
+      },
+      {
+        "species": "Homo sapiens",
+        "contrasts": 16
+      },
+      {
+        "species": "Mus musculus",
+        "contrasts": 5
+      },
+      {
+        "species": "Methylorubrum extorquens AM1",
+        "contrasts": 3
+      },
+      {
+        "species": "Cucumis melo",
+        "contrasts": 3
+      }
+    ],
+    "biospecimens": [
+      {
+        "biospecimen": "microbial culture supernatant",
+        "contrasts": 24
+      },
+      {
+        "biospecimen": "urine",
+        "contrasts": 5
+      },
+      {
+        "biospecimen": "plasma",
+        "contrasts": 5
+      },
+      {
+        "biospecimen": "saliva",
+        "contrasts": 4
+      },
+      {
+        "biospecimen": "feces",
+        "contrasts": 4
+      },
+      {
+        "biospecimen": "skin",
+        "contrasts": 3
+      },
+      {
+        "biospecimen": "bacterial culture extract",
+        "contrasts": 3
+      },
+      {
+        "biospecimen": "root, stem and leaf tissue",
+        "contrasts": 3
+      }
+    ],
+    "condition_families": [
+      {
+        "condition_family": "obesity",
+        "contrasts": 4
+      },
+      {
+        "condition_family": "high_fat_diet",
+        "contrasts": 3
+      },
+      {
+        "condition_family": "type_1_diabetes",
+        "contrasts": 2
+      },
+      {
+        "condition_family": "depressive_symptoms",
+        "contrasts": 2
+      },
+      {
+        "condition_family": "biological_sex",
+        "contrasts": 2
+      },
+      {
+        "condition_family": "inflammatory_bowel_disease",
+        "contrasts": 2
+      },
+      {
+        "condition_family": "lanthanide_metabolism_genetic_perturbation",
+        "contrasts": 2
+      },
+      {
+        "condition_family": "chemprop_drug_metronidazole",
+        "contrasts": 2
+      },
+      {
+        "condition_family": "chemprop_drug_montelukast",
+        "contrasts": 2
+      },
+      {
+        "condition_family": "chemprop_drug_cilnidipine",
+        "contrasts": 2
+      },
+      {
+        "condition_family": "chemprop_drug_clomifen",
+        "contrasts": 2
+      },
+      {
+        "condition_family": "chemprop_drug_erythromycin",
+        "contrasts": 2
+      },
+      {
+        "condition_family": "chemprop_drug_ketoconazole",
+        "contrasts": 2
+      },
+      {
+        "condition_family": "chemprop_drug_omeprazole",
+        "contrasts": 2
+      },
+      {
+        "condition_family": "chemprop_drug_sertraline",
+        "contrasts": 2
+      },
+      {
+        "condition_family": "chemprop_drug_simvastatin",
+        "contrasts": 2
+      },
+      {
+        "condition_family": "chemprop_drug_telmisartan",
+        "contrasts": 2
+      },
+      {
+        "condition_family": "chemprop_drug_loratadine",
+        "contrasts": 2
+      },
+      {
+        "condition_family": "chemprop_drug_lansoprazole",
+        "contrasts": 2
+      },
+      {
+        "condition_family": "atopic_dermatitis_local",
+        "contrasts": 1
+      },
+      {
+        "condition_family": "atopic_dermatitis",
+        "contrasts": 1
+      },
+      {
+        "condition_family": "bacterial_growth_promotion_stem",
+        "contrasts": 1
+      },
+      {
+        "condition_family": "bacterial_growth_promotion_root",
+        "contrasts": 1
+      },
+      {
+        "condition_family": "lanthanide_availability",
+        "contrasts": 1
+      },
+      {
+        "condition_family": "atopic_dermatitis_field",
+        "contrasts": 1
+      },
+      {
+        "condition_family": "bacterial_growth_promotion_leaf",
+        "contrasts": 1
+      },
+      {
+        "condition_family": "human_industrialization_context",
+        "contrasts": 1
+      },
+      {
+        "condition_family": "human_fecal_ibd_case_control",
+        "contrasts": 1
+      },
+      {
+        "condition_family": "human_plasma_covid_case_control",
+        "contrasts": 1
+      }
+    ],
+    "intentional_drug_exposure_contrasts": 24
+  },
+  "response_information": {
+    "response_rows": 238412,
+    "library_supported_rows": 3433,
+    "unresolved_rows": 234979,
+    "library_supported_study_entities": 979,
+    "unresolved_study_entities": 53882,
+    "identity_policy": "gnps_gold_silver_10ppm_wse070_mp6_v1",
+    "diagnostic_q005_rows": 43525,
+    "diagnostic_q005_boundary": "normal-approximation BH is descriptive only; heterogeneous small-n effect models do not share exact t degrees of freedom"
+  },
+  "complete_wse_identity_track": {
+    "two_face_all_world_calibrated_answers": 49,
+    "two_face_known_world_calibrated_answers": 19,
+    "two_face_unresolved_world_calibrated_answers": 49,
+    "all_world_same_parent_project_answers": 23,
+    "unresolved_supported_not_known_same_selection": 43,
+    "known_corroborated_same_selection": 3,
+    "all_world_cross_parent_answers": 26,
+    "all_world_cross_parent_same_species_and_biospecimen": 0,
+    "all_world_cross_parent_same_condition_family": 2,
+    "all_world_answers_targeting_chemprop_parent": 36,
+    "candidate_parent_project_counts": [
+      {
+        "candidate_project_dependence_group": "CHEMPROP_SHARED_PARENT_PROJECT",
+        "answers": 36
+      },
+      {
+        "candidate_project_dependence_group": "MSV000086360",
+        "answers": 6
+      },
+      {
+        "candidate_project_dependence_group": "MSV000084112",
+        "answers": 3
+      },
+      {
+        "candidate_project_dependence_group": "MSV000090788",
+        "answers": 2
+      },
+      {
+        "candidate_project_dependence_group": "MSV000083077",
+        "answers": 1
+      },
+      {
+        "candidate_project_dependence_group": "MSV000092887",
+        "answers": 1
+      }
+    ],
+    "biological_comparability_tier_counts": [
+      {
+        "biological_comparability_tier": "cross_parent_cross_domain_exploratory",
+        "answers": 24
+      },
+      {
+        "biological_comparability_tier": "same_parent_internal_control_or_shortcut",
+        "answers": 23
+      },
+      {
+        "biological_comparability_tier": "cross_parent_condition_family_only",
+        "answers": 2
+      }
+    ]
+  },
+  "candidate_question_classes": {
+    "same_parent_positive_control_or_shortcut": 47,
+    "unresolved_supported_cross_project_adjudication": 30,
+    "exploratory_unjudged": 13,
+    "reciprocal_cross_project_adjudication": 4,
+    "registered_cross_project_audit": 2
+  },
+  "decision": {
+    "panorama_data_product_complete": true,
+    "biological_validity_established": false,
+    "unknown_information_increment_established": false,
+    "in_house_algorithm_increment_established": false,
+    "different_mass_relation_track_present": false
+  },
+  "claim_boundary": [
+    "The panorama displays all 51 contrasts and every complete-WSE identity-track candidate direction; it does not label unregistered pairs as negatives.",
+    "Complete-system application yield and opportunity-matched explanatory controls are reported separately.",
+    "A same-precursor reciprocal spectral edge is an observed-ion identity hypothesis, not confirmed molecular identity.",
+    "The current release has no informative different-mass chemical-relation track and therefore does not decide the full Atlas hypothesis.",
+    "Stable or reciprocal retrieval is a prioritisation property, not independent biological validation.",
+    "The 13 dependence groups are operational groups and not proven fully independent projects."
+  ],
+  "provenance": {
+    "contrasts": "a3b46e4dcacd65a5845e7b319db3decff8cbe64a242ec65116ff7dd48fc5089c",
+    "sources": "5b9e2e02eebb34bba6c54a6000b7ea0bbdf3132f3376a9ddfeb17b8e84311448",
+    "effects": "6f6fa005983b9172c4f2cb7aa055feedd2165de90b6ce7c482eaa56af6b8de75",
+    "relations": "8fba3fe5652773c68740d5237e02d0db314a2185b3c12c7581c3c9e4ced4014c",
+    "eligibility": "359740f2ddf4089693de9b1a04c99904b858557c0d976ec4a4f3b1d5cfe9ba55",
+    "top": "f99f705b9a52092107c6925ccd5f5bf2ec565f4647eb39101673e629f3bfb0f8",
+    "scores": "ab8dbdb51e64719474fea50f04a801cb1c301ce6180fad5d86439f99e6770d15",
+    "edges": "b6c3bc09b16e4860ea81c2929a7b281042f1dcd8e20265b890c2226a22244862",
+    "registry": "81c6251a29d5abc5c1ac1135ca57f6c749a8a0c4ee7c6985fbea01ae8e484b52",
+    "common_identity_partition": "239af73938fc03056406afea8fc3d17fa29d761735a5e96e23e0efb8e8e395b2",
+    "project_map": "71cbdd00c3e39524b305217af098014ffc18ccbace517e15db9212d75b62e0a7",
+    "output_study_panorama": "d82982318cd1000f72fd2e72b1364f9b524e964a44781a1e59331e9cc7cd6100",
+    "output_contrast_panorama": "7fb99f278df99b7e989a311e7abdf7aede5aeebf97b24072593c86cff26de4ba",
+    "output_face_connections": "9aa3470be9a22002668e86a6570693c511225e56d64348aa6cc870d7efde913a",
+    "output_combined_answers": "75edfdc2bad5870fa345f35d689e2725428a93834fc567dd0e3469c8e7aad3ac",
+    "output_world_comparison": "e1d38836a4567520e05c2070c32803197516747850458670f055c8cd8c81c624",
+    "output_candidate_scores": "06b5a4fc4ab24ca7283681c8f78ff2b2ddc6a93d44d8bca50854eafbeff2d249",
+    "output_support": "bc11f11746a28be526aafbd2f139eea49b0314da5070d96710e7f6ce2df88cc6",
+    "output_questions": "ec65de9c082dadbf728a748baa8dc82c7ae4f2e4b93d3d82d00f9a5208d2f5ae",
+    "implementation_sha256": "0791424d8e9d708c37f969f5d4d5c3f22e48e9dfcaa4ccd21a8ef6e5b391c568"
+  }
+}

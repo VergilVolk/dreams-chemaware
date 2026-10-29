@@ -17,3 +17,6 @@ data/validation/contrast_atlas_entity_change_ledger_v7_20261027/** binary
 data/validation/contrast_atlas_ibd_decision_blocks_v5_20261027/** binary
 data/validation/contrast_atlas_complete_identity_wse_release_v1_20261029/** binary
 data/validation/contrast_atlas_ibd_wse_adjudication_v2_20261029/** binary
+data/validation/contrast_atlas_biological_panorama_release_v1_20261029/** binary
+data/validation/contrast_atlas_connection_evidence_ledger_release_v1_20261029/** binary
+data/validation/contrast_atlas_legacy_relation_evidence_ledger_smoke_v1_20261029/** binary
