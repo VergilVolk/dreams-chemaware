@@ -1,0 +1,49 @@
+{
+  "schema": "contrast_atlas_ibd_mz595_entity_resolution_v2",
+  "status": "DEVELOPMENT_CONSUMED_ENTITY_DISAMBIGUATION_COMPLETE",
+  "data_role": "development_consumed",
+  "phenotype_blind_pairing": true,
+  "features": {
+    "adult": 2,
+    "paediatric": 2,
+    "cross_study_pairs": 4
+  },
+  "resolution": {
+    "single_chain_merge_allowed": false,
+    "reason": "two distinct chromatographic peaks occur within each source and the cross-study MS/MS matrix supports two different pair hypotheses",
+    "response_blind_preferred_pairs_equal_expected_two_pairs": true,
+    "pair_hypotheses": [
+      {
+        "adult": "IBD200_GROUP::1041",
+        "paediatric": "MSV000097610::16870",
+        "identity_status": "legacy Bronze Stercobilin hypothesis; unresolved under current Gold/Silver policy"
+      },
+      {
+        "adult": "IBD200_GROUP::1286",
+        "paediatric": "MSV000097610::28796",
+        "identity_status": "unresolved same-precursor spectral identity hypothesis"
+      }
+    ]
+  },
+  "claim_boundary": [
+    "The four feature IDs are not version aliases and must not be collapsed into one response chain.",
+    "Retention times are only evidence of within-study peak separation; absolute RT is not aligned across studies.",
+    "The diagnostic cosine is not a Full23 score and does not prove molecular identity.",
+    "Legacy Bronze library matches are hypotheses, not current Gold/Silver identities.",
+    "All effects and spectra are development/consumed; no independent biological validation is claimed."
+  ],
+  "input_sha256": {
+    "data/reference/contrast_atlas_ibd_cross_study_20261014/adult_ibd200_gnps_quant.csv": "515c4821d9b0b86322cd7d6493ae9a5345a4541babbf189214e97719ed1e05fb",
+    "data/reference/contrast_atlas_ibd_cross_study_20261014/pediatric_veoibd_gnps_quant.csv": "f513ecde7e2f8d62e5baaebe044dc77ddc91c66252da5cbe6c6577a7d2c31b06",
+    "data/reference/contrast_atlas_ibd_cross_study_20261014/adult_ibd200_consensus.mgf": "6aeba8b4c1e9cc94e127985cc18bde9a4d1df8c99030d470d4cec888bc5465e6",
+    "data/reference/contrast_atlas_ibd_cross_study_20261014/pediatric_veoibd_consensus.mgf": "c628ce08fc8215942469ec8fb193c6b3c189484032f83cc9ba9b190281c64fd1",
+    "data/reference/contrast_atlas_ibd_cross_study_20261014/adult_ibd200_annotations.tsv": "61a7325e9c7b224970b224247170c8447003954a84216aafd447b0766109c869",
+    "data/reference/contrast_atlas_ibd_cross_study_20261014/pediatric_paper_annotations.tsv": "8b84c68ee3827556de8382971dd845507a9d02acdf8df18c29bdc41d60e37b5b",
+    "data/validation/contrast_atlas_open_response_collection_ibd200_plate3_v2_20261020/response_entities.tsv.gz": "1be14dcf162be1a0f1269892c05e48e28b9246174be7fdf6b9c09c1a83bd8409"
+  },
+  "implementation_sha256": "a7e0afbc0dde3ce941882eb9ebb58ff629fe67a62c626cd1661f6202157fdee8",
+  "output_sha256": {
+    "entities.tsv": "d2173396511cdb1fe4a4b0b2c30ae1ec72f821ac7034f196e6c4828ae84a9bb8",
+    "cross_study_pair_matrix.tsv": "87089337c659496161968f5cfe5c856d8d60755e83357ae3faff854d7663686d"
+  }
+}

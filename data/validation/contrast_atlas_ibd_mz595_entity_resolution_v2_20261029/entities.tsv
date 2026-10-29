@@ -1,0 +1,5 @@
+raw_entity_id	precursor_mz	retention_time_minutes	study_id	entity_id	legacy_compound_name	legacy_library_quality	legacy_spectrum_id	legacy_inchikey	legacy_mqscore	legacy_annotation_status	contrast_id	beta	se	data_role
+1286	595.3476977381264	5.359379	IBD200_GROUP	IBD200_GROUP::1286						no_legacy_library_hypothesis	adult_all_ibd_vs_healthy	-0.6487922396069161	0.397033880331045	development_consumed
+1041	595.3480037722619	4.1555343	IBD200_GROUP	IBD200_GROUP::1041	Stercobilin	Bronze	CCMSLIB00001059689	TYOWQSLRVAUSMI-UHFFFAOYSA-N	0.754528	legacy_bronze_hypothesis	adult_all_ibd_vs_healthy	-1.964020279511676	0.6011296475997095	development_consumed
+28796	595.3475292093758	5.8192115	MSV000097610	MSV000097610::28796						no_legacy_library_hypothesis	pediatric_veoibd_vs_healthy	-1.4444372176864877	0.6591890119730711	development_consumed
+16870	595.3484265464328	3.515389	MSV000097610	MSV000097610::16870	Stercobilin	Bronze	CCMSLIB00001059689	TYOWQSLRVAUSMI-UHFFFAOYSA-N	0.916708	legacy_bronze_hypothesis	pediatric_veoibd_vs_healthy	-4.03292092638887	1.0630778821957918	development_consumed

@@ -1,0 +1,55 @@
+{
+  "schema": "contrast_atlas_biology_evaluation_contract_v1",
+  "status": "FROZEN_DEVELOPMENT_CONTRACT",
+  "scientific_question": "Given a directed biological contrast, do unresolved MS/MS entities add reliable retrieval of related or opposite study responses, and does the in-house algorithm add value beyond the same evidence processed by existing methods?",
+  "unit": "study x contrast with entity-level beta and SE",
+  "candidate_policy": "Every source-disjoint target contrast remains in the denominator; missing evidence causes abstention, never candidate deletion.",
+  "tracks": {
+    "identity": {
+      "meaning": "same-entity hypothesis across studies",
+      "candidate_universe": "complete response-blind precursor/adduct-compatible candidate blocks",
+      "methods": ["WSE", "Official DreaMS", "Noise V1", "Full23 v1"],
+      "allowed_operation": "rank identity candidates, then accumulate beta/SE only for an accepted same-entity hypothesis",
+      "full23_eligible": true
+    },
+    "relation": {
+      "meaning": "different entities with a calibrated local chemical relationship",
+      "candidate_universe": "a model-independent relation universe; the current fragment-admitted fixed graph is development reweighting only",
+      "methods": ["fragment cosine", "WSE", "Official DreaMS", "Noise V1", "a separately validated relation scorer"],
+      "allowed_operation": "aggregate response-pattern evidence without merging entity effects",
+      "full23_eligible": false
+    }
+  },
+  "evidence_worlds": [
+    "known_only",
+    "measurement_matched_known",
+    "unresolved_shuffled_ms2",
+    "all"
+  ],
+  "primary_factorization": {
+    "unknown_increment": "all minus the draw-wise strongest of known_only, measurement_matched_known and unresolved_shuffled_ms2",
+    "algorithm_increment": "method replacement within the identical evidence world, candidate universe and response operator",
+    "joint_increment": "difference in differences between Full23 and WSE on identity-track all versus strongest-control worlds"
+  },
+  "truth_classes": {
+    "correct_answer": "relation fixed before score development and confirmed by independent evidence not used for matching, parameter selection or response construction",
+    "supported_hypothesis": "consumed or post-hoc relation with orthogonal support but no independent confirmation",
+    "abstain": "identity, coverage, design comparability or truth is inadequate",
+    "not_a_negative": "an unregistered pair or a pair lacking evidence"
+  },
+  "success_gate": {
+    "required_chain": [
+      "algorithm changes a legal entity or relation decision",
+      "unresolved information adds beyond matched controls",
+      "the change alters a study-level response answer",
+      "independent evidence confirms the answer"
+    ],
+    "permutation_significance_alone_is_sufficient": false,
+    "same_disease_name_is_truth": false
+  },
+  "data_boundary": {
+    "current_15_source_51_contrast_collection": "development_consumed",
+    "signed_entity_truth_count": 0,
+    "external_validation_contrasts": 0
+  }
+}

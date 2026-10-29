@@ -1,0 +1,38 @@
+{
+  "schema": "contrast_atlas_development_candidate_screen_v2",
+  "status": "DEVELOPMENT_CONSUMED_CANDIDATE_SCREEN_COMPLETE",
+  "data_role": "development_consumed",
+  "denominators": {
+    "exact_drug_directions": 24,
+    "unknown_information_candidates": 2,
+    "stage1_algorithm_increment_candidates": 0,
+    "joint_increment_candidates": 0
+  },
+  "screen_rule": {
+    "unknown_information": "Stage-1 all rank <=5, Stage-1 known rank >5, all max-T p<=0.05",
+    "stage1_algorithm_increment": "Stage-1 all rank <=5, fragment all rank >5, Stage-1 all max-T p<=0.05",
+    "joint": "both rules"
+  },
+  "main_observation": {
+    "unknown_information_positive_control": "cilnidipine in both directions",
+    "joint_unknown_and_algorithm_candidate": null,
+    "interpretation": "current consumed controls support an unresolved-signal hypothesis but do not yet close the algorithm-to-biology loop"
+  },
+  "claim_boundary": [
+    "The screen uses consumed labels from one broader ChemProp project and is not external validation.",
+    "Max-T calibration controls the specified retrieval null; it does not establish a biological mechanism.",
+    "Cilnidipine is not an algorithm-increment example because fragment, Official and Stage-1 all reach rank 1.",
+    "No row satisfies both the unknown-information and Stage-1 algorithm-increment screen.",
+    "The relation track is not a legal Full23 evaluation domain."
+  ],
+  "input_sha256": {
+    "data/validation/contrast_atlas_known_response_baselines_v2_20261029/registered_relation_ranks.tsv": "adab8b3569ccfdb38b4e6f466d066febc659a42d65e54ec0baa6e23afec2be0d",
+    "data/validation/contrast_atlas_open_local_edge_enrichment_v5_20261027/registered_relation_ranks.tsv": "5be8d0d136dce36b573afa596c7d3e6913db2b1e0cad3c81bac2e2a1be059819",
+    "data/validation/contrast_atlas_open_local_edge_enrichment_official_v1_20261027/registered_relation_ranks.tsv": "633452a909c18b3127b3d63c73a99d236e3d5e22f0ea56d436d90c75a7640e2a",
+    "data/validation/contrast_atlas_open_local_edge_enrichment_stage1_v1_20261027/registered_relation_ranks.tsv": "a9f319dea298deb6366fb0a32efca58f50846f73dfe61144ce1662ed4af788eb"
+  },
+  "implementation_sha256": "4368a862b81e9015f31e44de88083d62bfabf863fb5fa5841d195d3466b0800f",
+  "output_sha256": {
+    "exact_drug_direction_screen.tsv": "fbda92ea4801ebc5c814221ce624efc0654edf21a57eca5f6e17351b3a53839b"
+  }
+}

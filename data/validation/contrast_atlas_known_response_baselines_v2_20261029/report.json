@@ -1,0 +1,118 @@
+{
+  "schema": "contrast_atlas_known_response_baselines_v2",
+  "status": "DEVELOPMENT_CONSUMED_KNOWN_RESPONSE_BASELINES_COMPLETE",
+  "data_role": "development_consumed",
+  "methods": {
+    "continuous_strict_known": "cosine of full-InChIKey-aligned beta/sqrt(beta^2+SE^2)",
+    "idmet_like_signed_overlap": "z-thresholded up/down 2x2 signed log odds; not an exact software reproduction",
+    "idmet_plus_like_ora": "one-sided same/opposite up/down overlap enrichment on the pairwise detected background; not an exact software reproduction"
+  },
+  "parameters": {
+    "minimum_shared_known_identities": 3,
+    "active_absolute_z": 1.96,
+    "minimum_double_active_identities_for_signed_overlap": 2,
+    "identity_key": "full InChIKey",
+    "duplicate_identity_representative": "highest WSE, then matched peaks, then entity_id; selected before effects"
+  },
+  "denominators": {
+    "source_families": 15,
+    "study_level_contrasts": 51,
+    "response_rows": 238412,
+    "strict_known_study_identity_representatives": 734,
+    "unique_full_inchikeys": 429,
+    "source_disjoint_directed_candidate_pairs": 2286,
+    "continuous_available_pairs": 1814,
+    "idmet_like_available_pairs": 516,
+    "ora_available_pairs": 1218,
+    "registered_directed_relations": 42,
+    "primary_eligible_registered_relations": 34,
+    "exact_drug_registered_relations": 24
+  },
+  "registered_relevance_rank_summary": {
+    "primary_eligible_all": {
+      "continuous_absolute_rank": {
+        "available": 28,
+        "top1": 1,
+        "top5": 2,
+        "median_rank_among_available": 18.0
+      },
+      "idmet_absolute_rank": {
+        "available": 20,
+        "top1": 1,
+        "top5": 6,
+        "median_rank_among_available": 8.5
+      },
+      "ora_best_rank": {
+        "available": 28,
+        "top1": 2,
+        "top5": 10,
+        "median_rank_among_available": 6.5
+      }
+    },
+    "consumed_exact_drug_cross_design": {
+      "continuous_absolute_rank": {
+        "available": 24,
+        "top1": 0,
+        "top5": 0,
+        "median_rank_among_available": 18.0
+      },
+      "idmet_absolute_rank": {
+        "available": 20,
+        "top1": 1,
+        "top5": 6,
+        "median_rank_among_available": 8.5
+      },
+      "ora_best_rank": {
+        "available": 24,
+        "top1": 1,
+        "top5": 9,
+        "median_rank_among_available": 6.0
+      }
+    }
+  },
+  "truth_boundary": {
+    "score_sha256_before_registered_relations": "18346198a4d60a856734fe00c585fce443261e205ddf4de8239a786ebb0a7259",
+    "registered_relations_opened_after_score_write": true,
+    "signed_entity_truth_count": 0,
+    "pass_fail_adjudicated": false
+  },
+  "next_required_comparison": {
+    "unknown_increment": "all versus the draw-wise strongest of known_only, measurement_matched_known and unresolved_shuffled_ms2",
+    "algorithm_increment_identity_track": "WSE versus Official versus Noise V1 versus Full23 on identical complete identity blocks",
+    "algorithm_increment_relation_track": "plain fragment/WSE versus separately validated relation scorers; Full23 is not currently eligible"
+  },
+  "claim_boundary": [
+    "These baselines quantify direct study-response competitors; they do not establish that any registered relation is biologically correct.",
+    "Registered relations have no signed truth, so same/opposite accuracy is not reported.",
+    "The exact-drug relations are consumed and belong to one broader ChemProp project, not an external validation.",
+    "Known-only evidence shortage causes abstention while retaining the original query-target denominator.",
+    "No unresolved-information or Full23 increment is evaluated by this run."
+  ],
+  "input_sha256": {
+    "data/validation/contrast_atlas_open_response_collection_v9_frozenbase_chemprop_20261023/report.json": "4f814846a205052f43225b3ba7c547faf8718c2fffbc830fb02437e5d6587e32",
+    "data/validation/contrast_atlas_open_response_collection_v9_frozenbase_chemprop_20261023/response_entities.tsv.gz": "6f6fa005983b9172c4f2cb7aa055feedd2165de90b6ce7c482eaa56af6b8de75",
+    "data/validation/contrast_atlas_open_response_collection_v9_frozenbase_chemprop_20261023/contrast_manifest.tsv": "a3b46e4dcacd65a5845e7b319db3decff8cbe64a242ec65116ff7dd48fc5089c",
+    "data/validation/contrast_atlas_open_response_collection_v9_frozenbase_chemprop_20261023/registered_relations.tsv": "8fba3fe5652773c68740d5237e02d0db314a2185b3c12c7581c3c9e4ced4014c",
+    "data/validation/contrast_atlas_open_v9_frozenbase_common_identity_shards_20261023/IBD200_GROUP/identity_partition.tsv.gz": "8fdfdbeb0013e79db462955a0758943668cc2cfc56450d3ae64b07dad17703f1",
+    "data/validation/contrast_atlas_open_v9_frozenbase_common_identity_shards_20261023/MSV000083077/identity_partition.tsv.gz": "25879473c082902d3a01dadd33694d12d7c306f9ad3a15e3c4c1410db61c2225",
+    "data/validation/contrast_atlas_open_v9_frozenbase_common_identity_shards_20261023/MSV000084112/identity_partition.tsv.gz": "ede25984abc333a2fa9687f1501f0bb3e3554b068729d11feaf1c23a0ed5265f",
+    "data/validation/contrast_atlas_open_v9_frozenbase_common_identity_shards_20261023/MSV000084794/identity_partition.tsv.gz": "833d59e8ccf7df44c960c9cc9de3d39a5cc8764020389ba70320bdda67bd9988",
+    "data/validation/contrast_atlas_open_v9_frozenbase_common_identity_shards_20261023/MSV000086360/identity_partition.tsv.gz": "0392ba96f9843c488c12de0f710e585e3e8e00e57ee4a1bb41794af3cb1c4f39",
+    "data/validation/contrast_atlas_open_v9_frozenbase_common_identity_shards_20261023/MSV000088023/identity_partition.tsv.gz": "f128ff25ecf1e307f8f7d0e6ee4c2fd18f16db33bb460ca682a8aed2284ab872",
+    "data/validation/contrast_atlas_open_v9_frozenbase_common_identity_shards_20261023/MSV000090788/identity_partition.tsv.gz": "b3cacba664b994f8df262de8875e9bc2d518c1a2506e0cccbfe902556740f1d4",
+    "data/validation/contrast_atlas_open_v9_frozenbase_common_identity_shards_20261023/MSV000090804/identity_partition.tsv.gz": "b6e598cd854615bbc50a9d9f90b3c23c1675d9e5a22240719012a15615fe42ef",
+    "data/validation/contrast_atlas_open_v9_frozenbase_common_identity_shards_20261023/MSV000092887/identity_partition.tsv.gz": "f5fbc08da5bf66290e31c14bab62f5459d5e3d5d4812df31b2b1026f5744e877",
+    "data/validation/contrast_atlas_open_v9_frozenbase_common_identity_shards_20261023/MSV000093571/identity_partition.tsv.gz": "6ca8b40c000aa0910d9105370970844d9a06c27e46d79ce92a86703b95ea5631",
+    "data/validation/contrast_atlas_open_v9_frozenbase_common_identity_shards_20261023/MSV000094899/identity_partition.tsv.gz": "dc8042431d4977cafae9d55b4f1ef227b312b2747ad907b8d40150d7f853b967",
+    "data/validation/contrast_atlas_open_v9_frozenbase_common_identity_shards_20261023/MSV000096564/identity_partition.tsv.gz": "4754308a54c38175c525b019b3b0f86b5cd1fc753e9e0313cf3e43e353b524a5",
+    "data/validation/contrast_atlas_open_v9_frozenbase_common_identity_shards_20261023/MSV000096724/identity_partition.tsv.gz": "7cdde9e83b3b170bd6769b1bdd093c7da1b207fa9617be6321370ea469a38c59",
+    "data/validation/contrast_atlas_open_v9_frozenbase_common_identity_shards_20261023/MSV000097426/identity_partition.tsv.gz": "a407da09fe2ecf267171254fdf8cad694be052d518b1609b435a9f79dff934d1",
+    "data/validation/contrast_atlas_open_v9_frozenbase_common_identity_shards_20261023/MSV000097610/identity_partition.tsv.gz": "f85f4d244eaee9728dfeece01e1c4f18bee4eafac059148266ab75dd3c1f68cf"
+  },
+  "implementation_sha256": "a02b3980583a8f5d80e89bd6b8ef5329af547ccceab7ae35fbe867efd03a9d3a",
+  "output_sha256": {
+    "strict_known_identity_representatives.tsv.gz": "086ca2a0ba95847a5fa44ac75f791d115324ef508efd5140464292a68e59d5d6",
+    "fixed_candidate_scores.tsv.gz": "18346198a4d60a856734fe00c585fce443261e205ddf4de8239a786ebb0a7259",
+    "registered_relation_ranks.tsv": "adab8b3569ccfdb38b4e6f466d066febc659a42d65e54ec0baa6e23afec2be0d"
+  }
+}
