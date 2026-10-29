@@ -1,0 +1,5 @@
+world	relation_classes	canonical_relations	directional_relations	directional_available	directional_top1	directional_top5	directional_similar_top5	directional_opposite_top5	directional_median_rank	directional_best_face_bonferroni_005	directional_similar_face_maxT_005	directional_opposite_face_maxT_005	canonical_any_top1	canonical_both_top1	canonical_any_top5	canonical_both_top5	canonical_any_best_face_bonferroni_005	canonical_both_best_face_bonferroni_005	analysis_group
+known	prespecified_exact_intervention_family;prespecified_near_exact_condition_family	5	10	6	2	2	2	0	14.0	1	1	0	1	1	1	1	1	0	source_independent_primary
+unresolved	prespecified_exact_intervention_family;prespecified_near_exact_condition_family	5	10	10	0	2	2	0	8.5	2	2	0	0	0	2	0	1	1	source_independent_primary
+known	consumed_exact_drug_cross_design	12	24	24	3	9	6	3	7.5	2	2	0	2	1	6	3	1	1	shared_project_exact_drug
+unresolved	consumed_exact_drug_cross_design	12	24	24	3	17	14	5	4.0	24	18	8	2	1	11	6	12	12	shared_project_exact_drug

@@ -1,0 +1,39 @@
+{
+  "schema": "contrast_atlas_wse_reciprocal_edge_opportunity_matched_controls_v1",
+  "status": "DEVELOPMENT_CONSUMED_EDGE_OPPORTUNITY_MATCHED_WSE_CONTROLS_FROZEN",
+  "data_role": "development_consumed",
+  "resamples": 32,
+  "base_seed": 20261029,
+  "known_reciprocal_edges": 918,
+  "unresolved_reciprocal_edges_available": 32328,
+  "selected_unresolved_reciprocal_edges_per_resample": 918,
+  "exact_strata": 105,
+  "strata_with_shortage": 0,
+  "selected_unique_endpoints_range": [
+    1473,
+    1488
+  ],
+  "maximum_selected_endpoint_degree_range": [
+    6,
+    6
+  ],
+  "maximum_absolute_smd_range": [
+    0.5828170696940478,
+    0.607701288023018
+  ],
+  "claim_boundary": "reciprocal-edge opportunity matched only; not complete measurement matched, not external validation and not a formal unknown-information pass",
+  "provenance": {
+    "pairs": "741f3a6a4735d100121c16ec095d59eda872fe0cdde8c38cd25fe903c22994e2",
+    "blocks": "8108c15bee5884f9ae662d22efb09e432740ba176ba194c2c142610ed4b16ffd",
+    "wse": "a037c5be85118bbe279bcb56717fc4f081ed77b4ba8a8284be9d0525404091d4",
+    "full_edges": "7dcfc64cc87d34dc43183a4d096493473cadf55dec97418a1eadb34b13b560e5",
+    "alignment_report": "dcd85296f14b9db6e4d7caf98ff82cf1c9ef04efb3d702e1962ab1b61ee3c024",
+    "contrast_manifest": "a3b46e4dcacd65a5845e7b319db3decff8cbe64a242ec65116ff7dd48fc5089c",
+    "response_entities": "6f6fa005983b9172c4f2cb7aa055feedd2165de90b6ce7c482eaa56af6b8de75",
+    "matched_edge_pairs": "5fd0876095b887f1dc12828ed170552b8696375a293f0e13b019b10f59739f3c",
+    "exact_strata_balance": "02da4a2e114820ae922ea9fa9fa1e679c546de3529633697284c1015d450ca92",
+    "covariate_balance": "c0ef9beb902d3641d7e82456fe17170614fee1bd2c842f7393a7c07643ed127d",
+    "resample_manifest": "a10860de85fe5d7fc7a348f82862fbd52372cd895fc029f36782465be97a068a",
+    "implementation_sha256": "9da39736c105971f9408d9a046ffc26162c04e6132772e4ef93b90603b220dce"
+  }
+}

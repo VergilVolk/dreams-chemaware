@@ -166,3 +166,19 @@ IBD 的 3 个 canonical 关系：
 - 系统级摘要：`data/validation/contrast_atlas_complete_identity_wse_global_summary_v1_20261029/`
 - 新增与相关回归测试：6 passed。
 
+## 9. 机会匹配更新（同日完成）
+
+上述第 7.1 项已经完成为全局控制，而不是单疾病小面板：在 105 个 `source-pair × physicochemical-compatibility × response-availability` 精确层内，从 32,328 条 unresolved 互惠 WSE 身份边中，每轮无放回选择与 strict-known 完全相同的 918 条边；共冻结 32 个 response-blind resample。每轮都独立运行全部 51 个查询、2,286 个跨来源候选、256 次 whole-profile permutation 和 query-level max-T。
+
+主要结果：
+
+- 五个 source-independent HFD/IBD canonical 关系的 10 个方向，matched-unresolved Top-5 为每轮 1–3 个，中位数 2；但 32/32 个 resample 均为 **0 个方向通过 query-level max-T**；
+- 同一 ChemProp parent project 内 24 个 exact-drug 方向，Top-5 为 10–12 个，中位数 12；
+- similar-response calibrated calls 从完整 unresolved 图的 49/51 降至每轮 30–32/51；
+- opposite-response calibrated calls 从 46/51 降至每轮 25–31/51。
+
+因此，大量开放回答确实有相当部分来自 35.22 倍边机会，但边数匹配后仍保留结构化信号和明显的 ChemProp hub。该控制仍不能构成 unknown-information PASS：unresolved 边的 conservative WSE 与 matched-fragment 质量仍低于 known，端点复用拓扑未完全匹配，五个 source-independent canonical 单元太少，且 signed entity-level truth 仍为 0。
+
+冻结裁决相应更新为：**机会数主混杂已被系统检验，但 source-independent 生物检索、unknown 独立增量、自研算法同轴增量和封存外部验证仍均未通过。** 详细结果见 `docs/CONTRAST_ATLAS_WSE_EDGE_OPPORTUNITY_MATCHED_GLOBAL_RESULT_20261029.md`。
+
+本次新增 edge-matching、重抽样汇总及其回归测试后，相关测试为 7 passed。

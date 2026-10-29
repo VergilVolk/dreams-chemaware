@@ -1,0 +1,440 @@
+{
+  "schema": "contrast_atlas_open_local_edge_enrichment_v2_continuous",
+  "status": "DEVELOPMENT_CONSUMED_OPEN_LOCAL_EDGE_CONTINUOUS_RETRIEVAL_COMPLETE",
+  "data_role": "development_consumed",
+  "method": {
+    "unit": "study-level directed response contrast",
+    "chemical_graph": "complete-axis unresolved WSE reciprocal identity edges matched one-to-one to strict-known reciprocal edges by source pair, compatibility grade and response-contrast availability before any response effect is read",
+    "edge_strength_method": "weighted_spectral_entropy_reciprocal_edge_opportunity_matched_unresolved",
+    "response_evidence": "continuous beta/sqrt(beta^2+SE^2) on each endpoint; same and opposite sign energies kept separate",
+    "local_support": "mutual spectral edges contribute locally; absent edges remain zero and distinct entities are never merged",
+    "null": "whole multi-contrast entity response profiles reassigned within study and common identity stratum",
+    "candidate_calibration": "candidate-specific permutation z and empirical upper-tail p",
+    "open_query_calibration": "query-level max-T across the complete source-disjoint candidate universe",
+    "identity_track": "mutual top-1 and precursor compatible within 10.0 ppm; identity hypothesis, not proof",
+    "relation_track": "mutual top-1 and valid precursor difference greater than 10.0 ppm; distinct-response association, never effect meta-analysis",
+    "minimum_support_edges_for_answer": 3,
+    "query_alpha": 0.05,
+    "endpoint_fdr_role": "two-sided normal-approximation BH FDR <= 0.05 edge counts are diagnostic only and do not enter ranking, because several small-n source summaries do not retain enough variance components to reconstruct exact t degrees of freedom"
+  },
+  "algorithm_handoff": {
+    "pair_manifest": "frozen_mutual_edge_algorithm_handoff.tsv.gz",
+    "rows": 918,
+    "join_key": [
+      "left_study_id",
+      "right_study_id",
+      "evidence_world",
+      "left_entity_id",
+      "right_entity_id"
+    ],
+    "contract": "a replacement spectral model may update score/evidence columns on these exact keys; it may not add or remove pairs when testing algorithm contribution to the fixed response task",
+    "applied_score": {
+      "method_name": "weighted_spectral_entropy_reciprocal_edge_opportunity_matched_unresolved",
+      "score_source": "complete-axis unresolved WSE reciprocal identity edges matched one-to-one to strict-known reciprocal edges by source pair, compatibility grade and response-contrast availability before any response effect is read",
+      "edge_rows": 918,
+      "edge_rows_available": 918,
+      "edge_rows_unavailable": 0
+    }
+  },
+  "denominators": {
+    "independent_studies": 15,
+    "source_families": 15,
+    "study_level_contrasts": 51,
+    "response_rows": 238412,
+    "unique_study_entities": 54861,
+    "frozen_directional_edges": 1836,
+    "canonical_mutual_edges": 918,
+    "mutual_identity_hypothesis_edges": 918,
+    "mutual_nonmass_relation_edges": 0,
+    "directed_query_candidate_pairs": 2286,
+    "candidate_score_rows": 20574,
+    "top_hit_rows": 918,
+    "permutations": 256,
+    "registered_directional_relations": 42,
+    "registered_signed_truth_relations": 0
+  },
+  "open_query_calls": [
+    {
+      "evidence_world": "all",
+      "evidence_track": "combined_mutual",
+      "response_face": "opposite",
+      "result_class": "abstain_insufficient_evidence",
+      "queries": 51
+    },
+    {
+      "evidence_world": "all",
+      "evidence_track": "combined_mutual",
+      "response_face": "similar",
+      "result_class": "abstain_insufficient_evidence",
+      "queries": 51
+    },
+    {
+      "evidence_world": "all",
+      "evidence_track": "nonmass_chemical_relation_hypothesis",
+      "response_face": "opposite",
+      "result_class": "abstain_insufficient_evidence",
+      "queries": 51
+    },
+    {
+      "evidence_world": "all",
+      "evidence_track": "nonmass_chemical_relation_hypothesis",
+      "response_face": "similar",
+      "result_class": "abstain_insufficient_evidence",
+      "queries": 51
+    },
+    {
+      "evidence_world": "all",
+      "evidence_track": "same_precursor_10ppm_identity_hypothesis",
+      "response_face": "opposite",
+      "result_class": "abstain_insufficient_evidence",
+      "queries": 51
+    },
+    {
+      "evidence_world": "all",
+      "evidence_track": "same_precursor_10ppm_identity_hypothesis",
+      "response_face": "similar",
+      "result_class": "abstain_insufficient_evidence",
+      "queries": 51
+    },
+    {
+      "evidence_world": "known",
+      "evidence_track": "combined_mutual",
+      "response_face": "opposite",
+      "result_class": "abstain_insufficient_evidence",
+      "queries": 51
+    },
+    {
+      "evidence_world": "known",
+      "evidence_track": "combined_mutual",
+      "response_face": "similar",
+      "result_class": "abstain_insufficient_evidence",
+      "queries": 51
+    },
+    {
+      "evidence_world": "known",
+      "evidence_track": "nonmass_chemical_relation_hypothesis",
+      "response_face": "opposite",
+      "result_class": "abstain_insufficient_evidence",
+      "queries": 51
+    },
+    {
+      "evidence_world": "known",
+      "evidence_track": "nonmass_chemical_relation_hypothesis",
+      "response_face": "similar",
+      "result_class": "abstain_insufficient_evidence",
+      "queries": 51
+    },
+    {
+      "evidence_world": "known",
+      "evidence_track": "same_precursor_10ppm_identity_hypothesis",
+      "response_face": "opposite",
+      "result_class": "abstain_insufficient_evidence",
+      "queries": 51
+    },
+    {
+      "evidence_world": "known",
+      "evidence_track": "same_precursor_10ppm_identity_hypothesis",
+      "response_face": "similar",
+      "result_class": "abstain_insufficient_evidence",
+      "queries": 51
+    },
+    {
+      "evidence_world": "unresolved",
+      "evidence_track": "combined_mutual",
+      "response_face": "opposite",
+      "result_class": "abstain_insufficient_evidence",
+      "queries": 2
+    },
+    {
+      "evidence_world": "unresolved",
+      "evidence_track": "combined_mutual",
+      "response_face": "opposite",
+      "result_class": "no_calibrated_match",
+      "queries": 23
+    },
+    {
+      "evidence_world": "unresolved",
+      "evidence_track": "combined_mutual",
+      "response_face": "opposite",
+      "result_class": "opposite_response",
+      "queries": 26
+    },
+    {
+      "evidence_world": "unresolved",
+      "evidence_track": "combined_mutual",
+      "response_face": "similar",
+      "result_class": "abstain_insufficient_evidence",
+      "queries": 2
+    },
+    {
+      "evidence_world": "unresolved",
+      "evidence_track": "combined_mutual",
+      "response_face": "similar",
+      "result_class": "no_calibrated_match",
+      "queries": 18
+    },
+    {
+      "evidence_world": "unresolved",
+      "evidence_track": "combined_mutual",
+      "response_face": "similar",
+      "result_class": "similar_response",
+      "queries": 31
+    },
+    {
+      "evidence_world": "unresolved",
+      "evidence_track": "nonmass_chemical_relation_hypothesis",
+      "response_face": "opposite",
+      "result_class": "abstain_insufficient_evidence",
+      "queries": 51
+    },
+    {
+      "evidence_world": "unresolved",
+      "evidence_track": "nonmass_chemical_relation_hypothesis",
+      "response_face": "similar",
+      "result_class": "abstain_insufficient_evidence",
+      "queries": 51
+    },
+    {
+      "evidence_world": "unresolved",
+      "evidence_track": "same_precursor_10ppm_identity_hypothesis",
+      "response_face": "opposite",
+      "result_class": "abstain_insufficient_evidence",
+      "queries": 2
+    },
+    {
+      "evidence_world": "unresolved",
+      "evidence_track": "same_precursor_10ppm_identity_hypothesis",
+      "response_face": "opposite",
+      "result_class": "no_calibrated_match",
+      "queries": 23
+    },
+    {
+      "evidence_world": "unresolved",
+      "evidence_track": "same_precursor_10ppm_identity_hypothesis",
+      "response_face": "opposite",
+      "result_class": "opposite_response",
+      "queries": 26
+    },
+    {
+      "evidence_world": "unresolved",
+      "evidence_track": "same_precursor_10ppm_identity_hypothesis",
+      "response_face": "similar",
+      "result_class": "abstain_insufficient_evidence",
+      "queries": 2
+    },
+    {
+      "evidence_world": "unresolved",
+      "evidence_track": "same_precursor_10ppm_identity_hypothesis",
+      "response_face": "similar",
+      "result_class": "no_calibrated_match",
+      "queries": 18
+    },
+    {
+      "evidence_world": "unresolved",
+      "evidence_track": "same_precursor_10ppm_identity_hypothesis",
+      "response_face": "similar",
+      "result_class": "similar_response",
+      "queries": 31
+    }
+  ],
+  "registered_relation_descriptive_performance": [
+    {
+      "evidence_world": "all",
+      "evidence_track": "combined_mutual",
+      "registered_directional_relations": 34,
+      "best_face_top1": 0,
+      "best_face_top5": 0,
+      "median_best_face_rank": null,
+      "query_maxT_005": 0
+    },
+    {
+      "evidence_world": "all",
+      "evidence_track": "nonmass_chemical_relation_hypothesis",
+      "registered_directional_relations": 34,
+      "best_face_top1": 0,
+      "best_face_top5": 0,
+      "median_best_face_rank": null,
+      "query_maxT_005": 0
+    },
+    {
+      "evidence_world": "all",
+      "evidence_track": "same_precursor_10ppm_identity_hypothesis",
+      "registered_directional_relations": 34,
+      "best_face_top1": 0,
+      "best_face_top5": 0,
+      "median_best_face_rank": null,
+      "query_maxT_005": 0
+    },
+    {
+      "evidence_world": "known",
+      "evidence_track": "combined_mutual",
+      "registered_directional_relations": 34,
+      "best_face_top1": 0,
+      "best_face_top5": 0,
+      "median_best_face_rank": null,
+      "query_maxT_005": 0
+    },
+    {
+      "evidence_world": "known",
+      "evidence_track": "nonmass_chemical_relation_hypothesis",
+      "registered_directional_relations": 34,
+      "best_face_top1": 0,
+      "best_face_top5": 0,
+      "median_best_face_rank": null,
+      "query_maxT_005": 0
+    },
+    {
+      "evidence_world": "known",
+      "evidence_track": "same_precursor_10ppm_identity_hypothesis",
+      "registered_directional_relations": 34,
+      "best_face_top1": 0,
+      "best_face_top5": 0,
+      "median_best_face_rank": null,
+      "query_maxT_005": 0
+    },
+    {
+      "evidence_world": "unresolved",
+      "evidence_track": "combined_mutual",
+      "registered_directional_relations": 34,
+      "best_face_top1": 6,
+      "best_face_top5": 13,
+      "median_best_face_rank": 7.0,
+      "query_maxT_005": 8
+    },
+    {
+      "evidence_world": "unresolved",
+      "evidence_track": "nonmass_chemical_relation_hypothesis",
+      "registered_directional_relations": 34,
+      "best_face_top1": 0,
+      "best_face_top5": 0,
+      "median_best_face_rank": null,
+      "query_maxT_005": 0
+    },
+    {
+      "evidence_world": "unresolved",
+      "evidence_track": "same_precursor_10ppm_identity_hypothesis",
+      "registered_directional_relations": 34,
+      "best_face_top1": 6,
+      "best_face_top5": 13,
+      "median_best_face_rank": 7.0,
+      "query_maxT_005": 8
+    }
+  ],
+  "precursor_coverage": [
+    {
+      "study_id": "MSV000097426",
+      "response_entities": 2163,
+      "entities_with_valid_precursor": 2163,
+      "mgf_path": "D:\\DreaMS\\data\\validation\\msv000097426_hfd_ms2_anchored_20261014_v1\\representative_spectra.mgf"
+    },
+    {
+      "study_id": "MSV000084112",
+      "response_entities": 5501,
+      "entities_with_valid_precursor": 5501,
+      "mgf_path": "D:\\DreaMS\\data\\validation\\msv000084112_matched_ms2_anchored_20261014_v1\\representative_spectra.mgf"
+    },
+    {
+      "study_id": "MSV000083077",
+      "response_entities": 7132,
+      "entities_with_valid_precursor": 7132,
+      "mgf_path": "D:\\DreaMS\\data\\validation\\msv000083077_saliva_ms2_anchored_20261014_v4\\representative_spectra.mgf"
+    },
+    {
+      "study_id": "MSV000088023",
+      "response_entities": 212,
+      "entities_with_valid_precursor": 212,
+      "mgf_path": "D:\\DreaMS\\data\\reference\\msv000088023_hfd_response\\ms2spectra_maxTic.mgf"
+    },
+    {
+      "study_id": "MSV000090788",
+      "response_entities": 2350,
+      "entities_with_valid_precursor": 2350,
+      "mgf_path": "D:\\DreaMS\\data\\reference\\public_fbmn\\a36305db40414b6ea9c5b9a5de380bea\\representative.mgf"
+    },
+    {
+      "study_id": "MSV000097610",
+      "response_entities": 6081,
+      "entities_with_valid_precursor": 6081,
+      "mgf_path": "D:\\DreaMS\\data\\reference\\contrast_atlas_ibd_cross_study_20261014\\pediatric_veoibd_consensus.mgf"
+    },
+    {
+      "study_id": "IBD200_GROUP",
+      "response_entities": 662,
+      "entities_with_valid_precursor": 662,
+      "mgf_path": "D:\\DreaMS\\data\\reference\\contrast_atlas_ibd_cross_study_20261014\\adult_ibd200_consensus.mgf"
+    },
+    {
+      "study_id": "MSV000090804",
+      "response_entities": 4349,
+      "entities_with_valid_precursor": 4349,
+      "mgf_path": "D:\\DreaMS\\data\\reference\\public_fbmn_systematic_v1\\def58641630e488985bfbe5a15c94e32\\representative.mgf"
+    },
+    {
+      "study_id": "MSV000086360",
+      "response_entities": 3368,
+      "entities_with_valid_precursor": 3368,
+      "mgf_path": "D:\\DreaMS\\data\\reference\\public_fbmn_systematic_v1\\63d6d0c95b3e4d8d846d376499bb544e\\representative.mgf"
+    },
+    {
+      "study_id": "MSV000084794",
+      "response_entities": 2201,
+      "entities_with_valid_precursor": 2201,
+      "mgf_path": "D:\\DreaMS\\data\\reference\\public_fbmn_systematic_v1\\af7ec76b02ac482bbd2b7ee3a3ccbdc5\\representative.mgf"
+    },
+    {
+      "study_id": "MSV000096564",
+      "response_entities": 2817,
+      "entities_with_valid_precursor": 2817,
+      "mgf_path": "D:\\DreaMS\\data\\reference\\msv000096564_baseline_ibd_v1\\mgf.mgf"
+    },
+    {
+      "study_id": "MSV000092887",
+      "response_entities": 1411,
+      "entities_with_valid_precursor": 1411,
+      "mgf_path": "D:\\DreaMS\\data\\validation\\contrast_atlas_msv000092887_raw_ms2_link_v1_20261022\\representative_ms2.mgf"
+    },
+    {
+      "study_id": "MSV000094899",
+      "response_entities": 8055,
+      "entities_with_valid_precursor": 8055,
+      "mgf_path": "D:\\DreaMS\\data\\reference\\chemprop2_m1_20261011\\consensus.mgf"
+    },
+    {
+      "study_id": "MSV000096724",
+      "response_entities": 4429,
+      "entities_with_valid_precursor": 4429,
+      "mgf_path": "D:\\DreaMS\\data\\reference\\chemprop_cross_design_20261011\\chemprop_23drug\\spectra\\specs_ms.mgf"
+    },
+    {
+      "study_id": "MSV000093571",
+      "response_entities": 4130,
+      "entities_with_valid_precursor": 4130,
+      "mgf_path": "D:\\DreaMS\\data\\reference\\chemprop_cross_design_20261011\\chemprop_45drug\\spectra\\specs_ms.mgf"
+    }
+  ],
+  "leakage_status": "candidate spectral edges, common identity strata and the complete candidate universe were frozen upstream; registered biological relations were opened only after the complete score ledger was written and hashed",
+  "claim_boundary": [
+    "All 15 sources and all 51 contrasts are development/consumed; this is not sealed external validation.",
+    "No registered relation supplies signed metabolite-level truth; similar/opposite calls are calibrated hypotheses, not confirmed mechanisms.",
+    "This run consumes the exact upstream response-blind graph described in method.chemical_graph; its retrieval claims do not extend beyond that candidate-admission contract.",
+    "No calibrated match means no candidate passed this finite-power rule; it is not evidence that no biological relation exists.",
+    "Unresolved means lacking support under the common strict library policy, not a novel or unique molecule.",
+    "The 10-ppm track is a same-precursor identity hypothesis; isomers and ion-family redundancy remain possible.",
+    "The nonmass track relates distinct observations and never merges their beta or standard errors.",
+    "Every open top hit remains an unadjudicated hypothesis unless it is separately matched to a pre-existing eligible relation or independent experiment."
+  ],
+  "provenance": {
+    "response_entities_sha256": "6f6fa005983b9172c4f2cb7aa055feedd2165de90b6ce7c482eaa56af6b8de75",
+    "contrast_manifest_sha256": "a3b46e4dcacd65a5845e7b319db3decff8cbe64a242ec65116ff7dd48fc5089c",
+    "registered_relations_sha256": "8fba3fe5652773c68740d5237e02d0db314a2185b3c12c7581c3c9e4ced4014c",
+    "identity_partition_sha256": "239af73938fc03056406afea8fc3d17fa29d761735a5e96e23e0efb8e8e395b2",
+    "frozen_edges_sha256": "a5ea9ff3028b11d788cb006e0bce1003287cb11474f45b4eeb23001fb42646aa",
+    "score_sha256_before_registered_relations": "ead26b78306a46935f55c11f1393763b6440ba9950142d4cb55e31c9a3089a4a",
+    "edge_handoff": "c484cf386a7b1b53a92f6d555d910d7452e7bd634239e23fa2a5458482b3c3e7",
+    "scores": "ead26b78306a46935f55c11f1393763b6440ba9950142d4cb55e31c9a3089a4a",
+    "top_hits": "ee1b3de1d6f30248c9b95484e6d5b62b7093b60b276b770b88ffbf86df314bda",
+    "registered": "53e19642f18bf8a7cfcd300b4249b024e42d0b133bc7b9fa6932cd701497fae0",
+    "evidence": "d13af4e3d1a1cb5a6abda1f175d8344e3c096ab98c0adb58711279ef33977fcd",
+    "implementation_sha256": "8d635b907eb2631868ed1cf6e602f2048ec50d73d871de8d83d322e32f1f112f"
+  }
+}
