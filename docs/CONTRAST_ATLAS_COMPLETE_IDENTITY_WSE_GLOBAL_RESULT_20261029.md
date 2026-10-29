@@ -182,3 +182,23 @@ IBD 的 3 个 canonical 关系：
 冻结裁决相应更新为：**机会数主混杂已被系统检验，但 source-independent 生物检索、unknown 独立增量、自研算法同轴增量和封存外部验证仍均未通过。** 详细结果见 `docs/CONTRAST_ATLAS_WSE_EDGE_OPPORTUNITY_MATCHED_GLOBAL_RESULT_20261029.md`。
 
 本次新增 edge-matching、重抽样汇总及其回归测试后，相关测试为 7 passed。
+
+## 10. Parent-project holdout 更新（同日完成）
+
+上述第 7.2 项也已完成为全局检索，而不是单个实体或疾病案例。三项 ChemProp accession 被合并为一个操作性 parent-project dependence group；每个 query 在排名和 query-level max-T 之前删除同一 parent project 的全部候选。候选宇宙由 2,286 个 source-disjoint 有向方向降为 1,944 个 parent-project-disjoint 方向，精确删除 342 个同项目方向。24 个 ChemProp exact-drug 注册方向因此被标记为 `not_evaluable_same_parent_project`，没有被错误计为失败。
+
+在 32 张高度重叠的 matching-order sensitivity 图上：
+
+- two-face-Bonferroni 校准回答由 source-disjoint 的每轮 31–36/51（中位 33）降至 15–21/51（中位 19）；
+- 每轮丢失 12–17 个回答（中位 14.5），重新校准后新增回答始终为 0；
+- 13 个操作性项目组的 project-macro answer coverage 中位数为 0.338；
+- 15/51 个 query 在全部 32 张图中始终有回答，27/51 始终没有回答，9/51 随图变化；
+- 25/51 个 query 在全部 32 张图中始终选择同一个候选 parent project；
+- 暴露校正后，`MSV000086360` 成为最强项目级 hub：similar face 中位 9.5 次 Top-1、2.51 倍于候选暴露；opposite face 中位 15 次、3.97 倍；
+- 剩余 10 个 HFD/IBD primary 有向关系仍仅有 1–3 个 unsigned best-face Top-5（中位 2），32/32 张图均为 0 个关系通过 two-face-Bonferroni max-T。
+
+因此，删除 ChemProp 同项目捷径后并没有得到广泛、特异的跨项目生物学检索；系统会替换为另一个项目级响应 hub。剩余每轮中位 19 个回答是**校准的跨项目发现产量**，不是 19 个正确答案：1,926/1,944 个候选方向没有真值，注册关系没有 signed response-face truth，13 个组也只是操作性依赖组而非已证明完全独立的项目。
+
+冻结裁决进一步收紧为：**大规模检索和两个主要系统混杂控制均已完成；当前 WSE 身份轨仍未证明跨项目生物检索、unknown 独立增量或生物学正确性。** 详细结果见 `docs/CONTRAST_ATLAS_PARENT_PROJECT_HOLDOUT_GLOBAL_RESULT_20261029.md`。下一项不再继续扩大小案例或增加 null，而是等待 Official DreaMS、Noise V1、Full23/B 在同一 291,330 对冻结轴上的真实逐对分数，再原样替换算法；同时另行增加预先可判定、跨项目且有 signed truth 的封存生物关系。
+
+包括 parent-project 过滤、two-face 校正、机会匹配和全局汇总在内的相关回归测试合计为 13 passed。

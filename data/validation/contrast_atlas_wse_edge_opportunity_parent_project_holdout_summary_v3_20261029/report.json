@@ -1,0 +1,267 @@
+{
+  "schema": "contrast_atlas_parent_project_holdout_summary_v2",
+  "status": "DEVELOPMENT_CONSUMED_PARENT_PROJECT_HOLDOUT_SUMMARIZED",
+  "data_role": "development_consumed",
+  "scale": {
+    "sources": 15,
+    "operational_parent_project_groups": 13,
+    "study_level_contrasts": 51,
+    "directed_candidate_contrasts": 1944,
+    "candidate_score_rows_per_resample": 17496,
+    "selection_resamples": 32,
+    "response_permutations_per_resample": 256,
+    "registered_directions_evaluable": 18,
+    "registered_directions_not_evaluable_same_parent": 24
+  },
+  "calibrated_cross_project_discovery_yield": {
+    "calibrated_answers": {
+      "n": 32,
+      "minimum": 15.0,
+      "q25": 18.0,
+      "median": 19.0,
+      "q75": 20.0,
+      "maximum": 21.0
+    },
+    "answer_coverage": {
+      "n": 32,
+      "minimum": 0.29411764705882354,
+      "q25": 0.35294117647058826,
+      "median": 0.37254901960784315,
+      "q75": 0.39215686274509803,
+      "maximum": 0.4117647058823529
+    },
+    "project_macro_answer_coverage": {
+      "n": 32,
+      "minimum": 0.28205128205128205,
+      "q25": 0.31330128205128205,
+      "median": 0.33814102564102566,
+      "q75": 0.35977564102564097,
+      "maximum": 0.4423076923076923
+    },
+    "chemprop_query_answers": {
+      "n": 32,
+      "minimum": 6.0,
+      "q25": 7.0,
+      "median": 8.0,
+      "q75": 9.0,
+      "maximum": 10.0
+    },
+    "nonchemprop_query_answers": {
+      "n": 32,
+      "minimum": 9.0,
+      "q25": 10.0,
+      "median": 11.0,
+      "q75": 12.0,
+      "maximum": 13.0
+    },
+    "source_disjoint_answers": {
+      "n": 32,
+      "minimum": 31.0,
+      "q25": 32.0,
+      "median": 33.0,
+      "q75": 34.0,
+      "maximum": 36.0
+    },
+    "answers_lost_after_parent_holdout": {
+      "n": 32,
+      "minimum": 12.0,
+      "q25": 13.0,
+      "median": 14.5,
+      "q75": 16.0,
+      "maximum": 17.0
+    },
+    "answers_gained_after_parent_holdout": {
+      "n": 32,
+      "minimum": 0.0,
+      "q25": 0.0,
+      "median": 0.0,
+      "q75": 0.0,
+      "maximum": 0.0
+    }
+  },
+  "face_specific_and_hub_distributions": [
+    {
+      "response_face": "similar",
+      "calibrated_calls": {
+        "n": 32,
+        "minimum": 14.0,
+        "q25": 15.0,
+        "median": 16.0,
+        "q75": 16.0,
+        "maximum": 17.0
+      },
+      "chemprop_candidate_hits": {
+        "n": 32,
+        "minimum": 11.0,
+        "q25": 13.0,
+        "median": 13.0,
+        "q75": 14.25,
+        "maximum": 17.0
+      },
+      "largest_candidate_project_hits": {
+        "n": 32,
+        "minimum": 11.0,
+        "q25": 13.0,
+        "median": 13.0,
+        "q75": 14.25,
+        "maximum": 17.0
+      },
+      "candidate_project_hhi": {
+        "n": 32,
+        "minimum": 0.14571318723567858,
+        "q25": 0.16339869281045752,
+        "median": 0.16647443291041905,
+        "q75": 0.17281814686658978,
+        "maximum": 0.19184928873510187
+      }
+    },
+    {
+      "response_face": "opposite",
+      "calibrated_calls": {
+        "n": 32,
+        "minimum": 9.0,
+        "q25": 12.75,
+        "median": 14.0,
+        "q75": 15.0,
+        "maximum": 19.0
+      },
+      "chemprop_candidate_hits": {
+        "n": 32,
+        "minimum": 13.0,
+        "q25": 14.0,
+        "median": 15.0,
+        "q75": 16.0,
+        "maximum": 18.0
+      },
+      "largest_candidate_project_hits": {
+        "n": 32,
+        "minimum": 14.0,
+        "q25": 15.0,
+        "median": 16.0,
+        "q75": 16.0,
+        "maximum": 22.0
+      },
+      "candidate_project_hhi": {
+        "n": 32,
+        "minimum": 0.18800461361014997,
+        "q25": 0.20011534025374855,
+        "median": 0.20492118415993849,
+        "q75": 0.21337946943483274,
+        "maximum": 0.2710495963091119
+      }
+    }
+  ],
+  "sensitivity_selection_stability": {
+    "always_answered_queries": 15,
+    "never_answered_queries": 27,
+    "variable_answer_queries": 9,
+    "queries_selecting_one_candidate_project_in_all_32_graphs": 25,
+    "selected_candidate_projects_per_query": {
+      "n": 51,
+      "minimum": 1.0,
+      "q25": 1.0,
+      "median": 2.0,
+      "q75": 2.0,
+      "maximum": 5.0
+    },
+    "dominant_candidate_project_by_face": [
+      {
+        "response_face": "similar",
+        "candidate_parent_project": "CHEMPROP_SHARED_PARENT_PROJECT",
+        "minimum_top_hits": 11,
+        "median_top_hits": 13.0,
+        "maximum_top_hits": 17,
+        "median_candidate_exposure_fraction": 0.3333333333333333,
+        "median_top_hit_fraction": 0.2549019607843137,
+        "median_top_hit_to_exposure_ratio": 0.7647058823529411
+      },
+      {
+        "response_face": "opposite",
+        "candidate_parent_project": "MSV000086360",
+        "minimum_top_hits": 13,
+        "median_top_hits": 15.0,
+        "maximum_top_hits": 22,
+        "median_candidate_exposure_fraction": 0.07407407407407407,
+        "median_top_hit_fraction": 0.29411764705882354,
+        "median_top_hit_to_exposure_ratio": 3.970588235294118
+      }
+    ],
+    "most_overrepresented_candidate_project_by_face": [
+      {
+        "response_face": "similar",
+        "candidate_parent_project": "MSV000086360",
+        "minimum_top_hits": 6,
+        "median_top_hits": 9.5,
+        "maximum_top_hits": 14,
+        "median_candidate_exposure_fraction": 0.07407407407407407,
+        "median_top_hit_fraction": 0.18627450980392157,
+        "median_top_hit_to_exposure_ratio": 2.514705882352941
+      },
+      {
+        "response_face": "opposite",
+        "candidate_parent_project": "MSV000086360",
+        "minimum_top_hits": 13,
+        "median_top_hits": 15.0,
+        "maximum_top_hits": 22,
+        "median_candidate_exposure_fraction": 0.07407407407407407,
+        "median_top_hit_fraction": 0.29411764705882354,
+        "median_top_hit_to_exposure_ratio": 3.970588235294118
+      }
+    ]
+  },
+  "source_independent_primary": {
+    "directions": 10,
+    "canonical_pairs": 5,
+    "biological_components": 2,
+    "directional_top5": {
+      "n": 32,
+      "minimum": 1.0,
+      "q25": 2.0,
+      "median": 2.0,
+      "q75": 2.0,
+      "maximum": 3.0
+    },
+    "directional_two_face_bonferroni_005": {
+      "n": 32,
+      "minimum": 0.0,
+      "q25": 0.0,
+      "median": 0.0,
+      "q75": 0.0,
+      "maximum": 0.0
+    }
+  },
+  "decision": {
+    "parent_project_holdout_executed": true,
+    "cross_project_biological_retrieval_pass": false,
+    "unknown_information_increment_pass": false,
+    "in_house_algorithm_increment_evaluated": false,
+    "reasons": [
+      "The 24 exact-drug ChemProp directions are intentionally excluded, not counted as failures.",
+      "Only 10 primary registered directions remain, representing five pairs and two biological components.",
+      "The remaining 1,926 directed candidates are unjudged rather than negative.",
+      "All registered response faces are unspecified; calibrated calls are discovery yield, not signed accuracy.",
+      "All inputs are development/consumed and no sealed external biological validation is present."
+    ]
+  },
+  "claim_boundary": [
+    "The 13 groups are operational dependence groups; independence beyond the known shared ChemProp parent was not proven.",
+    "Two-face calls use min(1, 2*min(face-wise query max-T p)) and require at least three weighted evidence edges.",
+    "No-calibrated-match and insufficient-evidence are not biological no-match labels.",
+    "The 32 graphs are highly overlapping matching-order sensitivity selections, not independent replicates or confidence intervals.",
+    "This run evaluates the same-precursor identity-hypothesis track only; it does not validate different-mass chemical relations."
+  ],
+  "provenance": {
+    "project_map_sha256": "71cbdd00c3e39524b305217af098014ffc18ccbace517e15db9212d75b62e0a7",
+    "resamples": "012bbe58e97d67819a8a1618a17fd1d502449dc9f4445b8945426e17d2174a3f",
+    "project_coverage": "57a76f7604458cf8ed0ec22fa30764eab3cae86408eaeb96b6deb3243196fda3",
+    "faces": "042f2436d63858ff9583b19de8124c11fd2599c26a165a091955089960b25cf2",
+    "hubs": "fed4a90f82e4d2bba2eb6720c3961cb8cff2b8abd726ff4aebecdf20d5e8f1ff",
+    "primary": "d354f7e0846c811f0e2939aa6a4da928d8a1a1808f7a22ad5514e61416a27519",
+    "calls": "ce9d3c947ad5b3e10cac9732c05d7d38f569ae6256dc8bce2bb0f3d31527f641",
+    "provenance": "bbf85541082db35ae9bb8f3024c235dea4701b02fc93826213e6e303f85f2165",
+    "query_stability": "9a322766b6e69721f302c45f182979afb047a690ec966502a17b4a8632557c8d",
+    "project_coverage_summary": "535d60003dea6661d698051da46890f1de153f4fc31a37a0b7f572a3f9b1dc03",
+    "candidate_project_hub_summary": "0563b83cb16372788a03db3b10f6573ffb88bad191404578fe9bdd23f4dd8894",
+    "implementation_sha256": "1f9133d19e3a16b1fc45986142a3f4335cdfb4143488cf621a434d2f8f0276a6"
+  }
+}

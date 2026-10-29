@@ -13,8 +13,8 @@ mutual-neighbour edges are reported as identity hypotheses; mass-incompatible
 mutual-neighbour edges are reported separately as chemical-relation
 hypotheses.  Whole entity response profiles are reassigned within study and
 common identity stratum to obtain candidate-specific nulls.  A query-level
-max-T distribution controls selection across the full source-disjoint
-candidate universe.
+max-T distribution controls selection across either the full source-disjoint
+or a stricter parent-project-disjoint candidate universe.
 """
 
 from __future__ import annotations
@@ -45,6 +45,7 @@ TRACKS = (
     "nonmass_chemical_relation_hypothesis",
 )
 FACES = ("similar", "opposite")
+CANDIDATE_UNIVERSES = ("source_disjoint", "parent_project_disjoint")
 EDGE_KEY_COLUMNS = [
     "left_study_id",
     "right_study_id",
@@ -556,6 +557,7 @@ def make_directed_ledger(
     undirected: pd.DataFrame,
     null_by_undirected: dict[int, tuple[np.ndarray, np.ndarray]],
     contrast_manifest: pd.DataFrame,
+    parent_project_lookup: dict[str, str] | None = None,
 ) -> pd.DataFrame:
     source_lookup = dict(
         zip(
@@ -591,6 +593,27 @@ def make_directed_ledger(
         "candidate_source_family",
         ledger["candidate_study_id"].map(source_lookup),
     )
+    if parent_project_lookup is not None:
+        missing = sorted(
+            set(ledger["query_study_id"])
+            .union(ledger["candidate_study_id"])
+            .difference(parent_project_lookup)
+        )
+        if missing:
+            raise RuntimeError(f"parent-project map is missing studies: {missing}")
+        ledger.insert(
+            3,
+            "query_parent_project",
+            ledger["query_study_id"].map(parent_project_lookup),
+        )
+        ledger.insert(
+            7,
+            "candidate_parent_project",
+            ledger["candidate_study_id"].map(parent_project_lookup),
+        )
+        ledger = ledger.loc[
+            ledger["query_parent_project"].ne(ledger["candidate_parent_project"])
+        ].copy()
     group_columns = [
         "query_study_id",
         "query_contrast_id",
@@ -628,9 +651,21 @@ def make_directed_ledger(
             )
             ledger.loc[ordered, p_column] = adjusted
 
-    expected = contrast_manifest.set_index(["study_id", "contrast_id"])[
-        "source_disjoint_candidate_contrasts"
-    ].astype(int)
+    if parent_project_lookup is None:
+        expected = contrast_manifest.set_index(["study_id", "contrast_id"])[
+            "source_disjoint_candidate_contrasts"
+        ].astype(int)
+    else:
+        manifest = contrast_manifest[["study_id", "contrast_id"]].copy()
+        manifest["parent_project"] = manifest["study_id"].map(parent_project_lookup)
+        expected = pd.Series(
+            {
+                (str(row.study_id), str(row.contrast_id)): int(
+                    manifest["parent_project"].ne(row.parent_project).sum()
+                )
+                for row in manifest.itertuples(index=False)
+            }
+        )
     for row in ledger.drop_duplicates(group_columns).itertuples(index=False):
         target = int(expected.loc[(str(row.query_study_id), str(row.query_contrast_id))])
         if int(row.candidate_universe_size) != target:
@@ -704,6 +739,7 @@ def top_hits(
 def audit_registered_relations(
     ledger: pd.DataFrame,
     relation_path: Path,
+    parent_project_lookup: dict[str, str] | None = None,
 ) -> pd.DataFrame:
     relations = pd.read_csv(relation_path, sep="\t", dtype=str)
     records: list[dict[str, object]] = []
@@ -714,10 +750,47 @@ def audit_registered_relations(
             & ledger["candidate_study_id"].eq(str(relation["right_study_id"]))
             & ledger["candidate_contrast_id"].eq(str(relation["right_contrast_id"]))
         ]
+        expected_exclusion = bool(
+            parent_project_lookup is not None
+            and parent_project_lookup.get(str(relation["left_study_id"]))
+            == parent_project_lookup.get(str(relation["right_study_id"]))
+        )
+        if not len(matched) and expected_exclusion:
+            for world in WORLDS:
+                for track in TRACKS:
+                    record = dict(relation)
+                    record.update({
+                        "evidence_world": world,
+                        "evidence_track": track,
+                        "candidate_in_universe": False,
+                        "relation_candidate_eligible": False,
+                        "evaluation_status": "not_evaluable_same_parent_project",
+                    })
+                    for column in (
+                        "mutual_edges",
+                        "weighted_evidence_edges",
+                        "same_direction_dual_fdr_edges",
+                        "opposite_direction_dual_fdr_edges",
+                        "similar_z",
+                        "opposite_z",
+                        "similar_candidate_p",
+                        "opposite_candidate_p",
+                        "similar_query_maxT_p",
+                        "opposite_query_maxT_p",
+                        "similar_rank",
+                        "opposite_rank",
+                        "candidate_universe_size",
+                    ):
+                        record[column] = np.nan
+                    records.append(record)
+            continue
         if len(matched) != len(WORLDS) * len(TRACKS):
             raise RuntimeError(f"registered relation did not match the full score matrix: {relation}")
         for row in matched.itertuples(index=False):
             record = dict(relation)
+            record["candidate_in_universe"] = True
+            record["relation_candidate_eligible"] = True
+            record["evaluation_status"] = "evaluable"
             for column in (
                 "evidence_world",
                 "evidence_track",
@@ -742,7 +815,34 @@ def audit_registered_relations(
     result["best_face_query_maxT_p"] = result[
         ["similar_query_maxT_p", "opposite_query_maxT_p"]
     ].min(axis=1)
+    result["best_face_bonferroni_p"] = np.minimum(
+        1.0,
+        2.0 * pd.to_numeric(result["best_face_query_maxT_p"], errors="coerce"),
+    )
     return result
+
+
+def load_parent_project_lookup(
+    path: Path,
+    contrast_manifest: pd.DataFrame,
+) -> dict[str, str]:
+    mapping = pd.read_csv(path, sep="\t", dtype=str)
+    required = {"study_id", "parent_project_id"}
+    if not required.issubset(mapping.columns):
+        raise ValueError(f"parent-project map must contain {sorted(required)}")
+    if mapping["study_id"].duplicated().any():
+        raise ValueError("parent-project map contains duplicate study_id values")
+    if mapping[list(required)].isna().any().any():
+        raise ValueError("parent-project map contains missing identifiers")
+    lookup = dict(zip(mapping["study_id"], mapping["parent_project_id"]))
+    studies = set(contrast_manifest["study_id"].astype(str))
+    missing = sorted(studies.difference(lookup))
+    extra = sorted(set(lookup).difference(studies))
+    if missing or extra:
+        raise ValueError(
+            f"parent-project map does not exactly cover the collection; missing={missing}, extra={extra}"
+        )
+    return lookup
 
 
 def supporting_edge_details(
@@ -858,6 +958,16 @@ def main() -> None:
     parser.add_argument("--precursor-ppm", type=float, default=10.0)
     parser.add_argument("--top-evidence-per-hit", type=int, default=10)
     parser.add_argument(
+        "--candidate-universe",
+        choices=CANDIDATE_UNIVERSES,
+        default="source_disjoint",
+    )
+    parser.add_argument(
+        "--parent-project-map",
+        type=Path,
+        help="Required for parent_project_disjoint; columns: study_id, parent_project_id",
+    )
+    parser.add_argument(
         "--algorithm-edge-scores",
         type=Path,
         help="Optional exact-axis score table; it may reweight but not add/drop edges",
@@ -878,6 +988,11 @@ def main() -> None:
         raise ValueError(
             "--algorithm-edge-scores and --algorithm-score-column must be supplied together"
         )
+    if args.candidate_universe == "parent_project_disjoint":
+        if args.parent_project_map is None:
+            raise ValueError("--parent-project-map is required for parent_project_disjoint")
+    elif args.parent_project_map is not None:
+        raise ValueError("--parent-project-map is only valid for parent_project_disjoint")
 
     paths = {
         "entities": args.collection / "response_entities.tsv.gz",
@@ -919,6 +1034,14 @@ def main() -> None:
     contrasts = pd.read_csv(paths["contrasts"], sep="\t")
     contrasts["study_id"] = contrasts["study_id"].astype(str)
     contrasts["contrast_id"] = contrasts["contrast_id"].astype(str)
+    parent_project_lookup = None
+    if args.parent_project_map is not None:
+        if not args.parent_project_map.is_file():
+            raise FileNotFoundError(args.parent_project_map)
+        parent_project_lookup = load_parent_project_lookup(
+            args.parent_project_map,
+            contrasts,
+        )
     profiles = build_profiles(effects, contrasts, args.effect_fdr)
     donors = build_profile_reassignments(profiles, args.permutations, args.seed)
     precursors, precursor_summary = load_precursors(
@@ -951,7 +1074,12 @@ def main() -> None:
         algorithm_score_provenance.update(replacement)
 
     undirected, nulls = score_open_candidates(profiles, donors, mutual_edges)
-    ledger = make_directed_ledger(undirected, nulls, contrasts)
+    ledger = make_directed_ledger(
+        undirected,
+        nulls,
+        contrasts,
+        parent_project_lookup=parent_project_lookup,
+    )
 
     args.output_dir.mkdir(parents=True)
     outputs = {
@@ -970,7 +1098,11 @@ def main() -> None:
     score_hash_before_truth = sha256(outputs["scores"])
     top = top_hits(ledger, args.minimum_support, args.query_alpha)
     top.to_csv(outputs["top_hits"], sep="\t", index=False)
-    registered = audit_registered_relations(ledger, paths["relations"])
+    registered = audit_registered_relations(
+        ledger,
+        paths["relations"],
+        parent_project_lookup=parent_project_lookup,
+    )
     registered.to_csv(outputs["registered"], sep="\t", index=False)
     evidence = supporting_edge_details(
         top, mutual_edges, profiles, args.top_evidence_per_hit
@@ -987,6 +1119,7 @@ def main() -> None:
     relation_summary = []
     primary_registered = registered.loc[
         registered["eligible_primary_relevance"].astype(str).str.lower().eq("true")
+        & registered["relation_candidate_eligible"].astype(bool)
     ]
     for (world, track), block in primary_registered.groupby(
         ["evidence_world", "evidence_track"], sort=True
@@ -1001,7 +1134,9 @@ def main() -> None:
             "median_best_face_rank": (
                 None if pd.isna(median_rank) else float(median_rank)
             ),
-            "query_maxT_005": int(block["best_face_query_maxT_p"].le(args.query_alpha).sum()),
+            "two_face_bonferroni_query_maxT_005": int(
+                block["best_face_bonferroni_p"].le(args.query_alpha).sum()
+            ),
         })
 
     report = {
@@ -1016,7 +1151,10 @@ def main() -> None:
             "local_support": "mutual spectral edges contribute locally; absent edges remain zero and distinct entities are never merged",
             "null": "whole multi-contrast entity response profiles reassigned within study and common identity stratum",
             "candidate_calibration": "candidate-specific permutation z and empirical upper-tail p",
-            "open_query_calibration": "query-level max-T across the complete source-disjoint candidate universe",
+            "open_query_calibration": (
+                f"query-level max-T across the complete {args.candidate_universe.replace('_', '-')} candidate universe"
+            ),
+            "candidate_universe": args.candidate_universe,
             "identity_track": f"mutual top-1 and precursor compatible within {args.precursor_ppm} ppm; identity hypothesis, not proof",
             "relation_track": f"mutual top-1 and valid precursor difference greater than {args.precursor_ppm} ppm; distinct-response association, never effect meta-analysis",
             "minimum_support_edges_for_answer": args.minimum_support,
@@ -1042,6 +1180,11 @@ def main() -> None:
         "denominators": {
             "independent_studies": int(contrasts["study_id"].nunique()),
             "source_families": int(contrasts["source_family"].nunique()),
+            "parent_project_families": (
+                None
+                if parent_project_lookup is None
+                else int(len(set(parent_project_lookup.values())))
+            ),
             "study_level_contrasts": int(len(contrasts)),
             "response_rows": int(len(effects)),
             "unique_study_entities": int(effects[["study_id", "entity_id"]].drop_duplicates().shape[0]),
@@ -1059,6 +1202,18 @@ def main() -> None:
             "top_hit_rows": int(len(top)),
             "permutations": args.permutations,
             "registered_directional_relations": int(len(pd.read_csv(paths["relations"], sep="\t"))),
+            "registered_directional_relations_in_candidate_universe": int(
+                registered.loc[
+                    registered["relation_candidate_eligible"].astype(bool),
+                    ["relation_direction", "left_study_id", "left_contrast_id", "right_study_id", "right_contrast_id"],
+                ].drop_duplicates().shape[0]
+            ),
+            "registered_directional_relations_not_evaluable_same_parent_project": int(
+                registered.loc[
+                    registered["evaluation_status"].eq("not_evaluable_same_parent_project"),
+                    ["relation_direction", "left_study_id", "left_contrast_id", "right_study_id", "right_contrast_id"],
+                ].drop_duplicates().shape[0]
+            ),
             "registered_signed_truth_relations": int(
                 (~pd.read_csv(paths["relations"], sep="\t")["expected_signed_direction"].astype(str).str.lower().eq("unspecified")).sum()
             ),
@@ -1072,6 +1227,11 @@ def main() -> None:
         ),
         "claim_boundary": [
             "All 15 sources and all 51 contrasts are development/consumed; this is not sealed external validation.",
+            (
+                "Parent-project-disjoint retrieval removes all candidate contrasts from the query's parent project."
+                if args.candidate_universe == "parent_project_disjoint"
+                else "Source-disjoint retrieval can retain different accessions from one parent project."
+            ),
             "No registered relation supplies signed metabolite-level truth; similar/opposite calls are calibrated hypotheses, not confirmed mechanisms.",
             (
                 "This run consumes the exact upstream response-blind graph described in method.chemical_graph; "
@@ -1087,6 +1247,11 @@ def main() -> None:
             "response_entities_sha256": sha256(paths["entities"]),
             "contrast_manifest_sha256": sha256(paths["contrasts"]),
             "registered_relations_sha256": sha256(paths["relations"]),
+            **(
+                {"parent_project_map_sha256": sha256(args.parent_project_map)}
+                if args.parent_project_map is not None
+                else {}
+            ),
             "identity_partition_sha256": sha256(args.identity_partition),
             "frozen_edges_sha256": sha256(paths["edges"]),
             **(
