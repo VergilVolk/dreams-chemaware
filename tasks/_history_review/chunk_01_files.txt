@@ -1,0 +1,17 @@
+﻿docs/P1_execution_plan.md
+docs/E1_budget_conda_steps.md
+docs/second_report_scientific_story.md
+docs/ChemAware_SOTA_literature_audit_20260807.md
+docs/P0_failure_case_audit.md
+docs/P1_rule_noise_pilot.md
+docs/P1_noise_rule_preexperiment_decision.md
+docs/embedding_factor_discovery_pilot.md
+docs/dreams_factor_mining_v2.md
+docs/paired_layer_cka_pilot.md
+docs/multilevel_factor_pilot.md
+docs/implicit_chemical_factor_full_experiment.md
+docs/crossmodal_chemical_factor_strategy.md
+docs/fragmentation_factor_pilot_v1.md
+docs/PEAK_EVIDENCE_STAGE_DECISION.md
+docs/COUNTERFACTUAL_PEAK_FINETUNE_STAGE_REPORT.md
+docs/COUNTERFACTUAL_TRAINING_ANACONDA.md
