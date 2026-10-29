@@ -1,0 +1,93 @@
+{
+  "schema": "contrast_atlas_ibd_wse_adjudication_v2_compact_release",
+  "status": "DEVELOPMENT_CONSUMED_IBD_COMPLETE_BLOCK_WSE_ADJUDICATED",
+  "data_role": "development_consumed",
+  "truth_order": "WSE scores frozen before response estimates and candidate-set labels were joined",
+  "denominators": {
+    "targeted_candidate_pairs": 24,
+    "targeted_query_blocks": 9,
+    "stercobilin_like_entities_with_response": 3,
+    "post_contract_late_mz595_directed_pairs": 2
+  },
+  "findings": {
+    "stercobilin_like_response_direction": {
+      "entities": [
+        "IBD200_GROUP::1041",
+        "MSV000096564::13749",
+        "MSV000097610::16870"
+      ],
+      "beta": {
+        "MSV000097610::16870": -4.03292092638887,
+        "MSV000096564::13749": -6.359925560721163,
+        "IBD200_GROUP::1041": -1.964020279511676
+      },
+      "all_three_negative": true,
+      "boundary": "descriptive three-study unresolved response support; effect scales differ, strict-known baseline already retrieves the IBD study relation, and exact identity is unconfirmed"
+    },
+    "wse_5asa_identity_control": {
+      "query": "MSV000097610::37125",
+      "expected_candidate": "IBD200_GROUP::1547",
+      "expected_rank": 3,
+      "expected_score": 0.7804338335990906,
+      "wrong_top1_candidate": "IBD200_GROUP::1527",
+      "wrong_top1_score": 0.8170381784439087,
+      "interpretation": "frozen WSE failure on a full-InChIKey identity positive control; medication confounding precludes an IBD-mechanism claim but creates a legal same-axis algorithm-correction test"
+    },
+    "late_mz595_pair": {
+      "entities": [
+        "IBD200_GROUP::1286",
+        "MSV000097610::28796"
+      ],
+      "directed_pairs": 2,
+      "both_rank1": true,
+      "boundary": "post-contract exploratory pair; distinct from the early m/z 595 family and not pooled"
+    }
+  },
+  "success_gate_remaining": [
+    "Score the identical complete blocks with Official DreaMS, Noise V1 and Full23 v1.",
+    "Determine whether a self-developed method corrects the WSE 5-ASA error without using response labels.",
+    "Confirm any unresolved IBD identity and response link in an unconsumed cohort or orthogonal chemical experiment."
+  ],
+  "claim_boundary": [
+    "This is a consumed development adjudication, not external confirmation.",
+    "Response concordance did not select or rerank any candidate.",
+    "The unresolved m/z 595 entities are identity hypotheses; beta and SE are not pooled.",
+    "The 5-ASA block is an identity positive control, not an IBD mechanism endpoint."
+  ],
+  "provenance": {
+    "contract": {
+      "path": "tasks\\contrast_atlas_ibd_decision_blocks_v1.json",
+      "sha256": "983b2435586629efd1f831a2e9c46e5695ae2e70e9606cb09df921fa8f1d0283"
+    },
+    "handoff": {
+      "path": "data\\validation\\contrast_atlas_ibd_decision_blocks_v5_20261027\\complete_block_algorithm_handoff.tsv.gz",
+      "sha256": "19c9167ec53fe2fc12d5c5bf35063ada59b9678d24099b48c9cbdbf8e5b662eb"
+    },
+    "wse_release_report": {
+      "path": "data\\validation\\contrast_atlas_complete_identity_wse_release_v1_20261029\\report.json",
+      "sha256": "10b28e3919a6d71db6e01de58a94c113c1934a3ea21d414e8d2303768122f3ff"
+    },
+    "wse_aligned_scores": {
+      "path": "data\\validation\\contrast_atlas_complete_identity_wse_release_v1_20261029\\wse_scores_aligned.npz",
+      "sha256": "a037c5be85118bbe279bcb56717fc4f081ed77b4ba8a8284be9d0525404091d4"
+    },
+    "directed_pair_axis": {
+      "path": "data\\validation\\contrast_atlas_model_independent_identity_axis_v5_20261027\\directed_complete_candidate_pairs.tsv.gz",
+      "sha256": "741f3a6a4735d100121c16ec095d59eda872fe0cdde8c38cd25fe903c22994e2"
+    },
+    "responses": {
+      "path": "data\\validation\\contrast_atlas_open_response_collection_v9_frozenbase_chemprop_20261023\\response_entities.tsv.gz",
+      "sha256": "6f6fa005983b9172c4f2cb7aa055feedd2165de90b6ce7c482eaa56af6b8de75"
+    },
+    "implementation": {
+      "path": "D:\\DreaMS\\.codex-worktrees\\biology_result_20261029\\tasks\\adjudicate_contrast_atlas_ibd_wse_blocks.py",
+      "sha256": "a398a0a78065dc4d5159ef17d013e4993ef0e959f1d0664d0be1df9539825052"
+    }
+  },
+  "outputs": {
+    "targeted_pair_scores.tsv.gz": "62b963c248a2999cb5afcfd94216616151b9424e16b65ab6a9ef8f72fd7ce938",
+    "targeted_block_decisions.tsv": "b48af201fab3754307975e9dcd80fbae559c912f2258552a0053a4876b9954b9",
+    "targeted_entity_responses.tsv": "2b813bdab7af76ed43ed84f44f4a134b0a3f0e5905966c50a7269efa78679014",
+    "exploratory_distinct_mz595_pair.tsv": "ceabdf77a494e9c0d2e63b3346d92297dafac09674bf942787a702697ec090a3"
+  }
+}

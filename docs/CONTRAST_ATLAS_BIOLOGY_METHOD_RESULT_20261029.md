@@ -137,6 +137,61 @@ Reproducible output:
 - `data/validation/contrast_atlas_development_candidate_screen_v2_20261029/`
 - `tasks/summarize_contrast_atlas_development_candidates.py`
 
+## Result 4: complete-axis WSE is now scored, with a concrete correction target
+
+Canonical weighted spectral entropy was computed locally for every candidate
+on the frozen model-independent identity axis.  The scorer read no beta, SE,
+phenotype, registered relation or identity truth.  It used the predeclared
+0.01 noise threshold, 0.05-Da within-spectrum cleaning distance, no Top-N peak
+truncation and 0.02-Da comparison tolerance.
+
+| Complete identity-axis denominator | Count |
+|---|---:|
+| studies | 15 |
+| entities | 54,861 |
+| query-by-target-source blocks | 768,054 |
+| zero-candidate blocks retained | 628,925 |
+| singleton blocks retained | 81,871 |
+| multiple-candidate blocks retained | 57,258 |
+| directed candidate pairs scored | 291,330 / 291,330 |
+| unique WSE Top-1 decisions, including singleton hypotheses | 135,215 |
+| tied Top-1 abstentions | 3,914 |
+
+All 54,861 representative spectra were found uniquely in the 15 frozen MGF
+sources and were nonempty after cleaning.  The WSE median was 0.27624; 257,174
+pairs had at least one matched fragment and a positive score.  A legal zero
+score remained evidence rather than being rewritten as missing.
+
+Opening the predeclared IBD decision blocks only after scoring produced two
+different findings.
+
+First, the deoxycholic-acid-5-ASA positive-control block exposes a concrete
+classical-baseline error.  With paediatric entity `MSV000097610::37125` as the
+query, WSE ranks adult `IBD200_GROUP::1527` first at 0.81704, although that
+candidate has a different full InChIKey.  The frozen expected same-full-
+InChIKey entity `IBD200_GROUP::1547` ranks third at 0.78043.  This is an exact,
+response-blind opportunity for Official, Noise and Full23 to correct WSE on
+the identical four-candidate block.  It is an identity positive control, not
+an IBD-mechanism endpoint: 5-ASA exposure is a known confounder.
+
+Second, the m/z 595 evidence resolves into two separate spectral families.
+The predeclared early-retention-time unresolved entities `1041` and `16870`
+are reciprocal WSE Top-1; `16870` and third-study entity `13749` are also
+reciprocal Top-1.  Their three study-specific betas are all negative
+(-1.9640, -4.0329 and -6.3599), but their effect scales differ and are not
+pooled.  Separately, the post-contract late-retention-time pair `1286` and
+`28796` is reciprocal Top-1 and also decreases in both studies.  The two
+families must not be merged.  Because a strict-known baseline already retrieves
+the adult-paediatric IBD study relation, these unresolved entities add
+entity-level evidence; they do not establish a new study-level relation.
+
+Reproducible outputs:
+
+- `data/validation/contrast_atlas_complete_identity_wse_release_v1_20261029/`
+- `data/validation/contrast_atlas_ibd_wse_adjudication_v2_20261029/`
+- `tasks/score_contrast_atlas_complete_identity_wse.py`
+- `tasks/adjudicate_contrast_atlas_ibd_wse_blocks.py`
+
 ## Legal algorithm boundary
 
 | Track | Question | Eligible algorithm use |
@@ -165,7 +220,7 @@ on the already frozen complete candidate blocks:
 
 - worlds: known-only, measurement-matched known, unresolved-shuffled MS/MS,
   all;
-- methods: WSE, Official DreaMS, Noise V1, Full23 v1;
+- methods: WSE (now complete), Official DreaMS, Noise V1, Full23 v1;
 - same complete query blocks, including zero- and one-candidate abstentions;
 - identical response aggregation and target-contrast universe.
 

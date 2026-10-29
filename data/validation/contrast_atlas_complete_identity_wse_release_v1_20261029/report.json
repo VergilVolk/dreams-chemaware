@@ -1,0 +1,84 @@
+{
+  "schema": "contrast_atlas_complete_identity_wse_release_v1",
+  "status": "DEVELOPMENT_CONSUMED_CONTRAST_ATLAS_COMPLETE_IDENTITY_WSE_RELEASED",
+  "data_role": "development_consumed",
+  "alignment_contract": {
+    "score_rows": "exact row order of directed_complete_candidate_pairs.tsv.gz",
+    "block_pointer": "exact half-open offsets of query_target_source_blocks.tsv.gz",
+    "pair_axis_sha256": "741f3a6a4735d100121c16ec095d59eda872fe0cdde8c38cd25fe903c22994e2",
+    "block_axis_sha256": "8108c15bee5884f9ae662d22efb09e432740ba176ba194c2c142610ed4b16ffd",
+    "ids_not_duplicated": true
+  },
+  "denominators": {
+    "studies": 15,
+    "entities": 54861,
+    "query_blocks": 768054,
+    "zero_candidate_blocks": 628925,
+    "singleton_blocks": 81871,
+    "multiple_candidate_blocks": 57258,
+    "directed_candidate_pairs": 291330,
+    "finite_scores": 291330,
+    "available_scores": 291330,
+    "answered_blocks": 135215,
+    "tied_top1_blocks": 3914
+  },
+  "score_summary": {
+    "minimum": 0.0,
+    "median": 0.2762375473976135,
+    "maximum": 1.0,
+    "positive": 257174,
+    "matched_fragment_positive": 257174
+  },
+  "truth_blinding": {
+    "response_beta_se_read": false,
+    "phenotype_read": false,
+    "registered_relations_read": false,
+    "identity_truth_read": false,
+    "candidate_admission_changed": false
+  },
+  "method": {
+    "name": "weighted_spectral_entropy",
+    "backend": "ms_entropy",
+    "fragment_tolerance_da": 0.02,
+    "cleaning": {
+      "noise_threshold": 0.01,
+      "minimum_ms2_difference_da": 0.05,
+      "maximum_peak_number": -1
+    }
+  },
+  "claim_boundary": [
+    "WSE is a truth-blind classical identity-candidate baseline, not molecular-identity proof.",
+    "This run does not evaluate unresolved-information, algorithm, response-retrieval or biological increment.",
+    "All blocks, including zero- and one-candidate blocks, remain in the denominator."
+  ],
+  "provenance": {
+    "source_report": {
+      "path": "data\\validation\\contrast_atlas_complete_identity_wse_v2_20261029\\report.json",
+      "sha256": "690fc85ac7eb25dd58e69160259a90bd5ed78815815cd40f1980d5f7e23beaf9"
+    },
+    "source_candidate_scores": {
+      "path": "data\\validation\\contrast_atlas_complete_identity_wse_v2_20261029\\candidate_scores.tsv.gz",
+      "sha256": "b44a51a59d3888ef88caa00b0e538aadf2bd15af0e2aa117091700e7e35b1a12"
+    },
+    "source_block_decisions": {
+      "path": "data\\validation\\contrast_atlas_complete_identity_wse_v2_20261029\\block_decisions.tsv.gz",
+      "sha256": "43e2d6f6fc8d9c73ccc39eab2fe77e5768c521c2ecf0d0959b4f6367e6af9393"
+    },
+    "directed_pair_axis": {
+      "path": "data\\validation\\contrast_atlas_model_independent_identity_axis_v5_20261027\\directed_complete_candidate_pairs.tsv.gz",
+      "sha256": "741f3a6a4735d100121c16ec095d59eda872fe0cdde8c38cd25fe903c22994e2"
+    },
+    "query_block_axis": {
+      "path": "data\\validation\\contrast_atlas_model_independent_identity_axis_v5_20261027\\query_target_source_blocks.tsv.gz",
+      "sha256": "8108c15bee5884f9ae662d22efb09e432740ba176ba194c2c142610ed4b16ffd"
+    },
+    "implementation": {
+      "path": "D:\\DreaMS\\.codex-worktrees\\biology_result_20261029\\tasks\\package_contrast_atlas_complete_identity_wse_release.py",
+      "sha256": "a79966e18244ca23eb135641211cd2a2ec825250b6aff37cb92377d92942803b"
+    }
+  },
+  "outputs": {
+    "wse_scores_aligned.npz": "a037c5be85118bbe279bcb56717fc4f081ed77b4ba8a8284be9d0525404091d4",
+    "nonempty_block_decisions.tsv.gz": "375a5644a909b9bfea4ccf36e23baf34e05296edb6fb26bcdfaa2f83115c5be1"
+  }
+}
