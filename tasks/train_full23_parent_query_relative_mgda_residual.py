@@ -19,6 +19,7 @@ indicator or source-weight grid is exposed to the scorer.
 from __future__ import annotations
 
 import argparse
+from collections.abc import Callable
 import copy
 import json
 import math
@@ -272,6 +273,296 @@ def fit_delta_mgda(
             "mgda_alpha_enveda_max": float(np.max(alphas)),
             "gradient_cosine_mean": float(np.mean(cosines)),
             "steps": steps,
+        })
+    return model, history
+
+
+DeltaPayload = tuple[
+    torch.Tensor, np.ndarray, np.ndarray, np.ndarray, torch.Tensor,
+]
+
+
+def _delta_payload(
+    panels: dict[str, PanelData], selected: list[tuple[str, int]],
+    mean: np.ndarray, scale: np.ndarray, parent_scores: dict[str, np.ndarray],
+    device: str,
+) -> DeltaPayload:
+    features, labels, ptr, weights, fixed = pack_parent(
+        panels, selected, mean, scale, parent_scores,
+    )
+    return (
+        torch.as_tensor(features, dtype=torch.float32, device=device),
+        labels,
+        ptr,
+        weights,
+        torch.as_tensor(fixed, dtype=torch.float32, device=device),
+    )
+
+
+def _delta_objective_components(
+    model: ParentPlusLinearDelta,
+    payload: DeltaPayload,
+    parameters: tuple[torch.nn.Parameter, ...],
+    args: argparse.Namespace,
+) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+    """Return total, listwise, anchor and shared-L2 objectives.
+
+    The L2 term is placed inside both task objectives.  A plain common-gradient
+    step therefore optimizes exactly the regularized objectives used by MGDA;
+    no optimizer-side weight decay is allowed to rotate that direction.
+    """
+    features, labels, ptr, weights, fixed = payload
+    logits = model(features, fixed)
+    delta = model.delta(features)
+    listwise = weighted_listwise_loss(logits, ptr, labels, weights)
+    anchor = weighted_query_residual_penalty(
+        delta, ptr, weights, center_within_query=True,
+    )
+    l2 = 0.5 * args.weight_decay * sum(
+        torch.sum(torch.square(parameter)) for parameter in parameters
+    )
+    total = listwise + args.anchor_strength * anchor + l2
+    return total, listwise, anchor, l2
+
+
+def _pareto_backtracking_step(
+    parameters: tuple[torch.nn.Parameter, ...],
+    direction: tuple[torch.Tensor, ...],
+    source_gradients: tuple[tuple[torch.Tensor, ...], tuple[torch.Tensor, ...]],
+    base_losses: tuple[float, float],
+    loss_closure: Callable[[], tuple[torch.Tensor, torch.Tensor]],
+    learning_rate: float,
+    *,
+    maximum_norm: float = 5.0,
+    maximum_backtracks: int = 12,
+    armijo: float = 1e-4,
+) -> dict[str, float | int | bool]:
+    """Take a common-descent step without Adam/momentum direction rotation."""
+    if len(parameters) != len(direction) or any(
+        len(gradients) != len(parameters) for gradients in source_gradients
+    ):
+        raise ValueError("Pareto step gradient axes differ")
+    norm_squared = sum(float(torch.sum(value.detach() ** 2).cpu()) for value in direction)
+    if not np.isfinite(norm_squared) or norm_squared < 0:
+        raise RuntimeError("non-finite Pareto direction norm")
+    norm = math.sqrt(norm_squared)
+    scale = min(1.0, maximum_norm / norm) if norm > 0 else 1.0
+    scaled = tuple(value.detach() * scale for value in direction)
+    directional = tuple(
+        sum(
+            float(torch.sum(gradient.detach() * value).cpu())
+            for gradient, value in zip(gradients, scaled, strict=True)
+        )
+        for gradients in source_gradients
+    )
+    tolerance = 1e-8 * max(
+        1.0,
+        *(math.sqrt(sum(float(torch.sum(g.detach() ** 2).cpu()) for g in gradients))
+          * max(norm * scale, 1e-12) for gradients in source_gradients),
+    )
+    if any(value < -tolerance for value in directional):
+        raise RuntimeError(
+            f"MGDA direction is not common descent: derivatives={directional}"
+        )
+    if norm <= 1e-20:
+        return {
+            "accepted": True,
+            "stationary": True,
+            "backtracks": 0,
+            "step_size": 0.0,
+            "direction_norm": 0.0,
+            "enveda_directional_derivative": directional[0],
+            "gnps_directional_derivative": directional[1],
+        }
+
+    originals = tuple(parameter.detach().clone() for parameter in parameters)
+    for backtracks in range(maximum_backtracks + 1):
+        step_size = learning_rate * (0.5 ** backtracks)
+        with torch.no_grad():
+            for parameter, original, value in zip(
+                parameters, originals, scaled, strict=True,
+            ):
+                parameter.copy_(original - step_size * value)
+            trials = tuple(float(loss.detach().cpu()) for loss in loss_closure())
+        accepted = all(
+            trial <= base - armijo * step_size * derivative
+            + 1e-8 * max(1.0, abs(base))
+            for trial, base, derivative in zip(
+                trials, base_losses, directional, strict=True,
+            )
+        )
+        if accepted:
+            return {
+                "accepted": True,
+                "stationary": False,
+                "backtracks": backtracks,
+                "step_size": step_size,
+                "direction_norm": norm * scale,
+                "enveda_directional_derivative": directional[0],
+                "gnps_directional_derivative": directional[1],
+                "enveda_trial_loss": trials[0],
+                "gnps_trial_loss": trials[1],
+            }
+    with torch.no_grad():
+        for parameter, original in zip(parameters, originals, strict=True):
+            parameter.copy_(original)
+    return {
+        "accepted": False,
+        "stationary": False,
+        "backtracks": maximum_backtracks + 1,
+        "step_size": 0.0,
+        "direction_norm": norm * scale,
+        "enveda_directional_derivative": directional[0],
+        "gnps_directional_derivative": directional[1],
+    }
+
+
+def _fixed_monitor_occurrences(
+    groups: list[list[tuple[str, int]]], maximum_groups: int = 256,
+) -> list[tuple[str, int]]:
+    """Choose a deterministic, source-specific monitor ledger once per fit."""
+    if not groups:
+        raise ValueError("monitor ledger requires at least one group")
+    count = min(maximum_groups, len(groups))
+    indices = np.linspace(0, len(groups) - 1, num=count, dtype=np.int64)
+    return [occurrence for index in indices for occurrence in groups[int(index)]]
+
+
+def fit_delta_pareto_sgd(
+    panels: dict[str, PanelData], selected: list[tuple[str, int]],
+    parent_scores: dict[str, np.ndarray], mean: np.ndarray, scale: np.ndarray,
+    args: argparse.Namespace, seed: int,
+) -> tuple[ParentPlusLinearDelta, list[dict[str, float | int]]]:
+    """Fit the delta with an actual Pareto-safe common-gradient update.
+
+    Unlike :func:`fit_delta_mgda`, this implementation never passes the MGDA
+    direction through Adam, momentum, coordinate preconditioning or decoupled
+    weight decay.  A fixed-step SGD proposal is accepted only when both task
+    objectives decrease on the exact two source batches used for the gradient;
+    otherwise the step is halved, then rejected after a fixed bound.
+    """
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    model = ParentPlusLinearDelta(
+        len(next(iter(panels.values())).feature_names),
+    ).to(args.device)
+    parameters = tuple(
+        parameter for parameter in model.parameters() if parameter.requires_grad
+    )
+    groups = _source_groups(panels, selected)
+    steps = max(math.ceil(len(values) / args.batch_queries) for values in groups.values())
+    rng = np.random.default_rng(seed)
+    monitors = {
+        source: _delta_payload(
+            panels, _fixed_monitor_occurrences(groups[source]), mean, scale,
+            parent_scores, args.device,
+        )
+        for source in SOURCES
+    }
+    history: list[dict[str, float | int]] = []
+    for epoch in range(args.epochs):
+        source_total = {source: 0.0 for source in SOURCES}
+        source_listwise = {source: 0.0 for source in SOURCES}
+        source_anchor = {source: 0.0 for source in SOURCES}
+        alphas: list[float] = []
+        cosines: list[float] = []
+        backtracks: list[int] = []
+        direction_norms: list[float] = []
+        enveda_derivatives: list[float] = []
+        gnps_derivatives: list[float] = []
+        accepted_steps = stationary_steps = 0
+        for _ in range(steps):
+            payloads = {
+                source: _delta_payload(
+                    panels,
+                    _sample_groups(groups[source], args.batch_queries, rng),
+                    mean, scale, parent_scores, args.device,
+                )
+                for source in SOURCES
+            }
+            components = {
+                source: _delta_objective_components(
+                    model, payloads[source], parameters, args,
+                )
+                for source in SOURCES
+            }
+            losses = tuple(components[source][0] for source in SOURCES)
+            gradients = tuple(
+                torch.autograd.grad(loss, parameters, retain_graph=index == 0)
+                for index, loss in enumerate(losses)
+            )
+            alpha, cosine, _ = two_task_mgda_coefficient(
+                gradients[0], gradients[1],
+            )
+            direction = tuple(
+                alpha * first + (1.0 - alpha) * second
+                for first, second in zip(gradients[0], gradients[1], strict=True)
+            )
+
+            def current_losses() -> tuple[torch.Tensor, torch.Tensor]:
+                return tuple(
+                    _delta_objective_components(
+                        model, payloads[source], parameters, args,
+                    )[0]
+                    for source in SOURCES
+                )  # type: ignore[return-value]
+
+            result = _pareto_backtracking_step(
+                parameters,
+                direction,
+                (gradients[0], gradients[1]),
+                tuple(float(loss.detach().cpu()) for loss in losses),
+                current_losses,
+                args.learning_rate,
+            )
+            accepted_steps += int(bool(result["accepted"]))
+            stationary_steps += int(bool(result["stationary"]))
+            backtracks.append(int(result["backtracks"]))
+            direction_norms.append(float(result["direction_norm"]))
+            enveda_derivatives.append(float(result["enveda_directional_derivative"]))
+            gnps_derivatives.append(float(result["gnps_directional_derivative"]))
+            alphas.append(alpha)
+            cosines.append(cosine)
+            for source in SOURCES:
+                source_total[source] += float(components[source][0].detach().cpu())
+                source_listwise[source] += float(components[source][1].detach().cpu())
+                source_anchor[source] += float(components[source][2].detach().cpu())
+
+        monitor_values: dict[str, float] = {}
+        with torch.no_grad():
+            for source in SOURCES:
+                total, listwise, anchor, l2 = _delta_objective_components(
+                    model, monitors[source], parameters, args,
+                )
+                monitor_values.update({
+                    f"fixed_{source}_total": float(total.cpu()),
+                    f"fixed_{source}_listwise": float(listwise.cpu()),
+                    f"fixed_{source}_anchor": float(anchor.cpu()),
+                    f"fixed_{source}_shared_l2": float(l2.cpu()),
+                })
+        history.append({
+            "epoch": epoch + 1,
+            "enveda_loss": source_total["enveda"] / steps,
+            "gnps_loss": source_total["gnps"] / steps,
+            "enveda_listwise": source_listwise["enveda"] / steps,
+            "gnps_listwise": source_listwise["gnps"] / steps,
+            "enveda_anchor": source_anchor["enveda"] / steps,
+            "gnps_anchor": source_anchor["gnps"] / steps,
+            "mgda_alpha_enveda_mean": float(np.mean(alphas)),
+            "mgda_alpha_enveda_min": float(np.min(alphas)),
+            "mgda_alpha_enveda_max": float(np.max(alphas)),
+            "gradient_cosine_mean": float(np.mean(cosines)),
+            "accepted_steps": accepted_steps,
+            "stationary_steps": stationary_steps,
+            "rejected_steps": steps - accepted_steps,
+            "mean_backtracks": float(np.mean(backtracks)),
+            "maximum_backtracks": int(np.max(backtracks)),
+            "mean_direction_norm": float(np.mean(direction_norms)),
+            "minimum_enveda_directional_derivative": float(np.min(enveda_derivatives)),
+            "minimum_gnps_directional_derivative": float(np.min(gnps_derivatives)),
+            "steps": steps,
+            **monitor_values,
         })
     return model, history
 

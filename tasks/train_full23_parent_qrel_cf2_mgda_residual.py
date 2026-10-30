@@ -15,6 +15,7 @@ chemistry is an exact no-op by construction.
 from __future__ import annotations
 
 import argparse
+from collections.abc import Callable
 import copy
 import json
 from pathlib import Path
@@ -44,6 +45,7 @@ from evaluate_full23_centered_residual_from_frozen_gnps_ledger import _panel as 
 METHOD = "full23_parent_qrel_cf2_mgda_residual"
 SEQUENTIAL_PARENT = parent_qrel.SEQUENTIAL_PARENT
 SCHEMA = "full23_parent_qrel_cf2_mgda_residual_v1"
+STATUS = "FULL23_PARENT_QREL_CF2_MGDA_RESIDUAL_DEVELOPMENT_COMPLETE"
 
 REPRESENTATION = (
     "noise_v1_query_zscore",
@@ -174,10 +176,10 @@ def cf2_panel(panel: PanelData) -> PanelData:
 
 def _source_methods(
     original: PanelData, combined_scores: np.ndarray, combined_parent: np.ndarray,
-    candidate_slice: slice,
+    candidate_slice: slice, method: str = METHOD,
 ) -> dict[str, np.ndarray]:
     methods = {
-        METHOD: combined_scores[candidate_slice],
+        method: combined_scores[candidate_slice],
         SEQUENTIAL_PARENT: combined_parent[candidate_slice],
     }
     for baseline in (PARENT, WSE, "official_dreams", "noise_v1", "p2b_noise_v1_frozen"):
@@ -186,8 +188,19 @@ def _source_methods(
     return methods
 
 
-def main() -> None:
-    args = arguments()
+def run(
+    args: argparse.Namespace,
+    *,
+    fit_delta: Callable = parent_qrel.fit_delta_mgda,
+    method: str = METHOD,
+    schema: str = SCHEMA,
+    status: str = STATUS,
+    checkpoint_name: str = "full23_parent_qrel_cf2_mgda_residual.pt",
+    delta_semantics: str = "released_parent + zero_initialized_linear_CF2_delta",
+    task_gradient_combination: str = "closed_form_two_task_MGDA_via_AdamW",
+    run_label: str = "Full23 CF2",
+) -> dict:
+    """Execute the fixed CF2 protocol with one explicitly named optimizer."""
     if args.output.exists():
         raise FileExistsError(args.output)
     if (
@@ -262,7 +275,7 @@ def main() -> None:
 
         train_unique, train_source_mass = rebalance_selected_source_weights(combined, train)
         delta_mean, delta_scale = fit_normalization(combined, train)
-        delta_model, delta_history = parent_qrel.fit_delta_mgda(
+        delta_model, delta_history = fit_delta(
             combined, train, fold_parent_scores, delta_mean, delta_scale,
             args, args.seed + 100 * held_out + 51,
         )
@@ -294,7 +307,7 @@ def main() -> None:
             "delta_last_epoch": delta_history[-1],
             "parent_validation_formula_overlap": 0,
         })
-        print(f"[Full23 CF2] completed outer formula fold {held_out + 1}/{args.folds}", flush=True)
+        print(f"[{run_label}] completed outer formula fold {held_out + 1}/{args.folds}", flush=True)
     if any(np.any(~np.isfinite(values)) for values in oof.values()):
         raise RuntimeError("CF2 outer OOF predictions are incomplete")
     if any(np.any(~np.isfinite(values)) for values in parent_oof.values()):
@@ -306,10 +319,12 @@ def main() -> None:
         for source_index, source in enumerate(SOURCES):
             original = enveda_raw[name] if source == "enveda" else gnps_raw[name]
             _, candidate_slice = slices[name][source]
-            methods = _source_methods(original, oof[name], parent_oof[name], candidate_slice)
+            methods = _source_methods(
+                original, oof[name], parent_oof[name], candidate_slice, method,
+            )
             comparisons = {
-                f"{METHOD}_vs_{baseline}": _comparison(
-                    methods[METHOD], methods[baseline], original,
+                f"{method}_vs_{baseline}": _comparison(
+                    methods[method], methods[baseline], original,
                     args.bootstrap_resamples,
                     args.seed + 10_000 + panel_index * 100 + source_index * 10 + offset,
                 )
@@ -341,13 +356,13 @@ def main() -> None:
         combined, all_occurrences,
     )
     final_mean, final_scale = fit_normalization(combined, all_occurrences)
-    final_delta, final_history = parent_qrel.fit_delta_mgda(
+    final_delta, final_history = fit_delta(
         combined, all_occurrences, final_parent_scores, final_mean, final_scale,
         args, args.seed + 50_051,
     )
     feature_names = list(next(iter(combined.values())).feature_names)
     checkpoint = {
-        "schema": SCHEMA,
+        "schema": schema,
         "parent_integrator_schema": CHECKPOINT_SCHEMA,
         "parent_arm": CONTROL_ARM,
         "parent_checkpoint_sha256": sha256_file(args.parent_checkpoint),
@@ -358,7 +373,7 @@ def main() -> None:
         "delta_state_dict": {
             key: value.detach().cpu() for key, value in final_delta.state_dict().items()
         },
-        "delta_semantics": "released_parent + zero_initialized_linear_CF2_delta",
+        "delta_semantics": delta_semantics,
         "feature_contract": {
             "candidate_varying_main_effects": EXPECTED_BASE_FEATURES,
             "cross_family_products": EXPECTED_INTERACTIONS,
@@ -373,14 +388,14 @@ def main() -> None:
             "sources": list(SOURCES),
             "source_indicator": False,
             "source_weight_grid": False,
-            "task_gradient_combination": "closed_form_two_task_MGDA",
+            "task_gradient_combination": task_gradient_combination,
             "query_centered_delta_penalty": True,
             "final_parent": "released Full23 v1 all-Enveda refit checkpoint",
         },
     }
     report = {
-        "status": "FULL23_PARENT_QREL_CF2_MGDA_RESIDUAL_DEVELOPMENT_COMPLETE",
-        "method": METHOD,
+        "status": status,
+        "method": method,
         "dataset_roles": {
             "enveda": "consumed development strict global formula outer-fit",
             "gnps": "consumed development strict global formula outer-fit",
@@ -424,7 +439,7 @@ def main() -> None:
     args.output.parent.mkdir(parents=True, exist_ok=True)
     staging = Path(tempfile.mkdtemp(prefix=f".{args.output.name}.", dir=args.output.parent))
     try:
-        checkpoint_path = staging / "full23_parent_qrel_cf2_mgda_residual.pt"
+        checkpoint_path = staging / checkpoint_name
         torch.save(checkpoint, checkpoint_path)
         prediction_path = staging / "candidate_predictions_outer_oof.npz"
         np.savez_compressed(prediction_path, **prediction_artifact)
@@ -443,6 +458,11 @@ def main() -> None:
         shutil.rmtree(staging, ignore_errors=True)
         raise
     print(json.dumps({"status": report["status"], "output": str(args.output)}, indent=2))
+    return report
+
+
+def main() -> None:
+    run(arguments())
 
 
 if __name__ == "__main__":

@@ -11,11 +11,16 @@ from enveda_unified_candidate_integrator_core import formula_fold
 from train_enveda_unified_candidate_integrator import PanelData
 from train_full23_parent_query_relative_mgda_residual import (
     ParentPlusLinearDelta,
+    _pareto_backtracking_step,
     fit_delta_mgda,
+    fit_delta_pareto_sgd,
     outer_parent_training_occurrences,
     pack_parent,
 )
-from train_full23_query_relative_mgda import formula_oof_partition
+from train_full23_query_relative_mgda import (
+    formula_oof_partition,
+    two_task_mgda_coefficient,
+)
 
 
 def panel(name: str, source: str) -> PanelData:
@@ -94,6 +99,55 @@ def main() -> None:
     assert np.isfinite(history[0]["enveda_loss"])
     assert np.isfinite(history[0]["gnps_loss"])
     assert all(torch.all(torch.isfinite(value)) for value in fitted.parameters())
+
+    # The MGDA direction is common descent, whereas passing it through an
+    # adaptive optimizer is not guaranteed to be.  Exercise the actual manual
+    # update on a conflicting-gradient quadratic pair.
+    parameter = torch.nn.Parameter(torch.zeros(2, dtype=torch.float32))
+    target_enveda = torch.tensor([-6.0, 7.0])
+    target_gnps = torch.tensor([2.0, -9.0])
+
+    def toy_losses() -> tuple[torch.Tensor, torch.Tensor]:
+        return (
+            0.5 * torch.sum(torch.square(parameter - target_enveda)),
+            0.5 * torch.sum(torch.square(parameter - target_gnps)),
+        )
+
+    initial = toy_losses()
+    toy_gradients = tuple(
+        torch.autograd.grad(loss, (parameter,), retain_graph=index == 0)
+        for index, loss in enumerate(initial)
+    )
+    alpha, cosine, _ = two_task_mgda_coefficient(
+        toy_gradients[0], toy_gradients[1],
+    )
+    assert cosine < 0
+    direction = tuple(
+        alpha * first + (1.0 - alpha) * second
+        for first, second in zip(toy_gradients[0], toy_gradients[1], strict=True)
+    )
+    base = tuple(float(loss.detach()) for loss in initial)
+    result = _pareto_backtracking_step(
+        (parameter,), direction, (toy_gradients[0], toy_gradients[1]),
+        base, toy_losses, 1.0,
+    )
+    final = tuple(float(loss.detach()) for loss in toy_losses())
+    assert result["accepted"] and not result["stationary"]
+    assert final[0] < base[0] and final[1] < base[1]
+    assert result["enveda_directional_derivative"] >= 0
+    assert result["gnps_directional_derivative"] >= 0
+
+    pareto, pareto_history = fit_delta_pareto_sgd(
+        combined, all_occ, parent_scores, mean, scale, args, 17,
+    )
+    assert len(pareto_history) == 1
+    assert pareto_history[0]["accepted_steps"] == pareto_history[0]["steps"]
+    assert pareto_history[0]["rejected_steps"] == 0
+    assert pareto_history[0]["minimum_enveda_directional_derivative"] >= -1e-8
+    assert pareto_history[0]["minimum_gnps_directional_derivative"] >= -1e-8
+    assert np.isfinite(pareto_history[0]["fixed_enveda_listwise"])
+    assert np.isfinite(pareto_history[0]["fixed_gnps_listwise"])
+    assert all(torch.all(torch.isfinite(value)) for value in pareto.parameters())
     print("PASS: Full23 parent query-relative MGDA residual synthetic contracts")
 
 

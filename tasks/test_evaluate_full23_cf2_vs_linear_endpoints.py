@@ -131,7 +131,8 @@ def _write_external(root: Path) -> dict[str, Path]:
 
 def _args(root: Path, cf2: Path, linear: Path, output: Path, external: dict) -> SimpleNamespace:
     return SimpleNamespace(
-        cf2_run=cf2, linear_run=linear,
+        candidate_run=cf2, baseline_run=linear,
+        candidate_method=None, baseline_method=None,
         enveda_ledger=external["enveda"],
         gnps_score_dir=external["score_dir"],
         gnps_axis_ledger=external["axis"],

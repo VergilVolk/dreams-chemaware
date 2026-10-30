@@ -61,8 +61,10 @@ EXTERNAL_SCORE_NAME = {
 
 def arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--cf2-run", type=Path, required=True)
-    parser.add_argument("--linear-run", type=Path, required=True)
+    parser.add_argument("--candidate-run", "--cf2-run", dest="candidate_run", type=Path, required=True)
+    parser.add_argument("--baseline-run", "--linear-run", dest="baseline_run", type=Path, required=True)
+    parser.add_argument("--candidate-method")
+    parser.add_argument("--baseline-method")
     parser.add_argument("--enveda-ledger", type=Path, required=True)
     parser.add_argument("--gnps-score-dir", type=Path, required=True)
     parser.add_argument("--gnps-axis-ledger", type=Path, required=True)
@@ -74,7 +76,7 @@ def arguments() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def _load_run(run: Path, expected_method: str) -> tuple[dict, Path]:
+def _load_run(run: Path, expected_method: str | None) -> tuple[dict, Path, str]:
     report_path = run / "report.json"
     prediction_path = run / "candidate_predictions_outer_oof.npz"
     if not report_path.is_file() or not prediction_path.is_file():
@@ -85,15 +87,18 @@ def _load_run(run: Path, expected_method: str) -> tuple[dict, Path]:
     status = str(report.get("status", ""))
     if not status.endswith("_COMPLETE"):
         raise RuntimeError(f"run is not complete: {run}: {status!r}")
-    if str(report.get("method", "")) != expected_method:
+    method = str(report.get("method", ""))
+    if not method:
+        raise RuntimeError(f"run report lacks method: {run}")
+    if expected_method is not None and method != expected_method:
         raise RuntimeError(
-            f"run method mismatch: {run}: {report.get('method')!r} != {expected_method!r}"
+            f"run method mismatch: {run}: {method!r} != {expected_method!r}"
         )
     recorded = report.get("artifacts", {}).get("predictions_sha256")
     actual = sha256_file(prediction_path)
     if recorded is not None and str(recorded) != actual:
         raise RuntimeError(f"prediction hash disagrees with run report: {run}")
-    return report, prediction_path
+    return report, prediction_path, method
 
 
 def _array_equal(left: np.ndarray, right: np.ndarray) -> bool:
@@ -150,6 +155,8 @@ def _aligned_panel(
     formulas: np.ndarray,
     enveda: np.lib.npyio.NpzFile,
     gnps_scores: dict[str, np.lib.npyio.NpzFile],
+    candidate_method: str = CF2_METHOD,
+    baseline_method: str = LINEAR_METHOD,
 ) -> tuple[PanelData, dict[str, np.ndarray], dict]:
     prefix = f"{source}__{panel_name}__"
     metadata_names = ("query_ptr", "labels", "query_keys", "formula", "near")
@@ -157,11 +164,13 @@ def _aligned_panel(
         prefix + name for name in metadata_names
         if prefix + name not in cf2.files or prefix + name not in linear.files
     ]
-    required_scores = (CF2_METHOD, LINEAR_METHOD, *FROZEN_AXIS_SCORES)
+    if prefix + candidate_method not in cf2.files:
+        missing.append(prefix + candidate_method)
+    if prefix + baseline_method not in linear.files:
+        missing.append(prefix + baseline_method)
     missing.extend(
-        prefix + name for name in required_scores
-        if prefix + name not in cf2.files and name != LINEAR_METHOD
-        or prefix + name not in linear.files and name != CF2_METHOD
+        prefix + name for name in FROZEN_AXIS_SCORES
+        if prefix + name not in cf2.files or prefix + name not in linear.files
     )
     if missing:
         raise RuntimeError(f"paired artifacts lack required arrays: {sorted(set(missing))}")
@@ -218,8 +227,8 @@ def _aligned_panel(
         raise RuntimeError(f"frozen candidate score length drifted: {source}/{panel_name}")
 
     methods = {
-        CF2_METHOD: np.asarray(cf2[prefix + CF2_METHOD], dtype=np.float32),
-        LINEAR_METHOD: np.asarray(linear[prefix + LINEAR_METHOD], dtype=np.float32),
+        candidate_method: np.asarray(cf2[prefix + candidate_method], dtype=np.float32),
+        baseline_method: np.asarray(linear[prefix + baseline_method], dtype=np.float32),
     }
     if any(len(value) != len(labels) or np.any(~np.isfinite(value)) for value in methods.values()):
         raise RuntimeError(f"paired method scores are incomplete: {source}/{panel_name}")
@@ -262,8 +271,14 @@ def evaluate(args: argparse.Namespace) -> dict:
         raise FileExistsError(args.output)
     if args.bootstrap_resamples < 100:
         raise ValueError("bootstrap-resamples must be at least 100")
-    cf2_report, cf2_path = _load_run(args.cf2_run, CF2_METHOD)
-    linear_report, linear_path = _load_run(args.linear_run, LINEAR_METHOD)
+    candidate_report, candidate_path, candidate_method = _load_run(
+        args.candidate_run, args.candidate_method,
+    )
+    baseline_report, baseline_path, baseline_method = _load_run(
+        args.baseline_run, args.baseline_method,
+    )
+    if candidate_method == baseline_method:
+        raise RuntimeError("paired endpoint methods must differ")
 
     gnps_paths = {
         name: args.gnps_score_dir / f"candidate_scores_{name}.npz" for name in PANELS
@@ -290,8 +305,8 @@ def evaluate(args: argparse.Namespace) -> dict:
     gnps_ik14: dict[str, np.ndarray] = {}
 
     with (
-        np.load(cf2_path, allow_pickle=False) as cf2,
-        np.load(linear_path, allow_pickle=False) as linear,
+        np.load(candidate_path, allow_pickle=False) as cf2,
+        np.load(baseline_path, allow_pickle=False) as linear,
         np.load(args.enveda_ledger, allow_pickle=False) as enveda,
         np.load(args.gnps_axis_ledger, allow_pickle=False) as axis,
         np.load(gnps_paths["identity_disjoint"], allow_pickle=False) as gnps_identity,
@@ -314,7 +329,7 @@ def evaluate(args: argparse.Namespace) -> dict:
                 )
                 panel, methods, axis_report = _aligned_panel(
                     cf2, linear, source, panel_name, keys, near, formulas,
-                    enveda, gnps_scores,
+                    enveda, gnps_scores, candidate_method, baseline_method,
                 )
                 source_panels[source][panel_name] = panel
                 source_methods[source][panel_name] = methods
@@ -323,7 +338,7 @@ def evaluate(args: argparse.Namespace) -> dict:
                 if ik14 is not None:
                     gnps_ik14[panel_name] = ik14
                 panel_reports[source][panel_name] = _paired_panel_report(
-                    panel, methods, CF2_METHOD, LINEAR_METHOD,
+                    panel, methods, candidate_method, baseline_method,
                     args.bootstrap_resamples,
                     args.seed + source_index * 10_000 + panel_index * 100,
                 )
@@ -332,7 +347,7 @@ def evaluate(args: argparse.Namespace) -> dict:
     for source_index, source in enumerate(SOURCES):
         collapsed, formulas = _collapse_records(
             source_panels[source], source_methods[source], source_keys[source],
-            CF2_METHOD, LINEAR_METHOD,
+            candidate_method, baseline_method,
         )
         overlap = len(
             set(map(str, source_keys[source]["identity_disjoint"]))
@@ -342,7 +357,7 @@ def evaluate(args: argparse.Namespace) -> dict:
             "panel_occurrences": int(sum(len(v) for v in source_keys[source].values())),
             "cross_panel_repeated_queries": int(overlap),
             **_collapsed_report(
-                collapsed, formulas, CF2_METHOD, LINEAR_METHOD,
+                collapsed, formulas, candidate_method, baseline_method,
                 args.bootstrap_resamples, args.seed + 30_000 + source_index * 100,
                 (
                     "Each stable source query key has total mass one; a key present in "
@@ -355,12 +370,12 @@ def evaluate(args: argparse.Namespace) -> dict:
         {"identity_disjoint": source_panels["gnps"]["identity_disjoint"]},
         {"identity_disjoint": source_methods["gnps"]["identity_disjoint"]},
         {"identity_disjoint": gnps_ik14["identity_disjoint"]},
-        CF2_METHOD, LINEAR_METHOD,
+        candidate_method, baseline_method,
     )
     ik14_report = {
         "spectrum_queries": int(len(gnps_ik14["identity_disjoint"])),
         **_collapsed_report(
-            ik14_collapsed, ik14_formulas, CF2_METHOD, LINEAR_METHOD,
+            ik14_collapsed, ik14_formulas, candidate_method, baseline_method,
             args.bootstrap_resamples, args.seed + 40_000,
             (
                 "GNPS identity spectra are grouped by aligned 14-character query "
@@ -370,9 +385,13 @@ def evaluate(args: argparse.Namespace) -> dict:
     }
 
     report = {
-        "status": "FULL23_CF2_VS_LINEAR_ENDPOINT_EVALUATION_COMPLETE",
-        "candidate": CF2_METHOD,
-        "baseline": LINEAR_METHOD,
+        "status": (
+            "FULL23_CF2_VS_LINEAR_ENDPOINT_EVALUATION_COMPLETE"
+            if candidate_method == CF2_METHOD and baseline_method == LINEAR_METHOD
+            else "FULL23_PAIRED_ENDPOINT_EVALUATION_COMPLETE"
+        ),
+        "candidate": candidate_method,
+        "baseline": baseline_method,
         "dataset_role": "consumed multisource development outer-OOF only",
         "allow_final_external_claim": False,
         "candidate_axis_contract": axis_reports,
@@ -380,12 +399,12 @@ def evaluate(args: argparse.Namespace) -> dict:
         "query_balanced_primary_endpoints": query_balanced,
         "gnps_identity_ik14_collapse_sensitivity": ik14_report,
         "inputs": {
-            "cf2_status": cf2_report["status"],
-            "cf2_report_sha256": sha256_file(args.cf2_run / "report.json"),
-            "cf2_predictions_sha256": sha256_file(cf2_path),
-            "linear_status": linear_report["status"],
-            "linear_report_sha256": sha256_file(args.linear_run / "report.json"),
-            "linear_predictions_sha256": sha256_file(linear_path),
+            "candidate_status": candidate_report["status"],
+            "candidate_report_sha256": sha256_file(args.candidate_run / "report.json"),
+            "candidate_predictions_sha256": sha256_file(candidate_path),
+            "baseline_status": baseline_report["status"],
+            "baseline_report_sha256": sha256_file(args.baseline_run / "report.json"),
+            "baseline_predictions_sha256": sha256_file(baseline_path),
             "enveda_ledger_sha256": sha256_file(args.enveda_ledger),
             "gnps_axis_ledger_sha256": sha256_file(args.gnps_axis_ledger),
             **{
@@ -398,7 +417,7 @@ def evaluate(args: argparse.Namespace) -> dict:
             },
         },
         "claim_boundary": (
-            "CF2 and linear are both sequential outer-fit estimates on consumed Enveda "
+            "Both candidates are sequential outer-fit estimates on consumed Enveda "
             "and GNPS development resources. This paired read-only comparison cannot "
             "support an untouched external claim."
         ),
