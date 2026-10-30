@@ -1,0 +1,16 @@
+method_edge_id	analysis_id	mode	feature_id	feature_mz	feature_rt_min	identity_world	expected_direction	diagnoses
+wse_identity:001820	AN001881	C8_positive	283.2631_8.31	283.2631	8.31	known	-1	CD
+wse_identity:001910	AN001878	HILIC_positive	305.1847_2.47	305.1847	2.47	unresolved	-1	CD
+wse_identity:001910	AN001881	C8_positive	305.1865_3.41	305.1865	3.41	unresolved	-1	CD
+wse_identity:001771	AN001881	C8_positive	371.2578_3.74	371.2578	3.74	unresolved	1	CD
+wse_identity:001778	AN001878	HILIC_positive	375.2879_1.63	375.2879	1.63	known	-1	CD
+wse_identity:001772	AN001881	C8_positive	389.2685_3.73	389.2685	3.73	unresolved	1	CD
+wse_identity:001847	AN001878	HILIC_positive	411.3606_1.69	411.3606	1.69	unresolved	-1	CD
+wse_identity:001830	AN001878	HILIC_positive	427.3556_1.71	427.3556	1.71	unresolved	-1	CD
+wse_identity:001694	AN001881	C8_positive	595.3494_3.21	595.3494	3.21	unresolved	-1	CD
+wse_identity:001748	AN001878	HILIC_positive	597.3618_1.94	597.3618	1.94	unresolved	-1	CD,UC
+wse_identity:001742	AN001878	HILIC_positive	617.3279_6.42	617.3279	6.42	unresolved	-1	CD,UC
+wse_identity:001742	AN001881	C8_positive	617.3314_3.21	617.3314	3.21	unresolved	-1	CD
+wse_identity:001734	AN001881	C8_positive	817.5808_4.02	817.5808	4.02	mixed_known_unresolved	1	CD
+wse_identity:001738	AN001881	C8_positive	834.6087_4.02	834.6087	4.02	mixed_known_unresolved	1	CD
+wse_identity:001736	AN001881	C8_positive	839.5631_4.02	839.5631	4.02	unresolved	1	CD

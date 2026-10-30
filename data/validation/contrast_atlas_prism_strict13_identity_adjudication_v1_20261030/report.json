@@ -1,0 +1,58 @@
+{
+  "candidate_analytical_families_after_prespecified_collapse": 9,
+  "candidate_analytical_families_by_identity_world": {
+    "known": 2,
+    "mixed_known_unresolved": 1,
+    "unresolved": 6
+  },
+  "candidate_analytical_family_range": {
+    "lower_bound_under_prespecified_coelution_mass_delta_collapse": 9,
+    "upper_bound_without_cross_pair_collapse": 13
+  },
+  "candidate_ion_relation_edges": 4,
+  "claim_boundary": "The 13 rows are response-prioritized source entity-pair hypotheses, not 13 metabolites. Library-policy evidence permits two source-pair identity merges. Analytical-family components are phenotype-blind redundancy hypotheses and do not themselves confirm a common neutral molecule.",
+  "data_role": "development_consumed_identity_adjudication",
+  "diagnostic_score_boundary": "diagnostic_raw_sqrt_cosine_0p02 is recomputed from exact MGF peaks with a greedy 0.02-Da matcher. It is response-blind but is not a frozen Atlas model score and must not replace the canonical cross-study WSE.",
+  "family_parameters": {
+    "mass_delta_tolerance_da": 0.01,
+    "positive_ion_relationships_da": {
+      "ammonium_minus_proton": 17.026549,
+      "potassium_minus_proton": 37.955882,
+      "sodium_minus_proton": 21.981942,
+      "water_loss_or_gain": 18.010565
+    },
+    "rt_tolerance_min": 0.03,
+    "same_acquisition_mode_required": true
+  },
+  "identity_evidence_class_counts": {
+    "conflicting_below_policy_candidates": 1,
+    "exact_known_identity_merge_allowed": 2,
+    "mixed_one_named_anchor_not_mergeable": 2,
+    "no_qualified_library_candidate": 3,
+    "one_sided_below_policy_candidate": 1,
+    "shared_below_policy_candidate_not_mergeable": 4
+  },
+  "identity_hypothesis_only_pairs": 11,
+  "identity_merge_allowed_pairs": 2,
+  "input_sha256": {
+    "left_mgf": "6aeba8b4c1e9cc94e127985cc18bde9a4d1df8c99030d470d4cec888bc5465e6",
+    "library_annotations": "379bc0b67a4d0255f5d00b53530d418cad6f6fe9e6057a84a4d098f0c7c91997",
+    "right_mgf": "c628ce08fc8215942469ec8fb193c6b3c189484032f83cc9ba9b190281c64fd1",
+    "strict_candidates": "fe77d801fb6efd537cdd1da771da92c93b1d90246fe0a52477ae83e04eee2eed"
+  },
+  "multi_pair_candidate_analytical_families": 3,
+  "outputs": {
+    "candidate_analytical_families": "strict13_candidate_analytical_families.tsv",
+    "candidate_analytical_family_summary": "strict13_candidate_analytical_family_summary.tsv",
+    "candidate_ion_relation_edges": "strict13_candidate_ion_relation_edges.tsv",
+    "identity_evidence": "strict13_identity_evidence.tsv",
+    "unique_feature_observations": "strict13_unique_feature_observations.tsv"
+  },
+  "scientific_question": "How many of the 13 PRISM-prioritized source entity-pair hypotheses have policy-qualified identity evidence, and how many remain after a phenotype-blind coelution/adduct-family redundancy audit?",
+  "script_sha256": "e87a3d538609abc99e4c3cb83311c6377a67f10aa62bcf95da104d69c9eed055",
+  "status": "COMPLETE",
+  "strict_response_rows": 17,
+  "strict_unique_source_entity_pairs": 13,
+  "strict_unique_st001000_feature_mode_observations": 15,
+  "unknown_increment_boundary": "Family collapse changes both numerator and denominator. Unknown enrichment must not be recomputed by collapsing only the 13 prioritized pairs; the full set of 101 retained testable pairs requires the same phenotype-blind family procedure."
+}
