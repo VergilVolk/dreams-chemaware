@@ -1,0 +1,204 @@
+{
+  "analyses": {
+    "AN001878": {
+      "candidate_mode_matches_before_feature_deduplication": 85,
+      "cohort_fit_n": {
+        "Neth:not_applicable": 65,
+        "PRISM:complete_case": 150,
+        "PRISM:na_as_no_sensitivity": 155
+      },
+      "features": 2269,
+      "mode": "HILIC_positive",
+      "samples": 220,
+      "unique_mass_matched_features": 77
+    },
+    "AN001881": {
+      "candidate_mode_matches_before_feature_deduplication": 69,
+      "cohort_fit_n": {
+        "Neth:not_applicable": 65,
+        "PRISM:complete_case": 150,
+        "PRISM:na_as_no_sensitivity": 155
+      },
+      "features": 2316,
+      "mode": "C8_positive",
+      "samples": 220,
+      "unique_mass_matched_features": 63
+    }
+  },
+  "candidate_freeze": {
+    "all_world_edges": 232,
+    "known_world_edges": 17,
+    "opposite_direction_edges_excluded": 99,
+    "same_direction_frozen_candidates": 133,
+    "same_direction_frozen_pairs_by_identity_world": {
+      "known": 13,
+      "mixed_known_unresolved": 9,
+      "unresolved": 111
+    },
+    "unresolved_world_edges": 206
+  },
+  "claim_boundary": "Mass matching and directional concordance do not confirm entity identity. Rows passing three within-fit BH filters are candidate priorities, not replicated-findings FDR-controlled discoveries.",
+  "cohort_counts": {
+    "Neth": {
+      "CD": 20,
+      "Control": 22,
+      "UC": 23,
+      "total": 65
+    },
+    "PRISM": {
+      "CD": 68,
+      "Control": 34,
+      "UC": 53,
+      "total": 155
+    }
+  },
+  "data_role": "development_now_consumed_two_participant_cohorts_not_sealed_external",
+  "descriptive_entity_pair_concordance_rates_by_identity_world": {
+    "known": {
+      "interpretation": "descriptive_only_not_an_unknown_enrichment_test",
+      "rate": 0.16666666666666666,
+      "retained_testable_pairs": 12,
+      "three_fit_concordant_pairs": 2
+    },
+    "mixed_known_unresolved": {
+      "interpretation": "descriptive_only_not_an_unknown_enrichment_test",
+      "rate": 0.2857142857142857,
+      "retained_testable_pairs": 7,
+      "three_fit_concordant_pairs": 2
+    },
+    "unresolved": {
+      "interpretation": "descriptive_only_not_an_unknown_enrichment_test",
+      "rate": 0.10975609756097561,
+      "retained_testable_pairs": 82,
+      "three_fit_concordant_pairs": 9
+    }
+  },
+  "exploratory_direction_label_sensitivity": {
+    "calibration_status": "exploratory_direction_label_sensitivity;exchangeability_not_established",
+    "null_mean": 11.6963,
+    "null_median": 12.0,
+    "null_q025": 6.0,
+    "null_q975": 18.0,
+    "observed_strict_entity_pairs": 13,
+    "observed_strict_tests": 17,
+    "p_ge_observed": 0.05649435056494351,
+    "pair_null_mean": 9.5102,
+    "pair_null_median": 9.0,
+    "pair_null_q025": 5.0,
+    "pair_null_q975": 14.0,
+    "pair_p_ge_observed": 0.08839116088391161,
+    "randomization_unit": "frozen adult-pediatric entity pair",
+    "repeats": 10000,
+    "seed": 20261030
+  },
+  "exploratory_direction_sensitivity_summary": {
+    "entity_pair_level_p_below_reference": false,
+    "interpretation": "Individual three-fit concordant candidates prioritize hypotheses, but the exploratory label shuffle does not support a confirmatory aggregate claim and is not a calibrated permutation test.",
+    "reference_value": 0.05,
+    "test_level_p_below_reference": false
+  },
+  "hc3_three_fit_concordant_tests": 16,
+  "hc3_three_fit_concordant_unique_entity_pairs": 13,
+  "hc3_three_fit_concordant_unique_features": 15,
+  "independence_boundary": "Feature-mode observations, CD/UC tests, and coeluting adduct/isotope-like ions are not independent metabolites; unique entity-pair counts are still hypotheses until phenotype-blind MS/MS identity verification.",
+  "input_sha256": {
+    "AN001878": "76662e20a3e0b3c3cd5048b497ada2f57b1e3ff6cddb753220c2d4e0b901ca57",
+    "AN001881": "8df4e80c530f9aaf96c22181a874ac3fc12711c7661afdb205456780bf12ef4b",
+    "ledger": "0db6dc4ddbd8504907edd89adddbddaeb9d6ae7b650bf3b4415e0a969c108438",
+    "mapping": "74d2c72f96ab7e49d1bce8fe0141ae3301f3eaf7aa86725b661692cbea053d6b"
+  },
+  "leakage_status": {
+    "candidate_mass_and_direction": "frozen from the consumed IBD200--VEO-IBD ledger before ST001000 abundance or phenotype effects were read",
+    "prism_feature_selection": "nearest positive-mode midpoint mass, required within 10 ppm of both frozen source masses; phenotype-blind; no ST001000 abundance or response used to choose among candidates",
+    "validation_status": "ST001000 is an independent-participant public development validation dataset, not a sealed external test"
+  },
+  "multiplicity": "Benjamini-Hochberg across all frozen candidate-feature x CD/UC tests, combining both positive acquisition modes within each cohort fit. Passing all three overlapping filters is not formal replicated-findings FDR control.",
+  "ols_inference": {
+    "claim_boundary": "HC3 changes the test-level count but not the unique feature-mode or source entity-pair priority counts; broader outlier sensitivity was not tested.",
+    "primary": "Classical homoskedastic OLS standard errors reproduce the intended published model.",
+    "sensitivity": "HC3 sandwich standard errors with residual-df Student-t p-values; BH recomputed over the same within-fit 280-test families."
+  },
+  "outputs": {
+    "cohort_effects": "cohort_effects.tsv",
+    "directional_concordance_screen": "directional_concordance_screen.tsv",
+    "frozen_candidate_feature_matches": "frozen_candidate_feature_matches.tsv",
+    "hc3_three_fit_concordant_candidates": "hc3_three_fit_concordant_candidates.tsv",
+    "three_fit_concordant_candidates": "strict_three_fit_concordant_candidates.tsv"
+  },
+  "positive_mode_only": true,
+  "ppm_tolerance": 10.0,
+  "raw_candidate_mode_mass_compatible_hits_before_feature_deduplication": 154,
+  "raw_mass_compatible_pair_coverage_by_identity_world": {
+    "known": {
+      "all_frozen_same_direction_pairs": 13,
+      "coverage": 1.0,
+      "raw_mass_compatible_pairs": 13
+    },
+    "mixed_known_unresolved": {
+      "all_frozen_same_direction_pairs": 9,
+      "coverage": 0.7777777777777778,
+      "raw_mass_compatible_pairs": 7
+    },
+    "unresolved": {
+      "all_frozen_same_direction_pairs": 111,
+      "coverage": 0.7477477477477478,
+      "raw_mass_compatible_pairs": 83
+    }
+  },
+  "raw_mass_compatible_unique_entity_pairs": 103,
+  "retained_candidate_feature_matches_after_feature_deduplication": 140,
+  "retained_testable_pair_coverage_by_identity_world": {
+    "known": {
+      "all_frozen_same_direction_pairs": 13,
+      "coverage": 0.9230769230769231,
+      "retained_testable_pairs": 12
+    },
+    "mixed_known_unresolved": {
+      "all_frozen_same_direction_pairs": 9,
+      "coverage": 0.7777777777777778,
+      "retained_testable_pairs": 7
+    },
+    "unresolved": {
+      "all_frozen_same_direction_pairs": 111,
+      "coverage": 0.7387387387387387,
+      "retained_testable_pairs": 82
+    }
+  },
+  "retained_testable_pair_denominator_by_identity_world": {
+    "known": 12,
+    "mixed_known_unresolved": 7,
+    "unresolved": 82
+  },
+  "retained_testable_unique_entity_pairs": 101,
+  "scientific_question": "Do same-direction adult IBD200 and pediatric VEO-IBD identity hypotheses show the prespecified disease direction in participant-independent PRISM and Netherlands fecal cohorts?",
+  "script_sha256": "3841962ee30142931885b8210270aec30e1d6812f1d632aac816d9556b169a8a",
+  "source_provenance": {
+    "cohort_independence": "PRISM and Netherlands contain independent participants but belong to one published study package; they are not two independent projects",
+    "open_full_text": "https://pmc.ncbi.nlm.nih.gov/articles/mid/EMS80310/",
+    "primary_publication": "https://www.nature.com/articles/s41564-018-0306-4",
+    "study": "Metabolomics Workbench ST001000 / PR000677"
+  },
+  "status": "COMPLETE",
+  "three_fit_concordant_entity_pairs_by_identity_world": {
+    "known": 2,
+    "mixed_known_unresolved": 2,
+    "unresolved": 9
+  },
+  "three_fit_concordant_tests": 17,
+  "three_fit_concordant_tests_by_identity_world": {
+    "known": 2,
+    "mixed_known_unresolved": 2,
+    "unresolved": 13
+  },
+  "three_fit_concordant_unique_entity_pairs": 13,
+  "three_fit_concordant_unique_features": 15,
+  "total_feature_diagnosis_tests": 280,
+  "unknown_increment_test": {
+    "alternative": "unresolved_greater_than_known",
+    "comparison": "unresolved_vs_known_three_fit_concordance_rate_conditional_on_retention_after_feature_deduplication",
+    "fisher_exact_p": 0.8547707845158647,
+    "interpretation": "no_evidence_of_unresolved_enrichment",
+    "mixed_world_excluded": true,
+    "odds_ratio": 0.6164383561643836
+  }
+}

@@ -1,0 +1,140 @@
+{
+  "status": "COMPLETE",
+  "data_role": "development_now_consumed_two_participant_cohorts_not_sealed_external",
+  "scientific_question": "Do the pre-frozen VEO-IBD directions of three AD-skin--VEO-IBD mass hypotheses replicate at the IBD end in PRISM and Netherlands?",
+  "target_freeze": {
+    "target_freeze_date": "2026-10-30",
+    "targets": [
+      {
+        "target_mz": 295.2266,
+        "ledger_rows": 3,
+        "veo_entity_id": "MSV000097610::39999",
+        "veo_precursor_mz": 295.2266,
+        "veo_beta": -1.0778320889817816,
+        "veo_effect_q": 0.24591225409376843,
+        "expected_ibd_direction": -1,
+        "identity_world": "known",
+        "source_ad_contrasts": "lesion_vs_healthy;lesion_vs_nonlesion_paired;nonlesion_vs_healthy"
+      },
+      {
+        "target_mz": 197.1285,
+        "ledger_rows": 3,
+        "veo_entity_id": "MSV000097610::6972",
+        "veo_precursor_mz": 197.1284,
+        "veo_beta": -1.5684695950857943,
+        "veo_effect_q": 1.67894107303244e-05,
+        "expected_ibd_direction": -1,
+        "identity_world": "unresolved",
+        "source_ad_contrasts": "lesion_vs_healthy;lesion_vs_nonlesion_paired;nonlesion_vs_healthy"
+      },
+      {
+        "target_mz": 158.1176,
+        "ledger_rows": 3,
+        "veo_entity_id": "MSV000097610::7310",
+        "veo_precursor_mz": 158.1176,
+        "veo_beta": -2.1938693104368694,
+        "veo_effect_q": 0.0413230130280755,
+        "expected_ibd_direction": -1,
+        "identity_world": "unresolved",
+        "source_ad_contrasts": "lesion_vs_healthy;lesion_vs_nonlesion_paired;nonlesion_vs_healthy"
+      }
+    ]
+  },
+  "leakage_status": {
+    "target_masses": "fixed to 295.2266, 197.1285, and 158.1176 before ST001000 effects",
+    "expected_directions": "read from the VEO-IBD right_beta in the frozen ledger before ST001000 abundance or phenotype effects",
+    "feature_selection": "nearest positive-mode feature within 10 ppm, selected without phenotype"
+  },
+  "claim_boundary": {
+    "supported_scope": "independent participant replication test of the IBD end",
+    "not_supported": [
+      "AD-skin--IBD biological relation",
+      "same molecular identity across studies",
+      "AD-end replication",
+      "unknown-information increment",
+      "in-house algorithm increment"
+    ],
+    "identity_limitation": "ST001000 abundance matrices are full-scan and lack sample-linked MS/MS; mass matching is not identity confirmation"
+  },
+  "source_provenance": {
+    "study": "Metabolomics Workbench ST001000 / PR000677",
+    "primary_publication": "https://www.nature.com/articles/s41564-018-0306-4",
+    "open_full_text": "https://pmc.ncbi.nlm.nih.gov/articles/mid/EMS80310/",
+    "cohort_independence": "PRISM and Netherlands contain independent participants but belong to one published study package; they are not two independent projects"
+  },
+  "preprocessing_and_models": {
+    "abundance": "within-sample sum normalization to 1e6, half-minimum zero smoothing, log10",
+    "PRISM_primary": "CD and UC vs control with age, antibiotics, immunosuppressants, mesalamine, and steroids; medication complete cases",
+    "PRISM_sensitivity": "same model with medication NA treated as no",
+    "Netherlands": "CD and UC vs control with age",
+    "multiplicity": "BH within each cohort/model across all mass-matched target-mode x CD/UC tests"
+  },
+  "cohort_counts": {
+    "PRISM": {
+      "total": 155,
+      "CD": 68,
+      "UC": 53,
+      "Control": 34
+    },
+    "Neth": {
+      "total": 65,
+      "CD": 20,
+      "UC": 23,
+      "Control": 22
+    }
+  },
+  "analysis_audit": {
+    "AN001878": {
+      "mode": "HILIC_positive",
+      "features": 2269,
+      "samples": 220,
+      "targets_mass_matched": 2,
+      "unmatched_target_masses": [
+        197.1285
+      ],
+      "cohort_fit_n": {
+        "PRISM:complete_case": 150,
+        "PRISM:na_as_no_sensitivity": 155,
+        "Neth:not_applicable": 65
+      }
+    },
+    "AN001881": {
+      "mode": "C8_positive",
+      "features": 2316,
+      "samples": 220,
+      "targets_mass_matched": 1,
+      "unmatched_target_masses": [
+        158.1176,
+        197.1285
+      ],
+      "cohort_fit_n": {
+        "PRISM:complete_case": 150,
+        "PRISM:na_as_no_sensitivity": 155,
+        "Neth:not_applicable": 65
+      }
+    }
+  },
+  "result_counts": {
+    "frozen_targets": 3,
+    "target_mode_mass_matches": 3,
+    "target_mode_diagnosis_tests": 6,
+    "all_three_direction_match": 4,
+    "three_fit_concordant_candidates": 0
+  },
+  "result_interpretation": "A three-fit concordance pass requires the frozen VEO direction and within-fit BH q<=0.05 for the same diagnosis in PRISM primary, Netherlands, and PRISM sensitivity. This is not formal replicated-findings FDR control, and PRISM sensitivity is not an independent cohort.",
+  "ols_inference_boundary": "Classical homoskedastic OLS standard errors reproduce the intended published model; heteroskedasticity-robust and outlier sensitivity were not tested.",
+  "inputs": {
+    "ledger": "data\\validation\\contrast_atlas_connection_evidence_ledger_release_v1_20261029\\connection_edge_contributions.tsv.gz",
+    "mapping": "C:\\Users\\21597\\AppData\\Local\\Temp\\dreams_prism_st001000_audit\\mapping.csv",
+    "AN001878": "C:\\Users\\21597\\AppData\\Local\\Temp\\dreams_prism_st001000_audit\\AN001878.txt",
+    "AN001881": "C:\\Users\\21597\\AppData\\Local\\Temp\\dreams_prism_st001000_audit\\AN001881.txt"
+  },
+  "input_sha256": {
+    "ledger": "0db6dc4ddbd8504907edd89adddbddaeb9d6ae7b650bf3b4415e0a969c108438",
+    "mapping": "74d2c72f96ab7e49d1bce8fe0141ae3301f3eaf7aa86725b661692cbea053d6b",
+    "AN001878": "76662e20a3e0b3c3cd5048b497ada2f57b1e3ff6cddb753220c2d4e0b901ca57",
+    "AN001881": "8df4e80c530f9aaf96c22181a874ac3fc12711c7661afdb205456780bf12ef4b"
+  },
+  "script_sha256": "7ba50956b9d969969803556b992f89d8ef1e4b7324712fbb0d9262e786a4caac",
+  "shared_analysis_module_sha256": "3841962ee30142931885b8210270aec30e1d6812f1d632aac816d9556b169a8a"
+}
