@@ -1,0 +1,233 @@
+{
+  "schema": "contrast_atlas_global_biological_adjudication_v1",
+  "status": "DEVELOPMENT_CONSUMED_GLOBAL_ADJUDICATION_COMPLETE",
+  "data_role": "development_consumed",
+  "denominators": {
+    "contrast_nodes": 51,
+    "connection_diagnostic_rows": 6858,
+    "selected_answer_rows": 306,
+    "all_world_queue_rows": 102,
+    "identity_contribution_rows": 1315906,
+    "relation_contribution_rows": 315584,
+    "entity_library_evidence_rows": 54861,
+    "identity_method_edge_annotation_rows": 67465,
+    "identity_unique_selected_links": 44,
+    "registered_target_directions": 42
+  },
+  "all_world_by_layer": [
+    {
+      "evidence_layer": "legacy_different_mass_relation_hypothesis_exploratory",
+      "queries": 51,
+      "statistically_selected_hypotheses": 38,
+      "same_parent_answers": 6,
+      "cross_parent_answers": 32,
+      "cross_parent_same_species_and_biospecimen": 0,
+      "cross_parent_same_condition_family": 0,
+      "answers_targeting_chemprop_parent": 23,
+      "registered_unsigned_answers": 1
+    },
+    {
+      "evidence_layer": "same_precursor_identity_hypothesis",
+      "queries": 51,
+      "statistically_selected_hypotheses": 49,
+      "same_parent_answers": 23,
+      "cross_parent_answers": 26,
+      "cross_parent_same_species_and_biospecimen": 0,
+      "cross_parent_same_condition_family": 2,
+      "answers_targeting_chemprop_parent": 36,
+      "registered_unsigned_answers": 4
+    }
+  ],
+  "identity_global_diagnostics": {
+    "selected_directions": 49,
+    "unique_undirected_links": 44,
+    "opposite_directions": 45,
+    "same_parent_directions": 23,
+    "cross_parent_directions": 26,
+    "cross_parent_species_biospecimen_condition_all_mismatch": 21,
+    "cross_parent_same_species_and_biospecimen": 0,
+    "reciprocal_selected_directions": 10,
+    "all_unresolved_same_target_and_face": 46,
+    "all_known_same_target_and_face": 3,
+    "cross_parent_top1_fraction_median": 0.022557238562457275,
+    "cross_parent_top10_fraction_median": 0.19119011051212564,
+    "cross_parent_effective_edge_count_median": 91.31717041311583,
+    "cross_parent_dual_q_strength_fraction": 0.03660773725237472
+  },
+  "entity_library_evidence_counts": [
+    {
+      "library_evidence_class": "below_policy_library_candidate",
+      "entities": 35955
+    },
+    {
+      "library_evidence_class": "no_10ppm_library_candidate",
+      "entities": 17927
+    },
+    {
+      "library_evidence_class": "library_supported",
+      "entities": 979
+    }
+  ],
+  "identity_method_edge_library_classes": [
+    {
+      "library_edge_class": "unresolved_unresolved",
+      "method_edge_rows": 64261
+    },
+    {
+      "library_edge_class": "mixed_one_named_anchor",
+      "method_edge_rows": 1419
+    },
+    {
+      "library_edge_class": "known_known_exact_inchikey",
+      "method_edge_rows": 1366
+    },
+    {
+      "library_edge_class": "known_known_discordant_identity",
+      "method_edge_rows": 417
+    },
+    {
+      "library_edge_class": "known_known_same_connectivity_only",
+      "method_edge_rows": 2
+    }
+  ],
+  "identity_selected_answer_library_contribution": {
+    "exact_inchikey": {
+      "strength": 215.09848940340356,
+      "fraction": 0.025064665097110448
+    },
+    "same_connectivity_only": {
+      "strength": 0.0,
+      "fraction": 0.0
+    },
+    "discordant_named_identity": {
+      "strength": 26.881900232948347,
+      "fraction": 0.0031324526191773626
+    },
+    "one_named_anchor": {
+      "strength": 88.83570376347075,
+      "fraction": 0.010351709905882193
+    },
+    "unresolved_unresolved": {
+      "strength": 8250.925915520973,
+      "fraction": 0.9614511723778301
+    }
+  },
+  "registered_target_audit": {
+    "registered_directions": 42,
+    "eligible_primary_directions": 34,
+    "identity_primary_targets_selected": 2,
+    "relation_primary_targets_selected": 1,
+    "identity_posthoc_targets_selected": 2,
+    "relation_posthoc_targets_selected": 0,
+    "identity_primary_registered_target_best_face_top1": 3,
+    "identity_primary_registered_target_best_face_top5": 20,
+    "identity_primary_registered_target_median_best_face_rank": 5.0,
+    "identity_primary_registered_target_maxT_005": 28,
+    "identity_hfd_selected": 0,
+    "identity_ibd_selected": 0,
+    "identity_exact_drug_selected": 2
+  },
+  "source_concentration": [
+    {
+      "evidence_layer": "legacy_different_mass_relation_hypothesis_exploratory",
+      "selected_directions": 38,
+      "candidate_parent_projects": 5,
+      "parent_project_hhi": 0.41274238227146814,
+      "effective_parent_projects": 2.422818791946309
+    },
+    {
+      "evidence_layer": "same_precursor_identity_hypothesis",
+      "selected_directions": 49,
+      "candidate_parent_projects": 6,
+      "parent_project_hhi": 0.5610162432319866,
+      "effective_parent_projects": 1.7824795842613217
+    }
+  ],
+  "cross_track": {
+    "both_tracks_answered": 38,
+    "same_target": 2,
+    "same_target_and_face": 2
+  },
+  "adjudication_strata": [
+    {
+      "adjudication_stratum": "cross_domain_unregistered_hypothesis",
+      "query_layer_rows": 52
+    },
+    {
+      "adjudication_stratum": "same_parent_internal_control_or_shortcut",
+      "query_layer_rows": 29
+    },
+    {
+      "adjudication_stratum": "no_statistically_selected_match",
+      "query_layer_rows": 15
+    },
+    {
+      "adjudication_stratum": "cross_track_convergent_cross_domain_hypothesis",
+      "query_layer_rows": 4
+    },
+    {
+      "adjudication_stratum": "registered_unsigned_cross_parent_audit",
+      "query_layer_rows": 2
+    }
+  ],
+  "decision": {
+    "atlas_globally_traceable": true,
+    "biological_validity_established": false,
+    "unknown_increment_established": false,
+    "in_house_algorithm_increment_established": false,
+    "signed_external_truth_available": false
+  },
+  "claim_boundaries": [
+    "Statistically selected hypotheses are not counts of correct biological links.",
+    "Unregistered study pairs are unjudged, never negative controls.",
+    "Identity and different-mass relation layers remain separate and are never meta-analysed as one molecule.",
+    "The relation layer is a legacy fragment-cosine exploratory graph, not a validated Full23 relation score.",
+    "Contribution concentration and cross-track convergence are prioritisation diagnostics, not validation.",
+    "All inputs are development/consumed; no sealed biological truth was opened."
+  ],
+  "provenance": {
+    "implementation_sha256": "973d7e751e9b670fdccfae615a6651c32629d871d9023b5696f4588c05a1bd30",
+    "inputs": {
+      "data\\validation\\contrast_atlas_biological_panorama_release_v1_20261029\\contrast_panorama.tsv": "7fb99f278df99b7e989a311e7abdf7aede5aeebf97b24072593c86cff26de4ba",
+      "data\\validation\\contrast_atlas_biological_panorama_release_v1_20261029\\combined_two_face_answer_ledger.tsv": "75edfdc2bad5870fa345f35d689e2725428a93834fc567dd0e3469c8e7aad3ac",
+      "data\\validation\\contrast_atlas_connection_evidence_ledger_release_v1_20261029\\connection_edge_contributions.tsv.gz": "0db6dc4ddbd8504907edd89adddbddaeb9d6ae7b650bf3b4415e0a969c108438",
+      "data\\validation\\contrast_atlas_connection_evidence_ledger_release_v1_20261029\\identity_connection_strengths.tsv.gz": "c18dc6063519834826a95b78f2f391eca816de8bb1f8b89c9ba9943258077a23",
+      "data\\validation\\contrast_atlas_connection_evidence_ledger_release_v1_20261029\\method_entity_edges.tsv.gz": "88a6cef766bc15b903c40d6aa665e36aa7ea01fa297993fdcd56aa2819acf3b0",
+      "data\\validation\\contrast_atlas_legacy_relation_evidence_ledger_smoke_v1_20261029\\legacy_relation_edge_contributions.tsv.gz": "6fe78c7d0564413edf9599d35be2869dbeab616c6dbb36039df2887771c63864",
+      "data\\validation\\contrast_atlas_legacy_relation_evidence_ledger_smoke_v1_20261029\\legacy_relation_connection_strengths.tsv.gz": "9a935abf57d0aa7cd8114b4b721ff6934151e488763d63a0c0204a5ec9daeddd",
+      "data\\validation\\contrast_atlas_open_local_edge_enrichment_v5_20261027\\open_local_edge_top_hits.tsv": "1a169f6fe5caf505d0a6081b2994dee29be05498523cf143ae62630b91f5b374",
+      "data\\validation\\contrast_atlas_complete_identity_wse_open_retrieval_v3_20261029\\registered_relation_ranks.tsv": "3b92cae990fab57ddfbef3e99a390d21eb4bd89b5e5596635b027029c523d149",
+      "data\\validation\\contrast_atlas_open_response_collection_v9_frozenbase_chemprop_20261023\\registered_relations.tsv": "8fba3fe5652773c68740d5237e02d0db314a2185b3c12c7581c3c9e4ced4014c"
+    },
+    "common_identity_shards": {
+      "data\\validation\\contrast_atlas_open_v9_frozenbase_common_identity_shards_20261023\\IBD200_GROUP\\identity_partition.tsv.gz": "8fdfdbeb0013e79db462955a0758943668cc2cfc56450d3ae64b07dad17703f1",
+      "data\\validation\\contrast_atlas_open_v9_frozenbase_common_identity_shards_20261023\\MSV000083077\\identity_partition.tsv.gz": "25879473c082902d3a01dadd33694d12d7c306f9ad3a15e3c4c1410db61c2225",
+      "data\\validation\\contrast_atlas_open_v9_frozenbase_common_identity_shards_20261023\\MSV000084112\\identity_partition.tsv.gz": "ede25984abc333a2fa9687f1501f0bb3e3554b068729d11feaf1c23a0ed5265f",
+      "data\\validation\\contrast_atlas_open_v9_frozenbase_common_identity_shards_20261023\\MSV000084794\\identity_partition.tsv.gz": "833d59e8ccf7df44c960c9cc9de3d39a5cc8764020389ba70320bdda67bd9988",
+      "data\\validation\\contrast_atlas_open_v9_frozenbase_common_identity_shards_20261023\\MSV000086360\\identity_partition.tsv.gz": "0392ba96f9843c488c12de0f710e585e3e8e00e57ee4a1bb41794af3cb1c4f39",
+      "data\\validation\\contrast_atlas_open_v9_frozenbase_common_identity_shards_20261023\\MSV000088023\\identity_partition.tsv.gz": "f128ff25ecf1e307f8f7d0e6ee4c2fd18f16db33bb460ca682a8aed2284ab872",
+      "data\\validation\\contrast_atlas_open_v9_frozenbase_common_identity_shards_20261023\\MSV000090788\\identity_partition.tsv.gz": "b3cacba664b994f8df262de8875e9bc2d518c1a2506e0cccbfe902556740f1d4",
+      "data\\validation\\contrast_atlas_open_v9_frozenbase_common_identity_shards_20261023\\MSV000090804\\identity_partition.tsv.gz": "b6e598cd854615bbc50a9d9f90b3c23c1675d9e5a22240719012a15615fe42ef",
+      "data\\validation\\contrast_atlas_open_v9_frozenbase_common_identity_shards_20261023\\MSV000092887\\identity_partition.tsv.gz": "f5fbc08da5bf66290e31c14bab62f5459d5e3d5d4812df31b2b1026f5744e877",
+      "data\\validation\\contrast_atlas_open_v9_frozenbase_common_identity_shards_20261023\\MSV000093571\\identity_partition.tsv.gz": "6ca8b40c000aa0910d9105370970844d9a06c27e46d79ce92a86703b95ea5631",
+      "data\\validation\\contrast_atlas_open_v9_frozenbase_common_identity_shards_20261023\\MSV000094899\\identity_partition.tsv.gz": "dc8042431d4977cafae9d55b4f1ef227b312b2747ad907b8d40150d7f853b967",
+      "data\\validation\\contrast_atlas_open_v9_frozenbase_common_identity_shards_20261023\\MSV000096564\\identity_partition.tsv.gz": "4754308a54c38175c525b019b3b0f86b5cd1fc753e9e0313cf3e43e353b524a5",
+      "data\\validation\\contrast_atlas_open_v9_frozenbase_common_identity_shards_20261023\\MSV000096724\\identity_partition.tsv.gz": "7cdde9e83b3b170bd6769b1bdd093c7da1b207fa9617be6321370ea469a38c59",
+      "data\\validation\\contrast_atlas_open_v9_frozenbase_common_identity_shards_20261023\\MSV000097426\\identity_partition.tsv.gz": "a407da09fe2ecf267171254fdf8cad694be052d518b1609b435a9f79dff934d1",
+      "data\\validation\\contrast_atlas_open_v9_frozenbase_common_identity_shards_20261023\\MSV000097610\\identity_partition.tsv.gz": "f85f4d244eaee9728dfeece01e1c4f18bee4eafac059148266ab75dd3c1f68cf"
+    },
+    "outputs": {
+      "atlas_connection_diagnostics.tsv.gz": "b8074194c85d30fc60be1d00468c522bd3b9952192710e7ffa0115e089c672bb",
+      "atlas_selected_answer_diagnostics.tsv.gz": "4537a85d254e0a3d67b8baf94dd2e8146b943238422c6d6dd4d905bf4ef172fc",
+      "atlas_all_world_adjudication_queue.tsv": "a6a1f1a8143c010b1cbc83891d41487aeafd2708433adf197b3ee9deeeba2f36",
+      "identity_global_answer_adjudication.tsv": "0c5c2b9866a03ae6543642a62151c61c454876804c020bcad22ea1e1f326cb6b",
+      "relation_global_answer_adjudication.tsv": "2f82389bdd5c92a8828a4327c41b0b7648432cc86d183aae6bc5f7f423d2214e",
+      "identity_selected_link_evidence.tsv.gz": "d6a516cbb8484e422879fbed5c3fac04e67d734c1ed9118ac47854842e4f2ac2",
+      "registered_target_audit.tsv": "b81503a66eddf47b35fc75d76b31047c5235b1c1af7bd5ab20a6330dde322f02",
+      "source_concentration.tsv": "8503f402e63927c08a935d35a91ee0031c5381e2087c9c81c4561c191e5705df",
+      "entity_library_evidence.tsv.gz": "ed0297b43236e7cb6b5be4e6fccc3d19685b3288029cf0bd7c6465af744b6e63",
+      "identity_method_edge_library_annotation.tsv.gz": "379bc0b67a4d0255f5d00b53530d418cad6f6fe9e6057a84a4d098f0c7c91997"
+    },
+    "checksums_manifest_sha256": "b68dc73cba1ab83a1ea3560b8e626614630bf626cfd30f5c06ed931a2683b814"
+  }
+}
