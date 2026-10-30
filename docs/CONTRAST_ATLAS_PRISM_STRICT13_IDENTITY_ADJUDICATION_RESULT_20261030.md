@@ -90,13 +90,13 @@ Atlas 的大规模主体仍是 15 个来源、51 个研究级对比和完整开�
 
 411.3606@1.69 与 427.3556@1.71 共洗脱且相差约 15.995 Da，可作为氧化关系候选；它不是常见正离子加合物，因此没有被合并成同一个分子家族。595.3494 与 597.3618 来自不同 LC 模式，也没有被按约 2.012 Da 差强行合并。
 
-折叠后的 9 个工作家族为：
+只在 13 个优先源实体对内部折叠时，9 个工作家族为：
 
 - unresolved：6；
 - known：2；
 - mixed known/unresolved：1。
 
-这里的“9”仍是分析物家族假说，不是 9 个已鉴定代谢物。合理报告范围是 **9–13**。
+这里的“9”仍是分析物家族假说，不是 9 个已鉴定代谢物。合理报告范围是 **9–13**。当同一规则扩展到全部 101 个可测试实体对时，一条严格 known 边还会与一条未通过筛选的 unresolved 水损失边归入同一 mixed 家族，因此完整分母中的 9 个优先家族组成变为 unresolved 6、known 1、mixed 2。两种数字回答的分母不同，不能混写。
 
 ## 五、历史注释为什么不能替代当前严格证据
 
@@ -119,7 +119,16 @@ Atlas 的大规模主体仍是 15 个来源、51 个研究级对比和完整开�
 
 unresolved 对 known 的单侧 Fisher 检验为 OR `0.616`、`p=0.855`，没有 unknown 富集证据。
 
-离子家族折叠后，13 个阳性源实体对变成 9 个家族，看起来 unresolved 从 9 对降为 6 个家族。但**不能只折叠阳性分子后重新计算 unknown 增量**。全部 101 个可测试源实体对必须使用同一表型盲家族规则折叠分母；否则会改变 known/unresolved 的机会结构并制造偏差。
+离子家族折叠后，13 个阳性源实体对变成 9 个家族。为避免只折叠阳性分子，本轮已经把同一规则应用到全部 101 个可测试源实体对：
+
+| 分母 | unresolved | known | mixed | unresolved vs known 单侧 Fisher |
+|---|---:|---:|---:|---:|
+| 源实体对 | 9/82 | 2/12 | 2/7 | OR 0.616，`p=0.855` |
+| 表型盲家族 | **6/72** | **1/10** | **2/8** | OR 0.818，`p=0.798` |
+
+完整折叠得到 90 个候选分析物家族、13 条候选离子关系边和 9 个多实体对家族；最大家族含 3 个源实体对。家族定义没有读取响应，且 known/unresolved 使用同一规则。
+
+这仍是冗余敏感性分析，不是 family-level replicated-findings FDR：上游 q 值在 feature×diagnosis 层计算，一个家族只要有任一成员通过就记为优先家族。尽管如此，结论没有因统一折叠而改变。
 
 因此当前允许的结论仍是：
 
@@ -154,5 +163,14 @@ unresolved 对 known 的单侧 Fisher 检验为 OR `0.616`、`p=0.855`，没有 
 - `data/validation/contrast_atlas_prism_strict13_identity_adjudication_v1_20261030/strict13_unique_feature_observations.tsv`
 - `data/validation/contrast_atlas_prism_strict13_identity_adjudication_v1_20261030/report.json`
 - `data/validation/contrast_atlas_prism_strict13_identity_adjudication_v1_20261030/checksums.sha256`
+
+完整 101 对的统一家族分母敏感性：
+
+- `tasks/analyze_contrast_atlas_prism_family_level_increment.py`
+- `data/validation/contrast_atlas_prism_family_level_increment_v1_20261030/retained_pair_family_assignments.tsv`
+- `data/validation/contrast_atlas_prism_family_level_increment_v1_20261030/retained_family_summary.tsv`
+- `data/validation/contrast_atlas_prism_family_level_increment_v1_20261030/retained_candidate_ion_relation_edges.tsv`
+- `data/validation/contrast_atlas_prism_family_level_increment_v1_20261030/report.json`
+- `data/validation/contrast_atlas_prism_family_level_increment_v1_20261030/checksums.sha256`
 
 脚本通过 `py_compile`；全部输出 SHA256 已复核一致。

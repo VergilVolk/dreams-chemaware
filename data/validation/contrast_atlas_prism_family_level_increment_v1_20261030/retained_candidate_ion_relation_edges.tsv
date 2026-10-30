@@ -1,0 +1,14 @@
+left_method_edge_id	right_method_edge_id	mode	left_feature_id	right_feature_id	rt_delta_min	observed_mass_delta_da	candidate_relation	reference_mass_delta_da	mass_delta_error_da	claim_boundary
+wse_identity:001830	wse_identity:001832	HILIC_positive	427.3556_1.71	445.3654_1.69	0.020000000000000018	18.00980000000004	water_loss_or_gain	18.010565	0.0007649999999586043	phenotype_blind_family_edge_not_confirmed_identity
+wse_identity:001808	wse_identity:001809	HILIC_positive	263.2359_1.62	281.2463_1.63	0.009999999999999787	18.010400000000004	water_loss_or_gain	18.010565	0.00016499999999552983	phenotype_blind_family_edge_not_confirmed_identity
+wse_identity:001771	wse_identity:001725	HILIC_positive	371.2566_1.94	353.246_1.94	0.0	18.01060000000001	water_loss_or_gain	18.010565	3.500000001110948e-05	phenotype_blind_family_edge_not_confirmed_identity
+wse_identity:001780	wse_identity:001778	C8_positive	357.2787_4.3	375.2888_4.3	0.0	18.010099999999966	water_loss_or_gain	18.010565	0.0004650000000339105	phenotype_blind_family_edge_not_confirmed_identity
+wse_identity:001808	wse_identity:001809	C8_positive	263.2369_4.36	281.2475_4.36	0.0	18.01060000000001	water_loss_or_gain	18.010565	3.500000001110948e-05	phenotype_blind_family_edge_not_confirmed_identity
+wse_identity:001772	wse_identity:001771	C8_positive	389.2685_3.73	371.2578_3.74	0.010000000000000231	18.010700000000043	water_loss_or_gain	18.010565	0.00013500000004285084	phenotype_blind_family_edge_not_confirmed_identity
+wse_identity:001738	wse_identity:001734	C8_positive	834.6087_4.02	817.5808_4.02	0.0	17.027900000000045	ammonium_minus_proton	17.026549	0.0013510000000458433	phenotype_blind_family_edge_not_confirmed_identity
+wse_identity:001771	wse_identity:001725	C8_positive	371.2578_3.74	353.2464_3.73	0.010000000000000231	18.01139999999998	water_loss_or_gain	18.010565	0.0008349999999808233	phenotype_blind_family_edge_not_confirmed_identity
+wse_identity:001746	wse_identity:001745	C8_positive	593.3326_3.18	615.3153_3.18	0.0	21.982700000000023	sodium_minus_proton	21.981942	0.0007580000000224629	phenotype_blind_family_edge_not_confirmed_identity
+wse_identity:001763	wse_identity:001747	C8_positive	807.5743_4.36	785.5935_4.36	0.0	21.980800000000045	sodium_minus_proton	21.981942	0.0011419999999553454	phenotype_blind_family_edge_not_confirmed_identity
+wse_identity:001750	wse_identity:001775	C8_positive	544.3276_3.88	526.3178_3.86	0.020000000000000018	18.009799999999927	water_loss_or_gain	18.010565	0.0007650000000722912	phenotype_blind_family_edge_not_confirmed_identity
+wse_identity:001736	wse_identity:001734	C8_positive	839.5631_4.02	817.5808_4.02	0.0	21.98230000000001	sodium_minus_proton	21.981942	0.0003580000000091843	phenotype_blind_family_edge_not_confirmed_identity
+wse_identity:001694	wse_identity:001742	C8_positive	595.3494_3.21	617.3314_3.21	0.0	21.982000000000085	sodium_minus_proton	21.981942	5.8000000084490466e-05	phenotype_blind_family_edge_not_confirmed_identity
