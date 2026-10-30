@@ -194,6 +194,53 @@ top_connection_support_evidence 只保留 top-10 边。完整互惠边集为 **7
 - 300–500 Da 占 28.5%（220/771）——中等分子（缀合物、脂质片段）
 - 500+ Da 占 7.8%（60/771）——脂质/复合物
 
+---
+
+## 全部 15 条跨项目联系的边级诊断率总表
+
+| 查询 | 候选 | 边数 | sim | opp | **sim_diag** | **opp_diag** |
+|---|---|---:|---:|---:|---:|---:|
+| mouse_hfd_vs_nfd | obesity_without_diabetes | **771** | 430 | 341 | **50** | **21** |
+| pediatric_veoibd | drug_montelukast | 749 | 386 | 363 | 8 | 12 |
+| baseline_ibd | obesity_with_diabetes | 582 | 267 | 315 | 2 | 1 |
+| depression_obese | drug_cilnidipine | 573 | 287 | 286 | 0 | 0 |
+| obesity_high_depr | drug_montelukast | 573 | 227 | 346 | 0 | 0 |
+| obesity_low_depr ↔ obesity_with_diab | 603 | 256 | 347 | 0 | 0 |
+| diabetes_obese | drug_cilnidipine | 524 | 284 | 240 | 2 | 7 |
+| obesity_without | drug_telmisartan | 524 | 271 | 253 | 3 | 1 |
+| depression_nonobese | drug_sertraline | 495 | 154 | 341 | 0 | **22** |
+| lanthanophore_ko | drug_telmisartan | 446 | 223 | 223 | 4 | 2 |
+| lanthanide_limited | drug_cilnidipine | 438 | 246 | 192 | 9 | 13 |
+| lanthanophore_overexp | drug_cilnidipine | 385 | 202 | 183 | **23** | **27** |
+| drug_simvastatin | bsubtilis_root | 280 | 108 | 172 | 8 | **35** |
+| bsubtilis_stem ↔ lesion_paired | 200 | 57 | 143 | 10 | 9 |
+| bsubtilis_leaf ↔ lesion_paired | 204 | 65 | 139 | 4 | 10 |
+| industrialized↔bsubtilis_stem | 239 | 125 | 114 | 6 | **20** |
+| female_hfd_plasma | drug_metronidazole | **91** | 36 | 48 | 0 | **6** |
+| male_hfd_plasma | lanthanophore_overexp | 49 | 21 | 28 | 7 | **12** |
+| covid_plasma | bsubtilis_root | 108 | 54 | 54 | 11 | **18** |
+| adult_ibd_plate3 | drug_cilnidipine | 159 | 86 | 73 | 4 | 0 |
+
+### 关键观察
+
+1. **小鼠 HFD 尿→人类肥胖尿遥遥领先**：50 条双端诊断 similar 边是第二名的 6 倍以上。这是唯一以 similar 面为主导的高诊断连接。
+
+2. **几乎所有其他跨项目联系以 opposite 面为主**：这支持"广泛化学变化的方向相反"是常见的跨域模式（疾病 vs 培养、炎症 vs 药物处理）。
+
+3. **诊断率异常高的连接**：
+   - female_hfd_plasma→metronidazole：91 边中 6 opp_diag（6.6% 诊断率，全 Atlas 最高）
+   - male_hfd_plasma→lanthanophore：49 边中 12 opp_diag（24.5%）
+   - covid_plasma→bsubtilis_root：108 边中 18 opp_diag（16.7%）
+
+4. **全部分析中，只有 mouse_hfd→human_obesity 连接的诊断边以 similar 为主**——这是它作为跨物种保守响应候选的独特性。
+
+### 有命名锚的跨项目诊断边
+
+在全部跨项目诊断边中，只有极少数有命名锚：
+
+- **pediatric IBD → montelukast**：m/z 414.36 双端均命名为 **12-hydroxyoctadecanoic acid_L-threonine**（羟基脂肪酸-氨基酸缀合物；IBD 中降低 z=−3.6，培养中升高 z=+5.1）——**这是唯一有双端命名锚的跨项目诊断边**
+- female HFD→metronidazole：m/z 663.45 候选端命名为 **isocholic-acid_3-hydroxybutanoic-acid**（胆汁酸缀合物）
+
 1. **立即可做**：检查 known-only 世界中小鼠 HFD 查询的答案——如果不同于 all-world，则 unresolved 增量有了第一个具体案例
 2. **短期**：对 top 10 m/z 做 SIRIUS/CSI:FingerID 精确注释，判断化学类别
 3. **中期**：在独立 HFD 小鼠尿队列中验证这 10 个 m/z
