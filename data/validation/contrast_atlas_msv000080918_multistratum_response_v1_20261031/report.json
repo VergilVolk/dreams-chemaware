@@ -1,0 +1,82 @@
+{
+  "schema": "contrast_atlas_msv000080918_multistratum_response_v1",
+  "status": "DEVELOPMENT_CONSUMED_RESPONSE_SOURCE_COMPLETE",
+  "evidence_boundary": {
+    "source_status": "development_consumed",
+    "independent_source_count": 1,
+    "accessions_are_same_parent_study": true,
+    "xalign_overlap": "X-Align used the B6-HFD (6M) 5-mouse versus B6-NC (6M) 6-mouse subset; it is not an unopened external panel.",
+    "original_paper_consumed_positive_controls": [
+      "mup_hfd_10_11m_iga_ko_vs_intact_date_matched",
+      "mup_hfd_10_11m_cd8_ko_vs_intact_date_matched"
+    ],
+    "causal_claim": false,
+    "identity_truth_claimed": false,
+    "mechanism_claimed": false,
+    "inference_unit": "cage cluster with cage-by-arm analysis cells"
+  },
+  "inputs": {
+    "analysis_script": "D:\\DreaMS\\.codex-worktrees\\biology_result_20261029\\tasks\\build_msv000080918_multistratum_response.py",
+    "analysis_script_sha256": "a0b3261f738c8a080665979fdda66b9142c8647d3510763753b6ac1ce4222c47",
+    "abundance": "C:\\Users\\21597\\AppData\\Local\\Temp\\MSV000080558_metabolomics_table_noise_thr1000_metadata.csv",
+    "abundance_sha256": "580dbbbd4979b7ec2438178e7bf612813d3ee1147b2096f000acf845eadf1e2f",
+    "cluster_members": "C:\\Users\\21597\\AppData\\Local\\Temp\\MSV000080918_gnps_full\\clusterinfo\\beafccce32b74180bf7419d746052ae8.clusterinfo",
+    "cluster_members_sha256": "63cb482dd8a662a16aa6a999f9d114e960b2940a710367b5f10695ac8b89f547",
+    "cluster_summary": "C:\\Users\\21597\\AppData\\Local\\Temp\\MSV000080918_gnps_full\\clusterinfosummary\\5cf4d9f7890a4500a0926d3d3d2ca58a.clustersummary",
+    "cluster_summary_sha256": "8a9473db29519387d0f680fad19b3528410fdb23e2c4c1e4314d959c9f5823e2",
+    "params_xml": "C:\\Users\\21597\\AppData\\Local\\Temp\\MSV000080918_gnps_full\\params.xml",
+    "params_xml_sha256": "83a2180dc631952f38b5db8cc5111b4fbf6ed6d944401b495ddcae132f20a7f4",
+    "library_clusters": "C:\\Users\\21597\\AppData\\Local\\Temp\\MSV000080918_gnps_full\\clusterinfosummarygroup_attributes_withIDs_withcomponentID\\23cb07030aa5435eb0c3c8b8a99caf26.tsv",
+    "library_clusters_sha256": "b137a4486c2724bed1bce4b660ed6ebe8daeae92a7afe57c7b811b477772bbfe",
+    "mgf": "C:\\Users\\21597\\AppData\\Local\\Temp\\MSV000080918_gnps_full\\METABOLOMICS-SNETS-977d85bb-download_clustered_spectra-main.mgf",
+    "mgf_sha256": "2c414c7ec0dcf2df1130e34bfed4f6f5a148de63f297333af6549b1d53d9c544"
+  },
+  "join_contract": {
+    "precursor_ppm": 10.0,
+    "retention_seconds": 12.0,
+    "minimum_ms2_peaks": 3,
+    "requires_nonzero_source_sample_overlap": true,
+    "uses_abundance_presence_for_join": true,
+    "uses_arm_labels_or_effect_estimates_for_join": false
+  },
+  "source_counts": {
+    "biological_samples": 451,
+    "cages": 176,
+    "abundance_features": 8515,
+    "mgf_spectra_total": 9869,
+    "mgf_spectra_meeting_peak_qc": 5885,
+    "mgf_spectra_below_peak_qc": 3984,
+    "cluster_rows_meeting_mgf_peak_qc": 5885,
+    "features_with_spectral_candidates": 1037,
+    "feature_cluster_candidate_rows": 1934,
+    "spectral_evidence_status_counts": {
+      "reciprocal_unique_unresolved": 693,
+      "ambiguous_unresolved": 280,
+      "single_candidate_nonreciprocal_unresolved": 26,
+      "reciprocal_unique_library_supported": 22,
+      "ambiguous_with_library_candidate": 16
+    }
+  },
+  "response_counts": {
+    "intended_panels": 7,
+    "analysis_eligible_contrasts": 2,
+    "primary_eligible_contrasts": 1,
+    "effect_rows": 2074,
+    "eligible_effect_rows": 729,
+    "eligible_features": 421,
+    "within_contrast_q05_rows": 37,
+    "contrasts_with_q05_features": 2
+  },
+  "method": {
+    "normalization": "median-ratio across biological samples",
+    "transform": "log2(normalized abundance + 1)",
+    "within_cage_arm": "mean of mouse-level log abundance",
+    "effect_model": "OLS treatment indicator plus shared-collection-date fixed effects and centered cage-cell mean age in weeks, CR1 finite-sample-corrected cage-clustered SE, cage-by-arm rows; t reference df=min(number of cages minus 1, model residual df)",
+    "response_filter": "label-blind pooled cage detection; at least max(minimum_detected_cages, ceil(minimum_pooled_cage_prevalence * independent cages))",
+    "minimum_detected_cages": 3,
+    "minimum_pooled_cage_prevalence": 0.5,
+    "multiple_testing": "BH within each contrast over all label-blind response-eligible abundance features before the spectral-evidence inner join",
+    "date_robustness": "leave one collection date out; report direction consistency separately from the full-model BH result",
+    "primary_panel_gate": "predefined analysis role; >=specification shared collection dates, cages per arm, and total unique cages; overlapping observed age ranges"
+  }
+}
