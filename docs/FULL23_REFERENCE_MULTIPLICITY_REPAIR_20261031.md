@@ -113,6 +113,33 @@ the same low-capacity support residual trained on Enveda OOF with the boundary
 loss and then transferred once to GNPS. Full23 v1 remains the release until
 that fixed-transfer result exists.
 
+## Large-source fixed-transfer implementation
+
+`train_full23_reference_support_transfer.py` now implements that experiment
+without regenerating any upstream artifact:
+
+- training/development source: Enveda identity 25,000 queries plus formula
+  9,435 queries, using its existing five global-formula folds and frozen
+  repeated-query weights;
+- fixed transfer evaluation: GNPS identity 10,995 plus formula 5,261 queries;
+- performance arm: count-only listwise residual;
+- quality arm: 15-feature reference-support residual with boundary Top-1 loss;
+- unchanged parent and evidence: released Full23 v1, Noise, WSE, P2b, MSG,
+  Stage-1, Phase-A, FullMSG and V2 artifacts are only read from existing
+  caches.
+
+The Enveda residual OOF estimate conditions on already-created parent OOF
+scores, so it is development evidence rather than a newly sealed external
+claim. The GNPS result is a fixed application of the all-Enveda residual fit.
+Both resources are already consumed; neither can support a final external
+claim. Their combined scale is appropriate for deciding whether the repair is
+stable enough to include in the next frozen candidate.
+
+The runnable entry point is
+`tasks/run_full23_reference_support_transfer.sbatch`; its synthetic variable-
+candidate and repeated-query contract is
+`tasks/test_full23_reference_support_transfer.py`.
+
 Promotion requires the Enveda-fitted correction to retain positive direction
 on both GNPS panels, improve the query-balanced endpoint, and not create a
 material near-subset or AUPRC loss. Otherwise Full23 v1 remains the release.
