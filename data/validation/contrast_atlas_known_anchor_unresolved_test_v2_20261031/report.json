@@ -1,0 +1,232 @@
+{
+  "schema": "contrast_atlas_known_anchor_unresolved_entity_disjoint_v2",
+  "status": "DEVELOPMENT_CONSUMED_ENTITY_DISJOINT_TEST_COMPLETE",
+  "data_role": "development_consumed",
+  "question": "Do unresolved-only reciprocal WSE response links recover signed relationships defined on a disjoint set of exact-InChIKey library-supported entities?",
+  "contract": {
+    "known_anchor": "one response-blind best library-supported observed ion per full InChIKey and study; signed cosine across shared exact InChIKeys",
+    "unresolved_test": "reciprocal unresolved--unresolved WSE edges only; no library identity, semantic condition name, or registered relation enters pairing or target selection; beta/SE are estimated from experimental labels",
+    "cross_parent_only_according_to_current_provisional_parent_map": true,
+    "min_known_exact_inchikeys": 5,
+    "min_unresolved_mutual_edges": 3,
+    "stable_anchor_abs_score": 0.5,
+    "stable_anchor_requires_leave_one_out_sign": true
+  },
+  "denominators": {
+    "selected_library_study_inchikeys": 734,
+    "known_anchor_contrast_pairs": 1099,
+    "reciprocal_unresolved_edges": 32870,
+    "eligible_cross_parent_continuous_pairs": 615,
+    "eligible_cross_parent_source_pairs": 50,
+    "stable_anchor_pairs": 101,
+    "known_unresolved_entity_key_overlap": 0
+  },
+  "continuous_agreement": {
+    "raw": {
+      "source_pair_dyad_bootstrap_descriptive": {
+        "spearman_rho": 0.2240176681981719,
+        "source_pair_clusters": 50,
+        "rows": 615,
+        "bootstrap_replicates_requested": 2000,
+        "bootstrap_replicates_finite": 2000,
+        "cluster_bootstrap_ci95_low": 0.08566504807990188,
+        "cluster_bootstrap_ci95_high": 0.3716129574319415
+      },
+      "leave_one_study_out": {
+        "studies": 13,
+        "finite_leave_one_study_out_estimates": 13,
+        "minimum_rho": 0.16980642698666412,
+        "maximum_rho": 0.31674076802153145,
+        "median_rho": 0.21934545907181108
+      },
+      "axis_label_permutation": {
+        "observed_rho": 0.22325430844488373,
+        "rows": 610,
+        "exchangeable_source_pairs": 45,
+        "permutations": 999,
+        "permutation_p_one_sided": 0.001,
+        "null_q025": -0.05232213055938445,
+        "null_median": 0.031840838761445424,
+        "null_q975": 0.11653736518824374
+      }
+    },
+    "source_pair_centered": {
+      "source_pair_dyad_bootstrap_descriptive": {
+        "spearman_rho": 0.20377704875738384,
+        "source_pair_clusters": 45,
+        "rows": 610,
+        "bootstrap_replicates_requested": 2000,
+        "bootstrap_replicates_finite": 2000,
+        "cluster_bootstrap_ci95_low": 0.047098118511574305,
+        "cluster_bootstrap_ci95_high": 0.35792186935486225
+      },
+      "leave_one_study_out": {
+        "studies": 12,
+        "finite_leave_one_study_out_estimates": 12,
+        "minimum_rho": 0.1412332253540795,
+        "maximum_rho": 0.30636392369929405,
+        "median_rho": 0.20211748065744778
+      },
+      "axis_label_permutation": {
+        "observed_rho": 0.20377704875738384,
+        "rows": 610,
+        "exchangeable_source_pairs": 45,
+        "permutations": 999,
+        "permutation_p_one_sided": 0.001,
+        "null_q025": -0.0814266404247521,
+        "null_median": 0.0009352085437865359,
+        "null_q975": 0.08984271636858143
+      }
+    },
+    "candidate_axis_centered": {
+      "source_pair_dyad_bootstrap_descriptive": {
+        "spearman_rho": 0.16940104444373455,
+        "source_pair_clusters": 26,
+        "rows": 508,
+        "bootstrap_replicates_requested": 2000,
+        "bootstrap_replicates_finite": 2000,
+        "cluster_bootstrap_ci95_low": 0.011071573064371896,
+        "cluster_bootstrap_ci95_high": 0.35269474731688216
+      },
+      "leave_one_study_out": {
+        "studies": 10,
+        "finite_leave_one_study_out_estimates": 10,
+        "minimum_rho": 0.0829417392315136,
+        "maximum_rho": 0.2885759276012866,
+        "median_rho": 0.17255414482243353
+      },
+      "axis_label_permutation": {
+        "observed_rho": 0.16940104444373455,
+        "rows": 508,
+        "exchangeable_source_pairs": 26,
+        "permutations": 999,
+        "permutation_p_one_sided": 0.004,
+        "null_q025": -0.10438854566459553,
+        "null_median": 0.0024062060655944935,
+        "null_q975": 0.11474837173526663
+      }
+    },
+    "query_axis_centered": {
+      "source_pair_dyad_bootstrap_descriptive": {
+        "spearman_rho": 0.16762139294563075,
+        "source_pair_clusters": 40,
+        "rows": 580,
+        "bootstrap_replicates_requested": 2000,
+        "bootstrap_replicates_finite": 2000,
+        "cluster_bootstrap_ci95_low": 0.0008338460507332499,
+        "cluster_bootstrap_ci95_high": 0.3574046899390778
+      },
+      "leave_one_study_out": {
+        "studies": 11,
+        "finite_leave_one_study_out_estimates": 11,
+        "minimum_rho": 0.0803819941117196,
+        "maximum_rho": 0.28633913482866485,
+        "median_rho": 0.15803324152432466
+      },
+      "axis_label_permutation": {
+        "observed_rho": 0.16762139294563075,
+        "rows": 580,
+        "exchangeable_source_pairs": 40,
+        "permutations": 999,
+        "permutation_p_one_sided": 0.002,
+        "null_q025": -0.10348509174911442,
+        "null_median": -0.00373565012237623,
+        "null_q975": 0.10825493863967561
+      }
+    },
+    "double_centered": {
+      "source_pair_dyad_bootstrap_descriptive": {
+        "spearman_rho": 0.05977674799130382,
+        "source_pair_clusters": 21,
+        "rows": 478,
+        "bootstrap_replicates_requested": 2000,
+        "bootstrap_replicates_finite": 2000,
+        "cluster_bootstrap_ci95_low": -0.10404391400354475,
+        "cluster_bootstrap_ci95_high": 0.2534006286138036
+      },
+      "leave_one_study_out": {
+        "studies": 8,
+        "finite_leave_one_study_out_estimates": 8,
+        "minimum_rho": -0.03184068120655918,
+        "maximum_rho": 0.18571530659121901,
+        "median_rho": 0.05724185812920386
+      },
+      "axis_label_permutation": {
+        "observed_rho": 0.05977674799130382,
+        "rows": 478,
+        "exchangeable_source_pairs": 21,
+        "permutations": 999,
+        "permutation_p_one_sided": 0.146,
+        "null_q025": -0.12192610138432242,
+        "null_median": 0.0011385811789701831,
+        "null_q975": 0.11330599529877221
+      }
+    }
+  },
+  "stable_anchor_sign_agreement": {
+    "agree": 72,
+    "total": 101,
+    "fraction": 0.7128712871287128
+  },
+  "face_specific_open_retrieval": {
+    "directions": 202,
+    "top1": 8,
+    "top3": 24,
+    "top5": 41,
+    "median_worst_tie_rank": 12.0,
+    "uniform_random_expected_top1_count": 5.062153413089373,
+    "uniform_random_expected_top3_count": 15.186460239268122,
+    "uniform_random_expected_top5_count": 25.310767065446875,
+    "source_pair_dyad_bootstrap_observed_minus_random_descriptive": {
+      "top1": {
+        "observed": 8,
+        "uniform_random_expected": 5.062153413089373,
+        "observed_minus_expected": 2.937846586910627,
+        "source_pair_clusters": 32,
+        "cluster_bootstrap_ci95_low": -1.7468466816434796,
+        "cluster_bootstrap_ci95_high": 8.099067639257294
+      },
+      "top3": {
+        "observed": 24,
+        "uniform_random_expected": 15.186460239268122,
+        "observed_minus_expected": 8.813539760731878,
+        "source_pair_clusters": 32,
+        "cluster_bootstrap_ci95_low": -3.6068497807611104,
+        "cluster_bootstrap_ci95_high": 23.00702507713959
+      },
+      "top5": {
+        "observed": 41,
+        "uniform_random_expected": 25.310767065446875,
+        "observed_minus_expected": 15.689232934553125,
+        "source_pair_clusters": 32,
+        "cluster_bootstrap_ci95_low": -0.8211876116494377,
+        "cluster_bootstrap_ci95_high": 34.85156173875385
+      }
+    }
+  },
+  "decision": {
+    "overall": "FAIL_CONTRAST_SPECIFIC_INTERACTION_GATE",
+    "descriptive_coarse_association_observed": true,
+    "double_centered_specificity_gate_passed": false,
+    "top1_above_random_dyad_sensitivity_gate_passed": false,
+    "interpretation": "A coarse descriptive association was observed between unresolved WSE responses and the disjoint known-entity response anchor, but the signal does not survive simultaneous removal of query- and candidate-contrast main effects and Top-1 improvement over uniform random is not robust under source-pair dyad resampling."
+  },
+  "claim_boundary": [
+    "This is an entity-disjoint internal development test, not external validation.",
+    "A GNPS library-supported InChIKey is not MSI level-1 identity.",
+    "Known signed agreement is an empirical response anchor, not a biological mechanism.",
+    "The marginal positive results support coarse unresolved response information; they do not establish contrast-specific retrieval or incremental value of Full23.",
+    "The failed specificity gate rejects this current WSE endpoint as an Atlas discovery result, not the master Atlas question.",
+    "Source-pair dyads share studies, so dyad-bootstrap intervals are descriptive rather than independent-source confidence intervals.",
+    "Axis-label permutation is a conditional development null that assumes within-pair contrast-axis exchangeability; it is not a universal biological p-value.",
+    "Cross-parent exclusions follow the current provisional parent-project map."
+  ],
+  "provenance": {
+    "entities": "e03400c9aa62e001ccc0435b3c8c3d93e4c83ec0a275e595a5d645de7df9eebc",
+    "contrasts": "36be9777bc155994a2a47118084126077a1fe4c4517945f69d06df4f6433f726",
+    "library_evidence": "ed0297b43236e7cb6b5be4e6fccc3d19685b3288029cf0bd7c6465af744b6e63",
+    "edges": "7b13af8f76ef385b42d31618fb99cc9e7277a2be5f974cbf25438a37b4de5ef8",
+    "parent_projects": "78780b54eacd79c7a5f60e6b1f74ee91185efe8078a85e1d82f8c1fe8647332d",
+    "implementation": "ff82d903265266fbdd99448dbd96729cb1faff5bac88047fd60b3fe6c76c7142"
+  }
+}
