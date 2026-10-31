@@ -66,6 +66,10 @@ if (( ${#missing[@]} > 0 )); then
   printf 'FULL23_TENSOR_SET_MISSING: %s\n' "${missing[@]}" >&2
   exit 4
 fi
+if [[ "${1:-}" == "--preflight" ]]; then
+  echo "FULL23_TENSOR_SET_PREFLIGHT_PASS"
+  exit 0
+fi
 [[ ! -e "$OUT" ]] || { echo "FULL23_TENSOR_SET_OUTPUT_EXISTS: $OUT" >&2; exit 5; }
 
 python -m py_compile \
