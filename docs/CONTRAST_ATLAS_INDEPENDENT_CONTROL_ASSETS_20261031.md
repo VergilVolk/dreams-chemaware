@@ -10,7 +10,7 @@
 当前最高性价比的下一步不是继续盲目扩大来源，而是冻结两组互补控制：
 
 1. **药物—肠道微生物三干预控制：**Omeprazole 正控、Telmisartan 响应异质性、Sertraline discordant/no-match；
-2. **独立 IBD 条件家族：**成人 IBD 粪便项目与独立 VEO-IBD 粪便项目，在表型盲实体连接后检验实际方向，不把疾病名称当逐实体答案。
+2. **独立母项目但已消耗的 IBD 条件家族：**成人 IBD 粪便项目与 VEO-IBD 粪便项目，在表型盲实体连接后检验实际方向，不把疾病名称当逐实体答案。
 
 这样同时检验“应该找回”“只在部分背景找回”和“不能因名称相同强行找回”三种能力。
 
@@ -62,7 +62,7 @@
 - 成人 IBD：`MSV000084908 / MSV000086509`，同一母项目；粪便 103 CD、60 UC、19 healthy（n=182），Bruker Maxis qTOF、正离子 DDA；[原始论文](https://pmc.ncbi.nlm.nih.gov/articles/PMC9400277/) · [MSV000084908](https://massive.ucsd.edu/ProteoSAFe/dataset.jsp?accession=MSV000084908) · [MSV000086509](https://massive.ucsd.edu/ProteoSAFe/dataset.jsp?accession=MSV000086509)
 - VEO-IBD：`MSV000097610`；粪便 21 VEO-IBD、27 healthy（n=48），Q Exactive、正离子 DDA；[原始论文](https://pmc.ncbi.nlm.nih.gov/articles/PMC12864830/) · [MassIVE](https://massive.ucsd.edu/ProteoSAFe/dataset.jsp?task=65cc240951884d4dadbfe2edf4172e03)
 
-两个项目在参与者、母项目和平台上独立，样本类型均为粪便，适合作为条件家族检索。但成人与儿童的年龄、疾病亚型和治疗不同，因此不能预注册“所有实体必须同向”。
+两个项目在参与者、母项目和平台上独立，样本类型均为粪便，适合作为条件家族检索。但它们已经进入当前 Atlas 开发集合，证据资格均为 `development / consumed`，不能再承担未开封外部确认。成人与儿童的年龄、疾病亚型和治疗也不同，因此不能预注册“所有实体必须同向”。最终确认仍需第三个未参与开发的合格 IBD 项目或 prospective 数据。
 
 正确顺序是：
 
@@ -91,6 +91,6 @@ HFD 当前项目的基质、设计或论文资格不一致；AD 项目缺完整�
 
 论文级闭环应为：
 
-> 模型改变一条合法化学连接 → unresolved 证据改变研究级回答 → 正控/异质性/no-match 控制给出预期行为 → 独立 IBD 或药物项目提供未参与调参的确认。
+> 模型改变一条合法化学连接 → unresolved 证据改变研究级回答 → 正控/异质性/no-match 控制给出预期行为 → 未参与开发的 MTBLS896 / MSV000096589 或未来第三个 IBD/prospective 项目提供确认。
 
 这仍是 Atlas 原始科学问题的实证化，不是新的项目定位。
