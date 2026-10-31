@@ -25,6 +25,10 @@ REUSE_RUN="${ENVEDA_UNIFIED_REUSE_RUN:-data/validation/enveda_unified_candidate_
 FULL23="${FULL23_V1_CHECKPOINT:-data/validation/enveda_no_query_context_diagnostic_run_2413878/modeling/unified_candidate_integrator.pt}"
 FULL23_OOF="${FULL23_V1_OOF:-data/validation/enveda_no_query_context_diagnostic_run_2413878/modeling/candidate_predictions_oof.npz}"
 GNPS="${GNPS_BENCHMARK:-data/validation/gnps_gold_silver_10ppm_benchmark_v1}"
+GNPS_IDENTITY="${GNPS_IDENTITY_PANEL:-$GNPS/panel_identity_disjoint.npz}"
+if [[ ! -s "$GNPS_IDENTITY" ]]; then
+  GNPS_IDENTITY="data/validation/GLM_gnps_identity_panel_reconstruction/panel_identity_disjoint.npz"
+fi
 GNPS_BASE="${GNPS_SCORE_BUNDLE:-data/validation/noise_gnps_article_benchmark_run_2349091/method_scores.npz}"
 GNPS_MSG="${NOISE_MSG_GNPS_CACHE:-data/validation/noise_msg_fusion_run_2349961/gnps_fusion_scores}"
 GNPS_CHEM="${GNPS_CONTINUOUS_CHEM_DIR:-data/validation/wse_conditional_residual_run_2376648/continuous_chem_evidence}"
@@ -48,7 +52,7 @@ required=(
   "$ENVEDA_MSG/report.json" "$ENVEDA_MSG/pair_scores_identity_disjoint.npy" "$ENVEDA_MSG/pair_scores_formula_disjoint.npy"
   "$ENVEDA_CHEM/report.json" "$ENVEDA_CHEM/continuous_chem_identity_disjoint.npz" "$ENVEDA_CHEM/continuous_chem_formula_disjoint.npz"
   "$FULL23" "$FULL23_OOF" "$(dirname "$FULL23_OOF")/report.json"
-  "$GNPS/manifest.csv.gz" "$GNPS/panel_identity_disjoint.npz" "$GNPS/panel_formula_disjoint.npz"
+  "$GNPS/manifest.csv.gz" "$GNPS_IDENTITY" "$GNPS/panel_formula_disjoint.npz"
   "$GNPS_BASE" "$GNPS_MSG/report.json" "$GNPS_MSG/pair_scores_identity_disjoint.npy" "$GNPS_MSG/pair_scores_formula_disjoint.npy"
   "$GNPS_NOISE" "$GNPS_STAGE1" "$GNPS_PHASEA" "$GNPS_FULLMSG"
   "$GNPS_CHEM/report.json" "$GNPS_CHEM/continuous_chem_identity_disjoint.npz" "$GNPS_CHEM/continuous_chem_formula_disjoint.npz"
@@ -79,8 +83,17 @@ python -u tasks/train_full23_tensor_set_readout.py \
   --full23-checkpoint "$FULL23" --full23-oof "$FULL23_OOF" \
   --output "$OUT/modeling" --device cuda
 
+# The historical identity panel may live in its reconstruction directory,
+# while the evaluator expects both panels beside the shared manifest.  Build a
+# read-only view without copying or changing any benchmark artifact.
+GNPS_VIEW="$OUT/gnps_benchmark_view"
+mkdir -p "$GNPS_VIEW"
+ln -s "$(readlink -f "$GNPS/manifest.csv.gz")" "$GNPS_VIEW/manifest.csv.gz"
+ln -s "$(readlink -f "$GNPS_IDENTITY")" "$GNPS_VIEW/panel_identity_disjoint.npz"
+ln -s "$(readlink -f "$GNPS/panel_formula_disjoint.npz")" "$GNPS_VIEW/panel_formula_disjoint.npz"
+
 python -u tasks/evaluate_full23_tensor_set_on_gnps.py \
-  --benchmark "$GNPS" --score-bundle "$GNPS_BASE" --msg-cache "$GNPS_MSG" \
+  --benchmark "$GNPS_VIEW" --score-bundle "$GNPS_BASE" --msg-cache "$GNPS_MSG" \
   --noise-embeddings "$GNPS_NOISE" --stage1-embeddings "$GNPS_STAGE1" \
   --phasea-embeddings "$GNPS_PHASEA" --fullmsg-embeddings "$GNPS_FULLMSG" \
   --chem-dir "$GNPS_CHEM" --full23-checkpoint "$FULL23" \
