@@ -1,0 +1,526 @@
+{
+  "schema": "contrast_atlas_signed_specificity_retrieval_v1",
+  "status": "DEVELOPMENT_CONSUMED_SIGNED_SPECIFICITY_RETRIEVAL_COMPLETE",
+  "data_role": "development_consumed",
+  "method": {
+    "signed_cosine": "sum(similarity * query_weight * candidate_weight) divided by matched endpoint response energy",
+    "candidate_source_centering": "subtract the query-specific mean score across all contrasts in the candidate study; unavailable for single-contrast candidate studies",
+    "source_pair_double_centering": "subtract both source-pair contrast main effects and retain only the contrast-by-contrast interaction; unavailable unless both sources have at least two contrasts",
+    "entity_profile_residualisation": "subtract each entity's mean response across all contrasts in its study before signed-cosine scoring; unavailable unless both sources have at least two contrasts",
+    "response_weight": "beta / sqrt(beta^2 + SE^2)",
+    "dual_fdr_arm": "signed cosine restricted to edges whose two endpoints each have within-contrast normal-approximation BH q <= 0.05; conservative development sensitivity analysis",
+    "null": "whole multi-contrast response profiles reassigned only among the actual source-pair graph endpoints within identity and fixed 100-Da precursor strata",
+    "null_mode": "edge_endpoints_identity_mz100",
+    "open_calibration": "single two-sided query-level max-abs-T across the complete parent-project-disjoint candidate universe",
+    "candidate_universe": "parent_project_disjoint",
+    "registered_truth_timing": "registered relations opened only after signed_response_candidate_scores.tsv.gz was written and hashed"
+  },
+  "denominators": {
+    "study_source_ids": 16,
+    "study_level_contrasts": 53,
+    "response_rows": 238863,
+    "world_specific_edge_rows": 68586,
+    "directed_score_rows": 32220,
+    "permutations": 999,
+    "parent_project_map_sha256": "78780b54eacd79c7a5f60e6b1f74ee91185efe8078a85e1d82f8c1fe8647332d",
+    "parent_project_families": 14
+  },
+  "open_query_calls": [
+    {
+      "evidence_world": "all",
+      "response_method": "candidate_source_centered_signed_cosine",
+      "result_class": "no_calibrated_match",
+      "queries": 49
+    },
+    {
+      "evidence_world": "all",
+      "response_method": "candidate_source_centered_signed_cosine",
+      "result_class": "opposite_response",
+      "queries": 2
+    },
+    {
+      "evidence_world": "all",
+      "response_method": "candidate_source_centered_signed_cosine",
+      "result_class": "similar_response",
+      "queries": 2
+    },
+    {
+      "evidence_world": "all",
+      "response_method": "dual_fdr_signed_cosine",
+      "result_class": "abstain_insufficient_evidence",
+      "queries": 22
+    },
+    {
+      "evidence_world": "all",
+      "response_method": "dual_fdr_signed_cosine",
+      "result_class": "abstain_no_contrast_specific_candidate",
+      "queries": 5
+    },
+    {
+      "evidence_world": "all",
+      "response_method": "dual_fdr_signed_cosine",
+      "result_class": "no_calibrated_match",
+      "queries": 24
+    },
+    {
+      "evidence_world": "all",
+      "response_method": "dual_fdr_signed_cosine",
+      "result_class": "opposite_response",
+      "queries": 1
+    },
+    {
+      "evidence_world": "all",
+      "response_method": "dual_fdr_signed_cosine",
+      "result_class": "similar_response",
+      "queries": 1
+    },
+    {
+      "evidence_world": "all",
+      "response_method": "entity_profile_residual_signed_cosine",
+      "result_class": "abstain_no_contrast_specific_candidate",
+      "queries": 6
+    },
+    {
+      "evidence_world": "all",
+      "response_method": "entity_profile_residual_signed_cosine",
+      "result_class": "no_calibrated_match",
+      "queries": 46
+    },
+    {
+      "evidence_world": "all",
+      "response_method": "entity_profile_residual_signed_cosine",
+      "result_class": "similar_response",
+      "queries": 1
+    },
+    {
+      "evidence_world": "all",
+      "response_method": "signed_cosine",
+      "result_class": "no_calibrated_match",
+      "queries": 50
+    },
+    {
+      "evidence_world": "all",
+      "response_method": "signed_cosine",
+      "result_class": "similar_response",
+      "queries": 3
+    },
+    {
+      "evidence_world": "all",
+      "response_method": "source_pair_double_centered_signed_cosine",
+      "result_class": "abstain_no_contrast_specific_candidate",
+      "queries": 6
+    },
+    {
+      "evidence_world": "all",
+      "response_method": "source_pair_double_centered_signed_cosine",
+      "result_class": "no_calibrated_match",
+      "queries": 43
+    },
+    {
+      "evidence_world": "all",
+      "response_method": "source_pair_double_centered_signed_cosine",
+      "result_class": "opposite_response",
+      "queries": 2
+    },
+    {
+      "evidence_world": "all",
+      "response_method": "source_pair_double_centered_signed_cosine",
+      "result_class": "similar_response",
+      "queries": 2
+    },
+    {
+      "evidence_world": "known",
+      "response_method": "candidate_source_centered_signed_cosine",
+      "result_class": "abstain_insufficient_evidence",
+      "queries": 30
+    },
+    {
+      "evidence_world": "known",
+      "response_method": "candidate_source_centered_signed_cosine",
+      "result_class": "abstain_no_contrast_specific_candidate",
+      "queries": 2
+    },
+    {
+      "evidence_world": "known",
+      "response_method": "candidate_source_centered_signed_cosine",
+      "result_class": "no_calibrated_match",
+      "queries": 16
+    },
+    {
+      "evidence_world": "known",
+      "response_method": "candidate_source_centered_signed_cosine",
+      "result_class": "opposite_response",
+      "queries": 4
+    },
+    {
+      "evidence_world": "known",
+      "response_method": "candidate_source_centered_signed_cosine",
+      "result_class": "similar_response",
+      "queries": 1
+    },
+    {
+      "evidence_world": "known",
+      "response_method": "dual_fdr_signed_cosine",
+      "result_class": "abstain_insufficient_evidence",
+      "queries": 40
+    },
+    {
+      "evidence_world": "known",
+      "response_method": "dual_fdr_signed_cosine",
+      "result_class": "abstain_no_contrast_specific_candidate",
+      "queries": 11
+    },
+    {
+      "evidence_world": "known",
+      "response_method": "dual_fdr_signed_cosine",
+      "result_class": "no_calibrated_match",
+      "queries": 2
+    },
+    {
+      "evidence_world": "known",
+      "response_method": "entity_profile_residual_signed_cosine",
+      "result_class": "abstain_insufficient_evidence",
+      "queries": 30
+    },
+    {
+      "evidence_world": "known",
+      "response_method": "entity_profile_residual_signed_cosine",
+      "result_class": "abstain_no_contrast_specific_candidate",
+      "queries": 8
+    },
+    {
+      "evidence_world": "known",
+      "response_method": "entity_profile_residual_signed_cosine",
+      "result_class": "no_calibrated_match",
+      "queries": 14
+    },
+    {
+      "evidence_world": "known",
+      "response_method": "entity_profile_residual_signed_cosine",
+      "result_class": "similar_response",
+      "queries": 1
+    },
+    {
+      "evidence_world": "known",
+      "response_method": "signed_cosine",
+      "result_class": "abstain_insufficient_evidence",
+      "queries": 35
+    },
+    {
+      "evidence_world": "known",
+      "response_method": "signed_cosine",
+      "result_class": "abstain_no_contrast_specific_candidate",
+      "queries": 2
+    },
+    {
+      "evidence_world": "known",
+      "response_method": "signed_cosine",
+      "result_class": "no_calibrated_match",
+      "queries": 16
+    },
+    {
+      "evidence_world": "known",
+      "response_method": "source_pair_double_centered_signed_cosine",
+      "result_class": "abstain_insufficient_evidence",
+      "queries": 15
+    },
+    {
+      "evidence_world": "known",
+      "response_method": "source_pair_double_centered_signed_cosine",
+      "result_class": "abstain_no_contrast_specific_candidate",
+      "queries": 8
+    },
+    {
+      "evidence_world": "known",
+      "response_method": "source_pair_double_centered_signed_cosine",
+      "result_class": "no_calibrated_match",
+      "queries": 25
+    },
+    {
+      "evidence_world": "known",
+      "response_method": "source_pair_double_centered_signed_cosine",
+      "result_class": "opposite_response",
+      "queries": 3
+    },
+    {
+      "evidence_world": "known",
+      "response_method": "source_pair_double_centered_signed_cosine",
+      "result_class": "similar_response",
+      "queries": 2
+    },
+    {
+      "evidence_world": "unresolved",
+      "response_method": "candidate_source_centered_signed_cosine",
+      "result_class": "no_calibrated_match",
+      "queries": 43
+    },
+    {
+      "evidence_world": "unresolved",
+      "response_method": "candidate_source_centered_signed_cosine",
+      "result_class": "opposite_response",
+      "queries": 3
+    },
+    {
+      "evidence_world": "unresolved",
+      "response_method": "candidate_source_centered_signed_cosine",
+      "result_class": "similar_response",
+      "queries": 7
+    },
+    {
+      "evidence_world": "unresolved",
+      "response_method": "dual_fdr_signed_cosine",
+      "result_class": "abstain_insufficient_evidence",
+      "queries": 26
+    },
+    {
+      "evidence_world": "unresolved",
+      "response_method": "dual_fdr_signed_cosine",
+      "result_class": "abstain_no_contrast_specific_candidate",
+      "queries": 5
+    },
+    {
+      "evidence_world": "unresolved",
+      "response_method": "dual_fdr_signed_cosine",
+      "result_class": "no_calibrated_match",
+      "queries": 21
+    },
+    {
+      "evidence_world": "unresolved",
+      "response_method": "dual_fdr_signed_cosine",
+      "result_class": "opposite_response",
+      "queries": 1
+    },
+    {
+      "evidence_world": "unresolved",
+      "response_method": "entity_profile_residual_signed_cosine",
+      "result_class": "abstain_no_contrast_specific_candidate",
+      "queries": 6
+    },
+    {
+      "evidence_world": "unresolved",
+      "response_method": "entity_profile_residual_signed_cosine",
+      "result_class": "no_calibrated_match",
+      "queries": 46
+    },
+    {
+      "evidence_world": "unresolved",
+      "response_method": "entity_profile_residual_signed_cosine",
+      "result_class": "similar_response",
+      "queries": 1
+    },
+    {
+      "evidence_world": "unresolved",
+      "response_method": "signed_cosine",
+      "result_class": "no_calibrated_match",
+      "queries": 50
+    },
+    {
+      "evidence_world": "unresolved",
+      "response_method": "signed_cosine",
+      "result_class": "opposite_response",
+      "queries": 2
+    },
+    {
+      "evidence_world": "unresolved",
+      "response_method": "signed_cosine",
+      "result_class": "similar_response",
+      "queries": 1
+    },
+    {
+      "evidence_world": "unresolved",
+      "response_method": "source_pair_double_centered_signed_cosine",
+      "result_class": "abstain_no_contrast_specific_candidate",
+      "queries": 6
+    },
+    {
+      "evidence_world": "unresolved",
+      "response_method": "source_pair_double_centered_signed_cosine",
+      "result_class": "no_calibrated_match",
+      "queries": 42
+    },
+    {
+      "evidence_world": "unresolved",
+      "response_method": "source_pair_double_centered_signed_cosine",
+      "result_class": "opposite_response",
+      "queries": 2
+    },
+    {
+      "evidence_world": "unresolved",
+      "response_method": "source_pair_double_centered_signed_cosine",
+      "result_class": "similar_response",
+      "queries": 3
+    }
+  ],
+  "registered_relation_summary": [
+    {
+      "evidence_world": "all",
+      "response_method": "candidate_source_centered_signed_cosine",
+      "eligible_primary_relations": 10,
+      "evaluable_relations": 2,
+      "top1": 1,
+      "top5": 1,
+      "median_rank": 9.0,
+      "query_maxT_005": 0
+    },
+    {
+      "evidence_world": "all",
+      "response_method": "dual_fdr_signed_cosine",
+      "eligible_primary_relations": 10,
+      "evaluable_relations": 6,
+      "top1": 1,
+      "top5": 3,
+      "median_rank": 9.5,
+      "query_maxT_005": 0
+    },
+    {
+      "evidence_world": "all",
+      "response_method": "entity_profile_residual_signed_cosine",
+      "eligible_primary_relations": 10,
+      "evaluable_relations": 0,
+      "top1": 0,
+      "top5": 0,
+      "median_rank": null,
+      "query_maxT_005": 0
+    },
+    {
+      "evidence_world": "all",
+      "response_method": "signed_cosine",
+      "eligible_primary_relations": 10,
+      "evaluable_relations": 10,
+      "top1": 0,
+      "top5": 3,
+      "median_rank": 11.0,
+      "query_maxT_005": 0
+    },
+    {
+      "evidence_world": "all",
+      "response_method": "source_pair_double_centered_signed_cosine",
+      "eligible_primary_relations": 10,
+      "evaluable_relations": 0,
+      "top1": 0,
+      "top5": 0,
+      "median_rank": null,
+      "query_maxT_005": 0
+    },
+    {
+      "evidence_world": "known",
+      "response_method": "candidate_source_centered_signed_cosine",
+      "eligible_primary_relations": 10,
+      "evaluable_relations": 0,
+      "top1": 0,
+      "top5": 0,
+      "median_rank": null,
+      "query_maxT_005": 0
+    },
+    {
+      "evidence_world": "known",
+      "response_method": "dual_fdr_signed_cosine",
+      "eligible_primary_relations": 10,
+      "evaluable_relations": 0,
+      "top1": 0,
+      "top5": 0,
+      "median_rank": null,
+      "query_maxT_005": 0
+    },
+    {
+      "evidence_world": "known",
+      "response_method": "entity_profile_residual_signed_cosine",
+      "eligible_primary_relations": 10,
+      "evaluable_relations": 0,
+      "top1": 0,
+      "top5": 0,
+      "median_rank": null,
+      "query_maxT_005": 0
+    },
+    {
+      "evidence_world": "known",
+      "response_method": "signed_cosine",
+      "eligible_primary_relations": 10,
+      "evaluable_relations": 6,
+      "top1": 1,
+      "top5": 2,
+      "median_rank": 10.0,
+      "query_maxT_005": 0
+    },
+    {
+      "evidence_world": "known",
+      "response_method": "source_pair_double_centered_signed_cosine",
+      "eligible_primary_relations": 10,
+      "evaluable_relations": 0,
+      "top1": 0,
+      "top5": 0,
+      "median_rank": null,
+      "query_maxT_005": 0
+    },
+    {
+      "evidence_world": "unresolved",
+      "response_method": "candidate_source_centered_signed_cosine",
+      "eligible_primary_relations": 10,
+      "evaluable_relations": 2,
+      "top1": 1,
+      "top5": 1,
+      "median_rank": 16.0,
+      "query_maxT_005": 0
+    },
+    {
+      "evidence_world": "unresolved",
+      "response_method": "dual_fdr_signed_cosine",
+      "eligible_primary_relations": 10,
+      "evaluable_relations": 6,
+      "top1": 0,
+      "top5": 3,
+      "median_rank": 8.0,
+      "query_maxT_005": 0
+    },
+    {
+      "evidence_world": "unresolved",
+      "response_method": "entity_profile_residual_signed_cosine",
+      "eligible_primary_relations": 10,
+      "evaluable_relations": 0,
+      "top1": 0,
+      "top5": 0,
+      "median_rank": null,
+      "query_maxT_005": 0
+    },
+    {
+      "evidence_world": "unresolved",
+      "response_method": "signed_cosine",
+      "eligible_primary_relations": 10,
+      "evaluable_relations": 10,
+      "top1": 0,
+      "top5": 2,
+      "median_rank": 13.5,
+      "query_maxT_005": 0
+    },
+    {
+      "evidence_world": "unresolved",
+      "response_method": "source_pair_double_centered_signed_cosine",
+      "eligible_primary_relations": 10,
+      "evaluable_relations": 0,
+      "top1": 0,
+      "top5": 0,
+      "median_rank": null,
+      "query_maxT_005": 0
+    }
+  ],
+  "claim_boundary": [
+    "All sources and contrasts are development/consumed; this is not sealed external validation.",
+    "A max-T call rejects only the implemented entity-profile reassignment null; it does not establish a biological mechanism.",
+    "Candidate-source centering measures contrast specificity relative to other contrasts in that source and abstains when that comparison is impossible.",
+    "Known and unresolved worlds must be interpreted separately; this run cannot establish an unresolved-information increment without a matched comparison.",
+    "The edge handoff uses WSE; this run does not test Full23 or BioAware."
+  ],
+  "provenance": {
+    "response_entities_sha256": "e03400c9aa62e001ccc0435b3c8c3d93e4c83ec0a275e595a5d645de7df9eebc",
+    "contrast_manifest_sha256": "36be9777bc155994a2a47118084126077a1fe4c4517945f69d06df4f6433f726",
+    "identity_partition_sha256": "333cab5f4732d3c8864d0bb108478e2ede426e925015c0ce1f4045854755f2cd",
+    "edge_handoff_sha256": "302679f25ac8bbf94c8914a3f446483a598e8bd9a05bc3f17b2936ef5a8a3e9c",
+    "parent_project_map_sha256": "78780b54eacd79c7a5f60e6b1f74ee91185efe8078a85e1d82f8c1fe8647332d",
+    "score_sha256_before_registered_relations": "8f01670545f3c6a1e96745c251b17e274092bf91f4390525e4d2f19c9d85a1c6",
+    "outputs_sha256": {
+      "signed_response_candidate_scores.tsv.gz": "8f01670545f3c6a1e96745c251b17e274092bf91f4390525e4d2f19c9d85a1c6",
+      "signed_response_top_hits.tsv": "8e355d4091ea92fbdaf094560a490933b2c2db830f24f015e183262014b45b73",
+      "registered_relation_ranks.tsv": "cb3e56797200841b2f03cd8325a7a71ce6821050533ddf4460d5dc83034e5ef0"
+    }
+  }
+}

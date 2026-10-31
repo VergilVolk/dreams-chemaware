@@ -1,0 +1,6 @@
+response_method	queries	development_calls	eligible_cross_parent_registered_directions	evaluable_registered_directions	registered_top1	registered_top5	registered_query_maxT_005	registered_relevance_top1_and_calibrated
+candidate_source_centered_signed_cosine	53	4	10	2	1	1	0	0
+dual_fdr_signed_cosine	53	2	10	4	1	2	0	0
+entity_profile_residual_signed_cosine	53	1	10	0	0	0	0	0
+signed_cosine	53	3	10	10	0	3	0	0
+source_pair_double_centered_signed_cosine	53	4	10	0	0	0	0	0

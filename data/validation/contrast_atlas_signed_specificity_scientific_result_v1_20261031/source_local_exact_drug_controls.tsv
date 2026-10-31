@@ -1,0 +1,6 @@
+response_method	registered_directions	evaluable_directions	top1	top3	median_rank	mrr	uniform_random_expected_top1	uniform_random_expected_top3	uniform_random_expected_mrr	query_maxT_005
+candidate_source_centered_signed_cosine	24	24	2	10	4.0	0.3105339105339105	3.0	9.0	0.323563011063011	2
+dual_fdr_signed_cosine	24	24	5	8	5.0	0.3694279100529101	3.0	9.0	0.323563011063011	2
+entity_profile_residual_signed_cosine	24	24	5	11	4.0	0.39155242905242904	3.0	9.0	0.323563011063011	7
+signed_cosine	24	24	4	13	3.0	0.4028484247234247	3.0	9.0	0.323563011063011	7
+source_pair_double_centered_signed_cosine	24	24	2	9	4.0	0.3111441798941799	3.0	9.0	0.323563011063011	2

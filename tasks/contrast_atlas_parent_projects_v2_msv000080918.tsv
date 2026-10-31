@@ -1,0 +1,17 @@
+study_id	parent_project_id	mapping_evidence	data_role
+MSV000097426	MSV000097426	separate accession in frozen collection	development_consumed
+MSV000084112	MSV000084112	separate accession in frozen collection	development_consumed
+MSV000083077	MSV000083077	separate accession in frozen collection	development_consumed
+MSV000088023	MSV000088023	separate accession in frozen collection	development_consumed
+MSV000090788	MSV000090788	separate accession in frozen collection	development_consumed
+MSV000097610	MSV000097610	separate accession in frozen collection	development_consumed
+IBD200_GROUP	IBD200_GROUP	pre-existing multi-accession study group already treated as one source	development_consumed
+MSV000090804	MSV000090804	separate accession in frozen collection	development_consumed
+MSV000086360	MSV000086360	separate accession in frozen collection	development_consumed
+MSV000084794	MSV000084794	separate accession in frozen collection	development_consumed
+MSV000096564	MSV000096564	separate accession in frozen collection	development_consumed
+MSV000092887	MSV000092887	separate accession in frozen collection	development_consumed
+MSV000094899	CHEMPROP_SHARED_PARENT_PROJECT	ChemProp shared parent project	development_consumed
+MSV000096724	CHEMPROP_SHARED_PARENT_PROJECT	ChemProp shared parent project	development_consumed
+MSV000093571	CHEMPROP_SHARED_PARENT_PROJECT	ChemProp shared parent project	development_consumed
+MSV000080918	MSV000080918_MSV000080558	Shalapour multi-accession parent study	development_consumed

@@ -1,0 +1,372 @@
+{
+  "schema": "contrast_atlas_signed_specificity_scientific_summary_v1",
+  "status": "CURRENT_WSE_RESPONSE_ENDPOINT_NOT_QUALIFIED_ON_CONSUMED_CONTROLS",
+  "data_role": "development_consumed",
+  "decision": {
+    "response_specificity": "not_qualified_on_available_development_controls",
+    "cross_parent_registered_answer": "none_passed_registered_relevance_and_calibration_gate",
+    "unresolved_increment": "not_established_no_opportunity_matched_control",
+    "full23_increment": "not_tested_wse_edges_only",
+    "biological_discovery": "not_established"
+  },
+  "source_disjoint": [
+    {
+      "response_method": "candidate_source_centered_signed_cosine",
+      "queries": 53,
+      "development_calls": 23,
+      "registered_query_count": 30,
+      "registered_target_top1": 2,
+      "called_registered_target": 0,
+      "called_nonregistered_target_for_registered_query": 21,
+      "calls_for_queries_without_registered_control": 2,
+      "registered_target_removal_queries": 30,
+      "post_registered_target_removal_calls": 21
+    },
+    {
+      "response_method": "dual_fdr_signed_cosine",
+      "queries": 53,
+      "development_calls": 8,
+      "registered_query_count": 30,
+      "registered_target_top1": 3,
+      "called_registered_target": 2,
+      "called_nonregistered_target_for_registered_query": 4,
+      "calls_for_queries_without_registered_control": 2,
+      "registered_target_removal_queries": 30,
+      "post_registered_target_removal_calls": 6
+    },
+    {
+      "response_method": "entity_profile_residual_signed_cosine",
+      "queries": 53,
+      "development_calls": 15,
+      "registered_query_count": 30,
+      "registered_target_top1": 3,
+      "called_registered_target": 1,
+      "called_nonregistered_target_for_registered_query": 13,
+      "calls_for_queries_without_registered_control": 1,
+      "registered_target_removal_queries": 30,
+      "post_registered_target_removal_calls": 13
+    },
+    {
+      "response_method": "signed_cosine",
+      "queries": 53,
+      "development_calls": 18,
+      "registered_query_count": 30,
+      "registered_target_top1": 4,
+      "called_registered_target": 4,
+      "called_nonregistered_target_for_registered_query": 12,
+      "calls_for_queries_without_registered_control": 2,
+      "registered_target_removal_queries": 30,
+      "post_registered_target_removal_calls": 16
+    },
+    {
+      "response_method": "source_pair_double_centered_signed_cosine",
+      "queries": 53,
+      "development_calls": 19,
+      "registered_query_count": 30,
+      "registered_target_top1": 1,
+      "called_registered_target": 1,
+      "called_nonregistered_target_for_registered_query": 16,
+      "calls_for_queries_without_registered_control": 2,
+      "registered_target_removal_queries": 30,
+      "post_registered_target_removal_calls": 17
+    }
+  ],
+  "source_local_exact_drug_control": [
+    {
+      "response_method": "candidate_source_centered_signed_cosine",
+      "registered_directions": 24,
+      "evaluable_directions": 24,
+      "top1": 2,
+      "top3": 10,
+      "median_rank": 4.0,
+      "mrr": 0.3105339105339105,
+      "uniform_random_expected_top1": 3.0,
+      "uniform_random_expected_top3": 9.0,
+      "uniform_random_expected_mrr": 0.323563011063011,
+      "query_maxT_005": 2
+    },
+    {
+      "response_method": "dual_fdr_signed_cosine",
+      "registered_directions": 24,
+      "evaluable_directions": 24,
+      "top1": 5,
+      "top3": 8,
+      "median_rank": 5.0,
+      "mrr": 0.3694279100529101,
+      "uniform_random_expected_top1": 3.0,
+      "uniform_random_expected_top3": 9.0,
+      "uniform_random_expected_mrr": 0.323563011063011,
+      "query_maxT_005": 2
+    },
+    {
+      "response_method": "entity_profile_residual_signed_cosine",
+      "registered_directions": 24,
+      "evaluable_directions": 24,
+      "top1": 5,
+      "top3": 11,
+      "median_rank": 4.0,
+      "mrr": 0.39155242905242904,
+      "uniform_random_expected_top1": 3.0,
+      "uniform_random_expected_top3": 9.0,
+      "uniform_random_expected_mrr": 0.323563011063011,
+      "query_maxT_005": 7
+    },
+    {
+      "response_method": "signed_cosine",
+      "registered_directions": 24,
+      "evaluable_directions": 24,
+      "top1": 4,
+      "top3": 13,
+      "median_rank": 3.0,
+      "mrr": 0.4028484247234247,
+      "uniform_random_expected_top1": 3.0,
+      "uniform_random_expected_top3": 9.0,
+      "uniform_random_expected_mrr": 0.323563011063011,
+      "query_maxT_005": 7
+    },
+    {
+      "response_method": "source_pair_double_centered_signed_cosine",
+      "registered_directions": 24,
+      "evaluable_directions": 24,
+      "top1": 2,
+      "top3": 9,
+      "median_rank": 4.0,
+      "mrr": 0.3111441798941799,
+      "uniform_random_expected_top1": 3.0,
+      "uniform_random_expected_top3": 9.0,
+      "uniform_random_expected_mrr": 0.323563011063011,
+      "query_maxT_005": 2
+    }
+  ],
+  "parent_project_disjoint": [
+    {
+      "response_method": "candidate_source_centered_signed_cosine",
+      "queries": 53,
+      "development_calls": 4,
+      "eligible_cross_parent_registered_directions": 10,
+      "evaluable_registered_directions": 2,
+      "registered_top1": 1,
+      "registered_top5": 1,
+      "registered_query_maxT_005": 0,
+      "registered_relevance_top1_and_calibrated": 0
+    },
+    {
+      "response_method": "dual_fdr_signed_cosine",
+      "queries": 53,
+      "development_calls": 2,
+      "eligible_cross_parent_registered_directions": 10,
+      "evaluable_registered_directions": 4,
+      "registered_top1": 1,
+      "registered_top5": 2,
+      "registered_query_maxT_005": 0,
+      "registered_relevance_top1_and_calibrated": 0
+    },
+    {
+      "response_method": "entity_profile_residual_signed_cosine",
+      "queries": 53,
+      "development_calls": 1,
+      "eligible_cross_parent_registered_directions": 10,
+      "evaluable_registered_directions": 0,
+      "registered_top1": 0,
+      "registered_top5": 0,
+      "registered_query_maxT_005": 0,
+      "registered_relevance_top1_and_calibrated": 0
+    },
+    {
+      "response_method": "signed_cosine",
+      "queries": 53,
+      "development_calls": 3,
+      "eligible_cross_parent_registered_directions": 10,
+      "evaluable_registered_directions": 10,
+      "registered_top1": 0,
+      "registered_top5": 3,
+      "registered_query_maxT_005": 0,
+      "registered_relevance_top1_and_calibrated": 0
+    },
+    {
+      "response_method": "source_pair_double_centered_signed_cosine",
+      "queries": 53,
+      "development_calls": 4,
+      "eligible_cross_parent_registered_directions": 10,
+      "evaluable_registered_directions": 0,
+      "registered_top1": 0,
+      "registered_top5": 0,
+      "registered_query_maxT_005": 0,
+      "registered_relevance_top1_and_calibrated": 0
+    }
+  ],
+  "parent_project_disjoint_calls": [
+    {
+      "query_study_id": "MSV000083077",
+      "query_contrast_id": "depression_nonobese",
+      "response_method": "signed_cosine",
+      "candidate_study_id": "MSV000080918",
+      "candidate_contrast_id": "mup_hfd_10_11m_iga_ko_vs_intact_date_matched",
+      "response_face": "similar",
+      "signed_score": 0.5307065230765848,
+      "query_max_absT_p": 0.05,
+      "response_overlap_edges": 36
+    },
+    {
+      "query_study_id": "MSV000083077",
+      "query_contrast_id": "obesity_low_depression",
+      "response_method": "signed_cosine",
+      "candidate_study_id": "MSV000080918",
+      "candidate_contrast_id": "mup_hfd_10_11m_iga_ko_vs_intact_date_matched",
+      "response_face": "similar",
+      "signed_score": 0.560613707849598,
+      "query_max_absT_p": 0.025,
+      "response_overlap_edges": 36
+    },
+    {
+      "query_study_id": "MSV000090788",
+      "query_contrast_id": "lesion_vs_nonlesion_paired",
+      "response_method": "dual_fdr_signed_cosine",
+      "candidate_study_id": "MSV000080918",
+      "candidate_contrast_id": "mup_hfd_10_11m_iga_ko_vs_intact_date_matched",
+      "response_face": "similar",
+      "signed_score": 0.6013243161806842,
+      "query_max_absT_p": 0.042,
+      "response_overlap_edges": 3
+    },
+    {
+      "query_study_id": "MSV000090788",
+      "query_contrast_id": "lesion_vs_nonlesion_paired",
+      "response_method": "source_pair_double_centered_signed_cosine",
+      "candidate_study_id": "MSV000086360",
+      "candidate_contrast_id": "bsubtilis_3610_vs_control_root",
+      "response_face": "similar",
+      "signed_score": 0.3792175582853486,
+      "query_max_absT_p": 0.039,
+      "response_overlap_edges": 164
+    },
+    {
+      "query_study_id": "MSV000090804",
+      "query_contrast_id": "lanthanide_limited_vs_replete_wt",
+      "response_method": "candidate_source_centered_signed_cosine",
+      "candidate_study_id": "MSV000093571",
+      "candidate_contrast_id": "drug_sertraline",
+      "response_face": "opposite",
+      "signed_score": -0.4882615862395001,
+      "query_max_absT_p": 0.007,
+      "response_overlap_edges": 310
+    },
+    {
+      "query_study_id": "MSV000090804",
+      "query_contrast_id": "lanthanide_limited_vs_replete_wt",
+      "response_method": "entity_profile_residual_signed_cosine",
+      "candidate_study_id": "MSV000093571",
+      "candidate_contrast_id": "drug_loratadine",
+      "response_face": "similar",
+      "signed_score": 0.4563338251278389,
+      "query_max_absT_p": 0.049,
+      "response_overlap_edges": 310
+    },
+    {
+      "query_study_id": "MSV000090804",
+      "query_contrast_id": "lanthanide_limited_vs_replete_wt",
+      "response_method": "source_pair_double_centered_signed_cosine",
+      "candidate_study_id": "MSV000093571",
+      "candidate_contrast_id": "drug_sertraline",
+      "response_face": "opposite",
+      "signed_score": -0.272391209674127,
+      "query_max_absT_p": 0.023,
+      "response_overlap_edges": 310
+    },
+    {
+      "query_study_id": "MSV000092887",
+      "query_contrast_id": "covid_vs_age_sex_matched_control_abundance",
+      "response_method": "candidate_source_centered_signed_cosine",
+      "candidate_study_id": "MSV000088023",
+      "candidate_contrast_id": "female_vs_male_hfd",
+      "response_face": "opposite",
+      "signed_score": -0.4117234887466946,
+      "query_max_absT_p": 0.019,
+      "response_overlap_edges": 35
+    },
+    {
+      "query_study_id": "MSV000092887",
+      "query_contrast_id": "covid_vs_age_sex_matched_control_abundance",
+      "response_method": "dual_fdr_signed_cosine",
+      "candidate_study_id": "MSV000086360",
+      "candidate_contrast_id": "bsubtilis_3610_vs_control_stem",
+      "response_face": "opposite",
+      "signed_score": -0.4910557925580443,
+      "query_max_absT_p": 0.01,
+      "response_overlap_edges": 16
+    },
+    {
+      "query_study_id": "MSV000093571",
+      "query_contrast_id": "drug_loratadine",
+      "response_method": "source_pair_double_centered_signed_cosine",
+      "candidate_study_id": "MSV000090804",
+      "candidate_contrast_id": "lanthanophore_cluster_ko_vs_wt",
+      "response_face": "opposite",
+      "signed_score": -0.4280686402603939,
+      "query_max_absT_p": 0.005,
+      "response_overlap_edges": 314
+    },
+    {
+      "query_study_id": "MSV000093571",
+      "query_contrast_id": "drug_simvastatin",
+      "response_method": "candidate_source_centered_signed_cosine",
+      "candidate_study_id": "MSV000090804",
+      "candidate_contrast_id": "lanthanophore_cluster_ko_vs_wt",
+      "response_face": "similar",
+      "signed_score": 0.3913331730328996,
+      "query_max_absT_p": 0.041,
+      "response_overlap_edges": 314
+    },
+    {
+      "query_study_id": "MSV000096564",
+      "query_contrast_id": "baseline_ibd_vs_control",
+      "response_method": "candidate_source_centered_signed_cosine",
+      "candidate_study_id": "MSV000088023",
+      "candidate_contrast_id": "female_vs_male_hfd",
+      "response_face": "similar",
+      "signed_score": 0.3943662824605914,
+      "query_max_absT_p": 0.033,
+      "response_overlap_edges": 43
+    },
+    {
+      "query_study_id": "MSV000096724",
+      "query_contrast_id": "drug_cilnidipine",
+      "response_method": "source_pair_double_centered_signed_cosine",
+      "candidate_study_id": "MSV000088023",
+      "candidate_contrast_id": "female_vs_male_hfd",
+      "response_face": "similar",
+      "signed_score": 0.4194553915329972,
+      "query_max_absT_p": 0.042,
+      "response_overlap_edges": 25
+    },
+    {
+      "query_study_id": "MSV000097610",
+      "query_contrast_id": "pediatric_veoibd_vs_healthy",
+      "response_method": "signed_cosine",
+      "candidate_study_id": "MSV000088023",
+      "candidate_contrast_id": "male_hfd_vs_normal",
+      "response_face": "similar",
+      "signed_score": 0.5724370289102652,
+      "query_max_absT_p": 0.01,
+      "response_overlap_edges": 30
+    }
+  ],
+  "claim_boundary": [
+    "All studies, response contrasts, and registered relations are development/consumed.",
+    "Exact-drug relations are internal controls from one ChemProp parent project, not cross-project validation.",
+    "HFD and IBD registrations establish relevance families, not signed entity-level biological truth.",
+    "A post-registered-target-removal call is failure to abstain in a stress test, not a proven false biological relation.",
+    "The parent-project grouping collapses known shared projects but treats most other accessions as provisionally independent; it is not a fully verified project-independence registry.",
+    "The implemented max-null combines source-pair-specific profile reassignments that are not synchronised across candidate sources; it is not an exact joint Westfall-Young FWER calibration.",
+    "P values are development quantities within one method and evidence world and are not multiplicity-corrected across all five arms, three worlds, and 53 queries.",
+    "A development p<=0.05 unregistered call is an exploratory hypothesis, not a correct answer or discovery.",
+    "Known and unresolved worlds have unequal matching opportunities; no unresolved-information increment is claimed.",
+    "The chemical graph is WSE-based; Full23, Noise, Official DreaMS, ChemAware, and BioAware increments are not evaluated here."
+  ],
+  "provenance": {
+    "source_disjoint_report_sha256": "8690e6375f966d738c08a9ad8996531e940dac591389e9bbc7fc1de952e7f16b",
+    "source_disjoint_scores_sha256": "fe18d2a92c5eaf7a50c2fd4068db43d050a15caaee82ff92cf6b0a85569134df",
+    "parent_disjoint_report_sha256": "619fee1400a1d9eda6194ed5f999752564cfe904c885dbe16991266dba08c84e",
+    "parent_disjoint_scores_sha256": "8f01670545f3c6a1e96745c251b17e274092bf91f4390525e4d2f19c9d85a1c6"
+  }
+}
