@@ -19,10 +19,10 @@ export PYTHONUNBUFFERED=1
 export OMP_NUM_THREADS=10
 
 ENVEDA="data/validation/enveda180_cross_condition_benchmark_v3_20261012"
-ENVEDA_PRED="data/validation/enveda_unified_candidate_integrator_run_2411772/modeling/candidate_predictions_oof.npz"
+ENVEDA_PRED="data/validation/enveda_no_query_context_diagnostic_run_2413878/modeling/candidate_predictions_oof.npz"
 GNPS_ID="data/validation/GLM_gnps_identity_panel_reconstruction/panel_identity_disjoint.npz"
 GNPS_FORMULA="data/validation/gnps_gold_silver_10ppm_benchmark_v1/panel_formula_disjoint.npz"
-GNPS_SCORES="data/validation/enveda_unified_candidate_integrator_run_2411772/gnps_fixed_evaluation"
+GNPS_SCORES="data/validation/enveda_no_query_context_diagnostic_run_2413878/gnps_fixed_evaluation"
 OUT="data/validation/full23_reference_count_correction_run_${SLURM_JOB_ID}"
 
 required=(

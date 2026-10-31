@@ -41,17 +41,17 @@ agreement.
 
 | Panel | Method | R@1 | MRR | Near R@1 | Macro AUROC | Micro AUROC | Micro AUPRC |
 |---|---|---:|---:|---:|---:|---:|---:|
-| Identity | Full23 v1 | 88.2310 | 92.3766 | 83.6407 | 94.8400 | 95.3995 | 83.6835 |
-| Identity | Count-corrected | **88.4766** | **92.5242** | **83.9831** | **94.9657** | **95.5403** | **84.0554** |
-| Formula | Full23 v1 | 89.4507 | 93.6454 | 82.0652 | 94.4271 | 94.8373 | 86.1828 |
-| Formula | Count-corrected | **89.6027** | **93.7532** | **82.3370** | **94.5680** | **95.0024** | **86.7272** |
+| Identity | Full23 v1 | 88.2492 | 92.3792 | 83.6934 | 94.8493 | 95.7594 | 84.4745 |
+| Identity | Count-corrected | **88.4766** | **92.5182** | **83.9963** | **94.9691** | **95.9050** | **84.8462** |
+| Formula | Full23 v1 | 89.5267 | 93.6815 | 82.2011 | 94.4717 | 95.2662 | 87.3952 |
+| Formula | Count-corrected | **89.6217** | **93.7577** | **82.3709** | **94.5629** | **95.4349** | **87.8228** |
 
 Paired Top-1 outcomes versus Full23 v1:
 
-- Identity: `+0.2456 pp`, formula-cluster CI `[+0.0988,+0.3922]`,
-  corrected/introduced `49/22`, `corrected - 2*introduced = +5`.
-- Formula: `+0.1521 pp`, formula-cluster CI `[-0.0382,+0.3578]`,
-  corrected/introduced `19/11`, risk net `-3`.
+- Identity: `+0.2274 pp`, formula-cluster CI `[+0.0810,+0.3701]`,
+  corrected/introduced `47/22`, `corrected - 2*introduced = +3`.
+- Formula: `+0.0950 pp`, formula-cluster CI `[-0.0934,+0.2842]`,
+  corrected/introduced `16/11`, risk net `-6`.
 
 The five count coefficients had the same sign and similar magnitude. This is
 evidence of max-over-reference opportunity bias, but the correction was fitted
@@ -78,11 +78,10 @@ material near-subset or AUPRC loss. Otherwise Full23 v1 remains the release.
 ## Artifacts
 
 - Local diagnostic:
-  `data/validation/full23_reference_coherence_residual_local_20261031`
+  `data/validation/full23_v1_reference_coherence_residual_local_20261031`
 - Diagnostic implementation:
   `tasks/train_full23_reference_coherence_residual.py`
 - Transfer implementation:
   `tasks/train_full23_reference_count_correction.py`
 - Server entry point:
   `tasks/run_full23_reference_count_correction.sbatch`
-
