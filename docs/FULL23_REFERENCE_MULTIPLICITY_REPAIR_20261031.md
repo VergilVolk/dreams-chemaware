@@ -71,6 +71,48 @@ on GNPS and is not deployable as the final model.
 No encoder, P2b, MSG, V2 policy or Full23 checkpoint is retrained. The Slurm
 entry point is `tasks/run_full23_reference_count_correction.sbatch`.
 
+## Next loss defect: listwise probability fitting does not protect Top-1
+
+The first correction exposed a mirror failure: all corrected cases demoted a
+high-reference false top candidate, whereas every introduced case demoted a
+high-reference true top candidate in favour of a low-reference false one.
+Ordinary listwise cross-entropy has no explicit cost for eroding an already
+correct parent margin. Merely doubling the loss of parent-correct queries had
+effectively no impact because most of their softmax losses were already
+saturated.
+
+`train_full23_reference_support_risk_residual.py` therefore compared the old
+listwise objective with a direct boundary objective. The latter trains only on
+queries within the bounded residual's reachable region: parent errors are
+pushed across the Top-1 boundary, while erosion of a parent-correct margin is
+charged twice. It also tests within-candidate support stability for each of the
+seven experts (`max-second` and `max-mean`) instead of relying only on the
+number of reference spectra.
+
+This remains strict formula-OOF on consumed GNPS development. It is a mechanism
+experiment, not external evidence.
+
+| Panel | Arm | R@1 | Delta vs Full23 | 95% formula-cluster CI | corrected / introduced | risk net |
+|---|---|---:|---:|---:|---:|---:|
+| Identity | count + listwise CE | 88.4857 | +0.2365 pp | [+0.0986,+0.3787] | 45 / 19 | +7 |
+| Identity | support + boundary Top-1 | 88.4311 | +0.1819 pp | [+0.0815,+0.2906] | 26 / 6 | **+14** |
+| Formula | count + listwise CE | 89.6408 | +0.1140 pp | [-0.0577,+0.2865] | 15 / 9 | -3 |
+| Formula | support + boundary Top-1 | 89.6217 | +0.0950 pp | [-0.0192,+0.2235] | 8 / 3 | **+2** |
+
+The result is specific and useful:
+
+- weighting ordinary cross-entropy by two did not change either panel;
+- adding support features under the old loss was harmful;
+- support features became useful only when the loss directly represented the
+  Top-1 repair/preservation problem;
+- the boundary arm has positive `corrected - 2*introduced` on both panels and
+  materially fewer introduced errors, but its formula CI still crosses zero.
+
+Therefore the deployable next experiment is not a larger fusion network. It is
+the same low-capacity support residual trained on Enveda OOF with the boundary
+loss and then transferred once to GNPS. Full23 v1 remains the release until
+that fixed-transfer result exists.
+
 Promotion requires the Enveda-fitted correction to retain positive direction
 on both GNPS panels, improve the query-balanced endpoint, and not create a
 material near-subset or AUPRC loss. Otherwise Full23 v1 remains the release.
@@ -81,6 +123,8 @@ material near-subset or AUPRC loss. Otherwise Full23 v1 remains the release.
   `data/validation/full23_v1_reference_coherence_residual_local_20261031`
 - Diagnostic implementation:
   `tasks/train_full23_reference_coherence_residual.py`
+- Risk-aligned support-loss implementation:
+  `tasks/train_full23_reference_support_risk_residual.py`
 - Transfer implementation:
   `tasks/train_full23_reference_count_correction.py`
 - Server entry point:
