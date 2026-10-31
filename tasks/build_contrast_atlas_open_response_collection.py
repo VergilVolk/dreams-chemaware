@@ -215,7 +215,16 @@ def reverse_relations(relations: list[dict[str, Any]]) -> pd.DataFrame:
                 "left_study_id", "left_contrast_id", "right_study_id", "right_contrast_id"
             }},
         })
-    return pd.DataFrame(rows)
+    if rows:
+        return pd.DataFrame(rows)
+    return pd.DataFrame(columns=[
+        "relation_direction",
+        "left_study_id", "left_contrast_id",
+        "right_study_id", "right_contrast_id",
+        "relation_class", "expected_signed_direction",
+        "eligible_primary_relevance", "evidence_boundary",
+        "signed_truth_claimed",
+    ])
 
 
 def run(contract_path: Path, output_dir: Path, root: Path) -> dict[str, Any]:
@@ -314,7 +323,10 @@ def run(contract_path: Path, output_dir: Path, root: Path) -> dict[str, Any]:
     source_path = output_dir / "source_manifest.tsv"
     contrast_path = output_dir / "contrast_manifest.tsv"
     relation_path = output_dir / "registered_relations.tsv"
-    responses.to_csv(response_path, sep="\t", index=False, compression="gzip")
+    responses.to_csv(
+        response_path, sep="\t", index=False,
+        compression={"method": "gzip", "mtime": 0},
+    )
     sources.to_csv(source_path, sep="\t", index=False)
     contrasts.to_csv(contrast_path, sep="\t", index=False)
     relations.to_csv(relation_path, sep="\t", index=False)

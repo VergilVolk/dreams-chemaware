@@ -1,0 +1,17 @@
+study_id	source_family	species	biospecimen	biological_units	contrasts	ms2_spectra	identity_partition_entities	identity_partition_library_supported	identity_partition_unresolved	response_eligible_entity_union	response_eligible_library_supported_union	response_eligible_unresolved_union
+MSV000097426	MSV000097426	Mus musculus	urine	12	1	4635	2163	50	2113	2163	50	2113
+MSV000084112	MSV000084112	Homo sapiens	urine	48	4	12116	5501	111	5390	5501	111	5390
+MSV000083077	MSV000083077	Homo sapiens	saliva	62	4	15184	7132	77	7055	7132	77	7055
+MSV000088023	MSV000088023	Mus musculus	plasma	39	4	971	212	5	207	212	5	207
+MSV000090788	MSV000090788	Homo sapiens	skin	60	3	9541	9541	138	9403	2350	51	2299
+MSV000097610	MSV000097610_veo_ibd_case_control	Homo sapiens	feces	48	1	10446	6081	480	5601	6081	480	5601
+IBD200_GROUP	IBD200_MSV000084775_MSV000084908_MSV000086509	Homo sapiens	feces	55	1	1249	746	162	584	662	135	527
+MSV000090804	MSV000090804_lanthanide_genetic_nutrient	Methylorubrum extorquens AM1	bacterial culture extract	19	3	4612	4612	30	4582	4349	30	4319
+MSV000086360	MSV000086360_melon_bsubtilis_intervention	Cucumis melo	root, stem and leaf tissue	96	3	4316	4316	89	4227	3368	75	3293
+MSV000084794	MSV000084794_human_industrialization_context	Homo sapiens	feces	90	1	36195	36234	1645	34589	2201	89	2112
+MSV000096564	CCFA_800805_mediterranean_diet_trial	Homo sapiens	feces	22	1	7267	7561	0	7561	2817	0	2817
+MSV000092887	independent_Austrian_COVID_plasma_matched_pairs	Homo sapiens	plasma	78	1	1616	1616	155	1461	1411	146	1265
+MSV000094899	MSV000094899_chemprop2_time_series	human-derived gut microbial community	microbial culture supernatant	36	12	8055	8055	0	8055	8055	0	8055
+MSV000096724	MSV000096724_chemprop_23drug_endpoint	human-derived gut microbial community	microbial culture supernatant	6	3	4429	4429	0	4429	4429	0	4429
+MSV000093571	MSV000093571_chemprop_45drug_endpoint	human-derived gut microbial community	microbial culture supernatant	27	9	4130	4130	0	4130	4130	0	4130
+MSV000080918	MSV000080918_MSV000080558	Mus musculus	feces	38	2	266	266	19	247	266	19	247

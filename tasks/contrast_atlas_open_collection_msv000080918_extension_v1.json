@@ -1,0 +1,51 @@
+{
+  "schema": "contrast_atlas_open_collection_extension_v1",
+  "base_contract": "tasks/contrast_atlas_open_collection_chemprop_extension_v1.json",
+  "standalone_contract": "tasks/contrast_atlas_open_collection_msv000080918_standalone_v1.json",
+  "data_role": "development_consumed",
+  "sources": [
+    {
+      "study_id": "MSV000080918",
+      "source_family": "MSV000080918_MSV000080558",
+      "species": "Mus musculus",
+      "biospecimen": "feces",
+      "biological_units": 38,
+      "effect_adapter": "flat_csv",
+      "effects_path": "data/validation/contrast_atlas_msv000080918_atlas_source_v5_20261031/effects.tsv.gz",
+      "effects_sep": "\t",
+      "effect_report_path": "data/validation/contrast_atlas_msv000080918_atlas_source_v5_20261031/report.json",
+      "expected_effect_status": "MSV000080918_ATLAS_SOURCE_PREPARED",
+      "entity_column": "entity_id",
+      "beta_column": "beta",
+      "se_column": "se",
+      "prevalence_column": "prevalence",
+      "effect_model_column": "effect_model",
+      "mgf_path": "data/validation/contrast_atlas_msv000080918_atlas_source_v5_20261031/representative_spectra.mgf",
+      "mgf_report_path": "data/validation/contrast_atlas_msv000080918_atlas_source_v5_20261031/report.json",
+      "expected_mgf_status": "MSV000080918_ATLAS_SOURCE_PREPARED",
+      "nonempty_ms2_spectra": 266,
+      "identity_path": "data/validation/contrast_atlas_msv000080918_atlas_source_v5_20261031/source_native_identity.tsv",
+      "identity_sep": "\t",
+      "identity_entity_column": "entity_id",
+      "identity_status_column": "identity_status",
+      "identity_status_map": {
+        "library_supported": "library_supported",
+        "unresolved_entity": "unresolved_entity"
+      },
+      "identity_partition_boundary": "reciprocal-unique within the truth-blind 10-ppm/12-second/source-overlap graph; library-supported means a nonempty current GNPS LibraryID, not independent identity confirmation",
+      "contrasts": {
+        "mup_hfd_10_11m_iga_ko_vs_intact_date_matched": {
+          "design": "IgA-knockout minus intact MUP-uPA HFD fecal response; four collection dates; date- and age-adjusted cage-clustered development positive control",
+          "condition_family": "iga_genetic_perturbation",
+          "independent_units": 26
+        },
+        "mup_hfd_10_11m_cd8_ko_vs_intact_date_matched": {
+          "design": "CD8-knockout minus intact MUP-uPA HFD fecal response; sensitivity-only because of sparse controls, shared cages, and residual within-date age imbalance",
+          "condition_family": "cd8_genetic_perturbation_sensitivity",
+          "independent_units": 12
+        }
+      }
+    }
+  ],
+  "registered_relations": []
+}

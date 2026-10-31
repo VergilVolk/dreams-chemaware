@@ -1,0 +1,46 @@
+{
+  "schema": "contrast_atlas_open_response_collection_v1",
+  "status": "DEVELOPMENT_CONSUMED_OPEN_RESPONSE_COLLECTION_FROZEN",
+  "denominators": {
+    "independent_studies": 1,
+    "source_families": 1,
+    "study_level_contrasts": 2,
+    "biological_units_across_sources": 38,
+    "representative_ms2_spectra": 266,
+    "identity_partitioned_feature_entities": 266,
+    "identity_partitioned_library_supported_entities": 19,
+    "identity_partitioned_unresolved_entities": 247,
+    "response_eligible_unique_feature_entities": 266,
+    "response_eligible_library_supported_entity_union": 19,
+    "response_eligible_unresolved_entity_union": 247,
+    "eligible_response_rows": 451,
+    "library_supported_response_rows": 35,
+    "unresolved_response_rows": 416,
+    "source_disjoint_candidates_per_query_min": 0,
+    "source_disjoint_candidates_per_query_max": 0,
+    "registered_directed_relevance_relations": 0,
+    "registered_signed_direction_truth_relations": 0
+  },
+  "leakage_status": "within-study phenotype labels were used only to estimate frozen beta/SE; spectral registries and identity partitions are phenotype blind; no cross-study score or result was used to construct the collection",
+  "provenance": {
+    "tasks\\contrast_atlas_open_collection_msv000080918_standalone_v1.json": "5364bbc40b08d04fcea6ffdecaaf26da98af7ee9b03aa2dbabcb070f316b61f8",
+    "data\\validation\\contrast_atlas_msv000080918_atlas_source_v5_20261031\\report.json": "8accdbd225047f4d497ed1631ce894a00b2d5d3c0475c730148418ee9329bdbf",
+    "data\\validation\\contrast_atlas_msv000080918_atlas_source_v5_20261031\\source_native_identity.tsv": "bdde00ab7b1c2612fde7c86ae93b49a22fe77c9908dda39e4b6bb8478cce33f8",
+    "data\\validation\\contrast_atlas_msv000080918_atlas_source_v5_20261031\\representative_spectra.mgf": "ba47ccccf5007dfbd8fa4c2fa1b5758e314758e223ed1c81ff59e1c2917207c0",
+    "data\\validation\\contrast_atlas_msv000080918_atlas_source_v5_20261031\\effects.tsv.gz": "2f0735397d1107d6af859d0b4676c6415b93e87522f6e33b21d064214fd92aed"
+  },
+  "outputs_sha256": {
+    "response_entities.tsv.gz": "40a97c9307fd5ed79e773acd5e3b3add46073a10e91909b988ce73c0d1e114c7",
+    "source_manifest.tsv": "3b94ea04df061d25eae8c4ee1abfd8170e346f21645dc71ec7888ff1563e8f8d",
+    "contrast_manifest.tsv": "23dc09a2b2adf109129f0c9e6be120b78f555f6d312570a40756615fbceae106",
+    "registered_relations.tsv": "03fe707f0f7b7ad56d050f44207e91d83c90f56005ca6cbf2add0f4756146267"
+  },
+  "claim_boundary": [
+    "All studies and prior pairwise results are development/consumed; this is not external validation.",
+    "Unresolved means not library-supported under the frozen partition, not a new molecule.",
+    "Feature entities may include adduct/isotope redundancy and are not asserted to be unique analytes.",
+    "Only explicitly registered design-level relations are eligible for relevance auditing; signed response direction is not assumed unless separately registered.",
+    "Every unregistered cross-study pair is unadjudicated, never a negative example.",
+    "The collection freezes an open candidate universe but contains no retrieval-performance claim."
+  ]
+}

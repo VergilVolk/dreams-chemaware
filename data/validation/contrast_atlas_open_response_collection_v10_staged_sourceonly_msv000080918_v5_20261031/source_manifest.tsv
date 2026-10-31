@@ -1,0 +1,2 @@
+study_id	source_family	species	biospecimen	biological_units	contrasts	ms2_spectra	identity_partition_entities	identity_partition_library_supported	identity_partition_unresolved	response_eligible_entity_union	response_eligible_library_supported_union	response_eligible_unresolved_union
+MSV000080918	MSV000080918_MSV000080558	Mus musculus	feces	38	2	266	266	19	247	266	19	247

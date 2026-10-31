@@ -46,6 +46,8 @@ def verify_collection(root: Path) -> dict[str, object]:
 
 
 def canonical_relation_key(frame: pd.DataFrame) -> pd.Series:
+    if frame.empty:
+        return pd.Series(index=frame.index, dtype=str)
     return frame[[
         "relation_direction",
         "left_study_id",
@@ -79,8 +81,38 @@ def run(
     base_studies = set(base_sources["study_id"])
     if base_studies.intersection(new_studies):
         raise RuntimeError("new source IDs overlap the frozen base")
-    if set(staged_sources["study_id"]) != base_studies.union(new_studies):
-        raise RuntimeError("staged extension source universe is not base plus new studies")
+    staged_studies = set(staged_sources["study_id"])
+    if staged_studies == base_studies.union(new_studies):
+        staging_mode = "base_replay_plus_new_sources"
+    elif staged_studies == set(new_studies):
+        staging_mode = "standalone_new_sources"
+        standalone_relative = contract.get("standalone_contract")
+        if not standalone_relative:
+            raise RuntimeError("standalone staging requires a bound standalone_contract")
+        root = Path(__file__).resolve().parents[1]
+        standalone_path = root / str(standalone_relative)
+        standalone_contract = json.loads(standalone_path.read_text(encoding="utf-8"))
+        if standalone_contract.get("schema") != "contrast_atlas_open_collection_contract_v1":
+            raise RuntimeError("bound standalone contract has the wrong schema")
+        if standalone_contract.get("data_role") != contract.get("data_role"):
+            raise RuntimeError("standalone and extension data roles differ")
+        if standalone_contract.get("sources") != contract.get("sources"):
+            raise RuntimeError("standalone and extension source definitions differ")
+        if standalone_contract.get("registered_relations", []) != contract.get(
+            "registered_relations", []
+        ):
+            raise RuntimeError("standalone and extension relation definitions differ")
+        provenance = staged_report.get("provenance", {})
+        provenance_key = str(Path(str(standalone_relative)))
+        recorded_hash = provenance.get(provenance_key)
+        if recorded_hash is None:
+            recorded_hash = provenance.get(provenance_key.replace("/", "\\"))
+        if recorded_hash != sha256(standalone_path):
+            raise RuntimeError("staging report is not bound to the standalone contract")
+    else:
+        raise RuntimeError(
+            "staged source universe must be either base plus new studies or exactly the new studies"
+        )
     new_source_rows = staged_sources.loc[staged_sources["study_id"].isin(new_studies)]
     if len(new_source_rows) != len(new_studies):
         raise RuntimeError("staged extension does not contain each new source exactly once")
@@ -168,9 +200,10 @@ def run(
             ),
         },
         "frozen_base_protection": {
-            "rule": "all pre-existing source, contrast and response rows come from the frozen base; only explicitly new studies are selected from the staged contract replay",
+            "rule": "all pre-existing source, contrast and response rows come from the frozen base; only explicitly new studies are selected from the validated staging collection",
             "base_status": base_report.get("status"),
             "staged_status": staged_report.get("status"),
+            "staging_mode": staging_mode,
             "new_studies": new_studies,
         },
         "leakage_status": (
@@ -190,8 +223,8 @@ def run(
         "output_sha256": output_hashes,
         "claim_boundary": [
             "The pre-existing IBD200 Plate3 correction is preserved and not reconstructed from its older contract artifact.",
-            "New exact-drug relations are development/consumed and come from one broader ChemProp project.",
-            "Post-hoc obesity relations remain marked ineligible for primary relevance.",
+            "Only explicitly registered development/consumed source and relation rows are appended.",
+            "A standalone staging collection does not replay or revise any pre-existing response row.",
             "This append operation contains no retrieval-performance claim.",
         ],
     }

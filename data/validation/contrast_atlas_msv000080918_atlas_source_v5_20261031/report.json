@@ -1,0 +1,45 @@
+{
+  "schema": "msv000080918_contrast_atlas_source_v1",
+  "status": "MSV000080918_ATLAS_SOURCE_PREPARED",
+  "data_role": "development_consumed",
+  "source_family": "MSV000080918_MSV000080558",
+  "counts": {
+    "response_rows": 451,
+    "response_entities_union": 266,
+    "representative_spectra": 266,
+    "identity_status": {
+      "unresolved_entity": 247,
+      "library_supported": 19
+    },
+    "contrast_by_spectral_status": {
+      "mup_hfd_10_11m_cd8_ko_vs_intact_date_matched::reciprocal_unique_library_supported": 19,
+      "mup_hfd_10_11m_cd8_ko_vs_intact_date_matched::reciprocal_unique_unresolved": 195,
+      "mup_hfd_10_11m_iga_ko_vs_intact_date_matched::reciprocal_unique_library_supported": 16,
+      "mup_hfd_10_11m_iga_ko_vs_intact_date_matched::reciprocal_unique_unresolved": 221
+    }
+  },
+  "selection_contract": "response_eligible and reciprocal-unique in the fixed 10-ppm/12-second/source-overlap graph; no response value, q-value, or direction used for spectral selection",
+  "contrast_roles": {
+    "mup_hfd_10_11m_iga_ko_vs_intact_date_matched": "primary_development_positive_control",
+    "mup_hfd_10_11m_cd8_ko_vs_intact_date_matched": "sensitivity_development_positive_control"
+  },
+  "inputs": {
+    "qualified_source_report": "data\\validation\\contrast_atlas_msv000080918_multistratum_response_v1_20261031\\report.json",
+    "qualified_source_report_sha256": "e9360aabc4c31c5534cb53e5a055c33b2ef52e7831bfe8405d06d71a0b351755",
+    "contrast_effects_sha256": "c22d4c494b0b77d8fc1bc39bd38da14e362a1ed0f7c2c0f679105cabc23b66ce",
+    "feature_cluster_candidates_sha256": "de9ca6fe0fabee11e6a34d01ead6af5d790b1eb8aa61a1fd9ed218d77e49d61f",
+    "mgf_sha256": "2c414c7ec0dcf2df1130e34bfed4f6f5a148de63f297333af6549b1d53d9c544",
+    "implementation_sha256": "fd190e175e4cb9990d94e2e124c1701eac54d1d3131cd94f58c5326ad334cd66"
+  },
+  "outputs_sha256": {
+    "effects.tsv.gz": "2f0735397d1107d6af859d0b4676c6415b93e87522f6e33b21d064214fd92aed",
+    "response_evidence.tsv.gz": "c178a4dd5b28d20e4d682609f3db09ada50a5780afbb0defc79e7b5e0cc3b067",
+    "source_native_identity.tsv": "bdde00ab7b1c2612fde7c86ae93b49a22fe77c9908dda39e4b6bb8478cce33f8",
+    "representative_spectra.mgf": "ba47ccccf5007dfbd8fa4c2fa1b5758e314758e223ed1c81ff59e1c2917207c0"
+  },
+  "claim_boundary": [
+    "Reciprocal uniqueness is graph-local evidence, not chemical identity truth.",
+    "The CD8 contrast remains sensitivity-only.",
+    "No cross-study retrieval, unknown increment, algorithm increment, or external validation is claimed."
+  ]
+}
