@@ -32,6 +32,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--retained-candidates", type=Path, required=True)
     parser.add_argument("--strict-candidates", type=Path, required=True)
+    parser.add_argument("--source-family-adjudication", type=Path)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--rt-tolerance-min", type=float, default=0.03)
     parser.add_argument("--mass-delta-tolerance-da", type=float, default=0.01)
@@ -53,6 +54,18 @@ def main() -> None:
     strict = read_tsv(args.strict_candidates)
     if not retained or not strict:
         raise ValueError("input table is empty")
+
+    rejected_relation_edges: set[frozenset[str]] = set()
+    if args.source_family_adjudication:
+        for row in read_tsv(args.source_family_adjudication):
+            if row["verdict"] != "keep_as_two_distinct_source_entity_hypotheses":
+                continue
+            method_edge_ids = [
+                value.strip() for value in row["method_edge_ids"].split(",") if value.strip()
+            ]
+            for index, left_edge in enumerate(method_edge_ids):
+                for right_edge in method_edge_ids[index + 1 :]:
+                    rejected_relation_edges.add(frozenset((left_edge, right_edge)))
 
     pair_rows: dict[str, dict[str, str]] = {}
     features: list[dict] = []
@@ -88,6 +101,7 @@ def main() -> None:
         raise ValueError("strict pair is absent from retained denominator")
 
     relation_rows: list[dict] = []
+    rejected_relation_rows: list[dict] = []
     graph_edges: list[tuple[str, str]] = []
     for index, left in enumerate(features):
         for right in features[index + 1 :]:
@@ -107,6 +121,21 @@ def main() -> None:
             if not matches:
                 continue
             relation, target, error = min(matches, key=lambda item: item[2])
+            if frozenset((left["method_edge_id"], right["method_edge_id"])) in rejected_relation_edges:
+                rejected_relation_rows.append(
+                    {
+                        "left_method_edge_id": left["method_edge_id"],
+                        "right_method_edge_id": right["method_edge_id"],
+                        "mode": left["mode"],
+                        "left_feature_id": left["feature_id"],
+                        "right_feature_id": right["feature_id"],
+                        "candidate_relation": relation,
+                        "rejection_reason": (
+                            "phenotype_blind_source_rt_and_fragment_evidence_rejects_family_merge"
+                        ),
+                    }
+                )
+                continue
             graph_edges.append((left["method_edge_id"], right["method_edge_id"]))
             relation_rows.append(
                 {
@@ -182,6 +211,7 @@ def main() -> None:
     assignment_path = args.output_dir / "retained_pair_family_assignments.tsv"
     family_path = args.output_dir / "retained_family_summary.tsv"
     relation_path = args.output_dir / "retained_candidate_ion_relation_edges.tsv"
+    rejected_relation_path = args.output_dir / "rejected_candidate_ion_relation_edges.tsv"
     write_tsv(assignment_path, assignment_rows, list(assignment_rows[0]))
     write_tsv(family_path, summary_rows, list(summary_rows[0]))
     relation_fields = [
@@ -198,6 +228,16 @@ def main() -> None:
         "claim_boundary",
     ]
     write_tsv(relation_path, relation_rows, relation_fields)
+    rejected_relation_fields = [
+        "left_method_edge_id",
+        "right_method_edge_id",
+        "mode",
+        "left_feature_id",
+        "right_feature_id",
+        "candidate_relation",
+        "rejection_reason",
+    ]
+    write_tsv(rejected_relation_path, rejected_relation_rows, rejected_relation_fields)
 
     counts: dict[str, dict[str, int | float]] = {}
     for world in ("known", "unresolved", "mixed_known_unresolved"):
@@ -232,6 +272,7 @@ def main() -> None:
         "retained_feature_mode_observations": len(features),
         "strict_source_entity_pairs": len(strict_pairs),
         "candidate_ion_relation_edges": len(relation_rows),
+        "source_rejected_candidate_ion_relation_edges": len(rejected_relation_rows),
         "retained_candidate_analytical_families": len(components),
         "multi_pair_candidate_analytical_families": sum(
             len(component) > 1 for component in components
@@ -263,6 +304,7 @@ def main() -> None:
             "positive_ion_relationships_da": {
                 name: value for name, value in ION_RELATIONSHIPS_DA
             },
+            "source_family_adjudication_applied": bool(args.source_family_adjudication),
         },
         "claim_boundary": (
             "Family construction is phenotype-blind and applied to the complete retained "
@@ -273,17 +315,29 @@ def main() -> None:
         "input_sha256": {
             "retained_candidates": sha256(args.retained_candidates),
             "strict_candidates": sha256(args.strict_candidates),
+            "source_family_adjudication": (
+                sha256(args.source_family_adjudication)
+                if args.source_family_adjudication
+                else None
+            ),
         },
         "script_sha256": sha256(Path(__file__)),
         "outputs": {
             "pair_family_assignments": assignment_path.name,
             "family_summary": family_path.name,
             "candidate_ion_relation_edges": relation_path.name,
+            "source_rejected_candidate_ion_relation_edges": rejected_relation_path.name,
         },
     }
     report_path = args.output_dir / "report.json"
     report_path.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    output_paths = [assignment_path, family_path, relation_path, report_path]
+    output_paths = [
+        assignment_path,
+        family_path,
+        relation_path,
+        rejected_relation_path,
+        report_path,
+    ]
     checksum_path = args.output_dir / "checksums.sha256"
     checksum_path.write_text(
         "".join(f"{sha256(path)}  {path.name}\n" for path in output_paths),

@@ -1,0 +1,6 @@
+target_mz	observed_precursor_mz	signed_ppm_error	scan	charge	peak_count	claim_boundary
+371.258	371.258	0.0	1183	1+	18	public_precursor_and_msms_occurrence_not_identity_or_response
+389.269	389.26801	-2.543228461556406	1288	0+	18	public_precursor_and_msms_occurrence_not_identity_or_response
+595.349	595.349	0.0	2142	1+	34	public_precursor_and_msms_occurrence_not_identity_or_response
+597.362	597.36401	3.364793877148439	2143	1+	23	public_precursor_and_msms_occurrence_not_identity_or_response
+617.33	617.33002	0.0323975830585017	2175	1+	29	public_precursor_and_msms_occurrence_not_identity_or_response

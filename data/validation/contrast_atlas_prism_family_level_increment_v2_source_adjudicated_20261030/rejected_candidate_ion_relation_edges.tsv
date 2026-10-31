@@ -1,0 +1,2 @@
+left_method_edge_id	right_method_edge_id	mode	left_feature_id	right_feature_id	candidate_relation	rejection_reason
+wse_identity:001694	wse_identity:001742	C8_positive	595.3494_3.21	617.3314_3.21	sodium_minus_proton	phenotype_blind_source_rt_and_fragment_evidence_rejects_family_merge

@@ -1,0 +1,47 @@
+{
+  "adjudicated_source_pair_hypotheses": 7,
+  "claim_boundary": "family units are phenotype-blind analytical hypotheses, not identified structures, MSI level-1 compounds, or independent biological findings",
+  "data_role": "development_consumed_phenotype_blind_source_evidence",
+  "outputs": {
+    "family_adjudication": "source_ion_family_adjudication.tsv",
+    "fragment_pair_metrics": "source_fragment_pair_metrics.tsv",
+    "members": "source_ion_family_members.tsv"
+  },
+  "parameters": {
+    "fragment_tolerance_da": 0.01,
+    "precursor_exclusion_da": 1.0,
+    "relative_base_peak_thresholds": [
+      0.05,
+      0.01
+    ]
+  },
+  "remaining_other_strict13_pairs_assumed_distinct": 6,
+  "schema": "contrast_atlas_prism_source_ion_family_adjudication_v1",
+  "script_sha256": "2133f809df7fd9795a9eea51f0dce16ee5096b1a75f426eaca293117d4153ff0",
+  "selection_rule": "three ion groups were frozen by the prior target-only mass/RT family screen; no phenotype or response value is used here",
+  "source_inputs": {
+    "adult_mgf": {
+      "path": "D:\\DreaMS\\data\\reference\\contrast_atlas_ibd_cross_study_20261014\\adult_ibd200_consensus.mgf",
+      "sha256": "6aeba8b4c1e9cc94e127985cc18bde9a4d1df8c99030d470d4cec888bc5465e6"
+    },
+    "adult_quant": {
+      "path": "D:\\DreaMS\\data\\reference\\contrast_atlas_ibd_cross_study_20261014\\adult_ibd200_gnps_quant.csv",
+      "sha256": "515c4821d9b0b86322cd7d6493ae9a5345a4541babbf189214e97719ed1e05fb"
+    },
+    "paediatric_mgf": {
+      "path": "D:\\DreaMS\\data\\reference\\contrast_atlas_ibd_cross_study_20261014\\pediatric_veoibd_consensus.mgf",
+      "sha256": "c628ce08fc8215942469ec8fb193c6b3c189484032f83cc9ba9b190281c64fd1"
+    },
+    "paediatric_quant": {
+      "path": "D:\\DreaMS\\data\\reference\\contrast_atlas_ibd_cross_study_20261014\\pediatric_veoibd_gnps_quant.csv",
+      "sha256": "f513ecde7e2f8d62e5baaebe044dc77ddc91c66252da5cbe6c6577a7d2c31b06"
+    }
+  },
+  "strict13_current_analytical_family_upper_bound": 10,
+  "supported_analytical_family_units": 4,
+  "verdicts": {
+    "mz371_389": "collapse_to_one_neutral_family_with_in_source_water_loss",
+    "mz595_617": "keep_as_two_distinct_source_entity_hypotheses",
+    "mz817_834_839": "collapse_to_one_analytical_ion_family"
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "candidate_ion_relation_edges": 12,
+  "claim_boundary": "Family construction is phenotype-blind and applied to the complete retained denominator. A family passes when any member pair was already prioritized by the upstream three-fit screen. This is a redundancy sensitivity analysis, not family-level replicated-findings FDR control or molecular identity confirmation.",
+  "data_role": "development_consumed_family_level_sensitivity",
+  "family_level_counts_by_identity_world": {
+    "known": {
+      "families": 10,
+      "strict_priority_families": 1,
+      "strict_priority_rate": 0.1
+    },
+    "mixed_known_unresolved": {
+      "families": 8,
+      "strict_priority_families": 2,
+      "strict_priority_rate": 0.25
+    },
+    "unresolved": {
+      "families": 73,
+      "strict_priority_families": 7,
+      "strict_priority_rate": 0.0958904109589041
+    }
+  },
+  "family_level_unknown_increment_test": {
+    "alternative": "unresolved_greater_than_known",
+    "comparison": "unresolved_vs_known_strict_priority_rate_after_common_family_collapse",
+    "fisher_exact_p": 0.7538838593158732,
+    "interpretation": "no_evidence_of_unresolved_family_enrichment",
+    "mixed_world_excluded": true,
+    "odds_ratio": 0.9545454545454546
+  },
+  "family_parameters": {
+    "mass_delta_tolerance_da": 0.01,
+    "positive_ion_relationships_da": {
+      "ammonium_minus_proton": 17.026549,
+      "potassium_minus_proton": 37.955882,
+      "sodium_minus_proton": 21.981942,
+      "water_loss_or_gain": 18.010565
+    },
+    "rt_tolerance_min": 0.03,
+    "same_acquisition_mode_required": true,
+    "source_family_adjudication_applied": true
+  },
+  "input_sha256": {
+    "retained_candidates": "7f877196032003b6f24d5aa7808a41d39e78a4b7d85930f296df1bff08364e2b",
+    "source_family_adjudication": "aa4d3e5ff6383e3bf04b0b0426d3a6645a8a1b811dc09782aa529dbc5909e7f5",
+    "strict_candidates": "fe77d801fb6efd537cdd1da771da92c93b1d90246fe0a52477ae83e04eee2eed"
+  },
+  "largest_family_source_pair_count": 3,
+  "multi_pair_candidate_analytical_families": 8,
+  "outputs": {
+    "candidate_ion_relation_edges": "retained_candidate_ion_relation_edges.tsv",
+    "family_summary": "retained_family_summary.tsv",
+    "pair_family_assignments": "retained_pair_family_assignments.tsv",
+    "source_rejected_candidate_ion_relation_edges": "rejected_candidate_ion_relation_edges.tsv"
+  },
+  "pair_level_reference": {
+    "known": {
+      "retained_pairs": 12,
+      "strict_pairs": 2
+    },
+    "mixed_known_unresolved": {
+      "retained_pairs": 7,
+      "strict_pairs": 2
+    },
+    "unresolved": {
+      "retained_pairs": 82,
+      "strict_pairs": 9
+    },
+    "unresolved_vs_known_odds_ratio": 0.6164383561643836,
+    "unresolved_vs_known_one_sided_fisher_p": 0.8547707845158647
+  },
+  "retained_candidate_analytical_families": 91,
+  "retained_feature_mode_observations": 140,
+  "retained_source_entity_pairs": 101,
+  "scientific_question": "Does unresolved-versus-known response prioritization change after applying the same phenotype-blind analytical-family collapse to all retained testable pairs?",
+  "script_sha256": "ea81992a0cf2ae1404f06af4eda2c6c0c8424e3286de0964384160297eff238a",
+  "source_rejected_candidate_ion_relation_edges": 1,
+  "status": "COMPLETE",
+  "strict_priority_candidate_analytical_families": 10,
+  "strict_source_entity_pairs": 13
+}

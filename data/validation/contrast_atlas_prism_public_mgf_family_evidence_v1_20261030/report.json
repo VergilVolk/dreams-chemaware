@@ -1,0 +1,75 @@
+{
+  "claim_boundary": "This public spectrum-only asset has no linked IBD response for this analysis. Hits do not establish identity, MSI level 1, or biological replication.",
+  "data_role": "public_development_consumed_spectrum_only_evidence",
+  "outputs": {
+    "fragment_pair_evidence": "public_fragment_pair_evidence.tsv",
+    "precursor_msms_hits": "public_precursor_msms_hits.tsv"
+  },
+  "pair_evidence": {
+    "mz371_389": {
+      "claim_boundary": "public_fragment_relation_not_neutral_identity_or_standard_confirmation",
+      "evidence_class": "strong_public_fragment_relation",
+      "group_id": "mz371_389",
+      "left_scan": "1183",
+      "left_target_mz": 371.258,
+      "matched_peaks": 13,
+      "raw_cosine": 0.8289067269874687,
+      "right_scan": "1288",
+      "right_target_mz": 389.269
+    },
+    "mz595_617": {
+      "claim_boundary": "public_fragment_relation_not_neutral_identity_or_standard_confirmation",
+      "evidence_class": "public_spectra_present_but_relation_not_supported",
+      "group_id": "mz595_617",
+      "left_scan": "2142",
+      "left_target_mz": 595.349,
+      "matched_peaks": 2,
+      "raw_cosine": 0.0008235651659322246,
+      "right_scan": "2175",
+      "right_target_mz": 617.33
+    }
+  },
+  "parameters": {
+    "analog_search": false,
+    "fragment_tolerance_da": 0.02,
+    "precursor_tolerance_ppm": 10.0
+  },
+  "public_asset": {
+    "bytes": 794977,
+    "context": "fecal-background concentration-series spectral asset",
+    "dataset": "MSV000079651",
+    "requested_url": "https://gnps.ucsd.edu/ProteoSAFe/DownloadResultFile?file=f.MSV000079651%2Fclustered%2FMSV000079651_specs_ms.mgf&forceDownload=true",
+    "resolved_url": "https://gnps.ucsd.edu/ProteoSAFe/DownloadResultFile?file=f.MSV000079651%2Fclustered%2FMSV000079651_specs_ms.mgf&forceDownload=true",
+    "sha256": "faa6847d06b491f62c858c1af5ddf63acf0b86a5f8f5ac54607bf4495f541896",
+    "spectrum_count": 2581
+  },
+  "schema": "contrast_atlas_prism_public_mgf_family_evidence_v1",
+  "script_sha256": "5feee43389714f7ef5449d95f5d277dfd378b6cdfa510ef26e51db425a172f24",
+  "target_hit_counts": {
+    "371.258": 1,
+    "389.269": 1,
+    "595.349": 1,
+    "597.362": 1,
+    "617.33": 1,
+    "817.581": 0,
+    "834.609": 0,
+    "839.563": 0
+  },
+  "targets": [
+    371.258,
+    389.269,
+    595.349,
+    597.362,
+    617.33,
+    817.581,
+    834.609,
+    839.563
+  ],
+  "targets_with_public_msms": [
+    371.258,
+    389.269,
+    595.349,
+    597.362,
+    617.33
+  ]
+}
