@@ -1,0 +1,11 @@
+acquisition_date_utc	covid	healthy	contains_both_groups	covid_after_healthy_auc	group_transitions
+2020-04-20	21	3	True	0.4603174603174603	6
+2020-04-21	15	1	True	0.9333333333333333	2
+2020-04-24	4	0	False	NA	0
+2020-04-29	4	0	False	NA	0
+2020-04-30	8	0	False	NA	0
+2020-05-05	9	9	True	0.09876543209876543	3
+2020-05-06	9	0	False	NA	0
+2020-05-07	0	11	False	NA	0
+2020-05-08	0	2	False	NA	0
+2020-05-13	13	0	False	NA	0

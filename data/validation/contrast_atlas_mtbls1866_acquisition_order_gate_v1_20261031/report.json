@@ -1,0 +1,45 @@
+{
+  "claim_boundary": [
+    "This result is a negative source-qualification decision, not a COVID response.",
+    "No cross-study response, unknown-information gain, or algorithm gain was tested.",
+    "Post-hoc day-restricted or nearest-neighbor matching is not activated by this result."
+  ],
+  "decision": {
+    "allowed_future_role": "phenotype-blind technical stress test only, unless independent batch metadata and a pre-specified correction model become available",
+    "eligible_as_positive_covid_biological_truth": false,
+    "eligible_to_activate_msv000092887_relation": false,
+    "reason": "group labels are strongly structured by acquisition order and date; the frozen assets provide neither interleaved QC support nor a defensible pre-specified batch adjustment"
+  },
+  "denominators": {
+    "acquisition_days": 10,
+    "days_containing_both_groups": 3,
+    "files": 109,
+    "healthy": 26,
+    "noncritical_covid": 83
+  },
+  "evidence_role": "development_consumed_qualification_only",
+  "leakage_status": "only frozen acquisition-header timestamps and the frozen design ledger were joined; no feature intensities, product ions, response effects, identities, registered relations, or retrieval scores were read",
+  "order_evidence": {
+    "covid_after_healthy_auc": 0.3016682113067655,
+    "mann_whitney_two_sided_p": 0.0023695726407363268,
+    "null_transitions_median": 40.0,
+    "null_transitions_q025": 32.0,
+    "null_transitions_q975": 46.0,
+    "observed_group_transitions": 14,
+    "permutation_p_transitions_le_observed": 9.99990000099999e-06,
+    "reverse_orientation_auc": 0.6983317886932345,
+    "transition_permutations": 100000,
+    "transition_seed": 20261031
+  },
+  "provenance": {
+    "acquisition_order_ledger_sha256": "7cb08280fca0dbeba7bfc8f93bdaaeb0b2e2944103466444288399eb9788537b",
+    "contract_sha256": "6a4fd8b4f2220bdc25a4d608f646a34f17722949877d896520879af1c873fdc3",
+    "day_group_counts_sha256": "2156cf127bbe7e7a4ba94cddc95062e9c3e315e2f2223d0053a0d6a1a2d78cc5",
+    "design_ledger_sha256": "203e49d67b776618741b431c6dff6c043c0e18669d195fa4c166d189b9e29ae1",
+    "implementation_sha256": "05e9302cd49fe72078ff70cd20e92d9b203ed96f3a66583b16adebe5ae54515e",
+    "staged_manifest_sha256": "20d921f1ae37b5f136a2574d5e6eb74b1e5e0bc3038fc365eae844241ca3fdbb"
+  },
+  "schema": "contrast_atlas_mtbls1866_acquisition_order_gate_v1",
+  "sequence_note": "resource-conserving early stop: the design ledger was opened before the phenotype-blind measurement object completed, solely to terminate an ineligible source; no measurement parameters or biological responses were selected or estimated",
+  "status": "FAIL_TECHNICAL_CONFOUNDING_GATE"
+}
