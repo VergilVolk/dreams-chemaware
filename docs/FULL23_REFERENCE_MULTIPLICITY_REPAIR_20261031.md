@@ -140,6 +140,61 @@ The runnable entry point is
 candidate and repeated-query contract is
 `tasks/test_full23_reference_support_transfer.py`.
 
+## Local joint-repair development
+
+The next local experiment trained both GNPS panels together instead of using
+only the 5,261-query formula panel. Panel duplicates were identified by the
+actual experimental `query_row`, not IK14: distinct acquisitions of the same
+molecule remain training observations. The 16,256 panel occurrences represent
+approximately 11,019 effective experimental query rows after overlap weights.
+
+The following candidate-level defects were trained together under strict
+formula-hash OOF:
+
+- reference multiplicity;
+- within-expert isolated maxima (`max-second`, `max-mean`);
+- query-relative scores and ranks for the seven deployed experts;
+- candidate-specific Top-1/Top-3 expert votes and disagreement;
+- frozen-parent relative margin;
+- a robust upstream reconstruction using each expert's top-two reference mean
+  instead of its maximum;
+- a hard reachability mask that prohibits changes to candidates more than
+  `2 * residual_bound` below the frozen parent top.
+
+The residual used a hybrid listwise plus Top-1 repair/preservation objective.
+Only the count-only arm improved every reported metric on both panels:
+
+| Panel | Method | R@1 | MRR | near R@1 | macro AUROC | micro AUROC | micro AUPRC |
+|---|---|---:|---:|---:|---:|---:|---:|
+| Identity | Full23 v1 | 88.2492 | 92.3792 | 83.6934 | 94.8493 | 95.7594 | 84.4745 |
+| Identity | count-hybrid | **88.4766** | **92.4989** | **83.9831** | **94.9049** | **95.8065** | **84.7347** |
+| Formula | Full23 v1 | 89.5267 | 93.6815 | 82.2011 | 94.4717 | 95.2662 | 87.3952 |
+| Formula | count-hybrid | **89.6598** | **93.7575** | **82.4049** | **94.5363** | **95.3458** | **87.6554** |
+
+Paired Top-1 outcomes were:
+
+- identity: `+0.2274 pp`, CI `[+0.0924,+0.3631]`, 43/18,
+  risk-net `+7`;
+- formula: `+0.1331 pp`, CI `[-0.0193,+0.3023]`, 15/8,
+  risk-net `-1`.
+
+The broader linear/nonlinear residuals and top-two-mean reconstruction did not
+improve the count arm and reduced candidate AUPRC. A targeted nonlinear gate
+using count, parent margin, expert voting and expert dispersion made no Top-1
+changes while reducing AUPRC. These paths are not promoted. Their failure is
+informative: the supported correction is an extreme-value opportunity term,
+not a generic second-stage reliability network.
+
+Scaling the count residual to 25% gave positive lambda-2 risk net on both
+panels but sacrificed most of the Recall gain. This is a deployment operating
+point, not evidence for a second model, and must be decided before a fresh
+external evaluation rather than selected retrospectively here.
+
+Implementation and latest local output:
+
+- `tasks/train_full23_joint_quality_repair_local.py`
+- `data/validation/full23_count_confidence_gate_local_20261031`
+
 Promotion requires the Enveda-fitted correction to retain positive direction
 on both GNPS panels, improve the query-balanced endpoint, and not create a
 material near-subset or AUPRC loss. Otherwise Full23 v1 remains the release.
