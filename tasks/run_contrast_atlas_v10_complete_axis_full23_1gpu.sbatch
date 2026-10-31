@@ -6,17 +6,13 @@
 #SBATCH --gpus=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=10
-#SBATCH --mem=64G
+#SBATCH --mem=38G
 #SBATCH --time=24:00:00
 #SBATCH --output=data/validation/atlas_v10_full23_%j.out
 #SBATCH --error=data/validation/atlas_v10_full23_%j.err
 
 set -euo pipefail
-# Default to the directory from which sbatch was invoked so the frozen runner
-# can be deployed as an isolated, git-free bundle.  The historical server path
-# remains the fallback for direct scheduler invocation.
-REPO_ROOT="${ATLAS_V10_REPO_ROOT:-${SLURM_SUBMIT_DIR:-/data02/run01/scv7tsl/DreaMS}}"
-cd "$REPO_ROOT"
+cd /data02/run01/scv7tsl/DreaMS
 source /data02/home/scv7tsl/run/miniconda3/etc/profile.d/conda.sh
 conda activate dreams
 export PYTHONPATH="$PWD:$PWD/tasks:${PYTHONPATH:-}"
