@@ -86,6 +86,32 @@ def main() -> None:
     if len(nonempty) != int(expected["singleton_blocks"]) + int(expected["multiple_candidate_blocks"]):
         raise RuntimeError("nonempty block denominator drifted")
 
+    release_denominators = dict(expected)
+    legacy_answered = release_denominators.pop("answered_blocks", None)
+    positive_answered = int(
+        (
+            decisions["wse_answered"].astype(bool)
+            & decisions["wse_top1_score"].fillna(0).gt(0)
+            & decisions["wse_top1_matched_fragments"].fillna(0).gt(0)
+        ).sum()
+    )
+    if "answered_with_positive_spectral_evidence" in release_denominators:
+        if int(release_denominators["answered_with_positive_spectral_evidence"]) != positive_answered:
+            raise RuntimeError("positive-evidence answer denominator drifted")
+    release_denominators["answered_with_positive_spectral_evidence"] = positive_answered
+    release_denominators["legacy_nominal_unique_top1_blocks"] = (
+        None if legacy_answered is None else int(legacy_answered)
+    )
+    release_denominators["zero_evidence_singleton_blocks"] = int(
+        (
+            decisions["candidate_count"].eq(1)
+            & (
+                decisions["wse_top1_score"].fillna(0).le(0)
+                | decisions["wse_top1_matched_fragments"].fillna(0).le(0)
+            )
+        ).sum()
+    )
+
     blocks = pd.read_csv(
         block_path,
         sep="\t",
@@ -133,11 +159,13 @@ def main() -> None:
             "block_axis_sha256": sha256(block_path),
             "ids_not_duplicated": True,
         },
-        "denominators": expected,
+        "denominators": release_denominators,
         "score_summary": source_report["score_summary"],
         "truth_blinding": source_report["truth_blinding"],
         "method": source_report["method"],
-        "claim_boundary": source_report["claim_boundary"],
+        "claim_boundary": source_report["claim_boundary"] + [
+            "Only blocks with positive WSE and at least one matched fragment count as spectral answers; zero-evidence singleton blocks remain explicit abstentions."
+        ],
         "provenance": {
             "source_report": {"path": str(source_report_path), "sha256": sha256(source_report_path)},
             "source_candidate_scores": {"path": str(score_path), "sha256": sha256(score_path)},
@@ -157,7 +185,7 @@ def main() -> None:
         "\n".join(f"{digest}  {name}" for name, digest in report["outputs"].items()) + "\n",
         encoding="utf-8",
     )
-    print(json.dumps({"denominators": expected, "outputs": report["outputs"]}, indent=2))
+    print(json.dumps({"denominators": release_denominators, "outputs": report["outputs"]}, indent=2))
 
 
 if __name__ == "__main__":

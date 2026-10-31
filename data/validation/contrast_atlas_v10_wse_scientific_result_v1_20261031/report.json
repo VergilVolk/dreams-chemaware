@@ -1,0 +1,114 @@
+{
+  "schema": "contrast_atlas_v10_wse_scientific_result_v1",
+  "status": "DEVELOPMENT_CONSUMED_GLOBAL_RETRIEVAL_FAIL_RESPONSE_SPECIFICITY",
+  "data_role": "development_consumed",
+  "scientific_verdict": {
+    "global_open_discovery": "FAIL_RESPONSE_SPECIFICITY",
+    "reason": "The current response operator and permutation/max-T calibration call a similar response for 51/53 heterogeneous queries and an opposite response for 49/53; these calls cannot be treated as validated biological links.",
+    "new_source_use": "MSV000080918 is retained as a composition-matched two-response stress test and candidate generator, not as independent validation.",
+    "aromatic_amino_acid_candidate": "Two high-contribution pairs have source-native phenylalanine/tryptophan labels on both sides, but common-policy searches expose isomer ambiguity; they are priority identity hypotheses, not confirmed same molecules or mechanisms.",
+    "unknown_increment": "NOT_TESTED_AND_NOT_ESTABLISHED",
+    "full23_increment": "NOT_TESTED_NO_COMPLETE_AXIS_SCORE_PACKAGE"
+  },
+  "global_denominators": {
+    "study_source_ids": 16,
+    "contrasts": 53,
+    "entities": 55127,
+    "directed_candidate_pairs": 294236,
+    "wse_answered_with_positive_spectral_evidence": 122795,
+    "world_specific_mutual_edge_rows": 68586,
+    "unique_mutual_entity_pairs": 35260,
+    "source_disjoint_query_candidate_contrasts": 2490
+  },
+  "global_response_specificity_diagnostic": {
+    "all_world_similar_response_queries": 51,
+    "all_world_opposite_response_queries": 49,
+    "query_denominator": 53,
+    "registered_relation_denominator": 34,
+    "registered_best_face_top1": 3,
+    "registered_best_face_top5": 20,
+    "registered_median_best_face_rank": 5.0,
+    "interpretation": "Permutation significance is evidence against the implemented null, not evidence that a selected cross-study biological relation is correct."
+  },
+  "new_source_axis_coverage": {
+    "entities": 266,
+    "directed_candidate_pairs_involving_source": 2906,
+    "source_entities_with_any_outgoing_candidate": 198,
+    "canonical_mutual_edges_all_world": 579,
+    "canonical_mutual_edges_unresolved_world": 542,
+    "source_entities_with_any_reciprocal_all_or_unresolved_edge": 163
+  },
+  "new_source_response_specificity": {
+    "shared_entities": 185,
+    "beta_pearson": 0.41245466340782,
+    "beta_spearman": 0.31733634054812176,
+    "sign_concordance": 0.6,
+    "iga_q005_and_loso_stable_entities": 25,
+    "cd8_q005_and_loso_stable_entities": 3,
+    "stable_overlap": 2,
+    "stable_union": 26,
+    "interpretation": "The two contrasts share chemistry and collection context but are not known biological negatives; their different top hits are a stress test, not validity proof."
+  },
+  "iga_ad_candidate": {
+    "candidate_rank": 2,
+    "candidate_query_maxT_p": 0.0077821011673151,
+    "mutual_edges": 27,
+    "reported_top_contributing_edges": 10,
+    "dual_normal_approx_fdr_005_edges_diagnostic": 3,
+    "source_native_aromatic_amino_acid_pairs": 2,
+    "independent_metabolites_claimed": 0,
+    "mechanism_claimed": false,
+    "required_next_evidence": [
+      "common-policy library search for the new source",
+      "ion-family and retention-time adjudication",
+      "orthogonal identity evidence or authentic standards",
+      "response replication in an independent AD or IgA-perturbation dataset"
+    ]
+  },
+  "claim_boundary": [
+    "All data and retrieval results are development/consumed.",
+    "The 51/53 and 49/53 counts reject the current retrieval result as a discovery engine; they do not prove every selected pair false.",
+    "No signed entity-level truth is available for the registered relations.",
+    "Source-native annotations are candidate evidence and do not resolve positional/stereochemical isomers.",
+    "The 188.071 feature is treated as a likely tryptophan ion-family duplicate, not an independent metabolite.",
+    "No unresolved-information increment or in-house algorithm increment is claimed."
+  ],
+  "provenance": {
+    "implementation": {
+      "path": "D:\\DreaMS\\.codex-worktrees\\biology_result_20261029\\tasks\\summarize_contrast_atlas_v10_wse_scientific_result.py",
+      "sha256": "7d0ca04eb174994e65edf842a0d3b622db53c8be7b86dd0d15e398163856822b"
+    },
+    "retrieval_report": {
+      "path": "D:\\DreaMS\\.codex-worktrees\\biology_result_20261029\\data\\validation\\contrast_atlas_complete_identity_wse_open_retrieval_v8_repeat_msv000080918_20261031\\report.json",
+      "sha256": "07a0a4ed5bb431e853131f1ea55696c0f9a6442d66d0b9f4a4a42658e020994d"
+    },
+    "wse_release_report": {
+      "path": "D:\\DreaMS\\.codex-worktrees\\biology_result_20261029\\data\\validation\\contrast_atlas_complete_identity_wse_release_v4_msv000080918_20261031\\report.json",
+      "sha256": "257e1e13af8a1360e44ae8a70a1f79f9f9ad88d38f5a929a7d4782d052883701"
+    },
+    "axis_report": {
+      "path": "D:\\DreaMS\\.codex-worktrees\\biology_result_20261029\\data\\validation\\contrast_atlas_model_independent_identity_axis_v6_msv000080918_20261031\\report.json",
+      "sha256": "2c7773fc635e942a378656e76196845234edca129023a87f060264bde7b7ed0f"
+    },
+    "response_collection": {
+      "path": "D:\\DreaMS\\.codex-worktrees\\biology_result_20261029\\data\\validation\\contrast_atlas_open_response_collection_v10_frozenbase_msv000080918_v7_20261031\\response_entities.tsv.gz",
+      "sha256": "e03400c9aa62e001ccc0435b3c8c3d93e4c83ec0a275e595a5d645de7df9eebc"
+    },
+    "source_response": {
+      "path": "D:\\DreaMS\\.codex-worktrees\\biology_result_20261029\\data\\validation\\contrast_atlas_msv000080918_atlas_source_v5_20261031\\response_evidence.tsv.gz",
+      "sha256": "c178a4dd5b28d20e4d682609f3db09ada50a5780afbb0defc79e7b5e0cc3b067"
+    },
+    "ad_source_native_library": {
+      "path": "D:\\DreaMS\\data\\reference\\public_fbmn\\a36305db40414b6ea9c5b9a5de380bea\\db_result.tsv",
+      "sha256": "c4eee76975be8ba49c8a69cc6632c97837c006e59a1ac3df3f313443fe02241a"
+    },
+    "common_library_evidence": {
+      "path": "D:\\DreaMS\\.codex-worktrees\\biology_result_20261029\\data\\validation\\contrast_atlas_global_biological_adjudication_v1_20261030\\entity_library_evidence.tsv.gz",
+      "sha256": "ed0297b43236e7cb6b5be4e6fccc3d19685b3288029cf0bd7c6465af744b6e63"
+    }
+  },
+  "outputs_sha256": {
+    "new_source_open_top_hits.tsv": "e8301c83dbff510f57a0b0a54bcaebe46fca14448a201fd3151ac6f95d519cb5",
+    "iga_ko_to_ad_skin_candidate_evidence.tsv": "f7d4f3172ea0d0cec9e6c8ef1cc2e5005652b08c2fbf9801eba1dd9e50796284"
+  }
+}

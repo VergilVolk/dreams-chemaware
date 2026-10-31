@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib.metadata
 import json
 import time
 from pathlib import Path
@@ -78,6 +79,7 @@ def load_spectra(
     registry: pd.DataFrame,
     source_report: dict,
     source_root: Path,
+    fallback_source_root: Path | None,
     expected_hashes: dict[str, str],
 ) -> tuple[dict[str, np.ndarray], dict[str, dict[str, object]]]:
     spectra: dict[str, np.ndarray] = {}
@@ -92,6 +94,8 @@ def load_spectra(
 
     for study in sorted(studies):
         path = source_root / source_paths[study]
+        if not path.is_file() and fallback_source_root is not None:
+            path = fallback_source_root / source_paths[study]
         if not path.is_file():
             raise FileNotFoundError(path)
         observed_hash = sha256(path)
@@ -141,6 +145,12 @@ def main() -> None:
         default=Path("data/validation/contrast_atlas_sparse_local_alignment_v3_chemprop_20261023/report.json"),
     )
     parser.add_argument("--source-root", type=Path, default=Path(__file__).resolve().parents[1])
+    parser.add_argument(
+        "--fallback-source-root",
+        type=Path,
+        default=None,
+        help="Optional second checkout used only when an MGF is absent from source-root.",
+    )
     parser.add_argument(
         "--output-dir",
         type=Path,
@@ -224,6 +234,7 @@ def main() -> None:
         registry,
         source_report,
         args.source_root.resolve(),
+        None if args.fallback_source_root is None else args.fallback_source_root.resolve(),
         axis_report["provenance"]["mgf_sha256_by_study"],
     )
 
@@ -307,9 +318,12 @@ def main() -> None:
         tied = np.flatnonzero(block_score >= top_score - 1e-12)
         all_available = bool(np.all(block_available))
         unique = len(tied) == 1
-        chosen = int(tied[0]) if all_available and unique else None
+        positive_top_evidence = bool(top_score > 0 and np.max(block_matched[tied]) > 0)
+        chosen = int(tied[0]) if all_available and unique and positive_top_evidence else None
         if not all_available:
             status = "abstain_missing_candidate_evidence"
+        elif not positive_top_evidence:
+            status = "abstain_no_positive_spectral_evidence"
         elif not unique:
             status = "abstain_tied_top1"
         elif size == 1:
@@ -410,6 +424,7 @@ def main() -> None:
         "method": {
             "name": "weighted_spectral_entropy",
             "backend": "ms_entropy",
+            "backend_version": importlib.metadata.version("ms_entropy"),
             "fragment_tolerance_da": args.fragment_tolerance_da,
             "cleaning": {
                 "noise_threshold": 0.01,
@@ -427,7 +442,10 @@ def main() -> None:
             "directed_candidate_pairs": int(len(pairs)),
             "finite_scores": int(np.isfinite(score).sum()),
             "available_scores": int(available.sum()),
-            "answered_blocks": int(decisions["wse_answered"].sum()),
+            "answered_with_positive_spectral_evidence": int(decisions["wse_answered"].sum()),
+            "no_positive_spectral_evidence_blocks": int(
+                decisions["wse_decision_status"].eq("abstain_no_positive_spectral_evidence").sum()
+            ),
             "tied_top1_blocks": int(decisions["wse_decision_status"].eq("abstain_tied_top1").sum()),
         },
         "score_summary": {
@@ -442,6 +460,7 @@ def main() -> None:
             "WSE is a truth-blind classical identity-candidate baseline, not molecular-identity proof.",
             "This run does not evaluate unresolved-information, algorithm, response-retrieval or biological increment.",
             "All blocks, including zero- and one-candidate blocks, remain in the denominator.",
+            "A unique candidate is answered only when WSE and matched-fragment evidence are both positive.",
         ],
         "provenance": {
             "axis_report": {"path": str(axis_report_path), "sha256": sha256(axis_report_path)},

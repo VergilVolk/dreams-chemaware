@@ -109,6 +109,11 @@ def main() -> None:
         default="data/validation/contrast_atlas_model_independent_identity_axis_v1_20261027",
     )
     parser.add_argument("--precursor-ppm", type=float, default=10.0)
+    parser.add_argument(
+        "--spectrum-asset-root",
+        default="",
+        help="Optional checkout containing historical repo-relative MGF assets.",
+    )
     args = parser.parse_args()
 
     root = Path(__file__).resolve().parents[1]
@@ -119,6 +124,7 @@ def main() -> None:
     source_report_path = (root / args.source_report).resolve()
     identity_partition_path = (root / args.identity_partition).resolve()
     output = (root / args.output_dir).resolve()
+    spectrum_asset_root = Path(args.spectrum_asset_root).resolve() if args.spectrum_asset_root else None
     if args.precursor_ppm <= 0:
         raise ValueError("precursor ppm must be positive")
     if output.exists():
@@ -133,8 +139,15 @@ def main() -> None:
         raise ValueError("response collection hash mismatch")
 
     source_report = json.loads(source_report_path.read_text(encoding="utf-8"))
-    if source_report.get("denominators", {}).get("response_rows") != 238412:
-        raise ValueError("source report is not aligned to the frozen 238,412-row collection")
+    expected_response_rows = int(collection_report["denominators"]["eligible_response_rows"])
+    source_response_rows = source_report.get("denominators", {}).get("response_rows")
+    if source_response_rows is None:
+        source_response_rows = source_report.get("denominators", {}).get("eligible_response_rows")
+    if source_response_rows is not None and int(source_response_rows) != expected_response_rows:
+        raise ValueError(
+            "source report response denominator differs from the response collection: "
+            f"{source_response_rows} != {expected_response_rows}"
+        )
     source_paths = {str(row["study_id"]): str(row["mgf_path"]) for row in source_report["sources"]}
 
     if not identity_partition_path.exists():
@@ -146,12 +159,18 @@ def main() -> None:
             if key in entity_status:
                 raise ValueError(f"duplicate common identity row: {key}")
             entity_status[key] = row["identity_status"]
-    if len(entity_status) != 54861:
-        raise ValueError(f"unexpected common identity denominator: {len(entity_status)}")
+    expected_entities = int(collection_report["denominators"]["unique_study_entities"])
+    if len(entity_status) != expected_entities:
+        raise ValueError(
+            "common identity denominator differs from the response collection: "
+            f"{len(entity_status)} != {expected_entities}"
+        )
 
     raw_to_entity: dict[str, dict[str, str]] = defaultdict(dict)
+    response_rows = 0
     with gzip.open(response_path, "rt", encoding="utf-8-sig", newline="") as handle:
         for row in csv.DictReader(handle, delimiter="\t"):
+            response_rows += 1
             sid, raw_id, entity_id = row["study_id"], row["raw_entity_id"], row["entity_id"]
             previous = raw_to_entity[sid].setdefault(raw_id, entity_id)
             if previous != entity_id:
@@ -159,13 +178,23 @@ def main() -> None:
             if (sid, entity_id) not in entity_status:
                 raise ValueError(f"entity absent from common identity partition: {sid}::{entity_id}")
 
+    if response_rows != expected_response_rows:
+        raise ValueError(
+            f"response row denominator differs from collection report: {response_rows} != {expected_response_rows}"
+        )
+    if sum(len(rows) for rows in raw_to_entity.values()) != expected_entities:
+        raise ValueError("response entity denominator differs from collection report")
+
     if set(raw_to_entity) != set(source_paths):
         raise ValueError("response studies and source report studies differ")
 
     registries: dict[str, list[dict[str, Any]]] = {}
     mgf_hashes: dict[str, str] = {}
     for sid in sorted(source_paths):
-        path = root / source_paths[sid].replace("\\", "/")
+        relative_path = Path(source_paths[sid].replace("\\", "/"))
+        path = root / relative_path
+        if not path.exists() and spectrum_asset_root is not None:
+            path = spectrum_asset_root / relative_path
         if not path.exists():
             raise FileNotFoundError(path)
         found: dict[str, dict[str, Any]] = {}

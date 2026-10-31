@@ -1,0 +1,31 @@
+{
+  "schema": "contrast_atlas_v10_identity_axis_inputs_v1",
+  "status": "DEVELOPMENT_CONSUMED_IDENTITY_AXIS_INPUTS_COMPLETE",
+  "denominators": {
+    "studies": 16,
+    "response_rows": 238863,
+    "study_entities": 55127,
+    "common_library_supported": 979,
+    "common_unresolved": 54148,
+    "new_source_entities_conservatively_unresolved": 266
+  },
+  "outputs_sha256": {
+    "identity_partition.tsv.gz": "333cab5f4732d3c8864d0bb108478e2ede426e925015c0ce1f4045854755f2cd",
+    "spectrum_source_manifest.json": "188e1b0387db85b4908e94ee8a8502d1c657082f9e20e19d7636fdab3f9a4a51"
+  },
+  "provenance": {
+    "collection_report_sha256": "bb9bca6eaf5066a41b13fb8de1c273a06dfe621ef48651a479d76447451ec5d7",
+    "response_entities_sha256": "e03400c9aa62e001ccc0435b3c8c3d93e4c83ec0a275e595a5d645de7df9eebc",
+    "base_source_report_sha256": "87d57cc04b90cfc8a01d50c96f1619675ba0d2117f7dbbb8be9115f95fba8db0",
+    "base_identity_partition_sha256": "239af73938fc03056406afea8fc3d17fa29d761735a5e96e23e0efb8e8e395b2",
+    "new_source_report_sha256": "8accdbd225047f4d497ed1631ce894a00b2d5d3c0475c730148418ee9329bdbf",
+    "new_source_mgf_sha256": "ba47ccccf5007dfbd8fa4c2fa1b5758e314758e223ed1c81ff59e1c2917207c0",
+    "new_source_native_identity_sha256": "bdde00ab7b1c2612fde7c86ae93b49a22fe77c9908dda39e4b6bb8478cce33f8",
+    "implementation_sha256": "517486794dd02bf40ed4a116f99d072d5ce48ac953c915298ba258c348954178"
+  },
+  "claim_boundary": [
+    "This manifest only supplies spectra and common identity-world labels for a model-independent candidate axis.",
+    "The new source's native library labels are not promoted into the common known-only world.",
+    "No candidate score, response value, relation truth, or retrieval result is used."
+  ]
+}

@@ -191,6 +191,7 @@ def load_precursors(
     alignment_report: dict[str, object],
     registry: pd.DataFrame,
     source_root: Path = Path("."),
+    fallback_source_root: Path | None = None,
 ) -> tuple[dict[tuple[str, str], float], list[dict[str, object]]]:
     output: dict[tuple[str, str], float] = {}
     summaries: list[dict[str, object]] = []
@@ -201,6 +202,9 @@ def load_precursors(
         path = Path(str(source["mgf_path"]))
         if not path.is_absolute():
             path = source_root / path
+        if not path.is_file() and fallback_source_root is not None:
+            relative = Path(str(source["mgf_path"]))
+            path = fallback_source_root / relative
         found = 0
         for metadata, _peaks in iter_mgf(path):
             raw_id = spectrum_id(metadata)
@@ -950,6 +954,12 @@ def main() -> None:
         default=Path("."),
         help="Root used to resolve relative MGF paths recorded in the frozen source manifest.",
     )
+    parser.add_argument(
+        "--fallback-source-root",
+        type=Path,
+        default=None,
+        help="Optional second checkout used only when an MGF is absent from source-root.",
+    )
     parser.add_argument("--permutations", type=int, default=256)
     parser.add_argument("--seed", type=int, default=20261027)
     parser.add_argument("--effect-fdr", type=float, default=0.05)
@@ -1011,9 +1021,14 @@ def main() -> None:
         raise RuntimeError("frozen spectral edge checksum drift")
     if alignment_report["provenance"]["response_entities_sha256"] != sha256(paths["entities"]):
         raise RuntimeError("response collection checksum drift")
-    if identity_report["provenance"]["combined_partition_sha256"] != sha256(
-        args.identity_partition
-    ):
+    expected_identity_hash = identity_report.get("provenance", {}).get(
+        "combined_partition_sha256"
+    )
+    if expected_identity_hash is None:
+        expected_identity_hash = identity_report.get("outputs_sha256", {}).get(
+            "identity_partition.tsv.gz"
+        )
+    if expected_identity_hash != sha256(args.identity_partition):
         raise RuntimeError("common identity partition checksum drift")
 
     effects = pd.read_csv(paths["entities"], sep="\t", low_memory=False)
@@ -1045,7 +1060,10 @@ def main() -> None:
     profiles = build_profiles(effects, contrasts, args.effect_fdr)
     donors = build_profile_reassignments(profiles, args.permutations, args.seed)
     precursors, precursor_summary = load_precursors(
-        alignment_report, raw_registry, args.source_root
+        alignment_report,
+        raw_registry,
+        args.source_root,
+        args.fallback_source_root,
     )
     mutual_edges = canonical_mutual_edges(
         paths["edges"], precursors, args.precursor_ppm
@@ -1178,7 +1196,7 @@ def main() -> None:
             "applied_score": algorithm_score_provenance,
         },
         "denominators": {
-            "independent_studies": int(contrasts["study_id"].nunique()),
+            "study_source_ids": int(contrasts["study_id"].nunique()),
             "source_families": int(contrasts["source_family"].nunique()),
             "parent_project_families": (
                 None
@@ -1189,9 +1207,19 @@ def main() -> None:
             "response_rows": int(len(effects)),
             "unique_study_entities": int(effects[["study_id", "entity_id"]].drop_duplicates().shape[0]),
             "frozen_directional_edges": int(alignment_report["denominators"]["frozen_directional_edges"]),
-            "canonical_mutual_edges": int(len(mutual_edges)),
-            "mutual_identity_hypothesis_edges": int(mutual_edges["precursor_compatible_10ppm"].sum()),
-            "mutual_nonmass_relation_edges": int(mutual_edges["precursor_incompatible_over_10ppm"].sum()),
+            "world_specific_mutual_edge_rows": int(len(mutual_edges)),
+            "unique_mutual_entity_pairs": int(
+                mutual_edges[[
+                    "left_study_id", "right_study_id",
+                    "left_entity_id", "right_entity_id",
+                ]].drop_duplicates().shape[0]
+            ),
+            "world_specific_identity_hypothesis_rows": int(
+                mutual_edges["precursor_compatible_10ppm"].sum()
+            ),
+            "world_specific_nonmass_relation_rows": int(
+                mutual_edges["precursor_incompatible_over_10ppm"].sum()
+            ),
             "directed_query_candidate_pairs": int(
                 ledger[[
                     "query_study_id", "query_contrast_id",
@@ -1226,7 +1254,10 @@ def main() -> None:
             "registered biological relations were opened only after the complete score ledger was written and hashed"
         ),
         "claim_boundary": [
-            "All 15 sources and all 51 contrasts are development/consumed; this is not sealed external validation.",
+            (
+                f"All {contrasts['study_id'].nunique()} sources and all {len(contrasts)} contrasts "
+                "are development/consumed; this is not sealed external validation."
+            ),
             (
                 "Parent-project-disjoint retrieval removes all candidate contrasts from the query's parent project."
                 if args.candidate_universe == "parent_project_disjoint"
