@@ -1,0 +1,116 @@
+{
+  "schema": "contrast_atlas_crossfit_unresolved_increment_v1",
+  "status": "FAIL_INTERNAL_CROSSFIT_UNRESOLVED_INCREMENT_GATE",
+  "data_role": "development_consumed",
+  "question": "Does a truth-blind fixed combination of unresolved and train-known response scores improve within-target-study ranking of held-out known response axes?",
+  "contract": {
+    "split": "SHA256(split_salt + '|' + full_InChIKey), first_64_bits_mod_2",
+    "split_salt": "contrast-atlas-known-crossfit-v1|20261031",
+    "fold_swaps": 2,
+    "cross_parent_only": true,
+    "min_known_exact_inchikeys_per_fold": 3,
+    "min_unresolved_reciprocal_edges": 3,
+    "both_studies_require_at_least_two_contrasts": true,
+    "interaction": "score - query-axis mean - candidate-axis mean + source-pair mean, separately within each truth fold and source pair",
+    "fixed_combination": "equal-L2-norm additive train-known plus unresolved within each truth-fold and source pair; no held-out truth is read",
+    "primary_endpoint": "source-dyad macro change in within-target-study pairwise contrast concordance: fixed combination minus train-known"
+  },
+  "denominators": {
+    "selected_study_inchikey_records": 734,
+    "unique_full_inchikeys": 429,
+    "unique_full_inchikeys_fold_0": 218,
+    "unique_full_inchikeys_fold_1": 211,
+    "study_sources_in_selected_known": 15,
+    "contrasts_represented_in_known_unresolved_ledger": 51,
+    "feature_side_fold_swapped_rows_before_truth_availability_filter": 943,
+    "fold_swapped_eligible_rows": 802,
+    "eligible_rows_truth_fold_0": 401,
+    "eligible_rows_truth_fold_1": 401,
+    "base_contrast_pair_rows": 401,
+    "eligible_multi_axis_studies": 8,
+    "eligible_study_contrast_units": 41,
+    "eligible_heldout_full_inchikeys": 59,
+    "eligible_heldout_full_inchikeys_fold_0": 27,
+    "eligible_heldout_full_inchikeys_fold_1": 32,
+    "eligible_heldout_full_inchikey_fold_overlap": 0,
+    "eligible_source_dyads": 17,
+    "pairwise_comparisons": 3072
+  },
+  "endpoints": {
+    "train_known": {
+      "pairwise_comparisons": 3072,
+      "micro_concordance": 0.5240885416666666,
+      "dyad_macro_concordance": 0.5003094672212319
+    },
+    "unresolved_only": {
+      "pairwise_comparisons": 3072,
+      "micro_concordance": 0.4677734375,
+      "dyad_macro_concordance": 0.5390485739750446
+    },
+    "train_known_plus_unresolved_fixed": {
+      "pairwise_comparisons": 3072,
+      "micro_concordance": 0.4977213541666667,
+      "dyad_macro_concordance": 0.5050690730837789
+    },
+    "dyad_delta_bootstrap": {
+      "dyads": 17,
+      "mean_delta": 0.004759605862547029,
+      "median_delta": 0.00347222222222221,
+      "ci95_low": -0.03207968162012279,
+      "ci95_high": 0.044266191325014845,
+      "replicates": 20000
+    },
+    "dyad_delta_sign_flip": {
+      "dyads": 17,
+      "observed_mean_delta": 0.004759605862547029,
+      "method": "exact_all_sign_configurations",
+      "one_sided_p": 0.409698486328125,
+      "null_configurations_or_replicates": 131072,
+      "requested_monte_carlo_replicates": 99999,
+      "null_q025": -0.037414587046939986,
+      "null_median": 0.0,
+      "null_q975": 0.037414587046939986
+    },
+    "leave_out_sensitivity": {
+      "dyad": {
+        "omissions": 17,
+        "minimum_mean_delta": -0.007963752104377114,
+        "maximum_mean_delta": 0.01357980850168349,
+        "all_positive": false
+      },
+      "study": {
+        "omissions": 8,
+        "minimum_mean_delta": -0.01872018799102133,
+        "maximum_mean_delta": 0.022346866096866085,
+        "all_positive": false
+      }
+    }
+  },
+  "decision": {
+    "gate_passed": false,
+    "required": [
+      "dyad bootstrap CI lower bound > 0",
+      "dyad sign-flip one-sided p <= 0.05",
+      "leave-one-study-out mean delta > 0 for every eligible study"
+    ],
+    "unresolved_increment": "not_established_on_internal_crossfit_gate",
+    "algorithm_increment": "not_tested_wse_unresolved_edges_only"
+  },
+  "claim_boundary": [
+    "All studies and response effects are development/consumed.",
+    "Known and held-out folds are entity-disjoint, but their beta/SE estimates reuse the same experimental samples and labels.",
+    "The common library policy and representative-ion selection use WSE and may favour the WSE baseline.",
+    "A GNPS full-InChIKey match is not MSI level-1 identification.",
+    "Unresolved entities may include adducts, fragments, or family members of known molecules; unresolved does not mean novel molecule.",
+    "Source dyads share studies; dyad bootstrap and exact sign-flip results are development sensitivities, not independent-study confidence intervals.",
+    "The fixed combination is truth-blind, but this result is not prospective or external biological validation.",
+    "Train-known and unresolved centering/scaling are frozen on the feature-side universe before held-out truth availability is applied.",
+    "Official, Noise, and Full23 require independent scoring and reciprocal decisions on the complete model-independent candidate axis before algorithm increment can be claimed."
+  ],
+  "input_sha256": {
+    "data\\validation\\contrast_atlas_open_response_collection_v10_frozenbase_msv000080918_v7_20261031\\response_entities.tsv.gz": "e03400c9aa62e001ccc0435b3c8c3d93e4c83ec0a275e595a5d645de7df9eebc",
+    "data\\validation\\contrast_atlas_open_response_collection_v10_frozenbase_msv000080918_v7_20261031\\contrast_manifest.tsv": "36be9777bc155994a2a47118084126077a1fe4c4517945f69d06df4f6433f726",
+    "data\\validation\\contrast_atlas_global_biological_adjudication_v1_20261030\\entity_library_evidence.tsv.gz": "ed0297b43236e7cb6b5be4e6fccc3d19685b3288029cf0bd7c6465af744b6e63",
+    "data\\validation\\contrast_atlas_known_anchor_unresolved_test_v2_20261031\\known_anchor_unresolved_scores.tsv.gz": "488de15e4fb7fbe894d5ad9db425a940cb945a5ddfde810bd695e04dfd1d9952"
+  }
+}

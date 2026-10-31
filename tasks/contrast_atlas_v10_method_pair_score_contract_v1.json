@@ -1,0 +1,76 @@
+{
+  "schema": "contrast_atlas_method_pair_score_contract_v1",
+  "status": "FROZEN_DEVELOPMENT_CONSUMED_HANDOFF_CONTRACT",
+  "data_role": "development_consumed",
+  "axis": {
+    "schema": "contrast_atlas_model_independent_identity_axis_v1",
+    "status": "DEVELOPMENT_CONSUMED_MODEL_INDEPENDENT_IDENTITY_AXIS_FROZEN",
+    "axis_report_sha256": "2c7773fc635e942a378656e76196845234edca129023a87f060264bde7b7ed0f",
+    "directed_pair_axis_sha256": "f7854880bba4431531ee95095360209f7f0a3c650ecb1612a2be0cb713416860",
+    "query_block_axis_sha256": "4bee8470d24e7eb097131b4216cdd8e1d7066617df0dc819b4b81b8fd1448623",
+    "directed_candidate_pairs": 294236,
+    "query_blocks_total": 826905,
+    "nonempty_candidate_blocks": 141332,
+    "zero_candidate_blocks": 685573
+  },
+  "package_schema": "contrast_atlas_method_pair_score_package_v1",
+  "required_outputs": {
+    "pair_scores": "method_pair_scores.tsv.gz",
+    "block_decisions": "method_block_decisions.tsv.gz",
+    "reciprocal_edges": "reciprocal_edges.tsv.gz"
+  },
+  "pair_score_columns": [
+    "directed_pair_id", "query_block_id", "query_block_index",
+    "candidate_index_within_block", "raw_score", "score_available",
+    "unavailable_reason"
+  ],
+  "block_decision_columns": [
+    "query_block_id", "query_block_index", "candidate_count",
+    "scored_candidate_count", "decision_status", "answered",
+    "selected_directed_pair_id", "selected_candidate_entity_id",
+    "selected_raw_score", "top1_tie_count", "top1_minus_top2_raw_margin"
+  ],
+  "reciprocal_edge_columns": [
+    "reciprocal_edge_id", "left_study_id", "left_entity_id",
+    "right_study_id", "right_entity_id", "left_to_right_directed_pair_id",
+    "right_to_left_directed_pair_id", "left_to_right_raw_score",
+    "right_to_left_raw_score"
+  ],
+  "allowed_decision_statuses": [
+    "selected_unique_top1", "abstain_incomplete_block_evidence",
+    "abstain_tied_top1", "abstain_method_rule"
+  ],
+  "required_manifest_values": {
+    "truth_blinding": {
+      "response_beta_read": false,
+      "response_se_read": false,
+      "phenotype_read": false,
+      "registered_relations_read": false,
+      "identity_truth_read": false
+    },
+    "missingness": {
+      "unavailable_pair_policy": "blank_score",
+      "incomplete_block_policy": "abstain_fail_closed",
+      "external_score_fallback_used": false,
+      "wse_fallback_used": false
+    },
+    "decision": {
+      "selection_scope": "complete_nonempty_candidate_block",
+      "block_decisions_are_method_specific": true,
+      "reciprocal_rule": "both_directions_selected_unique_top1",
+      "reciprocal_edges_preserve_both_directions": true
+    }
+  },
+  "forbidden_output_column_tokens": [
+    "response_beta", "response_se", "phenotype", "registered_relation",
+    "relation_truth", "identity_truth", "expected_answer", "biological_label"
+  ],
+  "claim_boundary": [
+    "This contract covers the frozen v10 same-observed-precursor identity-candidate axis only.",
+    "Every one of the 294236 directed pairs and all 141332 nonempty blocks must be delivered.",
+    "A method scores complete blocks independently; no WSE-selected edge can define another method's candidates.",
+    "Raw model scores are preserved without clipping and are not probabilities.",
+    "Missing required evidence causes fail-closed block abstention without score fallback.",
+    "No response, phenotype, registered relation or identity truth is read before method decisions are frozen."
+  ]
+}
