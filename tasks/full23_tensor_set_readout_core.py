@@ -42,8 +42,12 @@ class Full23TensorSetReadout(nn.Module):
 
     def __init__(self, settings: TensorSetSettings, residual_bound: float):
         super().__init__()
-        if tuple(settings.encoder_names) != ENCODER_NAMES:
-            raise ValueError("encoder registry drifted")
+        if (
+            not settings.encoder_names
+            or len(set(settings.encoder_names)) != len(settings.encoder_names)
+            or not set(settings.encoder_names).issubset(ENCODER_NAMES)
+        ):
+            raise ValueError("encoder registry must be a unique non-empty project subset")
         if settings.embedding_dimension < 1 or settings.top_k != TOP_K:
             raise ValueError("invalid tensor-set dimensions")
         if settings.encoder_dimension % settings.attention_heads:
