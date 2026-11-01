@@ -32,7 +32,7 @@ fi
 GNPS_BASE="${GNPS_SCORE_BUNDLE:-data/validation/noise_gnps_article_benchmark_run_2349091/method_scores.npz}"
 GNPS_MSG="${NOISE_MSG_GNPS_CACHE:-data/validation/noise_msg_fusion_run_2349961/gnps_fusion_scores}"
 GNPS_CHEM="${GNPS_CONTINUOUS_CHEM_DIR:-data/validation/wse_conditional_residual_run_2376648/continuous_chem_evidence}"
-OUT="data/validation/full23_tensor_set_readout_run_${SLURM_JOB_ID}"
+OUT="data/validation/full23_tensor_set_readout_run_${SLURM_JOB_ID:-preflight}"
 
 ENVEDA_NOISE="$ENVEDA_LAYER/noise_v1_embeddings.npz"
 ENVEDA_STAGE1="$REUSE_RUN/inputs/enveda_chemaware_stage1_embeddings.npz"
@@ -52,7 +52,7 @@ required=(
   "$ENVEDA_MSG/report.json" "$ENVEDA_MSG/pair_scores_identity_disjoint.npy" "$ENVEDA_MSG/pair_scores_formula_disjoint.npy"
   "$ENVEDA_CHEM/report.json" "$ENVEDA_CHEM/continuous_chem_identity_disjoint.npz" "$ENVEDA_CHEM/continuous_chem_formula_disjoint.npz"
   "$FULL23" "$FULL23_OOF" "$(dirname "$FULL23_OOF")/report.json"
-  "$GNPS/manifest.csv.gz" "$GNPS_IDENTITY" "$GNPS/panel_formula_disjoint.npz"
+  "$GNPS/report.json" "$GNPS/manifest.csv.gz" "$GNPS_IDENTITY" "$GNPS/panel_formula_disjoint.npz"
   "$GNPS_BASE" "$GNPS_MSG/report.json" "$GNPS_MSG/pair_scores_identity_disjoint.npy" "$GNPS_MSG/pair_scores_formula_disjoint.npy"
   "$GNPS_NOISE" "$GNPS_STAGE1" "$GNPS_PHASEA" "$GNPS_FULLMSG"
   "$GNPS_CHEM/report.json" "$GNPS_CHEM/continuous_chem_identity_disjoint.npz" "$GNPS_CHEM/continuous_chem_formula_disjoint.npz"
@@ -93,6 +93,7 @@ python -u tasks/train_full23_tensor_set_readout.py \
 GNPS_VIEW="$OUT/gnps_benchmark_view"
 mkdir -p "$GNPS_VIEW"
 ln -s "$(readlink -f "$GNPS/manifest.csv.gz")" "$GNPS_VIEW/manifest.csv.gz"
+ln -s "$(readlink -f "$GNPS/report.json")" "$GNPS_VIEW/report.json"
 ln -s "$(readlink -f "$GNPS_IDENTITY")" "$GNPS_VIEW/panel_identity_disjoint.npz"
 ln -s "$(readlink -f "$GNPS/panel_formula_disjoint.npz")" "$GNPS_VIEW/panel_formula_disjoint.npz"
 
