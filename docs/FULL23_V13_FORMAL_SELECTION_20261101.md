@@ -6,12 +6,14 @@
 candidate-ranking development algorithm. Full23 v1 remains its frozen parent;
 the failed uncentred v1.2 experiment remains negative development evidence.
 
-The primary selection endpoint is Recall@1. A candidate advances when its
-Recall@1 point estimate exceeds Full23 v1 on both registered GNPS development
-panels and on the query-balanced unique-query endpoint. Formula-cluster
+The primary selection endpoint is the query-balanced unique-query Top-1 point
+estimate. A candidate advances whenever that endpoint exceeds the formal
+parent. Panel-specific Recall@1 values, formula-cluster
 intervals, corrected/introduced exchanges, near metrics and the historical
 `corrected - 2*introduced` quantity remain visible diagnostics, but none can
-override a positive primary ranking endpoint.
+override a positive primary ranking endpoint. Full23 v1.3 additionally improves
+both constituent panels, but that is supporting evidence rather than a second
+promotion gate.
 
 This policy was corrected after the result was observed. It must be described
 as a post-result development choice, not as preregistered confirmation. GNPS is

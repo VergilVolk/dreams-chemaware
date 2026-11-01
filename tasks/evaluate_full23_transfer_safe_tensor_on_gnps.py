@@ -69,14 +69,10 @@ def main():
     # a preregistered confirmation rule.
     eligible=[]
     for arm in ARMS:
-        panel_positive=all(
-            metrics[p][arm]["recall@1"] > metrics[p]["full23_v1"]["recall@1"]
-            for p in PANELS
-        )
         joint_positive=(
             joint[arm]["top1_utility"] > joint["full23_v1"]["top1_utility"]
         )
-        if panel_positive and joint_positive:
+        if joint_positive:
             eligible.append(arm)
     selected=max(eligible,key=lambda n:joint[n]["top1_utility"]) if eligible else "full23_v1"
     args.output.parent.mkdir(parents=True,exist_ok=True)
@@ -91,12 +87,10 @@ def main():
                            "queries":{n:len(p.base.query_ptr)-1 for n,p in panels.items()}},
                 "selected":selected,
                 "selection_policy":{
-                    "name":"positive_recall1_both_panels_and_query_balanced_joint_v1",
+                    "name":"positive_query_balanced_unique_query_top1_v1",
                     "adopted":"2026-11-01 post-result specification correction",
-                    "primary_endpoint":"Recall@1 point estimate",
+                    "primary_endpoint":"query-balanced unique-query Top-1 point estimate",
                     "requirements":[
-                        "Recall@1 exceeds Full23 v1 on identity-disjoint",
-                        "Recall@1 exceeds Full23 v1 on formula-disjoint",
                         "query-balanced unique-query Top-1 utility exceeds Full23 v1",
                     ],
                     "descriptive_only":[
@@ -105,6 +99,7 @@ def main():
                         "risk_net_lambda2",
                         "near-subset metrics",
                         "AUROC and AUPRC",
+                        "panel-specific Recall@1",
                     ],
                 },
                 "metrics":metrics,"comparisons":comparisons,

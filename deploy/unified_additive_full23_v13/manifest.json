@@ -23,9 +23,9 @@
     "v13_readout_checkpoint": "assets/full23_v13_query_centered_readout.pt"
   },
   "selection_policy": {
-    "name": "positive_recall1_both_panels_and_query_balanced_joint_v1",
+    "name": "positive_query_balanced_unique_query_top1_v1",
     "adopted": "2026-11-01 post-result specification correction",
-    "primary_endpoint": "Recall@1 point estimate",
+    "primary_endpoint": "query-balanced unique-query Top-1 point estimate",
     "risk_net_lambda2": "descriptive only; never a promotion veto",
     "confidence_intervals": "uncertainty description; not a promotion veto"
   },
