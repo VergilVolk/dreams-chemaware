@@ -35,6 +35,8 @@ class TensorSetSettings:
     attention_heads: int = 4
     fusion_hidden: int = 128
     top_k: int = TOP_K
+    include_reference_count: bool = True
+    query_center_raw_residual: bool = False
 
 
 class Full23TensorSetReadout(nn.Module):
@@ -75,9 +77,12 @@ class Full23TensorSetReadout(nn.Module):
         # Attention-weighted mean and standard deviation preserve consensus
         # and dispersion.  Reference count is explicit rather than leaking via
         # max-pooling opportunity.
+        summary_width = 2 * settings.pair_dimension + (
+            1 if settings.include_reference_count else 0
+        )
         self.encoder_summaries = nn.ModuleDict({
             name: nn.Sequential(
-                nn.Linear(2 * settings.pair_dimension + 1, settings.encoder_dimension),
+                nn.Linear(summary_width, settings.encoder_dimension),
                 nn.GELU(),
                 nn.LayerNorm(settings.encoder_dimension),
             )
@@ -127,10 +132,13 @@ class Full23TensorSetReadout(nn.Module):
         centered = pair - mean[:, None, :]
         variance = torch.sum(attention[:, :, None] * centered.square(), dim=1)
         deviation = torch.sqrt(variance.clamp_min(1e-8))
-        count = mask.sum(dim=1, keepdim=True).to(dtype=dtype) / float(self.settings.top_k)
-        return self.encoder_summaries[name](torch.cat((mean, deviation, count), dim=-1))
+        values = [mean, deviation]
+        if self.settings.include_reference_count:
+            count = mask.sum(dim=1, keepdim=True).to(dtype=dtype) / float(self.settings.top_k)
+            values.append(count)
+        return self.encoder_summaries[name](torch.cat(values, dim=-1))
 
-    def raw_residual(
+    def candidate_embedding_tokens(
         self,
         query_positions: torch.Tensor,
         reference_positions: torch.Tensor,
@@ -161,6 +169,18 @@ class Full23TensorSetReadout(nn.Module):
         attended, _ = self.cross_encoder_attention(tokens, tokens, tokens, need_weights=False)
         tokens = self.cross_encoder_norm(tokens + attended)
         tokens = self.cross_encoder_ffn_norm(tokens + self.cross_encoder_ffn(tokens))
+        return tokens
+
+    def raw_residual(
+        self,
+        query_positions: torch.Tensor,
+        reference_positions: torch.Tensor,
+        reference_mask: torch.Tensor,
+        banks: Mapping[str, torch.Tensor],
+    ) -> torch.Tensor:
+        tokens = self.candidate_embedding_tokens(
+            query_positions, reference_positions, reference_mask, banks,
+        )
         return self.residual_head(tokens.flatten(1)).squeeze(-1)
 
     def residual(
@@ -169,8 +189,23 @@ class Full23TensorSetReadout(nn.Module):
         reference_positions: torch.Tensor,
         reference_mask: torch.Tensor,
         banks: Mapping[str, torch.Tensor],
+        query_ptr: np.ndarray | torch.Tensor | None = None,
     ) -> torch.Tensor:
         raw = self.raw_residual(query_positions, reference_positions, reference_mask, banks)
+        if self.settings.query_center_raw_residual:
+            if query_ptr is None:
+                raise ValueError("query-centered residual requires query_ptr")
+            ptr = np.asarray(
+                query_ptr.detach().cpu().numpy() if torch.is_tensor(query_ptr) else query_ptr,
+                dtype=np.int64,
+            )
+            if ptr.ndim != 1 or ptr[0] != 0 or ptr[-1] != len(raw) or np.any(np.diff(ptr) < 2):
+                raise ValueError("query_ptr is malformed")
+            centered = raw.clone()
+            for left, right in zip(ptr[:-1], ptr[1:]):
+                left, right = int(left), int(right)
+                centered[left:right] = raw[left:right] - raw[left:right].mean()
+            raw = centered
         return self.residual_bound * torch.tanh(raw / self.residual_bound)
 
     def forward(
@@ -180,9 +215,11 @@ class Full23TensorSetReadout(nn.Module):
         reference_positions: torch.Tensor,
         reference_mask: torch.Tensor,
         banks: Mapping[str, torch.Tensor],
+        query_ptr: np.ndarray | torch.Tensor | None = None,
     ) -> torch.Tensor:
         return anchor + self.residual(
             query_positions, reference_positions, reference_mask, banks,
+            query_ptr,
         )
 
     @property
@@ -244,6 +281,57 @@ def weighted_anchor_safe_ranking_loss(
             device=logits.device,
         ),
     }
+
+
+def structural_frontier_query_weights(
+    anchor: np.ndarray,
+    ptr: np.ndarray,
+    labels: np.ndarray,
+    maximum_pairwise_shift: float,
+    *,
+    vulnerable_correct_weight: float = 2.0,
+    reachable_error_weight: float = 1.0,
+    structurally_fixed_weight: float = 0.10,
+) -> tuple[np.ndarray, dict[str, int]]:
+    """Focus bounded-residual training on decisions it can actually change.
+
+    An anchor error whose positive deficit exceeds the maximum possible
+    pairwise residual shift cannot be corrected.  Likewise an anchor-correct
+    query with a larger margin cannot be damaged.  Such queries retain a small
+    background weight for score calibration, while reachable errors and
+    vulnerable correct decisions carry the ranking objective.
+    """
+    if not np.isfinite(maximum_pairwise_shift) or maximum_pairwise_shift <= 0:
+        raise ValueError("maximum pairwise shift must be finite and positive")
+    weights = np.empty(len(ptr) - 1, dtype=np.float32)
+    counts = {
+        "reachable_error": 0,
+        "unreachable_error": 0,
+        "vulnerable_correct": 0,
+        "protected_correct": 0,
+    }
+    for query, (left, right) in enumerate(zip(ptr[:-1], ptr[1:])):
+        left, right = int(left), int(right)
+        local_labels = np.asarray(labels[left:right], dtype=bool)
+        positive_local = np.flatnonzero(local_labels)
+        if len(positive_local) != 1 or right - left < 2:
+            raise ValueError("each training query needs one positive and one negative")
+        positive = left + int(positive_local[0])
+        negative = np.concatenate((anchor[left:positive], anchor[positive + 1:right]))
+        positive_score = float(anchor[positive])
+        best_negative = float(np.max(negative))
+        if positive_score >= best_negative:
+            if positive_score - best_negative <= maximum_pairwise_shift:
+                key, weight = "vulnerable_correct", vulnerable_correct_weight
+            else:
+                key, weight = "protected_correct", structurally_fixed_weight
+        elif best_negative - positive_score <= maximum_pairwise_shift:
+            key, weight = "reachable_error", reachable_error_weight
+        else:
+            key, weight = "unreachable_error", structurally_fixed_weight
+        counts[key] += 1
+        weights[query] = float(weight)
+    return weights, counts
 
 
 def model_from_payload(

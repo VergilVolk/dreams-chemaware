@@ -8,6 +8,7 @@ from full23_tensor_set_readout_core import (
     Full23TensorSetReadout,
     TensorSetSettings,
     weighted_anchor_safe_ranking_loss,
+    structural_frontier_query_weights,
 )
 
 
@@ -88,6 +89,24 @@ def main() -> None:
         before = model(anchor, query, refs, single_mask, banks)
         after = model(anchor, query, refs, single_mask, masked_banks)
         assert torch.allclose(before, after, atol=1e-6, rtol=0.0)
+
+    # Transfer-safe variants remove reference-count shortcuts and may center
+    # raw residuals within each query without changing the frozen parent at
+    # initialization.
+    safe_settings = TensorSetSettings(
+        embedding_dimension=12, pair_dimension=8, encoder_dimension=8,
+        attention_heads=2, fusion_hidden=16, include_reference_count=False,
+        query_center_raw_residual=True,
+    )
+    safe = Full23TensorSetReadout(safe_settings, residual_bound=0.5)
+    safe_initial = safe(anchor, query, refs, mask, banks, query_ptr=ptr)
+    assert torch.equal(safe_initial, anchor)
+    try:
+        safe(anchor, query, refs, mask, banks)
+    except ValueError as error:
+        assert "query_ptr" in str(error)
+    else:
+        raise AssertionError("query-centered model accepted missing query_ptr")
 
     print("PASS: Full23 information-preserving tensor-set readout contracts")
 
