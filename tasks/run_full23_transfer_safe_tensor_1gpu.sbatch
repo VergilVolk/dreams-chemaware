@@ -24,7 +24,10 @@ REUSE_RUN="data/validation/enveda_unified_candidate_integrator_run_2411378"
 FULL23="data/validation/enveda_no_query_context_diagnostic_run_2413878/modeling/unified_candidate_integrator.pt"
 FULL23_OOF="data/validation/enveda_no_query_context_diagnostic_run_2413878/modeling/candidate_predictions_oof.npz"
 GNPS="data/validation/gnps_gold_silver_10ppm_benchmark_v1"
-GNPS_ID="data/validation/GLM_gnps_identity_panel_reconstruction/panel_identity_disjoint.npz"
+GNPS_ID="$GNPS/panel_identity_disjoint.npz"
+if [[ ! -s "$GNPS_ID" ]]; then
+  GNPS_ID="data/validation/GLM_gnps_identity_panel_reconstruction/panel_identity_disjoint.npz"
+fi
 GNPS_BASE="data/validation/noise_gnps_article_benchmark_run_2349091/method_scores.npz"
 GNPS_MSG="data/validation/noise_msg_fusion_run_2349961/gnps_fusion_scores"
 GNPS_CHEM="data/validation/wse_conditional_residual_run_2376648/continuous_chem_evidence"
