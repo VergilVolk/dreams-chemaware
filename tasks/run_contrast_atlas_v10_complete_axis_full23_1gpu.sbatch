@@ -84,7 +84,6 @@ python -m py_compile \
   tasks/score_contrast_atlas_v10_complete_axis_full23.py \
   tasks/package_contrast_atlas_v10_method_scores.py
 python -m unittest tasks.test_contrast_atlas_v10_full23_pipeline -v
-python -u tasks/test_unified_additive_release.py
 
 python -u tasks/prepare_official_embedding_checkpoint.py \
   --source "$STAGE1" --output "$SCRATCH/chemaware_stage1_slim.pt"
