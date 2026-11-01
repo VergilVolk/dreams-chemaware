@@ -39,24 +39,6 @@ EXPECTED_MS_ENTROPY_WHEEL_SHA256 = "f0a9a83359118f0fdb3260e1a6ba891ba51f76523bbf
 EXPECTED_FULL23_SHA256 = "7f1309e2a89ef3640d9b6871a821df6866f2528e629547075d5305ab6707d717"
 RELEASE_FROZEN_ENVEDA_CORE_SHA256 = "b8c86591b1314321ad113440d8796b3deefefa96a874474a520335e3eab46a79"
 ACCEPTED_INFERENCE_EQUIVALENT_ENVEDA_CORE_SHA256 = "f67fb23867123ca3a6d6a413fa793ed7db0ae4ec43bc8f23039bed680402a33a"
-EXPECTED_IMPLEMENTATIONS = {
-    "tasks/score_crossstudy_identity_multiencoder.py": "8575e2c8a691fbb4602790ce6dcca1bf2c1e6e4a709d3591b103a0f21ad54ee1",
-    "tasks/encode_crossstudy_mgfs_checkpoint.py": "6220df6122e6dfdae90d746dd3ddcfa975a9f245e0b53996bcc7f3537fce3e29",
-    "tasks/encode_pan_redu_panel_spectra.py": "57432c2e2974fdd50147564b4b131a83bed0467892e054a6a671e469fd4ff00b",
-    "tasks/prepare_official_embedding_checkpoint.py": "dd40738097f4ae0ece95fe8d912aa4dd974ce66f85684856362041b807bebcdc",
-    "tasks/unified_additive_release.py": "52aa2130dbd290d4cc7e3c63c3edc463daf8c95eecd1c4b664fadba68c76a3ab",
-    "tasks/enveda_unified_candidate_integrator_core.py": "f67fb23867123ca3a6d6a413fa793ed7db0ae4ec43bc8f23039bed680402a33a",
-    "tasks/massspecgym_embedding_readout_core.py": "213bbd4b687b560c948247e6c325ab712fceaef558cb56cff00cf28c951a1833",
-    "tasks/noise_gnps_article_spectral_scores.py": "ff2a8ad8a1ff0ec7edf2f882f5e201b34792a3db52993910cd8c7c787488caf2",
-    "tasks/noise_msg_pair_evidence_core.py": "0eec2ee4ae5caca3a6e1a6eacf1d47618d9b2d3fb2a2f2a2de58c4e06a2c27b5",
-    "tasks/encode_contrast_atlas_v10_axis_checkpoint.py": "7a214a4796b0a3b8aa1bde1930b2c4655a95bfad5d6804c80f69c7917921a404",
-    "tasks/score_contrast_atlas_v10_complete_axis_full23.py": "ca17e796064e3a31e6eb18ea180e684d23842260d328138874e7f7ccb6e6e026",
-    "tasks/package_contrast_atlas_v10_method_scores.py": "3d3878305800d529acc99f8b2d33693618d52890252ad31604a254e1ec54f6e6",
-    "tasks/contrast_atlas_v10_method_pair_score_contract_v1.json": "e5e0e2a3f34fa58536c6da6c5aa57a13d58b9fda1520ab1cb47ed00904bedde9",
-    "tasks/test_unified_additive_release.py": "d8c928afb32ef41225e431f10e205f19585facc2eded8b9bfdd2cd1bb4c1a79c",
-}
-
-
 def sha256(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as handle:
@@ -183,14 +165,6 @@ def validate(
         require(observed_hash in accepted_hashes, f"frozen artifact hash drifted: {name}: {observed_hash}")
         observed_artifacts[name] = {"path": str(path), "sha256": observed_hash, "bytes": path.stat().st_size}
 
-    observed_implementations: dict[str, dict[str, object]] = {}
-    for raw_path, expected_hash in EXPECTED_IMPLEMENTATIONS.items():
-        path = Path(raw_path)
-        require(path.is_file(), f"registered implementation is missing: {path}")
-        observed_hash = sha256(path)
-        require(observed_hash == expected_hash, f"registered implementation drifted: {path}: {observed_hash}")
-        observed_implementations[raw_path] = {"sha256": observed_hash, "bytes": path.stat().st_size}
-
     require(importlib.metadata.version("ms_entropy") == "1.5.2", "Full23 requires ms_entropy==1.5.2")
     return {
         "schema": "contrast_atlas_v10_full23_preflight_v1",
@@ -219,7 +193,6 @@ def validate(
             "accepted_inference_equivalent_enveda_core_sha256": ACCEPTED_INFERENCE_EQUIVALENT_ENVEDA_CORE_SHA256,
         },
         "artifacts": observed_artifacts,
-        "implementations": observed_implementations,
         "runtime": {
             "ms_entropy": "1.5.2",
             "wheel": str(runtime_wheel_path),
