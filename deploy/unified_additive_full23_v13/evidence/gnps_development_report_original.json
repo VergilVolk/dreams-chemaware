@@ -1,0 +1,248 @@
+{
+  "status": "FULL23_TRANSFER_SAFE_GNPS_DEVELOPMENT_EVALUATION_COMPLETE",
+  "dataset": {
+    "name": "GNPS Gold/Silver",
+    "role": "consumed development",
+    "queries": {
+      "identity_disjoint": 10995,
+      "formula_disjoint": 5261
+    }
+  },
+  "selected": "full23_v1",
+  "metrics": {
+    "identity_disjoint": {
+      "full23_v1": {
+        "queries": 10995,
+        "recall@1": 0.8824920418371988,
+        "recall@2": 0.9394270122783083,
+        "recall@3": 0.9598908594815826,
+        "recall@5": 0.9748067303319691,
+        "recall@10": 0.9889040472942247,
+        "recall@20": 0.9975443383356071,
+        "mrr": 0.9237918445162012,
+        "mean_rank": 1.4242837653478855,
+        "median_rank": 1.0,
+        "macro_query_auroc": 0.9484928661164167,
+        "macro_query_auprc": 0.9237918445162012,
+        "micro_candidate_auroc": 0.9575939739072227,
+        "micro_candidate_auprc": 0.8447450083763,
+        "mean_top1_top2_margin": 9.333136320133788,
+        "near": {
+          "queries": 7592,
+          "recall@1": 0.8369336143308747,
+          "mrr": 0.8942255329029963
+        }
+      },
+      "no_reference_count": {
+        "queries": 10995,
+        "recall@1": 0.8816734879490677,
+        "recall@2": 0.939699863574352,
+        "recall@3": 0.9597089586175535,
+        "recall@5": 0.9748976807639836,
+        "recall@10": 0.988631195998181,
+        "recall@20": 0.9974533879035925,
+        "mrr": 0.9234543451212878,
+        "mean_rank": 1.4226466575716235,
+        "median_rank": 1.0,
+        "macro_query_auroc": 0.9485787327401743,
+        "macro_query_auprc": 0.9234543451212878,
+        "micro_candidate_auroc": 0.9579586492101217,
+        "micro_candidate_auprc": 0.8440625005227922,
+        "mean_top1_top2_margin": 9.770116820415755,
+        "near": {
+          "queries": 7592,
+          "recall@1": 0.8356164383561644,
+          "mrr": 0.8936392435574334
+        }
+      },
+      "no_count_query_centered": {
+        "queries": 10995,
+        "recall@1": 0.8829467939972715,
+        "recall@2": 0.9398817644383811,
+        "recall@3": 0.9590723055934516,
+        "recall@5": 0.9748976807639836,
+        "recall@10": 0.9889949977262392,
+        "recall@20": 0.9976352887676216,
+        "mrr": 0.9240482662200082,
+        "mean_rank": 1.418644838562983,
+        "median_rank": 1.0,
+        "macro_query_auroc": 0.949039414443878,
+        "macro_query_auprc": 0.9240482662200082,
+        "micro_candidate_auroc": 0.959423527249536,
+        "micro_candidate_auprc": 0.8492323626354843,
+        "mean_top1_top2_margin": 9.89293475398737,
+        "near": {
+          "queries": 7592,
+          "recall@1": 0.8373287671232876,
+          "mrr": 0.8943456526640541
+        }
+      }
+    },
+    "formula_disjoint": {
+      "full23_v1": {
+        "queries": 5261,
+        "recall@1": 0.8952670594943927,
+        "recall@2": 0.9566622315149211,
+        "recall@3": 0.9762402585059875,
+        "recall@5": 0.9897357916745866,
+        "recall@10": 0.9965785972248622,
+        "recall@20": 0.9996198441360958,
+        "mrr": 0.9368151602330116,
+        "mean_rank": 1.2375974149401254,
+        "median_rank": 1.0,
+        "macro_query_auroc": 0.9447173008904568,
+        "macro_query_auprc": 0.9368151602330116,
+        "micro_candidate_auroc": 0.9526615280080923,
+        "micro_candidate_auprc": 0.873951869990941,
+        "mean_top1_top2_margin": 10.063002153177425,
+        "near": {
+          "queries": 2944,
+          "recall@1": 0.8220108695652174,
+          "mrr": 0.8927847715725826
+        }
+      },
+      "no_reference_count": {
+        "queries": 5261,
+        "recall@1": 0.8935563581068238,
+        "recall@2": 0.9570423873788253,
+        "recall@3": 0.9766204143698917,
+        "recall@5": 0.9899258696065387,
+        "recall@10": 0.9969587530887664,
+        "recall@20": 0.9996198441360958,
+        "mrr": 0.936091782784677,
+        "mean_rank": 1.235126401824748,
+        "median_rank": 1.0,
+        "macro_query_auroc": 0.9446582020539843,
+        "macro_query_auprc": 0.936091782784677,
+        "micro_candidate_auroc": 0.9524411259922734,
+        "micro_candidate_auprc": 0.870614211831561,
+        "mean_top1_top2_margin": 10.500681470627114,
+        "near": {
+          "queries": 2944,
+          "recall@1": 0.8192934782608695,
+          "mrr": 0.8916336091782138
+        }
+      },
+      "no_count_query_centered": {
+        "queries": 5261,
+        "recall@1": 0.8964075270861053,
+        "recall@2": 0.9557118418551607,
+        "recall@3": 0.9764303364379395,
+        "recall@5": 0.9899258696065387,
+        "recall@10": 0.9967686751568143,
+        "recall@20": 0.9998099220680479,
+        "mrr": 0.937277608564211,
+        "mean_rank": 1.2339859342330355,
+        "median_rank": 1.0,
+        "macro_query_auroc": 0.9458873246811301,
+        "macro_query_auprc": 0.937277608564211,
+        "micro_candidate_auroc": 0.9548323490792144,
+        "micro_candidate_auprc": 0.8765736737106762,
+        "mean_top1_top2_margin": 10.671236631524039,
+        "near": {
+          "queries": 2944,
+          "recall@1": 0.8243885869565217,
+          "mrr": 0.8936192655244339
+        }
+      }
+    }
+  },
+  "comparisons": {
+    "identity_disjoint": {
+      "no_reference_count": {
+        "corrected": 57,
+        "introduced": 66,
+        "risk_net_lambda2": -75,
+        "recall1_formula_cluster_ci": {
+          "delta": -0.0008185538881309686,
+          "delta_pp": -0.08185538881309685,
+          "ci_low": -0.002885081114477586,
+          "ci_high": 0.0012575283290605854,
+          "ci_low_pp": -0.2885081114477586,
+          "ci_high_pp": 0.12575283290605854,
+          "formula_clusters": 4204,
+          "bootstrap_resamples": 5000
+        },
+        "mrr_delta": -0.0003374993949133598
+      },
+      "no_count_query_centered": {
+        "corrected": 92,
+        "introduced": 87,
+        "risk_net_lambda2": -82,
+        "recall1_formula_cluster_ci": {
+          "delta": 0.00045475216007276033,
+          "delta_pp": 0.04547521600727603,
+          "ci_low": -0.0020022983453527256,
+          "ci_high": 0.0028542768760764473,
+          "ci_low_pp": -0.20022983453527257,
+          "ci_high_pp": 0.28542768760764475,
+          "formula_clusters": 4204,
+          "bootstrap_resamples": 5000
+        },
+        "mrr_delta": 0.00025642170380698877
+      }
+    },
+    "formula_disjoint": {
+      "no_reference_count": {
+        "corrected": 23,
+        "introduced": 32,
+        "risk_net_lambda2": -41,
+        "recall1_formula_cluster_ci": {
+          "delta": -0.0017107013875689032,
+          "delta_pp": -0.1710701387568903,
+          "ci_low": -0.004445303440278315,
+          "ci_high": 0.0009386190106572057,
+          "ci_low_pp": -0.4445303440278315,
+          "ci_high_pp": 0.09386190106572057,
+          "formula_clusters": 2210,
+          "bootstrap_resamples": 5000
+        },
+        "mrr_delta": -0.0007233774483346807
+      },
+      "no_count_query_centered": {
+        "corrected": 52,
+        "introduced": 46,
+        "risk_net_lambda2": -40,
+        "recall1_formula_cluster_ci": {
+          "delta": 0.0011404675917126021,
+          "delta_pp": 0.11404675917126021,
+          "ci_low": -0.002655123316663316,
+          "ci_high": 0.004951484986901949,
+          "ci_low_pp": -0.2655123316663316,
+          "ci_high_pp": 0.4951484986901949,
+          "formula_clusters": 2210,
+          "bootstrap_resamples": 5000
+        },
+        "mrr_delta": 0.00046244833119951867
+      }
+    }
+  },
+  "query_balanced_joint": {
+    "full23_v1": {
+      "unique_queries": 11019,
+      "top1_utility": 0.8828387330973773,
+      "mrr_utility": 0.9242147244587849,
+      "semantics": "each unique query has total mass one; a query present in k panels contributes the mean of its k panel-specific outcomes",
+      "naive_union_metric_reported": false
+    },
+    "no_reference_count": {
+      "unique_queries": 11019,
+      "top1_utility": 0.8819765858970868,
+      "mrr_utility": 0.923872960600746,
+      "semantics": "each unique query has total mass one; a query present in k panels contributes the mean of its k panel-specific outcomes",
+      "naive_union_metric_reported": false
+    },
+    "no_count_query_centered": {
+      "unique_queries": 11019,
+      "top1_utility": 0.8834286232870496,
+      "mrr_utility": 0.9245546039200911,
+      "semantics": "each unique query has total mass one; a query present in k panels contributes the mean of its k panel-specific outcomes",
+      "naive_union_metric_reported": false
+    }
+  },
+  "readout_checkpoint_sha256": {
+    "no_reference_count": "d590126297e222cfbf29af77a6e67e81a1811582df187d54180a5a18eb085874",
+    "no_count_query_centered": "b1d4c108f780f1634fac55bc746f9c568ce8f11b32c9fb2c346735431a205675"
+  },
+  "claim_boundary": "Consumed development only; not external evidence."
+}

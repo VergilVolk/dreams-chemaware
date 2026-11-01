@@ -20,10 +20,14 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 
-from full23_multireference_readout_core import ENCODER_NAMES, TOP_K
-
-
 SCHEMA = "full23_anchored_tensor_set_readout_v1"
+ENCODER_NAMES = (
+    "noise_v1",
+    "chemaware_stage1",
+    "chemaware_phasea",
+    "noise_chemaware_fullmsg",
+)
+TOP_K = 3
 
 
 @dataclass(frozen=True)

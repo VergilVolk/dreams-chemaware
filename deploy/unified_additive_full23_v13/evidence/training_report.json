@@ -1,0 +1,189 @@
+{
+  "status": "FULL23_TRANSFER_SAFE_TENSOR_TRAINING_COMPLETE",
+  "dataset": {
+    "name": "Enveda-180",
+    "role": "consumed meta-development",
+    "queries": {
+      "identity_disjoint": 25000,
+      "formula_disjoint": 9435
+    }
+  },
+  "arms": {
+    "no_reference_count": {
+      "settings": {
+        "encoder_names": [
+          "noise_v1",
+          "chemaware_stage1",
+          "chemaware_phasea",
+          "noise_chemaware_fullmsg"
+        ],
+        "embedding_dimension": 1024,
+        "pair_dimension": 64,
+        "encoder_dimension": 64,
+        "attention_heads": 4,
+        "fusion_hidden": 128,
+        "top_k": 3,
+        "include_reference_count": false,
+        "query_center_raw_residual": false
+      },
+      "trainable_parameters": 625345,
+      "training_history": [
+        {
+          "loss": 0.8519164787401172,
+          "listwise": 0.5735441014115154,
+          "hardest_pairwise": 0.5524636327688025,
+          "epoch": 1
+        },
+        {
+          "loss": 0.8017543493292938,
+          "listwise": 0.539632790507377,
+          "hardest_pairwise": 0.5186266256094537,
+          "epoch": 2
+        },
+        {
+          "loss": 0.7821219823492095,
+          "listwise": 0.5266549921323939,
+          "hardest_pairwise": 0.5050092474045037,
+          "epoch": 3
+        },
+        {
+          "loss": 0.7703844155750753,
+          "listwise": 0.5188459715429742,
+          "hardest_pairwise": 0.49698990174243135,
+          "epoch": 4
+        },
+        {
+          "loss": 0.7666824878694135,
+          "listwise": 0.5166417795912944,
+          "hardest_pairwise": 0.4938243613404809,
+          "epoch": 5
+        },
+        {
+          "loss": 0.7570099017882368,
+          "listwise": 0.5101427699747725,
+          "hardest_pairwise": 0.4873890771598063,
+          "epoch": 6
+        }
+      ]
+    },
+    "no_count_query_centered": {
+      "settings": {
+        "encoder_names": [
+          "noise_v1",
+          "chemaware_stage1",
+          "chemaware_phasea",
+          "noise_chemaware_fullmsg"
+        ],
+        "embedding_dimension": 1024,
+        "pair_dimension": 64,
+        "encoder_dimension": 64,
+        "attention_heads": 4,
+        "fusion_hidden": 128,
+        "top_k": 3,
+        "include_reference_count": false,
+        "query_center_raw_residual": true
+      },
+      "trainable_parameters": 625345,
+      "training_history": [
+        {
+          "loss": 0.8294590592833195,
+          "listwise": 0.5592078685606295,
+          "hardest_pairwise": 0.5371317031110036,
+          "epoch": 1
+        },
+        {
+          "loss": 0.7683204726267202,
+          "listwise": 0.5186612128571043,
+          "hardest_pairwise": 0.49393672270399724,
+          "epoch": 2
+        },
+        {
+          "loss": 0.7481300522612978,
+          "listwise": 0.505299540002649,
+          "hardest_pairwise": 0.47970770959386727,
+          "epoch": 3
+        },
+        {
+          "loss": 0.7367313089915406,
+          "listwise": 0.49766024353437943,
+          "hardest_pairwise": 0.4718712987988727,
+          "epoch": 4
+        },
+        {
+          "loss": 0.7320300121223376,
+          "listwise": 0.49481439069308786,
+          "hardest_pairwise": 0.46799256846942705,
+          "epoch": 5
+        },
+        {
+          "loss": 0.7244645644233327,
+          "listwise": 0.489515985157048,
+          "hardest_pairwise": 0.4632806057151005,
+          "epoch": 6
+        }
+      ]
+    }
+  },
+  "residual_bound": 0.6255066394805908,
+  "reference_multiplicity": {
+    "identity_disjoint": {
+      "noise_v1": {
+        "1": 665459,
+        "2": 2843,
+        "3": 156
+      },
+      "chemaware_stage1": {
+        "1": 665459,
+        "2": 2843,
+        "3": 156
+      },
+      "chemaware_phasea": {
+        "1": 665459,
+        "2": 2843,
+        "3": 156
+      },
+      "noise_chemaware_fullmsg": {
+        "1": 665459,
+        "2": 2843,
+        "3": 156
+      }
+    },
+    "formula_disjoint": {
+      "noise_v1": {
+        "1": 58418,
+        "2": 339,
+        "3": 0
+      },
+      "chemaware_stage1": {
+        "1": 58418,
+        "2": 339,
+        "3": 0
+      },
+      "chemaware_phasea": {
+        "1": 58418,
+        "2": 339,
+        "3": 0
+      },
+      "noise_chemaware_fullmsg": {
+        "1": 58418,
+        "2": 339,
+        "3": 0
+      }
+    }
+  },
+  "embedding_score_alignment_max_abs_drift": {
+    "identity_disjoint": {
+      "noise_v1": 0.0,
+      "chemaware_stage1": 0.0,
+      "chemaware_phasea": 0.0,
+      "noise_chemaware_fullmsg": 0.0
+    },
+    "formula_disjoint": {
+      "noise_v1": 0.0,
+      "chemaware_stage1": 0.0,
+      "chemaware_phasea": 0.0,
+      "noise_chemaware_fullmsg": 0.0
+    }
+  },
+  "gnps_access": "none"
+}

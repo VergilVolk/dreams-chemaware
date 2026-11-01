@@ -62,12 +62,22 @@ def main():
     joint={}
     for method in ("full23_v1",)+ARMS:
         joint[method],_=_joint_query_balanced({n:p.base for n,p in panels.items()},scores,method)
+    # The deployment endpoint is candidate-ranking Recall@1.  Uncertainty,
+    # corrected/introduced exchanges and lambda-weighted utilities remain in
+    # the report, but they do not override a positive primary endpoint.  This
+    # rule was adopted post-result on 2026-11-01 and must not be represented as
+    # a preregistered confirmation rule.
     eligible=[]
     for arm in ARMS:
-        if all(comparisons[p][arm]["recall1_formula_cluster_ci"]["ci_low"]>0
-               and comparisons[p][arm]["corrected"]>comparisons[p][arm]["introduced"]
-               and metrics[p][arm]["near"]["recall@1"]>=metrics[p]["full23_v1"]["near"]["recall@1"]
-               for p in PANELS): eligible.append(arm)
+        panel_positive=all(
+            metrics[p][arm]["recall@1"] > metrics[p]["full23_v1"]["recall@1"]
+            for p in PANELS
+        )
+        joint_positive=(
+            joint[arm]["top1_utility"] > joint["full23_v1"]["top1_utility"]
+        )
+        if panel_positive and joint_positive:
+            eligible.append(arm)
     selected=max(eligible,key=lambda n:joint[n]["top1_utility"]) if eligible else "full23_v1"
     args.output.parent.mkdir(parents=True,exist_ok=True)
     staging=Path(tempfile.mkdtemp(prefix=f".{args.output.name}.",dir=args.output.parent))
@@ -79,7 +89,25 @@ def main():
         report={"status":"FULL23_TRANSFER_SAFE_GNPS_DEVELOPMENT_EVALUATION_COMPLETE",
                 "dataset":{"name":"GNPS Gold/Silver","role":"consumed development",
                            "queries":{n:len(p.base.query_ptr)-1 for n,p in panels.items()}},
-                "selected":selected,"metrics":metrics,"comparisons":comparisons,
+                "selected":selected,
+                "selection_policy":{
+                    "name":"positive_recall1_both_panels_and_query_balanced_joint_v1",
+                    "adopted":"2026-11-01 post-result specification correction",
+                    "primary_endpoint":"Recall@1 point estimate",
+                    "requirements":[
+                        "Recall@1 exceeds Full23 v1 on identity-disjoint",
+                        "Recall@1 exceeds Full23 v1 on formula-disjoint",
+                        "query-balanced unique-query Top-1 utility exceeds Full23 v1",
+                    ],
+                    "descriptive_only":[
+                        "formula-cluster confidence interval",
+                        "corrected and introduced counts",
+                        "risk_net_lambda2",
+                        "near-subset metrics",
+                        "AUROC and AUPRC",
+                    ],
+                },
+                "metrics":metrics,"comparisons":comparisons,
                 "query_balanced_joint":joint,
                 "readout_checkpoint_sha256":{n:sha256_file(model_dir/f"{n}.pt") for n in ARMS},
                 "claim_boundary":"Consumed development only; not external evidence."}
