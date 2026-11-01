@@ -1,0 +1,33 @@
+{
+  "schema": "unified_additive_full23_runtime_equivalence_addendum_v1",
+  "status": "FROZEN_INFERENCE_EQUIVALENCE_ACCEPTED",
+  "data_role": "development_consumed",
+  "release_manifest": {
+    "path": "deploy/unified_additive_full23_v1/manifest.json",
+    "sha256": "5c4c879de220f67e632c2f15c9d186dacd4d22d7f26eb2efd24e474ab510114e"
+  },
+  "component": {
+    "path": "tasks/enveda_unified_candidate_integrator_core.py",
+    "release_frozen_sha256": "b8c86591b1314321ad113440d8796b3deefefa96a874474a520335e3eab46a79",
+    "accepted_runtime_sha256": "f67fb23867123ca3a6d6a413fa793ed7db0ae4ec43bc8f23039bed680402a33a"
+  },
+  "equivalence_scope": {
+    "changed_symbol": "weighted_query_residual_penalty",
+    "changed_path": "training_only_residual_regularization",
+    "new_argument": "center_within_query",
+    "historical_default_retained": true,
+    "release_inference_path_calls_changed_symbol": false,
+    "release_checkpoint_or_feature_schema_changed": false,
+    "claim": "The accepted runtime differs only by an optional training-time residual penalty branch. Full23 v1 inference does not call this function, and the historical default remains numerically identical at the function-output level. This addendum does not authorize any other runtime-source drift."
+  },
+  "golden_replay": {
+    "test": "tasks/test_unified_additive_release.py",
+    "test_sha256": "d8c928afb32ef41225e431f10e205f19585facc2eded8b9bfdd2cd1bb4c1a79c",
+    "required_status": "PASS: unified Additive Full23 release contracts"
+  },
+  "claim_boundary": [
+    "This addendum establishes inference-runtime equivalence only; it is not a performance result.",
+    "The release manifest remains immutable and must match its frozen SHA-256 before this addendum is read.",
+    "The golden replay must pass in the formal job before scoring the Atlas axis."
+  ]
+}

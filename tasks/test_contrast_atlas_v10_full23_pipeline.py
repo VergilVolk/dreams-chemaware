@@ -154,7 +154,7 @@ class ContrastAtlasV10Full23PipelineTest(unittest.TestCase):
             EXPECTED_RELEASE_MANIFEST_SHA256,
         )
         self.assertEqual(
-            sha256(root / "deploy/unified_additive_full23_v1/runtime_equivalence_addendum_20261031.json"),
+            sha256(root / "tasks/full23_runtime_equivalence_addendum_20261031.json"),
             EXPECTED_RUNTIME_EQUIVALENCE_ADDENDUM_SHA256,
         )
         sbatch = (root / "tasks/run_contrast_atlas_v10_complete_axis_full23_1gpu.sbatch").read_text(
