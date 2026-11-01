@@ -6,7 +6,6 @@
 #SBATCH --gpus=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=10
-#SBATCH --mem=38G
 #SBATCH --time=24:00:00
 #SBATCH --output=data/validation/atlas_v10_full23_%j.out
 #SBATCH --error=data/validation/atlas_v10_full23_%j.err
