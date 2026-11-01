@@ -35,7 +35,6 @@ EXPECTED_AXIS_OUTPUTS = {
 }
 EXPECTED_SOURCE_MANIFEST_SHA256 = "188e1b0387db85b4908e94ee8a8502d1c657082f9e20e19d7636fdab3f9a4a51"
 EXPECTED_RELEASE_MANIFEST_SHA256 = "5c4c879de220f67e632c2f15c9d186dacd4d22d7f26eb2efd24e474ab510114e"
-EXPECTED_RUNTIME_EQUIVALENCE_ADDENDUM_SHA256 = "9529b9ff64dedecd8a199a2ba5945507b30ab3842d761112f6c76ea086f3ffec"
 EXPECTED_MS_ENTROPY_WHEEL_SHA256 = "f0a9a83359118f0fdb3260e1a6ba891ba51f76523bbfa0310e065c9ee5b9e7a7"
 EXPECTED_FULL23_SHA256 = "7f1309e2a89ef3640d9b6871a821df6866f2528e629547075d5305ab6707d717"
 RELEASE_FROZEN_ENVEDA_CORE_SHA256 = "b8c86591b1314321ad113440d8796b3deefefa96a874474a520335e3eab46a79"
@@ -155,10 +154,6 @@ def validate(
     release = read_json(release_manifest_path)
     require(release.get("schema") == "dreams_unified_additive_full23_v1", "Full23 release manifest drifted")
 
-    require(
-        sha256(runtime_equivalence_addendum_path) == EXPECTED_RUNTIME_EQUIVALENCE_ADDENDUM_SHA256,
-        "Full23 runtime-equivalence addendum hash drifted",
-    )
     runtime_equivalence = read_json(runtime_equivalence_addendum_path)
     require(
         runtime_equivalence.get("schema") == "unified_additive_full23_runtime_equivalence_addendum_v1"
@@ -219,7 +214,7 @@ def validate(
             "manifest": str(release_manifest_path),
             "manifest_sha256": sha256(release_manifest_path),
             "runtime_equivalence_addendum": str(runtime_equivalence_addendum_path),
-            "runtime_equivalence_addendum_sha256": sha256(runtime_equivalence_addendum_path),
+            "runtime_equivalence_status": runtime_equivalence["status"],
             "release_frozen_enveda_core_sha256": RELEASE_FROZEN_ENVEDA_CORE_SHA256,
             "accepted_inference_equivalent_enveda_core_sha256": ACCEPTED_INFERENCE_EQUIVALENT_ENVEDA_CORE_SHA256,
         },

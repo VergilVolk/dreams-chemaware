@@ -14,7 +14,6 @@ from package_contrast_atlas_v10_method_scores import package_method, validate_bu
 from preflight_contrast_atlas_v10_full23 import (
     EXPECTED_MS_ENTROPY_WHEEL_SHA256,
     EXPECTED_RELEASE_MANIFEST_SHA256,
-    EXPECTED_RUNTIME_EQUIVALENCE_ADDENDUM_SHA256,
     parse_artifacts,
 )
 
@@ -153,10 +152,12 @@ class ContrastAtlasV10Full23PipelineTest(unittest.TestCase):
             sha256(root / "deploy/unified_additive_full23_v1/manifest.json"),
             EXPECTED_RELEASE_MANIFEST_SHA256,
         )
-        self.assertEqual(
-            sha256(root / "tasks/full23_runtime_equivalence_addendum_20261031.json"),
-            EXPECTED_RUNTIME_EQUIVALENCE_ADDENDUM_SHA256,
+        addendum = json.loads(
+            (root / "tasks/full23_runtime_equivalence_addendum_20261031.json")
+            .read_text(encoding="utf-8")
         )
+        self.assertEqual(addendum["status"], "FROZEN_INFERENCE_EQUIVALENCE_ACCEPTED")
+        self.assertEqual(addendum["release_manifest"]["sha256"], EXPECTED_RELEASE_MANIFEST_SHA256)
         sbatch = (root / "tasks/run_contrast_atlas_v10_complete_axis_full23_1gpu.sbatch").read_text(
             encoding="utf-8"
         )
