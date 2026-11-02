@@ -1,0 +1,9 @@
+baseline_method	method	retained_edges	gained_edges	lost_edges
+weighted_spectral_entropy	official_dreams	24525	14105	10338
+weighted_spectral_entropy	noise_v1	24430	14356	10433
+weighted_spectral_entropy	p2b_noise_v1_frozen	28730	9696	6133
+weighted_spectral_entropy	noise_msg_fusion_stack_v1	24807	13863	10056
+weighted_spectral_entropy	chemaware_stage1	24513	14120	10350
+weighted_spectral_entropy	chemaware_phasea	24282	14409	10581
+weighted_spectral_entropy	noise_chemaware_fullmsg	24226	14500	10637
+weighted_spectral_entropy	full23_v1	31170	7188	3693
