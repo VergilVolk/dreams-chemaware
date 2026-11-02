@@ -53,11 +53,13 @@ candidate block is imputed.
 | Identity / Full23 v1.3.2 | **88.400%** | **94.009%** | **95.939%** | **97.505%** | **98.880%** | 99.754% | **0.9247** | **0.9497** | **0.9587** | **0.8445** | **83.870%** |
 | Identity / WSE | 87.417% | 93.007% | 95.320% | 97.004% | 98.698% | 99.672% | 0.9168 | 0.9437 | 0.9423 | 0.7566 | 82.577% |
 | Identity / official DreaMS | 85.387% | 92.315% | 95.010% | 97.014% | 98.762% | 99.763% | 0.9053 | 0.9377 | 0.9322 | 0.6817 | 79.979% |
+| Identity / MS2DeepScore 2.0 official | 79.159% | 88.510% | 92.525% | 95.702% | 98.398% | 99.636% | 0.8638 | 0.9078 | 0.9044 | 0.6893 | 72.461% |
 | Identity / MSBERT official | 81.899% | 89.985% | 93.435% | 96.030% | 98.306% | 99.727% | 0.8812 | 0.9183 | 0.8947 | 0.5408 | 75.481% |
 | Identity / SpecEmbedding official | 75.262% | 85.887% | 90.922% | 94.956% | 97.970% | 99.599% | 0.8374 | 0.8915 | 0.8563 | 0.4994 | 66.843% |
 | Formula / Full23 v1.3.2 | **89.644%** | **95.755%** | **97.658%** | 98.972% | 99.695% | 99.962% | **0.9376** | **0.9470** | **0.9539** | **0.8744** | **82.369%** |
 | Formula / WSE | 88.311% | 94.517% | 97.144% | 98.686% | 99.657% | 99.962% | 0.9281 | 0.9394 | 0.9285 | 0.7811 | 80.157% |
 | Formula / official DreaMS | 86.865% | 94.384% | 97.068% | 98.667% | 99.581% | 99.981% | 0.9205 | 0.9325 | 0.9073 | 0.6802 | 78.080% |
+| Formula / MS2DeepScore 2.0 official | 81.534% | 91.700% | 95.850% | 98.153% | 99.562% | 99.962% | 0.8877 | 0.9014 | 0.8863 | 0.7209 | 70.728% |
 | Formula / MSBERT official | 83.571% | 92.442% | 96.155% | 98.172% | 99.543% | **100.000%** | 0.8994 | 0.9124 | 0.8606 | 0.5569 | 73.315% |
 | Formula / SpecEmbedding official | 79.288% | 89.987% | 94.384% | 97.544% | 99.315% | 99.943% | 0.8714 | 0.8851 | 0.8249 | 0.5407 | 66.814% |
 
@@ -72,6 +74,15 @@ SpecEmbedding they are +13.138 and +10.356 percentage points. These public
 checkpoints were not trained under an identical protocol, and GNPS is training
 contaminated for several of them, so the result is a same-axis development
 comparison rather than a contradiction of their published task results.
+
+MS2DeepScore 2.0 is a 2026 published public model and the newest completed
+official-checkpoint run in this same-axis table. Full23 leads it by +9.242 pp
+on identity R@1 and +8.110 pp on formula R@1. MS2DeepScore 2.0 was trained for
+molecular fingerprint similarity rather than exact identity, so this is a
+useful released-model comparator, not a claim that Full23 supersedes its native
+chemical-similarity task. Official TransExION same-axis scoring is in progress
+and will be appended without changing the frozen Full23 scores or candidate
+axes.
 
 ## Curves and reproducibility
 
