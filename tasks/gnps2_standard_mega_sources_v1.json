@@ -1,0 +1,30 @@
+{
+  "schema": "gnps2_standard_mega_source_manifest_v1",
+  "dataset_id": "gnps2_standard_mega_20261102",
+  "sources": [
+    {
+      "source_id": "BMDMS-NP",
+      "mgf": "../data/external/gnps2_standard_mega_20261102/BMDMS-NP.mgf",
+      "required": true
+    },
+    {
+      "source_id": "PNNL-LIPIDS-POSITIVE",
+      "mgf": "../data/external/gnps2_standard_mega_20261102/PNNL-LIPIDS-POSITIVE.mgf",
+      "slim_metadata": "../data/external/gnps2_standard_mega_20261102/PNNL-LIPIDS-POSITIVE.slim.json",
+      "official_metadata_url": "https://library.gnps2.org/api/libraries/PNNL-LIPIDS-POSITIVE/spectra",
+      "required": true
+    },
+    {
+      "source_id": "PNNL-LIPIDS-NEGATIVE",
+      "mgf": "../data/external/gnps2_standard_mega_20261102/PNNL-LIPIDS-NEGATIVE.mgf",
+      "slim_metadata": "../data/external/gnps2_standard_mega_20261102/PNNL-LIPIDS-NEGATIVE.slim.json",
+      "official_metadata_url": "https://library.gnps2.org/api/libraries/PNNL-LIPIDS-NEGATIVE/spectra",
+      "required": true
+    },
+    {
+      "source_id": "MCE-DRUG",
+      "mgf": "../data/external/gnps2_standard_mega_20261102/MCE-DRUG.mgf",
+      "required": true
+    }
+  ]
+}
