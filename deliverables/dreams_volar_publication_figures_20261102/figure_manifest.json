@@ -1,0 +1,32 @@
+{
+  "status": "DREAMS_VOLAR_PUBLICATION_FIGURE_SUITE_COMPLETE",
+  "public_method_name": "DreaMS-VOLAR",
+  "expanded_name": "Vector, Orthogonal and Local Evidence with an Additive Residual for MS/MS Candidate Ranking",
+  "public_version": "1.0",
+  "frozen_implementation_alias": "Full23 v1.3.2",
+  "figures": [
+    "fig01_dreams_volar_method_overview.png",
+    "fig01_dreams_volar_method_overview.pdf",
+    "fig01_dreams_volar_method_overview.svg",
+    "fig02_public_method_benchmark.png",
+    "fig02_public_method_benchmark.pdf",
+    "fig02_public_method_benchmark.svg",
+    "fig03_precision_and_decision_flow.png",
+    "fig03_precision_and_decision_flow.pdf",
+    "fig03_precision_and_decision_flow.svg",
+    "fig04_evidence_contribution_and_error_exchange.png",
+    "fig04_evidence_contribution_and_error_exchange.pdf",
+    "fig04_evidence_contribution_and_error_exchange.svg",
+    "figS01_public_method_rank_profile.png",
+    "figS01_public_method_rank_profile.pdf",
+    "figS01_public_method_rank_profile.svg"
+  ],
+  "same_axis_domain": {
+    "identity_queries": 10983,
+    "formula_queries": 5253,
+    "reader_facing_public_methods": 9,
+    "all_scoring_streams_in_background_curves": 18
+  },
+  "evidence_role": "consumed GNPS development and consumed Enveda meta-development",
+  "external_confirmation": "pending; no CDC/HUMAN model performance is shown"
+}

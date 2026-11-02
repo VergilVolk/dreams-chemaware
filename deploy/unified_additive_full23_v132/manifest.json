@@ -1,0 +1,118 @@
+{
+  "schema": "dreams_unified_additive_full23_v132",
+  "release_date": "2026-11-02",
+  "release_status": "formal consumed-development residual-amplitude release",
+  "scientific_boundary": "Fit on consumed Enveda-180 meta-development; architecture and residual amplitude selected on consumed GNPS development. This is not external confirmation.",
+  "public_identity": {
+    "method_name": "DreaMS-VOLAR",
+    "expanded_name": "Vector, Orthogonal and Local Evidence with an Additive Residual for MS/MS Candidate Ranking",
+    "public_version": "1.0",
+    "frozen_implementation_alias": "Full23 v1.3.2",
+    "display_name": "DreaMS-VOLAR (ours)"
+  },
+  "architecture": {
+    "parent": "Full23 v1 candidate-level scalar evidence integrator",
+    "residual": "exact Full23 v1.3.1 four-encoder tensor-set readout",
+    "encoders": [
+      "Noise V1",
+      "ChemAware Stage-1",
+      "ChemAware Phase-A",
+      "Noise-ChemAware FullMSG"
+    ],
+    "score": "Full23_v1 + 0.9 * (Full23_v1.3.1 - Full23_v1)",
+    "residual_scale": 0.9,
+    "network_refit_for_v132": false,
+    "upstream_checkpoint_changed_for_v132": false
+  },
+  "assets": {
+    "parent_checkpoint": "assets/full23_v1_parent.pt",
+    "parent_checkpoint_sha256": "7f1309e2a89ef3640d9b6871a821df6866f2528e629547075d5305ab6707d717",
+    "readout_checkpoint": "assets/full23_v131_query_centered_raw_penalty_readout.pt",
+    "readout_sha256": "6603013a04fdc26946445a6ba1ed566d768bac49423046ce3922daac79fe637e"
+  },
+  "runtime": {
+    "entrypoint": "runtime/full23_v132_release.py",
+    "class": "FrozenFull23V132",
+    "missing_representation_semantics": "keep_parent_score"
+  },
+  "selection_disclosure": {
+    "primary_endpoint": "query-balanced unique-query Top-1 point estimate",
+    "residual_scale": 0.9,
+    "status": "post-result consumed-development amplitude calibration",
+    "statement": "The 0.9 scale was identified after inspection of consumed GNPS development predictions. It is not a prespecified confirmatory comparison.",
+    "risk_net_lambda2": "descriptive only; never a veto"
+  },
+  "source_runs": {
+    "v131_training_and_selection": "data/validation/full23_v13_cumulative_repairs_run_2434084",
+    "direct_repairs": "data/validation/full23_v131_direct_repairs_run_2434102",
+    "v132_materialization": "data/validation/full23_v132_residual_scale_20261102"
+  },
+  "data_roles": {
+    "enveda180": {
+      "role": "consumed meta-development fitting",
+      "identity_queries": 25000,
+      "formula_queries": 9435
+    },
+    "gnps_gold_silver": {
+      "role": "consumed development, selection and residual-amplitude calibration",
+      "identity_queries": 10995,
+      "identity_candidate_molecules": 87518,
+      "formula_queries": 5261,
+      "formula_candidate_molecules": 24401,
+      "query_balanced_unique_queries": 11019
+    }
+  },
+  "development_result": {
+    "identity_disjoint": {
+      "queries": 10995,
+      "v131_recall1": 0.8833105957253297,
+      "v132_recall1": 0.8836743974533879,
+      "delta_pp": 0.03638017280582082,
+      "corrected": 11,
+      "introduced": 7,
+      "v131_mrr": 0.9243132851912191,
+      "v132_mrr": 0.9245224309211846,
+      "v132_micro_auroc": 0.9585382756251873,
+      "v132_micro_auprc": 0.8441359708767561,
+      "v132_near_recall1": 0.8382507903055848
+    },
+    "formula_disjoint": {
+      "queries": 5261,
+      "v131_recall1": 0.8956472153582969,
+      "v132_recall1": 0.8960273712222011,
+      "delta_pp": 0.038015586390420075,
+      "corrected": 7,
+      "introduced": 5,
+      "v131_mrr": 0.9371485842190082,
+      "v132_mrr": 0.937401832892234,
+      "v132_micro_auroc": 0.9538401998737979,
+      "v132_micro_auprc": 0.8741531245268173,
+      "v132_near_recall1": 0.8230298913043478
+    },
+    "query_balanced_joint": {
+      "unique_queries": 11019,
+      "v1_top1": 0.8828387330973773,
+      "v131_top1": 0.8839277611398494,
+      "v132_top1": 0.8842453943189037,
+      "v132_minus_v131_pp": 0.03176331790542952,
+      "v132_minus_v1_pp": 0.14066612215263796,
+      "v131_mrr": 0.9249108126311878,
+      "v132_mrr": 0.9251069705348163
+    }
+  },
+  "direct_repair_adjudication": {
+    "v13_013_anchor_context_delta_joint_pp": -0.1315908884653776,
+    "v13_014_pair_width_128_delta_joint_pp": -0.08167710318541288,
+    "v13_015_signed_difference_delta_joint_pp": -0.4174607496143101,
+    "decision": "none promoted"
+  },
+  "evidence": {
+    "training": "evidence/training_report.json",
+    "training_contract": "evidence/training_contract.json",
+    "gnps_residual_scale": "evidence/gnps_development_residual_scale_report.json",
+    "candidate_predictions_identity": "evidence/candidate_predictions_identity_disjoint.npz",
+    "candidate_predictions_formula": "evidence/candidate_predictions_formula_disjoint.npz",
+    "parent_manifest": "evidence/parent_v13_manifest.json",
+    "checksums": "checksums.sha256"
+  }
+}

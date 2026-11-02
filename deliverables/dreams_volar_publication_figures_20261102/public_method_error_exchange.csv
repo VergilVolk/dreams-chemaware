@@ -1,0 +1,11 @@
+reference,corrected,introduced,net,panel
+weighted_spectral_entropy,221,113,108,identity_disjoint
+official_dreams,532,201,331,identity_disjoint
+spec2vec_gnps_public,421,192,229,identity_disjoint
+ms2deepscore_2x_public,1233,218,1015,identity_disjoint
+msbert_official,912,198,714,identity_disjoint
+weighted_spectral_entropy,116,46,70,formula_disjoint
+official_dreams,251,105,146,formula_disjoint
+spec2vec_gnps_public,208,94,114,formula_disjoint
+ms2deepscore_2x_public,533,107,426,formula_disjoint
+msbert_official,424,105,319,formula_disjoint

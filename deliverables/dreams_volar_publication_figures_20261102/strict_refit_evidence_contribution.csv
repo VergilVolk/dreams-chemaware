@@ -1,0 +1,33 @@
+dataset_panel,evidence_family,delta_pp
+Enveda identity,"All self-trained evidence
+vs official DreaMS + WSE",2.760000000000007
+Enveda identity,"Representation family
+Stage-1 / Phase-A / FullMSG",1.3000000000000012
+Enveda identity,"Candidate chemistry
+ChemAware V2",0.7480000000000042
+Enveda identity,"Local reranking
+P2b + MSG",0.38400000000000656
+Enveda formula,"All self-trained evidence
+vs official DreaMS + WSE",0.8267090620031836
+Enveda formula,"Representation family
+Stage-1 / Phase-A / FullMSG",0.010598834128250356
+Enveda formula,"Candidate chemistry
+ChemAware V2",0.43455219925808697
+Enveda formula,"Local reranking
+P2b + MSG",-0.0953895071542088
+GNPS identity,"All self-trained evidence
+vs official DreaMS + WSE",0.8094588449295115
+GNPS identity,"Representation family
+Stage-1 / Phase-A / FullMSG",0.04547521600728466
+GNPS identity,"Candidate chemistry
+ChemAware V2",0.6275579809004173
+GNPS identity,"Local reranking
+P2b + MSG",0.22737608003637888
+GNPS formula,"All self-trained evidence
+vs official DreaMS + WSE",1.0834442121269716
+GNPS formula,"Representation family
+Stage-1 / Phase-A / FullMSG",0.1330545523664628
+GNPS formula,"Candidate chemistry
+ChemAware V2",0.9123740733700814
+GNPS formula,"Local reranking
+P2b + MSG",0.36114807070898314
