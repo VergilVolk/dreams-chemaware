@@ -2,8 +2,9 @@
 
 Date: 2026-11-02
 
-Status: strict evaluator, public-model adapters and a 16-method GNPS smoke
-ladder are materialized locally; no claim of an unopened large external result
+Status: strict evaluator and an 18-scorer GNPS same-axis ladder are
+materialized locally; the seven-source 14.95M pair axis is now explicitly a
+known-overlap scale stress, not an unopened large external result
 
 ## Executive decision
 
@@ -35,10 +36,12 @@ The final SOTA claim therefore has three tiers:
    `4ef86f75a12ad2fdadbd63732e2d6690f4e506a6ff08f171758c1808d1249673`.
    Its competitive-query denominator is expected to be hundreds, so it cannot
    be the sole SOTA test.
-3. **Large aggregation/throughput stress:** StructureMASST/FASSTrecords and
-   other public aggregates after source-aware de-duplication.  These measure
-   throughput and robustness; aggregation labels and training overlap prevent
-   them from automatically becoming an independent final test.
+3. **Large aggregation/throughput stress:** the materialized seven-source
+   14.95M-pair axis and future StructureMASST/FASSTrecords. These measure
+   throughput and robustness. After the official MassSpecGym exclusion, the
+   strict seven-source axes collapse to 6,871 identity-disjoint and 2,218
+   formula-disjoint pairs before MoNA exclusion, confirming that aggregation
+   labels and training overlap prevent an independent final-test claim.
 
 If licensed NIST26 cannot be obtained, the final replacement is a MassBank
 release first published after the model freeze date or a prospective blind
@@ -250,6 +253,10 @@ The current defensible statement is:
 It is not yet defensible to write field-wide SOTA or externally validated
 SOTA.  That statement requires the primary independent source above and the
 missing published-model runs on the exact same candidate graph.
+
+The 14.95M verification axis is retained only for scale, runtime, memory and
+known-overlap robustness. It must not be used to imply 14.95M independent
+queries, 14.95M natural Top-k comparisons or an independent accuracy result.
 
 ## Immediate execution order
 

@@ -14,9 +14,12 @@ Two distinct deliverables are now materialized locally:
 
 The completed ladder uses consumed GNPS development panels. Full23 v1.3.2 is
 the Recall@1 leader on both panels, but this is development evidence rather
-than unopened external SOTA confirmation. The new ten-million-pair resource
-is pre-exclusion capacity and remains blocked from external claims until all
-consumed MassSpecGym and MoNA exclusion assets are present.
+than unopened external SOTA confirmation. The 14.95-million-pair resource is
+pre-exclusion scale capacity. Once the now-available official MassSpecGym
+exclusion is applied with GNPS, MassBank and MSnLib exclusions, only 6,871
+identity-disjoint and 2,218 formula-disjoint pairs remain. It is therefore a
+large throughput/robustness stress axis, not an independent external accuracy
+test. MoNA exclusion remains missing and can only shrink the strict axes.
 
 ## Denominators that must never be mixed
 
@@ -126,9 +129,28 @@ identity, polarity, adduct and 2-Da-window consistency.
 It is 24,571,375 bytes with SHA-256
 `dffce092d30890cf7ad6c4485b94077d6802f4b1e2763703274fb59c1e8e0462`.
 
-This axis supports ROC, PR, AUROC, average precision and sensitivity at fixed
-false-positive rates. Top-k remains reported only on the natural candidate
-graph above.
+The pre-exclusion axis supports ROC, PR, AUROC, average precision, sensitivity
+at fixed false-positive rates and runtime scaling. Because the overwhelming
+majority overlaps a consumed source once MassSpecGym is included, its accuracy
+results must be labelled a known-overlap stress/development analysis. Top-k
+remains reported only on the natural candidate graph above.
+
+### Strict exclusion result
+
+The official MassSpecGym split file is 582,897,368 bytes with SHA-256
+`ccda2c4114d9b21413977df03376ca0fc097956a7fa304b861a3154a2b81e64f`.
+After applying it together with the existing GNPS, MassBank and MSnLib
+exclusions, the materialized score-blind axes contain:
+
+| Axis | N_Q | Positive pairs | Negative pairs | N_pairs |
+|---|---:|---:|---:|---:|
+| Identity-disjoint | 461 | 2,173 | 4,698 | **6,871** |
+| Formula-disjoint | 208 | 927 | 1,291 | **2,218** |
+
+The independent integrity audit found no axis overlap, self-pair, duplicate,
+label/type, identity, polarity/adduct or mass-window violation. The remaining
+MoNA exclusion is unresolved, so these counts are not promoted as final
+external denominators.
 
 ## Latest-method task boundaries
 
@@ -156,14 +178,16 @@ The current defensible claim is:
 
 It is not yet defensible to claim field-wide or independently confirmed SOTA.
 The GNPS2 14.95-million-pair resource remains
-`GNPS2_STANDARD_MEGA_PREFLIGHT_BLOCKED_NOT_EXTERNAL`: currently available
-GNPS, MassBank and MSnLib consumed-source exclusions reduce the
-identity-disjoint pair capacity to 11,721,176, and the
-required MassSpecGym and MoNA positive/negative exclusions are not locally
-complete. The panel must be rebuilt after those exclusions before any score is
-read or final claim is made.
+`GNPS2_STANDARD_MEGA_PREFLIGHT_BLOCKED_NOT_EXTERNAL`. The MassSpecGym-updated
+strict build demonstrates that its apparent size was dominated by consumed
+identity coverage: 6,871 identity-disjoint and 2,218 formula-disjoint pairs
+remain before the still-missing MoNA exclusion. The 14.95-million axis may be
+used for throughput and known-overlap robustness only; external transfer must
+come from a genuinely post-freeze or prospective source.
 
 The seven-source forecast and source hashes are bound to
 `data/validation/gnps2_standard_mega_7source_preflight_v1_20261102/report.json`;
 the earlier four-source v4 report remains a historical build and is not the
-evidence source for the seven-source counts above.
+evidence source for the seven-source counts above. The strict exclusion
+correction is recorded under
+`data/validation/gnps2_standard_mega_7source_preflight_v3_massspecgym_20261102/`.

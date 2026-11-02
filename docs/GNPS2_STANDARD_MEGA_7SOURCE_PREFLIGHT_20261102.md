@@ -5,15 +5,20 @@ Date: 2026-11-02
 ## Decision
 
 The seven-source score-blind inventory is materially larger than the original
-four-source inventory. It supports a natural 10-ppm Top-k task with 29,332
-labelled queries and a separate pairwise identity-verification task with
-14,950,709 labelled pairs.
+four-source inventory. Before consumed-source exclusion it supports a natural
+10-ppm Top-k task with 29,332 labelled queries and a separate pairwise
+identity-verification task with 14,950,709 labelled pairs.
 
-It remains `GNPS2_STANDARD_MEGA_PREFLIGHT_BLOCKED_NOT_EXTERNAL`. The complete
-MassSpecGym and MoNA positive/negative consumed-source exclusions are absent
-locally, so neither pre-exclusion nor locally available-exclusion counts may be
-reported as a final independent benchmark result. No model, embedding,
-prediction or evaluation score was read during construction.
+The official MassSpecGym split asset is now present and verified. Applying the
+available MassSpecGym, GNPS, MassBank and MSnLib exclusions collapses the
+strict identity-disjoint pair axis to 461 queries / 6,871 pairs and the strict
+formula-disjoint axis to 208 queries / 2,218 pairs. Therefore the 14.95-million
+pre-exclusion axis is a scale/throughput stress resource, not an independent
+external accuracy benchmark. The build remains
+`GNPS2_STANDARD_MEGA_PREFLIGHT_BLOCKED_NOT_EXTERNAL` because MoNA positive and
+negative consumed-source exclusions are still unavailable; loading them can
+only reduce the strict axes further. No model, embedding, prediction or
+evaluation score was read during construction.
 
 ## Source inventory
 
@@ -59,10 +64,24 @@ pairs outside 10 ppm but within 0.05 Da, and 11,998,740 pairs outside 0.05 Da
 but within 2 Da. Each query contributes at most eight positives and 512
 negatives under seed `20261102`.
 
-Known locally available exclusions reduce the expanded identity-disjoint
-capacity to 54,555 labelled queries and 11,721,176 pairs. The corresponding
-formula-disjoint upper bound is 23,325 queries and 1,684,299 pairs. These
-remain incomplete upper bounds until all required exclusions are loaded.
+Before the official MassSpecGym exclusion was loaded, the locally available
+exclusions left 54,555 identity-disjoint queries / 11,721,176 pairs and 23,325
+formula-disjoint queries / 1,684,299 pairs. Those counts are superseded.
+
+After loading MassSpecGym together with the existing GNPS, MassBank and MSnLib
+exclusions, the actual materialized axes are:
+
+| Strict axis | N_Q | Positive pairs | Negative pairs | N_pairs |
+|---|---:|---:|---:|---:|
+| Identity-disjoint | 461 | 2,173 | 4,698 | **6,871** |
+| Formula-disjoint | 208 | 927 | 1,291 | **2,218** |
+
+MassSpecGym alone identifies 126,043 identity overlaps, 127,084 formula
+overlaps and 42,735 exact-spectrum overlaps in the cleaned inventory. An
+independent full-array check found zero query/reference-axis overlap, self
+pairs, duplicate pairs, label/type mismatch, identity mismatch,
+polarity/adduct violation or mass-window violation. These are still upper
+bounds on the final strict axes because MoNA exclusions remain missing.
 
 ## Reproducibility
 
@@ -70,6 +89,10 @@ remain incomplete upper bounds until all required exclusions are loaded.
 - preflight entry point: `tasks/preflight_gnps2_standard_mega_benchmark.py`;
 - score-blind report: `data/validation/gnps2_standard_mega_7source_preflight_v1_20261102/report.json`;
 - materialized pair artifact: `data/validation/gnps2_standard_mega_7source_preflight_v2_20261102/pre_exclusion_q123_pairwise_verification_indices.npz`.
+- MassSpecGym-updated strict build:
+  `data/validation/gnps2_standard_mega_7source_preflight_v3_massspecgym_20261102/`;
+- strict pair audit: `available_exclusion_pair_materialization.json` and
+  `independent_pair_verification.json` in that directory.
 
 The materialized pair artifact contains only integer row indices, labels and
 pair-type codes, not copied spectra. It is 24,571,375 bytes with SHA-256
