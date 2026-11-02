@@ -56,6 +56,10 @@ query counts must not be added naively.
 | GNPS Gold/Silver, fixed consumed transfer | identity-disjoint | 10,995 | 5,534 | 4,204 | 87,518 |
 | GNPS Gold/Silver, fixed consumed transfer | formula-disjoint | 5,261 | 2,662 | 2,210 | 24,401 |
 
+The mean candidate counts per query are 26.74/6.23 for Enveda and 7.96/4.64
+for GNPS (identity/formula). Candidate-molecule occurrences count repeated
+query-candidate comparisons, not independent molecules or experimental samples.
+
 There are 30,343 unique Enveda queries and 11,019 unique GNPS queries after
 giving a query present in both panels total weight one.  Enveda was constructed
 from a 1,175,202-spectrum source release; GNPS retained 329,607 clean spectra
@@ -75,9 +79,13 @@ Not in the sense of a new random draw from all metabolites or instruments.
   Under the builder's single pass this is the complete set that survived the
   frozen leakage, cross-condition and candidate-competition rules, rather than
   a further capped sample.
-- GNPS is not sampled at the query level.  The builder enumerates every eligible
-  Gold/Silver `[M+H]+` identity in sorted order and retains at most two
-  high-quality, independent-acquisition queries per identity.  The fixed hash is
+- GNPS does not use uniform random query sampling or a global random query
+  ceiling. The builder enumerates eligible Gold/Silver `[M+H]+` identities in
+  sorted order and retains at most two queries per identity, ordered by library
+  quality, descending peak count and source row. Each query must have a positive
+  reference with a different nonempty `FILENAME`. Different filenames do not,
+  by themselves, establish different studies, instruments or biological samples.
+  The fixed hash is
   used only if a query has more than 200 negative identities; the observed
   maximum is 52, so the candidate cap did not bind.  Before the two-query cap,
   27,320/11,949 query spectra were eligible on identity/formula; the final
@@ -90,6 +98,18 @@ GNPS deliberately favours curated positive-mode Gold/Silver spectra.  Neither
 resource alone establishes performance across arbitrary instruments, ion modes,
 collision programmes or real cohort spectra.  Both are closed-set panels: the
 correct identity must be present and at least one competing identity must exist.
+
+For Enveda, the hash samples eligible identity/adduct units, not arbitrary raw
+spectra: the builder selects the first source-ordered 60 eV query per unit and
+up to three 20 eV reference spectra. The v3 launch explicitly sets
+`--max-candidates 0`, so it does not apply the old candidate ceiling. Hash
+sampling is model-blind, but does not guarantee balance across chemical classes.
+
+`formula-disjoint` describes exclusions relative to the registered consumed
+formula set. Both primary panels still use the 10 ppm candidate rule; it does
+not mean that every candidate has the query's formula. Separate `same_formula`
+panels exist. The primary formula panel's higher R@1 should therefore not be
+read as proof of superior performance on a uniformly harder candidate set.
 
 ## Absolute performance
 
@@ -138,6 +158,11 @@ Query-balanced Full-minus-refit results are:
    module.**  It is retained in every group ablation and underlies P2b.  Its
    already-established direct gain and the performance of the retained
    Noise/WSE/P2b/MSG/V2 core show that the portable system is Noise-centred.
+   This is an architectural description, not a quantitative allocation of most
+   achieved accuracy to Noise. WSE already achieves 87.367%/88.272% on GNPS;
+   without a dedicated refit/replacement, Noise's conditional marginal gain in
+   the full system remains unmeasured. Family-ablation deltas are conditional
+   effects and must not be added as independent shares of the total gain.
 3. **ChemAware V2 is the most consistent independent incremental family.**  It
    is the only declared group with positive, supported Top-1 contribution in
    both resources and both panels.  On GNPS, setting all V2 evidence to the
@@ -159,13 +184,16 @@ Query-balanced Full-minus-refit results are:
 For the primary overall effects, yes.  The uncertainty is already small enough
 to distinguish the observed changes:
 
-- Full versus WSE on Enveda has cluster-CI widths of approximately
+- Full versus WSE on Enveda has cluster CIs of approximately
   `[+4.138,+4.999] pp` and `[+0.572,+1.497] pp`.
 - Fixed Full versus WSE on GNPS has intervals `[+0.577,+1.208] pp` and
   `[+0.783,+1.750] pp`.
 
-Thus 0.8--1.3 pp transfer gains are resolved on thousands of independent
-formula clusters.  Increasing the same Enveda hash sample from 25,000 to a much
+Thus the reported formula-cluster paired intervals resolve the observed
+0.8--1.3 pp transfer gains using thousands of formula groups. Grouping by formula
+accounts for dependence within that grouping; it does not establish independence
+across acquisition sources or all related chemical families. Increasing the
+same Enveda hash sample from 25,000 to a much
 larger number would narrow sampling error, but it would not repair source,
 instrument, adduct or collision-condition dependence.  The more important next
 evidence is a genuinely new collection, not another larger slice of the same
@@ -190,3 +218,33 @@ the next high-value work is to apply this exact model to the fixed biological
 candidate axis with legitimate V2 evidence wherever structures exist, and to
 reserve a genuinely new external collection for one final comparison.  No
 additional fusion-head search is justified by this result.
+
+## Construction review and provenance (2026-10-27)
+
+This follow-up reviewed the committed result above (commit `4e8f52e`) against:
+
+- `tasks/build_enveda180_cross_condition_benchmark.py`: group construction,
+  score-blind hash order, eligibility, mass-window candidates and query ceiling;
+- `tasks/run_prepare_gnps_enveda_benchmarks.sbatch`: corrected v3 asset,
+  25,000-query ceiling, seed 20261008 and uncapped candidate identities;
+- `tasks/build_gnps_gold_silver_10ppm_benchmark.py`: deterministic query
+  priorities, per-identity query ceiling and distinct-filename positive rule.
+
+The result and denominator counts in this document come from the committed
+run-2415768 analysis. This follow-up did not independently reload the remote
+run's raw NPZ predictions or regenerate its bootstrap intervals. In particular,
+the GNPS pre-cap eligible counts and observed candidate maximum above are
+reported metadata, not quantities independently recovered from the builder.
+The Enveda pre-cap eligible denominator remains unrecorded.
+
+The panel intersections implied by the unique-query totals are 4,092 Enveda
+queries and 5,237 GNPS queries. Neither the panel totals nor their structure
+counts should be summed as independent evidence.
+
+The decision is to retain the frozen evaluation and Full model. The present
+sample supports the main within-protocol comparisons; no arbitrary requirement
+to reach 100,000 queries follows from these results. For a stronger final
+publication claim, the next collection should contribute genuinely new source
+conditions with enough distinct chemical groups, rather than merely increasing
+replicate spectra from the same source. Its size should be planned from the
+minimum useful improvement and group dependence, not a round target count.

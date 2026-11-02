@@ -30,6 +30,12 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def sha256_text_lf(path: Path) -> str:
+    """Hash tracked text using Git's canonical LF representation."""
+    canonical = path.read_bytes().replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+    return hashlib.sha256(canonical).hexdigest()
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("bundle", type=Path)
@@ -57,7 +63,7 @@ def main() -> None:
     for report in reports:
         path = bundle / str(report.get("path", ""))
         digest = str(report.get("sha256", "")).lower()
-        if not path.is_file() or sha256(path) != digest:
+        if not path.is_file() or sha256_text_lf(path) != digest:
             raise RuntimeError(f"selection-evidence identity mismatch: {path}")
     frozen_sources = manifest.get("runtime_source_sha256_at_freeze", [])
     if len(frozen_sources) != 2:
@@ -72,6 +78,19 @@ def main() -> None:
             raise RuntimeError(f"release runtime source is missing: {name}")
     if not (bundle / "ARCHITECTURE_AND_METRICS.md").is_file():
         raise RuntimeError("release architecture/metrics report is missing")
+    status_path = bundle / "model_status.json"
+    if not status_path.is_file():
+        raise RuntimeError("release model status is missing")
+    status = json.loads(status_path.read_text(encoding="utf-8"))
+    if (
+        status.get("schema") != "unified_additive_full23_model_status_v1"
+        or status.get("checkpoint_sha256") != CHECKPOINT_SHA256
+        or status.get("decision_arm") != "additive_linear_control"
+        or status.get("successor_experiments", {})
+        .get("full23_v11_bounded_multireference", {})
+        .get("status") != "not_promoted"
+    ):
+        raise RuntimeError("release model status drifted from the frozen decision")
 
     checksum_path = bundle / "SHA256SUMS.txt"
     registered: set[str] = set()

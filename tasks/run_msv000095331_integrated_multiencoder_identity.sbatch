@@ -33,7 +33,7 @@ else
   MSG_MODEL_ARTIFACT="$MSG_FUSION_MODEL"
   MSG_MODEL_REPORT="$(dirname -- "$MSG_FUSION_MODEL")/report.json"
 fi
-FIXED_ADDITIVE_MODEL="data/validation/enveda_no_query_context_diagnostic_run_2413878/modeling/unified_candidate_integrator.pt"
+FIXED_ADDITIVE_MODEL="deploy/unified_additive_full23_v1/assets/unified_candidate_integrator.pt"
 UNIFIED_MODEL="${UNIFIED_RANKER_MODEL:-$FIXED_ADDITIVE_MODEL}"
 IDENTITY_HANDOFF="${IDENTITY_HANDOFF:-data/validation/msv000095331_complete_identity_handoff_v3_20261023}"
 REUSE_EMBEDDING_ROOT="${APPLICATION_EMBEDDING_CACHE_ROOT:-data/validation/msv000095331_integrated_multiencoder_identity_run_2404230}"
@@ -52,6 +52,10 @@ NOISE_EMBEDDING="$REUSE_EMBEDDING_ROOT/noise_v1_embeddings.npz"
 STAGE1_EMBEDDING="$REUSE_EMBEDDING_ROOT/chemaware_stage1_embeddings.npz"
 PHASEA_EMBEDDING="$REUSE_EMBEDDING_ROOT/chemaware_phase_a_embeddings.npz"
 FULLMSG_EMBEDDING="$REUSE_EMBEDDING_ROOT/noise_chemaware_fullmsg_embeddings.npz"
+NOISE_EMBEDDING_SIDECAR="${NOISE_EMBEDDING}.json"
+STAGE1_EMBEDDING_SIDECAR="${STAGE1_EMBEDDING}.json"
+PHASEA_EMBEDDING_SIDECAR="${PHASEA_EMBEDDING}.json"
+FULLMSG_EMBEDDING_SIDECAR="${FULLMSG_EMBEDDING}.json"
 REUSE_FROZEN_EMBEDDINGS=false
 if [[ -s "$NOISE_EMBEDDING" && -s "$STAGE1_EMBEDDING" \
       && -s "$PHASEA_EMBEDDING" && -s "$FULLMSG_EMBEDDING" ]]; then
@@ -71,9 +75,16 @@ required=(
   tasks/noise_gnps_article_spectral_scores.py
   tasks/score_crossstudy_identity_multiencoder.py
   tasks/test_crossstudy_identity_multiencoder.py
+  tasks/build_full23_application_evidence.py
+  tasks/unified_additive_release.py
+  tasks/verify_full23_application_replay.py
 )
 if [[ "$REUSE_FROZEN_EMBEDDINGS" == true ]]; then
-  required+=("$NOISE_EMBEDDING" "$STAGE1_EMBEDDING" "$PHASEA_EMBEDDING" "$FULLMSG_EMBEDDING")
+  required+=(
+    "$NOISE_EMBEDDING" "$STAGE1_EMBEDDING" "$PHASEA_EMBEDDING" "$FULLMSG_EMBEDDING"
+    "$NOISE_EMBEDDING_SIDECAR" "$STAGE1_EMBEDDING_SIDECAR"
+    "$PHASEA_EMBEDDING_SIDECAR" "$FULLMSG_EMBEDDING_SIDECAR"
+  )
 else
   required+=(
     "$NOISE" "$STAGE1" "$PHASEA" "$FULLMSG_CHEM"
@@ -89,37 +100,19 @@ if (( ${#missing[@]} > 0 )); then
   exit 4
 fi
 
-model_schema="$(python - "$UNIFIED_MODEL" <<'PY'
-import sys, torch
-try:
-    body=torch.load(sys.argv[1], map_location='cpu', weights_only=False)
-except TypeError:
-    body=torch.load(sys.argv[1], map_location='cpu')
-print(body.get('schema','legacy_massspecgym_embedding_readout'))
-PY
-)"
-if [[ "$model_schema" == "enveda_unified_candidate_integrator_v1" \
-      && -z "$ENVEDA_INTEGRATOR_ARM" ]]; then
-  # The 23-feature learned Additive is the fixed cross-source deployment
-  # candidate.  The checkpoint's nonlinear primary remains available only
-  # when explicitly requested through ENVEDA_INTEGRATOR_ARM.
-  ENVEDA_INTEGRATOR_ARM="additive_linear_control"
+if [[ -n "$ENVEDA_INTEGRATOR_ARM" \
+      && "$ENVEDA_INTEGRATOR_ARM" != "additive_linear_control" ]]; then
+  echo "APP_FULL23_V1_ARM_MUST_BE_ADDITIVE: $ENVEDA_INTEGRATOR_ARM" >&2
+  exit 4
 fi
-if [[ -n "$ENVEDA_INTEGRATOR_ARM" ]]; then
-  python - "$UNIFIED_MODEL" "$ENVEDA_INTEGRATOR_ARM" <<'PY'
-import sys, torch
-try:
-    body = torch.load(sys.argv[1], map_location='cpu', weights_only=False)
-except TypeError:
-    body = torch.load(sys.argv[1], map_location='cpu')
-if body.get('schema') != 'enveda_unified_candidate_integrator_v1':
-    raise SystemExit('APP_ENVEDA_ARM_REQUIRES_ENVEDA_INTEGRATOR_CHECKPOINT')
-if sys.argv[2] not in body.get('arms', {}):
-    raise SystemExit(f'APP_ENVEDA_ARM_NOT_IN_CHECKPOINT: {sys.argv[2]}')
+ENVEDA_INTEGRATOR_ARM="additive_linear_control"
+python - "$UNIFIED_MODEL" <<'PY'
+import sys
+from pathlib import Path
+from unified_additive_release import validate_checkpoint
+validate_checkpoint(Path(sys.argv[1]))
 PY
-fi
-if [[ "$model_schema" == "enveda_unified_candidate_integrator_v1" \
-      && ( ! -s "$MSG_MODEL_ARTIFACT" || ! -s "$MSG_MODEL_REPORT" ) ]]; then
+if [[ ! -s "$MSG_MODEL_ARTIFACT" || ! -s "$MSG_MODEL_REPORT" ]]; then
   echo "APP_UNIFIED_MSG_MODEL_MISSING: $MSG_FUSION_MODEL" >&2
   exit 4
 fi
@@ -129,7 +122,10 @@ trap 'rm -rf -- "$SCRATCH"' EXIT
 
 python -m py_compile \
   tasks/encode_crossstudy_mgfs_checkpoint.py \
-  tasks/score_crossstudy_identity_multiencoder.py
+  tasks/score_crossstudy_identity_multiencoder.py \
+  tasks/build_full23_application_evidence.py \
+  tasks/unified_additive_release.py \
+  tasks/verify_full23_application_replay.py
 python -u tasks/test_crossstudy_identity_multiencoder.py
 
 study_args=(
@@ -157,6 +153,10 @@ else
   STAGE1_EMBEDDING="$OUT/chemaware_stage1_embeddings.npz"
   PHASEA_EMBEDDING="$OUT/chemaware_phasea_embeddings.npz"
   FULLMSG_EMBEDDING="$OUT/noise_chemaware_fullmsg_embeddings.npz"
+  NOISE_EMBEDDING_SIDECAR="${NOISE_EMBEDDING}.json"
+  STAGE1_EMBEDDING_SIDECAR="${STAGE1_EMBEDDING}.json"
+  PHASEA_EMBEDDING_SIDECAR="${PHASEA_EMBEDDING}.json"
+  FULLMSG_EMBEDDING_SIDECAR="${FULLMSG_EMBEDDING}.json"
   encode_one noise_v1 "$NOISE" "$NOISE_EMBEDDING"
   encode_one chemaware_stage1 "$SCRATCH/chemaware_stage1_slim.pt" "$STAGE1_EMBEDDING"
   encode_one chemaware_phasea "$SCRATCH/chemaware_phasea_slim.pt" "$PHASEA_EMBEDDING"
@@ -191,6 +191,25 @@ python -u tasks/score_crossstudy_identity_multiencoder.py \
   --unified-model "$UNIFIED_MODEL" --device cuda \
   --output-dir "$OUT/identity_scoring" --fragment-da 0.02
 
+python -u tasks/build_full23_application_evidence.py \
+  --scoring-dir "$OUT/identity_scoring" \
+  --encoder-sidecar "noise_v1=$NOISE_EMBEDDING_SIDECAR" \
+  --encoder-sidecar "chemaware_stage1=$STAGE1_EMBEDDING_SIDECAR" \
+  --encoder-sidecar "chemaware_phasea=$PHASEA_EMBEDDING_SIDECAR" \
+  --encoder-sidecar "noise_chemaware_fullmsg=$FULLMSG_EMBEDDING_SIDECAR" \
+  --output-dir "$OUT/full23_v1_evidence"
+
+python -u tasks/unified_additive_release.py \
+  --evidence "$OUT/full23_v1_evidence/candidate_evidence.npz" \
+  --evidence-manifest "$OUT/full23_v1_evidence/candidate_evidence.json" \
+  --checkpoint "$UNIFIED_MODEL" \
+  --output "$OUT/full23_v1_release_scoring" --device cpu
+
+python -u tasks/verify_full23_application_replay.py \
+  --scorer-tsv "$OUT/identity_scoring/identity_candidate_scores.tsv.gz" \
+  --release-scores "$OUT/full23_v1_release_scoring/candidate_scores.npz" \
+  --output "$OUT/full23_v1_portable_replay.json"
+
 sha256sum \
   "$NOISE_EMBEDDING" \
   "$STAGE1_EMBEDDING" \
@@ -200,5 +219,11 @@ sha256sum \
   "$OUT/identity_scoring/identity_candidate_scores.tsv.gz" \
   "$OUT/identity_scoring/method_scores_long.tsv.gz" \
   "$OUT/identity_scoring/directional_query_registry.tsv.gz" \
-  "$OUT/identity_scoring/report.json" > "$OUT/SHA256SUMS.txt"
-echo "MSV000095331_UNIFIED_CANDIDATE_RANKER_APPLICATION_COMPLETE: $OUT"
+  "$OUT/identity_scoring/report.json" \
+  "$OUT/full23_v1_evidence/candidate_evidence.npz" \
+  "$OUT/full23_v1_evidence/candidate_evidence.json" \
+  "$OUT/full23_v1_release_scoring/candidate_scores.npz" \
+  "$OUT/full23_v1_release_scoring/query_registry.npz" \
+  "$OUT/full23_v1_release_scoring/report.json" \
+  "$OUT/full23_v1_portable_replay.json" > "$OUT/SHA256SUMS.txt"
+echo "MSV000095331_FULL23_V1_APPLICATION_COMPLETE: $OUT"

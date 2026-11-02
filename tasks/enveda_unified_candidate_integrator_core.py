@@ -292,11 +292,17 @@ def weighted_query_residual_penalty(
     residual: torch.Tensor,
     query_ptr: np.ndarray,
     query_weights: np.ndarray,
+    *,
+    center_within_query: bool = False,
 ) -> torch.Tensor:
-    """Penalize residual size without overweighting large candidate blocks.
+    """Penalize residual variation without overweighting candidate-rich queries.
 
     Mean square is computed inside each query first, then combined with the
-    same 1/k cross-panel occurrence weights as the listwise objective.
+    same 1/k cross-panel occurrence weights as the listwise objective.  The
+    historical default penalizes the absolute residual and is retained for
+    exact replay of Full23 v1.  When ``center_within_query`` is true, the
+    query mean is removed first: listwise ranking is invariant to that common
+    offset, so only candidate-separating residual variation is regularized.
     """
     ptr = np.asarray(query_ptr, dtype=np.int64)
     weights = torch.as_tensor(
@@ -306,10 +312,10 @@ def weighted_query_residual_penalty(
         raise ValueError("residual/query pointer axis mismatch")
     if weights.shape != (len(ptr) - 1,) or torch.any(weights <= 0):
         raise ValueError("query weights do not align with residual blocks")
-    penalties = torch.stack([
-        torch.mean(torch.square(residual[int(left):int(right)]))
-        for left, right in zip(ptr[:-1], ptr[1:])
-    ])
+    blocks = [residual[int(left):int(right)] for left, right in zip(ptr[:-1], ptr[1:])]
+    if center_within_query:
+        blocks = [block - torch.mean(block) for block in blocks]
+    penalties = torch.stack([torch.mean(torch.square(block)) for block in blocks])
     return torch.sum(penalties * weights) / torch.sum(weights)
 
 
