@@ -168,6 +168,36 @@ public models) will be shown on GNPS only as contaminated/consumed development
 comparators.  Their final status is decided on a genuinely new identity-
 disjoint source.
 
+### Current 2023--2026 frontier and table eligibility
+
+The main ladder is intentionally task-specific.  A method is not admitted
+merely because it emits one scalar for a spectrum pair.
+
+| Method | Native target | Main-ladder treatment |
+|---|---|---|
+| DreaMS | general MS/MS representation and fine-tuned similarity | same-axis identity comparator |
+| MSBERT (2024) | identity and analogue spectral retrieval | same-axis identity comparator on its strict supported domain; GNPS is training-contaminated |
+| SpecEmbedding (2025) | identity plus structural-similarity retrieval | official checkpoint run on the complete frozen axis; GNPS is training-contaminated |
+| MS2DeepScore 2.0 (2026) | molecular fingerprint-similarity prediction | same-axis **auxiliary** comparator, not relabelled as identity training |
+| TransExION (2024) | pairwise structural similarity and analogue interpretation | same-axis **auxiliary** comparator; official gradient-hook inference and its resource cost are preserved |
+| MS2Query (2023) | whole-library retrieval plus neighbourhood-feature reranking | native-system table only; inserting its RF score into the frozen small candidate graph would change the method |
+| MS2Query 2 | prototype library/retrieval framework | prototype only; no paper-grade frozen reranker yet |
+| LSM-MS2 (2025 preprint) | large-library MS/MS retrieval | reported-only frontier because no public reproducible checkpoint/reference library is available |
+| PRISM | proprietary large foundation model | reported-only; model, training corpus and executable code are unavailable |
+
+MIST, CSI:FingerID/SIRIUS, JESTR, ESP, MVP and related systems rank molecular
+structures conditioned on a query spectrum.  De-novo generators answer yet
+another task.  Their published Recall@k values therefore go in separate task
+tables rather than being mixed with experimental-spectrum identity retrieval.
+
+The first newly executed official checkpoint, SpecEmbedding, is recorded in
+`docs/GNPS_SPECEMBEDDING_SAME_AXIS_RESULT_20261102.md`.  Its same-axis GNPS
+Recall@1 is 75.252% on identity-disjoint and 79.282% on formula-disjoint,
+versus 88.367% and 89.603% for Full23 v1.3.2.  This is consumed development
+evidence under a different candidate protocol than the published
+SpecEmbedding table, not a contradiction of that paper and not an external
+claim.
+
 ## Mega benchmark construction
 
 For every source and polarity/adduct domain:
