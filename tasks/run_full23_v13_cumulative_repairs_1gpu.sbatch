@@ -53,6 +53,7 @@ required=(
   "$GNPS_BASE" "$GNPS_MSG/report.json" "$GNPS_CHEM/report.json"
   "$GNPS_NOISE" "$GNPS_STAGE1" "$GNPS_PHASEA" "$GNPS_FULLMSG"
   tasks/full23_tensor_set_readout_core.py tasks/train_full23_transfer_safe_tensor_readout.py
+  tasks/train_full23_tensor_set_readout.py
   tasks/train_full23_v13_cumulative_repairs.py tasks/evaluate_full23_v13_cumulative_repairs.py
   tasks/test_full23_tensor_set_readout.py tasks/test_full23_v13_cumulative_repairs.py
 )
