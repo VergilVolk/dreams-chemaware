@@ -271,6 +271,30 @@ def test_common_domain_panel_keeps_only_complete_query_blocks(tmp_path: Path) ->
     with np.load(output, allow_pickle=False) as saved:
         assert saved["candidate_row"].tolist() == [10, 11, 12]
 
+    source_scores = tmp_path / "source_scores.npz"
+    common_scores = tmp_path / "common_scores.npz"
+    score_report = tmp_path / "common_scores.json"
+    matrix = np.arange(12, dtype=np.float32).reshape(2, 6)
+    np.savez_compressed(
+        source_scores,
+        panel_sha256=np.asarray(sha256_file(panel_path)),
+        N_Q=np.asarray(3), N_E=np.asarray(6), N_P=np.asarray(9),
+        method_names=np.asarray(["first", "second"]),
+        molecule_scores=matrix,
+    )
+    main([
+        "subset-scores", "--scores", str(source_scores),
+        "--source-panel", str(panel_path), "--common-panel", str(output),
+        "--output", str(common_scores), "--report", str(score_report),
+    ])
+    with np.load(common_scores, allow_pickle=False) as saved:
+        assert saved["method_names"].tolist() == ["first", "second"]
+        assert np.array_equal(saved["molecule_scores"], matrix[:, :2])
+        assert [int(saved[key]) for key in ("N_Q", "N_E", "N_P")] == [1, 2, 3]
+        assert str(saved["panel_sha256"]) == sha256_file(output)
+    score_body = json.loads(score_report.read_text(encoding="utf-8"))
+    assert score_body["selection_rule"].startswith("exact source_molecule_index")
+
 
 if __name__ == "__main__":
     with tempfile.TemporaryDirectory() as directory:

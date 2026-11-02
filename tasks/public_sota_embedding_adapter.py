@@ -756,6 +756,101 @@ def subset_panel_command(args: argparse.Namespace) -> None:
     print(json.dumps(report, indent=2), flush=True)
 
 
+def subset_scores_command(args: argparse.Namespace) -> None:
+    for path in (args.scores, args.source_panel, args.common_panel):
+        if not path.is_file():
+            raise FileNotFoundError(path)
+    if args.output.exists() or args.report.exists():
+        raise FileExistsError("refusing to overwrite common-domain scores or report")
+    with np.load(args.source_panel, allow_pickle=False) as body:
+        source_panel = {key: np.asarray(body[key]) for key in body.files}
+    with np.load(args.common_panel, allow_pickle=False) as body:
+        common_panel = {key: np.asarray(body[key]) for key in body.files}
+    required_indices = {"source_query_index", "source_molecule_index", "source_pair_index"}
+    missing = sorted(required_indices - set(common_panel))
+    if missing:
+        raise RuntimeError(f"common-domain panel lacks source index registries: {missing}")
+    query_index = np.asarray(common_panel["source_query_index"], np.int64)
+    molecule_index = np.asarray(common_panel["source_molecule_index"], np.int64)
+    pair_index = np.asarray(common_panel["source_pair_index"], np.int64)
+    source_n_q = len(source_panel["query_row"])
+    source_n_e = len(source_panel["molecule_ptr"]) - 1
+    source_n_p = len(source_panel["candidate_row"])
+    common_n_q = len(common_panel["query_row"])
+    common_n_e = len(common_panel["molecule_ptr"]) - 1
+    common_n_p = len(common_panel["candidate_row"])
+    for name, index, expected, upper in (
+        ("source_query_index", query_index, common_n_q, source_n_q),
+        ("source_molecule_index", molecule_index, common_n_e, source_n_e),
+        ("source_pair_index", pair_index, common_n_p, source_n_p),
+    ):
+        if (
+            index.ndim != 1 or len(index) != expected or np.any(index < 0)
+            or np.any(index >= upper) or len(np.unique(index)) != len(index)
+            or not np.array_equal(index, np.sort(index))
+        ):
+            raise RuntimeError(f"common-domain {name} is malformed")
+    if not np.array_equal(common_panel["query_row"], source_panel["query_row"][query_index]):
+        raise RuntimeError("common-domain query axis differs from indexed source axis")
+    if not np.array_equal(common_panel["candidate_row"], source_panel["candidate_row"][pair_index]):
+        raise RuntimeError("common-domain pair axis differs from indexed source axis")
+    if "molecule_label" in source_panel and not np.array_equal(
+        common_panel["molecule_label"], source_panel["molecule_label"][molecule_index],
+    ):
+        raise RuntimeError("common-domain molecule axis differs from indexed source axis")
+    with np.load(args.scores, allow_pickle=False) as body:
+        required = {"method_names", "molecule_scores"}
+        if not required.issubset(body.files):
+            raise RuntimeError(f"source score cache misses {sorted(required - set(body.files))}")
+        provenance = _score_cache_provenance(body, args.scores)
+        names = np.asarray(body["method_names"])
+        scores = np.asarray(body["molecule_scores"], np.float32)
+    source_panel_sha256 = sha256_file(args.source_panel)
+    if provenance.get("panel_sha256") != source_panel_sha256:
+        raise RuntimeError("source score cache is not bound to the supplied source panel")
+    expected_source_counts = {"N_Q": source_n_q, "N_E": source_n_e, "N_P": source_n_p}
+    if any(int(provenance[key]) != value for key, value in expected_source_counts.items()):
+        raise RuntimeError("source score cache counts differ from the supplied source panel")
+    if scores.ndim != 2 or scores.shape != (len(names), source_n_e) or not np.all(np.isfinite(scores)):
+        raise RuntimeError("source score matrix is malformed")
+    common_scores = scores[:, molecule_index]
+    common_panel_sha256 = sha256_file(args.common_panel)
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    np.savez_compressed(
+        args.output,
+        schema_version=np.asarray("mega_identity_method_scores_v1"),
+        panel_sha256=np.asarray(common_panel_sha256),
+        N_Q=np.asarray(common_n_q, np.int64),
+        N_E=np.asarray(common_n_e, np.int64),
+        N_P=np.asarray(common_n_p, np.int64),
+        method_names=names,
+        molecule_scores=common_scores,
+    )
+    report = {
+        "schema": "public_sota_common_domain_score_subset_v1",
+        "status": "complete",
+        "selection_rule": "exact source_molecule_index slice; no score imputation or recalculation",
+        "source_scores": str(args.scores.resolve()),
+        "source_scores_sha256": sha256_file(args.scores),
+        "source_panel": str(args.source_panel.resolve()),
+        "source_panel_sha256": source_panel_sha256,
+        "common_panel": str(args.common_panel.resolve()),
+        "common_panel_sha256": common_panel_sha256,
+        "methods": [str(value) for value in names],
+        "original_N_Q": source_n_q,
+        "original_N_E": source_n_e,
+        "original_N_P": source_n_p,
+        "retained_N_Q": common_n_q,
+        "retained_N_E": common_n_e,
+        "retained_N_P": common_n_p,
+        "output": str(args.output.resolve()),
+        "output_sha256": sha256_file(args.output),
+    }
+    args.report.parent.mkdir(parents=True, exist_ok=True)
+    _write_json(args.report, report)
+    print(json.dumps(report, indent=2), flush=True)
+
+
 def _score_cache_provenance(body: np.lib.npyio.NpzFile, path: Path) -> dict[str, object]:
     for key in ("N_Q", "N_E", "N_P"):
         if key not in body.files:
@@ -903,6 +998,17 @@ def parser() -> argparse.ArgumentParser:
     subset_panel.add_argument("--output", type=Path, required=True)
     subset_panel.add_argument("--report", type=Path, required=True)
     subset_panel.set_defaults(function=subset_panel_command)
+
+    subset_scores = sub.add_parser(
+        "subset-scores",
+        help="Slice an existing score matrix onto a common-domain panel without changing scores.",
+    )
+    subset_scores.add_argument("--scores", type=Path, required=True)
+    subset_scores.add_argument("--source-panel", type=Path, required=True)
+    subset_scores.add_argument("--common-panel", type=Path, required=True)
+    subset_scores.add_argument("--output", type=Path, required=True)
+    subset_scores.add_argument("--report", type=Path, required=True)
+    subset_scores.set_defaults(function=subset_scores_command)
 
     merge = sub.add_parser("merge", help="Merge standard score caches for the mega evaluator.")
     merge.add_argument("--score-cache", type=Path, action="append", required=True)
