@@ -77,9 +77,11 @@ comparison rather than a contradiction of their published task results.
 
 MS2DeepScore 2.0 is a 2026 published public model and the newest completed
 official-checkpoint run in this same-axis table. Full23 leads it by +9.242 pp
-on identity R@1 and +8.110 pp on formula R@1. MS2DeepScore 2.0 was trained for
-molecular fingerprint similarity rather than exact identity, so this is a
-useful released-model comparator, not a claim that Full23 supersedes its native
+on identity R@1 and +8.110 pp on formula R@1. On the common domains this is
+1,015 and 426 additional correct Top-1 queries, corresponding descriptively to
+44.3% and 43.9% fewer Top-1 errors. MS2DeepScore 2.0 was trained for molecular
+fingerprint similarity rather than exact identity, so this is a useful
+released-model comparator, not a claim that Full23 supersedes its native
 chemical-similarity task. Official TransExION same-axis scoring is in progress
 and will be appended without changing the frozen Full23 scores or candidate
 axes.
