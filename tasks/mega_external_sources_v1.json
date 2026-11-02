@@ -1,0 +1,173 @@
+{
+  "schema": "mega_external_source_registry_v1",
+  "created_on": "2026-11-02",
+  "purpose": "Separate final external identity confirmation from independent stress tests and consumed development resources. Counts are never interchangeable.",
+  "denominator_contract": {
+    "N_Q": "labelled query spectra retained after all exclusions",
+    "N_I": "unique labelled identity clusters represented by the queries",
+    "N_F": "unique molecular-formula clusters represented by the queries",
+    "N_E": "directed query-candidate-molecule edges",
+    "N_P": "actual query-reference-spectrum comparisons used to construct candidate scores",
+    "prohibited_claim": "N_P must never be reported as the number of labelled queries"
+  },
+  "primary_external_candidates": [
+    {
+      "id": "nist26_new_relative_to_nist23",
+      "role": "preferred_final_external_identity_confirmation",
+      "status": "not_materialized_requires_commercial_license",
+      "public_scale": {
+        "tandem_spectra": 3219115,
+        "precursor_ions": 567114,
+        "compounds": 68635
+      },
+      "local_required_paths": [
+        "data/external/nist26/licensed_nist26_source",
+        "data/external/nist23/licensed_nist23_source"
+      ],
+      "selection_rule": "Use only NIST26 identities/spectra genuinely new relative to NIST23, then exclude every consumed training/development identity, formula and available exact spectrum hash.",
+      "minimum_target_after_exclusion": {
+        "identity_queries": 5000,
+        "formula_clusters": 2000,
+        "near_queries": 1000
+      },
+      "allow_final_claim": true,
+      "source_url": "https://www.nist.gov/programs-projects/tandem-mass-spectral-library"
+    },
+    {
+      "id": "future_massbank_post_freeze_release",
+      "role": "fallback_final_external_identity_confirmation",
+      "status": "not_yet_available",
+      "selection_rule": "Use only accessions and identities first released after the method freeze date and remove overlap with all consumed sources.",
+      "allow_final_claim": true,
+      "source_url": "https://massbank.eu/MassBank/"
+    },
+    {
+      "id": "prospective_blind_multienergy_standards",
+      "role": "preferred_prospective_final_confirmation",
+      "status": "not_yet_acquired",
+      "selection_rule": "Independent laboratory, blinded identities, multiple instruments and collision energies, frozen candidate construction before unblinding.",
+      "allow_final_claim": true
+    }
+  ],
+  "independent_stress_sources": [
+    {
+      "id": "multims2_msv000099369",
+      "role": "independent_cross_condition_and_fragmentation_stress",
+      "status": "source_materialized_locally_benchmark_not_opened",
+      "commit": "659bd9b608408a75ecbb4b03295ed4c03ba52539",
+      "source_mgf": "data/external/MultiMS2_659bd9b608408a75ecbb4b03295ed4c03ba52539/data/multims2_spectra.mgf",
+      "source_sha256": "4ef86f75a12ad2fdadbd63732e2d6690f4e506a6ff08f171758c1808d1249673",
+      "public_scale": {
+        "validated_spectra": 43728,
+        "compounds": 2899
+      },
+      "primary_condition": "CID 60 eV query to CID 40 eV reference",
+      "secondary_condition": "EAD 16 eV query to CID 40 eV reference",
+      "builder": "tasks/build_multims2_external_benchmark.py",
+      "allow_final_claim": false,
+      "claim_boundary": "Independent focused OOD/cross-condition confirmation only; expected competitive-query denominator is hundreds, not a sole SOTA benchmark.",
+      "source_url": "https://github.com/zamboni-lab/MultiMS2"
+    }
+  ],
+  "large_open_aggregations": [
+    {
+      "id": "structuremasst_fasstrecords_2026",
+      "role": "large_open_aggregation_and_throughput_stress",
+      "status": "not_downloaded_42gb_archive",
+      "public_scale": {
+        "reference_spectra": 1565620,
+        "unique_planar_structures": 200258,
+        "public_raw_msms_spectra": 1752167824,
+        "precomputed_spectral_matches": 1204350873,
+        "archive_bytes": 42634390813
+      },
+      "truth_boundary": "The billion-scale values are public raw spectra and FASST-predicted matches, not independent authentic-standard identity labels. Aggregated reference labels and repeated source spectra require identity, source and exact-spectrum de-duplication. This is not automatically an independent final test.",
+      "allow_final_claim": false,
+      "source_url": "https://zenodo.org/records/18199544"
+    },
+    {
+      "id": "metlin_960k",
+      "role": "large_queryable_authentic_standard_resource",
+      "status": "web_queryable_not_verified_as_bulk_download_corpus",
+      "public_scale": {
+        "experimentally_validated_molecular_standards": 960000,
+        "approximate_experimental_msms_spectra": 6000000
+      },
+      "access_boundary": "The searchable web resource is public-facing, but the bulk local database is separately licensed/commercial and was not verified as an open download.",
+      "allow_final_claim": false,
+      "source_url": "https://pubs.acs.org/doi/10.1021/acs.analchem.5c08031"
+    }
+  ],
+  "consumed_or_contaminated_sources": [
+    {
+      "id": "massspecgym",
+      "role": "development_consumed",
+      "known_scale": {
+        "queries": 83619,
+        "candidate_molecules": 392229,
+        "reference_edges": 6220661
+      },
+      "allow_final_claim": false
+    },
+    {
+      "id": "gnps_gold_silver",
+      "role": "development_consumed",
+      "known_scale": {
+        "identity_queries": 10995,
+        "formula_queries": 5261,
+        "accepted_spectra": 329607
+      },
+      "allow_final_claim": false
+    },
+    {
+      "id": "gnps2_library_knowledgebase_2026_10_26",
+      "role": "aggregated_source_consumed_and_training_contaminated",
+      "known_scale": {
+        "libraries": 107,
+        "spectra": 2701012,
+        "unique_2d_inchikeys": 208697
+      },
+      "truth_boundary": "The snapshot mixes standards, propagated annotations, MassQL-derived, multiplex and imported libraries; counts are not a uniform gold-standard label set.",
+      "allow_final_claim": false,
+      "source_url": "https://library.gnps2.org/libraries"
+    },
+    {
+      "id": "mona_current_aggregate",
+      "role": "aggregated_source_consumed_and_training_contaminated",
+      "known_scale": {
+        "all_records": 3601153,
+        "experimental_filter_records": 1756800,
+        "lc_msms_filter_records": 1317260
+      },
+      "truth_boundary": "MoNA download categories overlap and must not be summed. The aggregate mixes sources and has been used by several comparator models.",
+      "allow_final_claim": false,
+      "source_url": "https://mona.fiehnlab.ucdavis.edu/downloads"
+    },
+    {
+      "id": "enveda180",
+      "role": "fusion_meta_development_consumed",
+      "known_scale": {
+        "source_spectra": 1175202,
+        "identity_queries": 25000,
+        "formula_queries": 9435
+      },
+      "allow_final_claim": false
+    },
+    {
+      "id": "massbank_2026_03",
+      "role": "stress_consumed",
+      "allow_final_claim": false
+    },
+    {
+      "id": "mona_local",
+      "role": "stress_consumed",
+      "allow_final_claim": false
+    },
+    {
+      "id": "msnlib_family_including_v8",
+      "role": "source_family_consumed_latest_version_may_be_descriptive_stress_only",
+      "local_download": "data/external/msnlib_v8_20261019/msnlib_ms2.parquet",
+      "allow_final_claim": false
+    }
+  ]
+}

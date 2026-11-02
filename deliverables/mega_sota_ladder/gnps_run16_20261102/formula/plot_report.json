@@ -1,0 +1,58 @@
+{
+  "status": "complete",
+  "evaluation_dir": "D:\\DreaMS\\data\\validation\\gnps_run16_mega_evaluation_v2_20261102\\formula",
+  "methods": [
+    "weighted_spectral_entropy",
+    "official_dreams",
+    "noise_v1",
+    "cosine_greedy",
+    "modified_cosine",
+    "p2b_sqrt_cosine",
+    "p2b_unweighted_entropy",
+    "neutral_loss_sqrt_cosine",
+    "p2b_official_frozen",
+    "p2b_noise_v1_frozen",
+    "ms2deepscore_2x_public",
+    "spec2vec_gnps_public",
+    "entropy_raw_public",
+    "denoising_search_public",
+    "spec2vec_2026_retrained",
+    "full23_v132"
+  ],
+  "ladder_preset": "recall@1_descending_then_method_name",
+  "ladder_order": [
+    "full23_v132",
+    "weighted_spectral_entropy",
+    "p2b_noise_v1_frozen",
+    "p2b_sqrt_cosine",
+    "p2b_unweighted_entropy",
+    "entropy_raw_public",
+    "noise_v1",
+    "denoising_search_public",
+    "p2b_official_frozen",
+    "neutral_loss_sqrt_cosine",
+    "spec2vec_gnps_public",
+    "spec2vec_2026_retrained",
+    "cosine_greedy",
+    "modified_cosine",
+    "official_dreams",
+    "ms2deepscore_2x_public"
+  ],
+  "curve_display_max_points_per_method": 25000,
+  "front_preserving_sampling": {
+    "roc_fpr_at_or_below": 0.01,
+    "pr_recall_at_or_below": 0.1,
+    "display_budget_fraction": 0.5
+  },
+  "exact_curve_csvs_preserved": true,
+  "figures": [
+    "ladder.png",
+    "ladder.pdf",
+    "topk.png",
+    "topk.pdf",
+    "roc.png",
+    "roc.pdf",
+    "pr.png",
+    "pr.pdf"
+  ]
+}

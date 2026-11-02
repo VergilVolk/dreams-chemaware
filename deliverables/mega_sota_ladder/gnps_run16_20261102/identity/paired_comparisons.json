@@ -1,0 +1,2042 @@
+{
+  "official_dreams": {
+    "reference_method": "weighted_spectral_entropy",
+    "candidate_method": "official_dreams",
+    "queries": 10995,
+    "corrected": 249,
+    "introduced": 470,
+    "net_corrected_minus_introduced": -221,
+    "risk_net_lambda2": -691,
+    "near_queries": 7592,
+    "near_corrected": 234,
+    "near_introduced": 429,
+    "formula_cluster_bootstrap": {
+      "cluster_unit": "query_formula",
+      "clusters": 4204,
+      "bootstrap_resamples": 10000,
+      "bootstrap_seed": 20262102,
+      "familywise_confidence_level": 0.95,
+      "per_interval_nominal_level": 0.9975,
+      "familywise_hypotheses": 20,
+      "tail_probability": 0.00125,
+      "metrics": {
+        "recall@1": {
+          "delta": -0.020100045475216006,
+          "ci_low": -0.02841923023593332,
+          "ci_high": -0.011851908990450266
+        },
+        "recall@2": {
+          "delta": -0.006912232833105957,
+          "ci_low": -0.013616283125849298,
+          "ci_high": -0.0002288314530849454
+        },
+        "recall@3": {
+          "delta": -0.0030923146884947704,
+          "ci_low": -0.008149919666225755,
+          "ci_high": 0.0019486769617432082
+        },
+        "recall@5": {
+          "delta": 9.095043201455206e-05,
+          "ci_low": -0.003703961449707967,
+          "ci_high": 0.003953780094810051
+        },
+        "recall@10": {
+          "delta": 0.0006366530241018644,
+          "ci_low": -0.0023307949869731206,
+          "ci_high": 0.003668887848788275
+        },
+        "recall@20": {
+          "delta": 0.0009095043201455207,
+          "ci_low": -0.00045620545511505946,
+          "ci_high": 0.0024586850077906518
+        },
+        "mrr": {
+          "delta": -0.011439704737037891,
+          "ci_low": -0.016491395870732166,
+          "ci_high": -0.006435047882222709
+        },
+        "mean_rank_improvement": {
+          "delta": -0.009549795361527967,
+          "ci_low": -0.048672846780931714,
+          "ci_high": 0.0294973261018428
+        },
+        "macro_query_auroc": {
+          "delta": -0.005953152283583793,
+          "ci_low": -0.010510988008829193,
+          "ci_high": -0.0014167806143858023
+        },
+        "macro_query_average_precision": {
+          "delta": -0.011439704737037891,
+          "ci_low": -0.016491395870732166,
+          "ci_high": -0.006435047882222709
+        }
+      }
+    },
+    "identity_cluster_bootstrap": {
+      "cluster_unit": "query_ik14",
+      "clusters": 5534,
+      "bootstrap_resamples": 10000,
+      "bootstrap_seed": 20262103,
+      "familywise_confidence_level": 0.95,
+      "per_interval_nominal_level": 0.9975,
+      "familywise_hypotheses": 20,
+      "tail_probability": 0.00125,
+      "metrics": {
+        "recall@1": {
+          "delta": -0.020100045475216006,
+          "ci_low": -0.028263347569824213,
+          "ci_high": -0.012202115426488257
+        },
+        "recall@2": {
+          "delta": -0.006912232833105957,
+          "ci_low": -0.013414688809077046,
+          "ci_high": -0.0006825865116178195
+        },
+        "recall@3": {
+          "delta": -0.0030923146884947704,
+          "ci_low": -0.008366698438546422,
+          "ci_high": 0.0020474978156661662
+        },
+        "recall@5": {
+          "delta": 9.095043201455206e-05,
+          "ci_low": -0.0039542525757383365,
+          "ci_high": 0.0038183558216036174
+        },
+        "recall@10": {
+          "delta": 0.0006366530241018644,
+          "ci_low": -0.0023660063009445704,
+          "ci_high": 0.003862549520354029
+        },
+        "recall@20": {
+          "delta": 0.0009095043201455207,
+          "ci_low": -0.0004544216284062162,
+          "ci_high": 0.002452542901991533
+        },
+        "mrr": {
+          "delta": -0.011439704737037891,
+          "ci_low": -0.01643472326862854,
+          "ci_high": -0.00662249169492068
+        },
+        "mean_rank_improvement": {
+          "delta": -0.009549795361527967,
+          "ci_low": -0.049929974205263176,
+          "ci_high": 0.03404733306333665
+        },
+        "macro_query_auroc": {
+          "delta": -0.005953152283583793,
+          "ci_low": -0.010521598483785389,
+          "ci_high": -0.001302146148854636
+        },
+        "macro_query_average_precision": {
+          "delta": -0.011439704737037891,
+          "ci_low": -0.01643472326862854,
+          "ci_high": -0.00662249169492068
+        }
+      }
+    }
+  },
+  "noise_v1": {
+    "reference_method": "weighted_spectral_entropy",
+    "candidate_method": "noise_v1",
+    "queries": 10995,
+    "corrected": 287,
+    "introduced": 376,
+    "net_corrected_minus_introduced": -89,
+    "risk_net_lambda2": -465,
+    "near_queries": 7592,
+    "near_corrected": 271,
+    "near_introduced": 352,
+    "formula_cluster_bootstrap": {
+      "cluster_unit": "query_formula",
+      "clusters": 4204,
+      "bootstrap_resamples": 10000,
+      "bootstrap_seed": 20263102,
+      "familywise_confidence_level": 0.95,
+      "per_interval_nominal_level": 0.9975,
+      "familywise_hypotheses": 20,
+      "tail_probability": 0.00125,
+      "metrics": {
+        "recall@1": {
+          "delta": -0.008094588449295134,
+          "ci_low": -0.01622286556553785,
+          "ci_high": -0.00022723644479332556
+        },
+        "recall@2": {
+          "delta": 9.095043201455206e-05,
+          "ci_low": -0.0060723011573381004,
+          "ci_high": 0.00632288257716052
+        },
+        "recall@3": {
+          "delta": -0.0019099590723055935,
+          "ci_low": -0.007238869369787945,
+          "ci_high": 0.003644165580693844
+        },
+        "recall@5": {
+          "delta": 0.0016371077762619372,
+          "ci_low": -0.002468688411460847,
+          "ci_high": 0.005702141904545884
+        },
+        "recall@10": {
+          "delta": 0.00045475216007276033,
+          "ci_low": -0.002899491147807561,
+          "ci_high": 0.0037848403389801094
+        },
+        "recall@20": {
+          "delta": 0.0015461573442473852,
+          "ci_low": -0.0005497894889297498,
+          "ci_high": 0.0038230593824470573
+        },
+        "mrr": {
+          "delta": -0.003862677762434799,
+          "ci_low": -0.008737508678666192,
+          "ci_high": 0.0008236583444905211
+        },
+        "mean_rank_improvement": {
+          "delta": 0.021282401091405185,
+          "ci_low": -0.02615101100232134,
+          "ci_high": 0.06909197473625622
+        },
+        "macro_query_auroc": {
+          "delta": -0.001992664836089287,
+          "ci_low": -0.006892986856606979,
+          "ci_high": 0.0025994760967637085
+        },
+        "macro_query_average_precision": {
+          "delta": -0.003862677762434799,
+          "ci_low": -0.008737508678666192,
+          "ci_high": 0.0008236583444905211
+        }
+      }
+    },
+    "identity_cluster_bootstrap": {
+      "cluster_unit": "query_ik14",
+      "clusters": 5534,
+      "bootstrap_resamples": 10000,
+      "bootstrap_seed": 20263103,
+      "familywise_confidence_level": 0.95,
+      "per_interval_nominal_level": 0.9975,
+      "familywise_hypotheses": 20,
+      "tail_probability": 0.00125,
+      "metrics": {
+        "recall@1": {
+          "delta": -0.008094588449295134,
+          "ci_low": -0.01609386198289943,
+          "ci_high": -0.0005457369522552623
+        },
+        "recall@2": {
+          "delta": 9.095043201455206e-05,
+          "ci_low": -0.006365952754984689,
+          "ci_high": 0.006367691636081266
+        },
+        "recall@3": {
+          "delta": -0.0019099590723055935,
+          "ci_low": -0.007373025790807818,
+          "ci_high": 0.003686940048724142
+        },
+        "recall@5": {
+          "delta": 0.0016371077762619372,
+          "ci_low": -0.0026367241375747103,
+          "ci_high": 0.005825067360775747
+        },
+        "recall@10": {
+          "delta": 0.00045475216007276033,
+          "ci_low": -0.002731620180026912,
+          "ci_high": 0.003814894103450104
+        },
+        "recall@20": {
+          "delta": 0.0015461573442473852,
+          "ci_low": -0.0002727769327827408,
+          "ci_high": 0.0036420049420785795
+        },
+        "mrr": {
+          "delta": -0.003862677762434799,
+          "ci_low": -0.008670183798811371,
+          "ci_high": 0.0009142731327329037
+        },
+        "mean_rank_improvement": {
+          "delta": 0.021282401091405185,
+          "ci_low": -0.028030585422958228,
+          "ci_high": 0.06971352066422971
+        },
+        "macro_query_auroc": {
+          "delta": -0.001992664836089287,
+          "ci_low": -0.006627416893793148,
+          "ci_high": 0.0027897533379004193
+        },
+        "macro_query_average_precision": {
+          "delta": -0.003862677762434799,
+          "ci_low": -0.008670183798811371,
+          "ci_high": 0.0009142731327329037
+        }
+      }
+    }
+  },
+  "cosine_greedy": {
+    "reference_method": "weighted_spectral_entropy",
+    "candidate_method": "cosine_greedy",
+    "queries": 10995,
+    "corrected": 177,
+    "introduced": 433,
+    "net_corrected_minus_introduced": -256,
+    "risk_net_lambda2": -689,
+    "near_queries": 7592,
+    "near_corrected": 171,
+    "near_introduced": 375,
+    "formula_cluster_bootstrap": {
+      "cluster_unit": "query_formula",
+      "clusters": 4204,
+      "bootstrap_resamples": 10000,
+      "bootstrap_seed": 20264102,
+      "familywise_confidence_level": 0.95,
+      "per_interval_nominal_level": 0.9975,
+      "familywise_hypotheses": 20,
+      "tail_probability": 0.00125,
+      "metrics": {
+        "recall@1": {
+          "delta": -0.023283310595725328,
+          "ci_low": -0.030422917109535253,
+          "ci_high": -0.015906400652910196
+        },
+        "recall@2": {
+          "delta": -0.010732150977717144,
+          "ci_low": -0.016426642591252937,
+          "ci_high": -0.005082562527838034
+        },
+        "recall@3": {
+          "delta": -0.009095043201455207,
+          "ci_low": -0.013550281640273385,
+          "ci_high": -0.004805625672508819
+        },
+        "recall@5": {
+          "delta": -0.0030013642564802184,
+          "ci_low": -0.006618936961470718,
+          "ci_high": 0.0005051694258991364
+        },
+        "recall@10": {
+          "delta": -0.0011823556161891769,
+          "ci_low": -0.004012814247400634,
+          "ci_high": 0.0017710866665539052
+        },
+        "recall@20": {
+          "delta": 0.0005457025920873125,
+          "ci_low": -0.0001812357988359305,
+          "ci_high": 0.0014010122986999477
+        },
+        "mrr": {
+          "delta": -0.014738386472800978,
+          "ci_low": -0.01908004280610698,
+          "ci_high": -0.010190954030811222
+        },
+        "mean_rank_improvement": {
+          "delta": -0.05547976352887676,
+          "ci_low": -0.0871184564349405,
+          "ci_high": -0.023010789398368314
+        },
+        "macro_query_auroc": {
+          "delta": -0.009614661091706249,
+          "ci_low": -0.012916264595884188,
+          "ci_high": -0.006111078149539513
+        },
+        "macro_query_average_precision": {
+          "delta": -0.014738386472800978,
+          "ci_low": -0.01908004280610698,
+          "ci_high": -0.010190954030811222
+        }
+      }
+    },
+    "identity_cluster_bootstrap": {
+      "cluster_unit": "query_ik14",
+      "clusters": 5534,
+      "bootstrap_resamples": 10000,
+      "bootstrap_seed": 20264103,
+      "familywise_confidence_level": 0.95,
+      "per_interval_nominal_level": 0.9975,
+      "familywise_hypotheses": 20,
+      "tail_probability": 0.00125,
+      "metrics": {
+        "recall@1": {
+          "delta": -0.023283310595725328,
+          "ci_low": -0.030679051341790428,
+          "ci_high": -0.015999799173511995
+        },
+        "recall@2": {
+          "delta": -0.010732150977717144,
+          "ci_low": -0.016278786980463273,
+          "ci_high": -0.005503385679604411
+        },
+        "recall@3": {
+          "delta": -0.009095043201455207,
+          "ci_low": -0.013380073288800835,
+          "ci_high": -0.004731142626021008
+        },
+        "recall@5": {
+          "delta": -0.0030013642564802184,
+          "ci_low": -0.006687658786664569,
+          "ci_high": 0.0007273392036735411
+        },
+        "recall@10": {
+          "delta": -0.0011823556161891769,
+          "ci_low": -0.0038183577466558653,
+          "ci_high": 0.0013643812368848702
+        },
+        "recall@20": {
+          "delta": 0.0005457025920873125,
+          "ci_low": -0.00027285129604365623,
+          "ci_high": 0.001455802907317088
+        },
+        "mrr": {
+          "delta": -0.014738386472800978,
+          "ci_low": -0.019340238049873386,
+          "ci_high": -0.01030095106405526
+        },
+        "mean_rank_improvement": {
+          "delta": -0.05547976352887676,
+          "ci_low": -0.08677873797215288,
+          "ci_high": -0.02442230216836813
+        },
+        "macro_query_auroc": {
+          "delta": -0.009614661091706249,
+          "ci_low": -0.012961982410549057,
+          "ci_high": -0.006245704057533517
+        },
+        "macro_query_average_precision": {
+          "delta": -0.014738386472800978,
+          "ci_low": -0.019340238049873386,
+          "ci_high": -0.01030095106405526
+        }
+      }
+    }
+  },
+  "modified_cosine": {
+    "reference_method": "weighted_spectral_entropy",
+    "candidate_method": "modified_cosine",
+    "queries": 10995,
+    "corrected": 177,
+    "introduced": 434,
+    "net_corrected_minus_introduced": -257,
+    "risk_net_lambda2": -691,
+    "near_queries": 7592,
+    "near_corrected": 171,
+    "near_introduced": 375,
+    "formula_cluster_bootstrap": {
+      "cluster_unit": "query_formula",
+      "clusters": 4204,
+      "bootstrap_resamples": 10000,
+      "bootstrap_seed": 20265102,
+      "familywise_confidence_level": 0.95,
+      "per_interval_nominal_level": 0.9975,
+      "familywise_hypotheses": 20,
+      "tail_probability": 0.00125,
+      "metrics": {
+        "recall@1": {
+          "delta": -0.02337426102773988,
+          "ci_low": -0.030633971129374393,
+          "ci_high": -0.016110035090841718
+        },
+        "recall@2": {
+          "delta": -0.010823101409731696,
+          "ci_low": -0.01677309815305717,
+          "ci_high": -0.005208561423312652
+        },
+        "recall@3": {
+          "delta": -0.009276944065484311,
+          "ci_low": -0.014020613652007404,
+          "ci_high": -0.004937991503997137
+        },
+        "recall@5": {
+          "delta": -0.0030013642564802184,
+          "ci_low": -0.006726430611709504,
+          "ci_high": 0.000686675602065781
+        },
+        "recall@10": {
+          "delta": -0.0011823556161891769,
+          "ci_low": -0.004079752648471202,
+          "ci_high": 0.001592603000979735
+        },
+        "recall@20": {
+          "delta": 0.0005457025920873125,
+          "ci_low": -9.22894060778711e-05,
+          "ci_high": 0.001375644740971837
+        },
+        "mrr": {
+          "delta": -0.014819901346711606,
+          "ci_low": -0.019482270312082082,
+          "ci_high": -0.010292017985801368
+        },
+        "mean_rank_improvement": {
+          "delta": -0.056116416552978624,
+          "ci_low": -0.08982998076843939,
+          "ci_high": -0.022253920187897323
+        },
+        "macro_query_auroc": {
+          "delta": -0.009678524633776971,
+          "ci_low": -0.013029359829595856,
+          "ci_high": -0.006101211145546967
+        },
+        "macro_query_average_precision": {
+          "delta": -0.014819901346711606,
+          "ci_low": -0.019482270312082082,
+          "ci_high": -0.010292017985801368
+        }
+      }
+    },
+    "identity_cluster_bootstrap": {
+      "cluster_unit": "query_ik14",
+      "clusters": 5534,
+      "bootstrap_resamples": 10000,
+      "bootstrap_seed": 20265103,
+      "familywise_confidence_level": 0.95,
+      "per_interval_nominal_level": 0.9975,
+      "familywise_hypotheses": 20,
+      "tail_probability": 0.00125,
+      "metrics": {
+        "recall@1": {
+          "delta": -0.02337426102773988,
+          "ci_low": -0.0302313104634772,
+          "ci_high": -0.01611800832634731
+        },
+        "recall@2": {
+          "delta": -0.010823101409731696,
+          "ci_low": -0.016115819152952796,
+          "ci_high": -0.005457768740654245
+        },
+        "recall@3": {
+          "delta": -0.009276944065484311,
+          "ci_low": -0.013779667011005723,
+          "ci_high": -0.004865490322706057
+        },
+        "recall@5": {
+          "delta": -0.0030013642564802184,
+          "ci_low": -0.006635464750147873,
+          "ci_high": 0.0007280669821623589
+        },
+        "recall@10": {
+          "delta": -0.0011823556161891769,
+          "ci_low": -0.00395447683475056,
+          "ci_high": 0.0012741753466858226
+        },
+        "recall@20": {
+          "delta": 0.0005457025920873125,
+          "ci_low": -0.00027288855663040306,
+          "ci_high": 0.0015439106348197258
+        },
+        "mrr": {
+          "delta": -0.014819901346711606,
+          "ci_low": -0.018942174059462864,
+          "ci_high": -0.010587897360565313
+        },
+        "mean_rank_improvement": {
+          "delta": -0.056116416552978624,
+          "ci_low": -0.0871047795997812,
+          "ci_high": -0.024521061875357197
+        },
+        "macro_query_auroc": {
+          "delta": -0.009678524633776971,
+          "ci_low": -0.0129560559419535,
+          "ci_high": -0.006458596669279891
+        },
+        "macro_query_average_precision": {
+          "delta": -0.014819901346711606,
+          "ci_low": -0.018942174059462864,
+          "ci_high": -0.010587897360565313
+        }
+      }
+    }
+  },
+  "p2b_sqrt_cosine": {
+    "reference_method": "weighted_spectral_entropy",
+    "candidate_method": "p2b_sqrt_cosine",
+    "queries": 10995,
+    "corrected": 110,
+    "introduced": 146,
+    "net_corrected_minus_introduced": -36,
+    "risk_net_lambda2": -182,
+    "near_queries": 7592,
+    "near_corrected": 104,
+    "near_introduced": 135,
+    "formula_cluster_bootstrap": {
+      "cluster_unit": "query_formula",
+      "clusters": 4204,
+      "bootstrap_resamples": 10000,
+      "bootstrap_seed": 20266102,
+      "familywise_confidence_level": 0.95,
+      "per_interval_nominal_level": 0.9975,
+      "familywise_hypotheses": 20,
+      "tail_probability": 0.00125,
+      "metrics": {
+        "recall@1": {
+          "delta": -0.0032742155525238743,
+          "ci_low": -0.008210355561724043,
+          "ci_high": 0.001437239796600689
+        },
+        "recall@2": {
+          "delta": 0.00027285129604365623,
+          "ci_low": -0.003284116954141645,
+          "ci_high": 0.003975802797970098
+        },
+        "recall@3": {
+          "delta": -0.0008185538881309686,
+          "ci_low": -0.003725559707907876,
+          "ci_high": 0.002053139417609964
+        },
+        "recall@5": {
+          "delta": 0.0018190086402910413,
+          "ci_low": -0.000636297190837958,
+          "ci_high": 0.004383797132892539
+        },
+        "recall@10": {
+          "delta": 0.00018190086402910413,
+          "ci_low": -0.0018285807027437631,
+          "ci_high": 0.002339826088714304
+        },
+        "recall@20": {
+          "delta": 0.0005457025920873125,
+          "ci_low": -9.243436824915177e-05,
+          "ci_high": 0.0014166545089323555
+        },
+        "mrr": {
+          "delta": -0.0014764433935079424,
+          "ci_low": -0.004184224771895167,
+          "ci_high": 0.0012295276648190824
+        },
+        "mean_rank_improvement": {
+          "delta": 0.012005457025920874,
+          "ci_low": -0.007094913520137375,
+          "ci_high": 0.03386676636896777
+        },
+        "macro_query_auroc": {
+          "delta": -0.0022051276837499797,
+          "ci_low": -0.004538870792365943,
+          "ci_high": 0.00011601448794448228
+        },
+        "macro_query_average_precision": {
+          "delta": -0.0014764433935079424,
+          "ci_low": -0.004184224771895167,
+          "ci_high": 0.0012295276648190824
+        }
+      }
+    },
+    "identity_cluster_bootstrap": {
+      "cluster_unit": "query_ik14",
+      "clusters": 5534,
+      "bootstrap_resamples": 10000,
+      "bootstrap_seed": 20266103,
+      "familywise_confidence_level": 0.95,
+      "per_interval_nominal_level": 0.9975,
+      "familywise_hypotheses": 20,
+      "tail_probability": 0.00125,
+      "metrics": {
+        "recall@1": {
+          "delta": -0.0032742155525238743,
+          "ci_low": -0.007911609154674381,
+          "ci_high": 0.0015468633548662487
+        },
+        "recall@2": {
+          "delta": 0.00027285129604365623,
+          "ci_low": -0.003274074947700162,
+          "ci_high": 0.00381957588474414
+        },
+        "recall@3": {
+          "delta": -0.0008185538881309686,
+          "ci_low": -0.0035512704858058166,
+          "ci_high": 0.0020927166792683136
+        },
+        "recall@5": {
+          "delta": 0.0018190086402910413,
+          "ci_low": -0.0006366535057783432,
+          "ci_high": 0.0043620511906153564
+        },
+        "recall@10": {
+          "delta": 0.00018190086402910413,
+          "ci_low": -0.001911176278838061,
+          "ci_high": 0.002273658223043251
+        },
+        "recall@20": {
+          "delta": 0.0005457025920873125,
+          "ci_low": -0.00013648950966200905,
+          "ci_high": 0.0014551412627476805
+        },
+        "mrr": {
+          "delta": -0.0014764433935079424,
+          "ci_low": -0.004132516770942532,
+          "ci_high": 0.0012311403907095905
+        },
+        "mean_rank_improvement": {
+          "delta": 0.012005457025920874,
+          "ci_low": -0.008421134472603196,
+          "ci_high": 0.032927402191285204
+        },
+        "macro_query_auroc": {
+          "delta": -0.0022051276837499797,
+          "ci_low": -0.004602952686639244,
+          "ci_high": 1.589731938009034e-05
+        },
+        "macro_query_average_precision": {
+          "delta": -0.0014764433935079424,
+          "ci_low": -0.004132516770942532,
+          "ci_high": 0.0012311403907095905
+        }
+      }
+    }
+  },
+  "p2b_unweighted_entropy": {
+    "reference_method": "weighted_spectral_entropy",
+    "candidate_method": "p2b_unweighted_entropy",
+    "queries": 10995,
+    "corrected": 109,
+    "introduced": 152,
+    "net_corrected_minus_introduced": -43,
+    "risk_net_lambda2": -195,
+    "near_queries": 7592,
+    "near_corrected": 103,
+    "near_introduced": 139,
+    "formula_cluster_bootstrap": {
+      "cluster_unit": "query_formula",
+      "clusters": 4204,
+      "bootstrap_resamples": 10000,
+      "bootstrap_seed": 20267102,
+      "familywise_confidence_level": 0.95,
+      "per_interval_nominal_level": 0.9975,
+      "familywise_hypotheses": 20,
+      "tail_probability": 0.00125,
+      "metrics": {
+        "recall@1": {
+          "delta": -0.003910868576625739,
+          "ci_low": -0.008799542864760127,
+          "ci_high": 0.0005947927355748314
+        },
+        "recall@2": {
+          "delta": 0.0006366530241018644,
+          "ci_low": -0.003010252651337091,
+          "ci_high": 0.003975457575962242
+        },
+        "recall@3": {
+          "delta": -0.0006366530241018644,
+          "ci_low": -0.0033878142564887277,
+          "ci_high": 0.0021213034513642053
+        },
+        "recall@5": {
+          "delta": 0.0011823556161891769,
+          "ci_low": -0.001096341950572284,
+          "ci_high": 0.0035614449419139327
+        },
+        "recall@10": {
+          "delta": 0.00018190086402910413,
+          "ci_low": -0.0016876764525188995,
+          "ci_high": 0.001995118538793047
+        },
+        "recall@20": {
+          "delta": 0.00045475216007276033,
+          "ci_low": -0.00036032886555875204,
+          "ci_high": 0.0013485025042416284
+        },
+        "mrr": {
+          "delta": -0.0017841789561155671,
+          "ci_low": -0.004536022467351728,
+          "ci_high": 0.0007820611403682896
+        },
+        "mean_rank_improvement": {
+          "delta": 0.008822191905411551,
+          "ci_low": -0.010039234098760853,
+          "ci_high": 0.02960268911810904
+        },
+        "macro_query_auroc": {
+          "delta": -0.0024937596628124103,
+          "ci_low": -0.0048407018379760455,
+          "ci_high": -0.0002739627917574082
+        },
+        "macro_query_average_precision": {
+          "delta": -0.0017841789561155671,
+          "ci_low": -0.004536022467351728,
+          "ci_high": 0.0007820611403682896
+        }
+      }
+    },
+    "identity_cluster_bootstrap": {
+      "cluster_unit": "query_ik14",
+      "clusters": 5534,
+      "bootstrap_resamples": 10000,
+      "bootstrap_seed": 20267103,
+      "familywise_confidence_level": 0.95,
+      "per_interval_nominal_level": 0.9975,
+      "familywise_hypotheses": 20,
+      "tail_probability": 0.00125,
+      "metrics": {
+        "recall@1": {
+          "delta": -0.003910868576625739,
+          "ci_low": -0.008870183249105486,
+          "ci_high": 0.0006365085262223815
+        },
+        "recall@2": {
+          "delta": 0.0006366530241018644,
+          "ci_low": -0.0029106408680133213,
+          "ci_high": 0.004137209746904075
+        },
+        "recall@3": {
+          "delta": -0.0006366530241018644,
+          "ci_low": -0.0034561164165529787,
+          "ci_high": 0.002000274558373323
+        },
+        "recall@5": {
+          "delta": 0.0011823556161891769,
+          "ci_low": -0.0011821947597070235,
+          "ci_high": 0.003458162950396022
+        },
+        "recall@10": {
+          "delta": 0.00018190086402910413,
+          "ci_low": -0.001547846672129655,
+          "ci_high": 0.002003370546942993
+        },
+        "recall@20": {
+          "delta": 0.00045475216007276033,
+          "ci_low": -0.000272975432211101,
+          "ci_high": 0.0013640086872833987
+        },
+        "mrr": {
+          "delta": -0.0017841789561155671,
+          "ci_low": -0.0045508260184918435,
+          "ci_high": 0.0007309502040428865
+        },
+        "mean_rank_improvement": {
+          "delta": 0.008822191905411551,
+          "ci_low": -0.00941003616277788,
+          "ci_high": 0.030347344687386115
+        },
+        "macro_query_auroc": {
+          "delta": -0.0024937596628124103,
+          "ci_low": -0.004761610054901003,
+          "ci_high": -0.0002947095993692376
+        },
+        "macro_query_average_precision": {
+          "delta": -0.0017841789561155671,
+          "ci_low": -0.0045508260184918435,
+          "ci_high": 0.0007309502040428865
+        }
+      }
+    }
+  },
+  "neutral_loss_sqrt_cosine": {
+    "reference_method": "weighted_spectral_entropy",
+    "candidate_method": "neutral_loss_sqrt_cosine",
+    "queries": 10995,
+    "corrected": 163,
+    "introduced": 224,
+    "net_corrected_minus_introduced": -61,
+    "risk_net_lambda2": -285,
+    "near_queries": 7592,
+    "near_corrected": 155,
+    "near_introduced": 212,
+    "formula_cluster_bootstrap": {
+      "cluster_unit": "query_formula",
+      "clusters": 4204,
+      "bootstrap_resamples": 10000,
+      "bootstrap_seed": 20268102,
+      "familywise_confidence_level": 0.95,
+      "per_interval_nominal_level": 0.9975,
+      "familywise_hypotheses": 20,
+      "tail_probability": 0.00125,
+      "metrics": {
+        "recall@1": {
+          "delta": -0.005547976352887676,
+          "ci_low": -0.011545253977147098,
+          "ci_high": 0.0005504598263827253
+        },
+        "recall@2": {
+          "delta": -0.0005457025920873125,
+          "ci_low": -0.005109530445049483,
+          "ci_high": 0.004146277882326016
+        },
+        "recall@3": {
+          "delta": 0.0010004547521600727,
+          "ci_low": -0.0030330679821931037,
+          "ci_high": 0.00490514483294441
+        },
+        "recall@5": {
+          "delta": 0.0030013642564802184,
+          "ci_low": -0.00027461235853245517,
+          "ci_high": 0.0062117574731410385
+        },
+        "recall@10": {
+          "delta": 0.001364256480218281,
+          "ci_low": -0.0009962418094385977,
+          "ci_high": 0.0038712756402615733
+        },
+        "recall@20": {
+          "delta": 0.0009095043201455207,
+          "ci_low": 0.0,
+          "ci_high": 0.002079971570304806
+        },
+        "mrr": {
+          "delta": -0.00233384671275072,
+          "ci_low": -0.0059777430586520205,
+          "ci_high": 0.0012750135126729058
+        },
+        "mean_rank_improvement": {
+          "delta": 0.031105047748976808,
+          "ci_low": 0.001726239602826169,
+          "ci_high": 0.062375493490568056
+        },
+        "macro_query_auroc": {
+          "delta": -0.00012197609790926025,
+          "ci_low": -0.0033247295485554483,
+          "ci_high": 0.0029853359634885225
+        },
+        "macro_query_average_precision": {
+          "delta": -0.00233384671275072,
+          "ci_low": -0.0059777430586520205,
+          "ci_high": 0.0012750135126729058
+        }
+      }
+    },
+    "identity_cluster_bootstrap": {
+      "cluster_unit": "query_ik14",
+      "clusters": 5534,
+      "bootstrap_resamples": 10000,
+      "bootstrap_seed": 20268103,
+      "familywise_confidence_level": 0.95,
+      "per_interval_nominal_level": 0.9975,
+      "familywise_hypotheses": 20,
+      "tail_probability": 0.00125,
+      "metrics": {
+        "recall@1": {
+          "delta": -0.005547976352887676,
+          "ci_low": -0.011638485399649458,
+          "ci_high": 0.00031825393354963766
+        },
+        "recall@2": {
+          "delta": -0.0005457025920873125,
+          "ci_low": -0.005277767038736429,
+          "ci_high": 0.004003103432577627
+        },
+        "recall@3": {
+          "delta": 0.0010004547521600727,
+          "ci_low": -0.002727403597625065,
+          "ci_high": 0.004731579090473231
+        },
+        "recall@5": {
+          "delta": 0.0030013642564802184,
+          "ci_low": 0.0001362749215633038,
+          "ci_high": 0.006046076969803275
+        },
+        "recall@10": {
+          "delta": 0.001364256480218281,
+          "ci_low": -0.0009090911232156291,
+          "ci_high": 0.003730326631718428
+        },
+        "recall@20": {
+          "delta": 0.0009095043201455207,
+          "ci_low": 0.0,
+          "ci_high": 0.0020030052279863433
+        },
+        "mrr": {
+          "delta": -0.00233384671275072,
+          "ci_low": -0.005973387394396372,
+          "ci_high": 0.0012348462662124012
+        },
+        "mean_rank_improvement": {
+          "delta": 0.031105047748976808,
+          "ci_low": 0.004410777066409813,
+          "ci_high": 0.06084987872248159
+        },
+        "macro_query_auroc": {
+          "delta": -0.00012197609790926025,
+          "ci_low": -0.0031536380415998736,
+          "ci_high": 0.002847791452160117
+        },
+        "macro_query_average_precision": {
+          "delta": -0.00233384671275072,
+          "ci_low": -0.005973387394396372,
+          "ci_high": 0.0012348462662124012
+        }
+      }
+    }
+  },
+  "p2b_official_frozen": {
+    "reference_method": "weighted_spectral_entropy",
+    "candidate_method": "p2b_official_frozen",
+    "queries": 10995,
+    "corrected": 161,
+    "introduced": 204,
+    "net_corrected_minus_introduced": -43,
+    "risk_net_lambda2": -247,
+    "near_queries": 7592,
+    "near_corrected": 150,
+    "near_introduced": 195,
+    "formula_cluster_bootstrap": {
+      "cluster_unit": "query_formula",
+      "clusters": 4204,
+      "bootstrap_resamples": 10000,
+      "bootstrap_seed": 20269102,
+      "familywise_confidence_level": 0.95,
+      "per_interval_nominal_level": 0.9975,
+      "familywise_hypotheses": 20,
+      "tail_probability": 0.00125,
+      "metrics": {
+        "recall@1": {
+          "delta": -0.003910868576625739,
+          "ci_low": -0.00997228875339065,
+          "ci_high": 0.0017419070927525294
+        },
+        "recall@2": {
+          "delta": 0.0008185538881309686,
+          "ci_low": -0.003628662428914671,
+          "ci_high": 0.005545254995485151
+        },
+        "recall@3": {
+          "delta": 0.0012733060482037289,
+          "ci_low": -0.0021018402711234655,
+          "ci_high": 0.004503657365048057
+        },
+        "recall@5": {
+          "delta": 0.0043656207366985,
+          "ci_low": 0.0011928776203131552,
+          "ci_high": 0.007628060015793643
+        },
+        "recall@10": {
+          "delta": 0.0009095043201455207,
+          "ci_low": -0.001451117052139848,
+          "ci_high": 0.0033831284828069767
+        },
+        "recall@20": {
+          "delta": 0.0008185538881309686,
+          "ci_low": -0.0001792283735983573,
+          "ci_high": 0.002031494898956296
+        },
+        "mrr": {
+          "delta": -0.0011659721097546129,
+          "ci_low": -0.004622414349761246,
+          "ci_high": 0.0021819883358196453
+        },
+        "mean_rank_improvement": {
+          "delta": 0.03547066848567531,
+          "ci_low": 0.010199166292581755,
+          "ci_high": 0.06463034112680931
+        },
+        "macro_query_auroc": {
+          "delta": 6.270172542596776e-05,
+          "ci_low": -0.003073206878754117,
+          "ci_high": 0.00316943615395528
+        },
+        "macro_query_average_precision": {
+          "delta": -0.0011659721097546129,
+          "ci_low": -0.004622414349761246,
+          "ci_high": 0.0021819883358196453
+        }
+      }
+    },
+    "identity_cluster_bootstrap": {
+      "cluster_unit": "query_ik14",
+      "clusters": 5534,
+      "bootstrap_resamples": 10000,
+      "bootstrap_seed": 20269103,
+      "familywise_confidence_level": 0.95,
+      "per_interval_nominal_level": 0.9975,
+      "familywise_hypotheses": 20,
+      "tail_probability": 0.00125,
+      "metrics": {
+        "recall@1": {
+          "delta": -0.003910868576625739,
+          "ci_low": -0.009644259096637882,
+          "ci_high": 0.0017274301732546416
+        },
+        "recall@2": {
+          "delta": 0.0008185538881309686,
+          "ci_low": -0.003455806752863742,
+          "ci_high": 0.00540818121502003
+        },
+        "recall@3": {
+          "delta": 0.0012733060482037289,
+          "ci_low": -0.0019561201080778266,
+          "ci_high": 0.004639950720977459
+        },
+        "recall@5": {
+          "delta": 0.0043656207366985,
+          "ci_low": 0.001409222161745683,
+          "ci_high": 0.007549572494087684
+        },
+        "recall@10": {
+          "delta": 0.0009095043201455207,
+          "ci_low": -0.0015456662761965255,
+          "ci_high": 0.0034510960411554027
+        },
+        "recall@20": {
+          "delta": 0.0008185538881309686,
+          "ci_low": -9.102496230182904e-05,
+          "ci_high": 0.0019575406419696916
+        },
+        "mrr": {
+          "delta": -0.0011659721097546129,
+          "ci_low": -0.004589497679687737,
+          "ci_high": 0.002147400745655727
+        },
+        "mean_rank_improvement": {
+          "delta": 0.03547066848567531,
+          "ci_low": 0.008590024397220059,
+          "ci_high": 0.06519267963466963
+        },
+        "macro_query_auroc": {
+          "delta": 6.270172542596776e-05,
+          "ci_low": -0.002945950136117021,
+          "ci_high": 0.002970511402467085
+        },
+        "macro_query_average_precision": {
+          "delta": -0.0011659721097546129,
+          "ci_low": -0.004589497679687737,
+          "ci_high": 0.002147400745655727
+        }
+      }
+    }
+  },
+  "p2b_noise_v1_frozen": {
+    "reference_method": "weighted_spectral_entropy",
+    "candidate_method": "p2b_noise_v1_frozen",
+    "queries": 10995,
+    "corrected": 171,
+    "introduced": 197,
+    "net_corrected_minus_introduced": -26,
+    "risk_net_lambda2": -223,
+    "near_queries": 7592,
+    "near_corrected": 159,
+    "near_introduced": 188,
+    "formula_cluster_bootstrap": {
+      "cluster_unit": "query_formula",
+      "clusters": 4204,
+      "bootstrap_resamples": 10000,
+      "bootstrap_seed": 20270102,
+      "familywise_confidence_level": 0.95,
+      "per_interval_nominal_level": 0.9975,
+      "familywise_hypotheses": 20,
+      "tail_probability": 0.00125,
+      "metrics": {
+        "recall@1": {
+          "delta": -0.0023647112323783538,
+          "ci_low": -0.008122094054868984,
+          "ci_high": 0.0031708711906862
+        },
+        "recall@2": {
+          "delta": 0.0020009095043201455,
+          "ci_low": -0.0024156310479753365,
+          "ci_high": 0.006572078982530898
+        },
+        "recall@3": {
+          "delta": 0.0019099590723055935,
+          "ci_low": -0.0014685681682767005,
+          "ci_high": 0.005422617092433381
+        },
+        "recall@5": {
+          "delta": 0.004274670304683947,
+          "ci_low": 0.001277545358676668,
+          "ci_high": 0.007432582760041434
+        },
+        "recall@10": {
+          "delta": 0.0010004547521600727,
+          "ci_low": -0.0014653526849926087,
+          "ci_high": 0.003582726220936426
+        },
+        "recall@20": {
+          "delta": 0.0008185538881309686,
+          "ci_low": -0.00031549028514064284,
+          "ci_high": 0.002060988152539578
+        },
+        "mrr": {
+          "delta": -0.0001453011464877543,
+          "ci_low": -0.0035194199471365616,
+          "ci_high": 0.0030110765744885714
+        },
+        "mean_rank_improvement": {
+          "delta": 0.03956343792633015,
+          "ci_low": 0.012851765333851444,
+          "ci_high": 0.0696160615270643
+        },
+        "macro_query_auroc": {
+          "delta": 0.0010932488740524565,
+          "ci_low": -0.0019442512688850207,
+          "ci_high": 0.00404427928557316
+        },
+        "macro_query_average_precision": {
+          "delta": -0.0001453011464877543,
+          "ci_low": -0.0035194199471365616,
+          "ci_high": 0.0030110765744885714
+        }
+      }
+    },
+    "identity_cluster_bootstrap": {
+      "cluster_unit": "query_ik14",
+      "clusters": 5534,
+      "bootstrap_resamples": 10000,
+      "bootstrap_seed": 20270103,
+      "familywise_confidence_level": 0.95,
+      "per_interval_nominal_level": 0.9975,
+      "familywise_hypotheses": 20,
+      "tail_probability": 0.00125,
+      "metrics": {
+        "recall@1": {
+          "delta": -0.0023647112323783538,
+          "ci_low": -0.008187412791221645,
+          "ci_high": 0.003458003458003458
+        },
+        "recall@2": {
+          "delta": 0.0020009095043201455,
+          "ci_low": -0.0025928944881878032,
+          "ci_high": 0.006363636363636364
+        },
+        "recall@3": {
+          "delta": 0.0019099590723055935,
+          "ci_low": -0.0016358446071508214,
+          "ci_high": 0.005410410957424992
+        },
+        "recall@5": {
+          "delta": 0.004274670304683947,
+          "ci_low": 0.0013644421851635618,
+          "ci_high": 0.007367992826483259
+        },
+        "recall@10": {
+          "delta": 0.0010004547521600727,
+          "ci_low": -0.0016392698043266984,
+          "ci_high": 0.0035475512361952404
+        },
+        "recall@20": {
+          "delta": 0.0008185538881309686,
+          "ci_low": -0.0002729880970875513,
+          "ci_high": 0.0020958634436524363
+        },
+        "mrr": {
+          "delta": -0.0001453011464877543,
+          "ci_low": -0.0036196008187405412,
+          "ci_high": 0.0032533488193477755
+        },
+        "mean_rank_improvement": {
+          "delta": 0.03956343792633015,
+          "ci_low": 0.010228575373864577,
+          "ci_high": 0.07100006635516584
+        },
+        "macro_query_auroc": {
+          "delta": 0.0010932488740524565,
+          "ci_low": -0.002056056184175854,
+          "ci_high": 0.0040131451957756146
+        },
+        "macro_query_average_precision": {
+          "delta": -0.0001453011464877543,
+          "ci_low": -0.0036196008187405412,
+          "ci_high": 0.0032533488193477755
+        }
+      }
+    }
+  },
+  "ms2deepscore_2x_public": {
+    "reference_method": "weighted_spectral_entropy",
+    "candidate_method": "ms2deepscore_2x_public",
+    "queries": 10995,
+    "corrected": 253,
+    "introduced": 1160,
+    "net_corrected_minus_introduced": -907,
+    "risk_net_lambda2": -2067,
+    "near_queries": 7592,
+    "near_corrected": 235,
+    "near_introduced": 1002,
+    "formula_cluster_bootstrap": {
+      "cluster_unit": "query_formula",
+      "clusters": 4204,
+      "bootstrap_resamples": 10000,
+      "bootstrap_seed": 20271102,
+      "familywise_confidence_level": 0.95,
+      "per_interval_nominal_level": 0.9975,
+      "familywise_hypotheses": 20,
+      "tail_probability": 0.00125,
+      "metrics": {
+        "recall@1": {
+          "delta": -0.08249204183719873,
+          "ci_low": -0.09429054284669483,
+          "ci_high": -0.07050665019224917
+        },
+        "recall@2": {
+          "delta": -0.04492951341518872,
+          "ci_low": -0.055172260720281564,
+          "ci_high": -0.03521260093750316
+        },
+        "recall@3": {
+          "delta": -0.027921782628467486,
+          "ci_low": -0.03568092896998425,
+          "ci_high": -0.020216173345215943
+        },
+        "recall@5": {
+          "delta": -0.013005911778080945,
+          "ci_low": -0.019047090251037038,
+          "ci_high": -0.007249723794802914
+        },
+        "recall@10": {
+          "delta": -0.0030013642564802184,
+          "ci_low": -0.006913989380685667,
+          "ci_high": 0.0008167344768655404
+        },
+        "recall@20": {
+          "delta": -0.00036380172805820825,
+          "ci_low": -0.0022976971634144513,
+          "ci_high": 0.0013633353868127433
+        },
+        "mrr": {
+          "delta": -0.052953165835691623,
+          "ci_low": -0.060622154519310946,
+          "ci_high": -0.04543476220086845
+        },
+        "mean_rank_improvement": {
+          "delta": -0.22773988176443838,
+          "ci_low": -0.3012197934046696,
+          "ci_high": -0.16467749873861215
+        },
+        "macro_query_auroc": {
+          "delta": -0.03597423207403161,
+          "ci_low": -0.042711516880759,
+          "ci_high": -0.029396832066750773
+        },
+        "macro_query_average_precision": {
+          "delta": -0.052953165835691623,
+          "ci_low": -0.060622154519310946,
+          "ci_high": -0.04543476220086845
+        }
+      }
+    },
+    "identity_cluster_bootstrap": {
+      "cluster_unit": "query_ik14",
+      "clusters": 5534,
+      "bootstrap_resamples": 10000,
+      "bootstrap_seed": 20271103,
+      "familywise_confidence_level": 0.95,
+      "per_interval_nominal_level": 0.9975,
+      "familywise_hypotheses": 20,
+      "tail_probability": 0.00125,
+      "metrics": {
+        "recall@1": {
+          "delta": -0.08249204183719873,
+          "ci_low": -0.09420492031781255,
+          "ci_high": -0.07010853538328053
+        },
+        "recall@2": {
+          "delta": -0.04492951341518872,
+          "ci_low": -0.05354797409643963,
+          "ci_high": -0.035824695399163484
+        },
+        "recall@3": {
+          "delta": -0.027921782628467486,
+          "ci_low": -0.03535560508955739,
+          "ci_high": -0.020597350361606016
+        },
+        "recall@5": {
+          "delta": -0.013005911778080945,
+          "ci_low": -0.018905657969688926,
+          "ci_high": -0.007557816011016781
+        },
+        "recall@10": {
+          "delta": -0.0030013642564802184,
+          "ci_low": -0.006725147496275014,
+          "ci_high": 0.0007733404367380854
+        },
+        "recall@20": {
+          "delta": -0.00036380172805820825,
+          "ci_low": -0.001954801219250416,
+          "ci_high": 0.001273074474856779
+        },
+        "mrr": {
+          "delta": -0.052953165835691623,
+          "ci_low": -0.06052342151215363,
+          "ci_high": -0.04540027234893435
+        },
+        "mean_rank_improvement": {
+          "delta": -0.22773988176443838,
+          "ci_low": -0.2892096493396656,
+          "ci_high": -0.16607586015338735
+        },
+        "macro_query_auroc": {
+          "delta": -0.03597423207403161,
+          "ci_low": -0.04238282864047427,
+          "ci_high": -0.029480245450845946
+        },
+        "macro_query_average_precision": {
+          "delta": -0.052953165835691623,
+          "ci_low": -0.06052342151215363,
+          "ci_high": -0.04540027234893435
+        }
+      }
+    }
+  },
+  "spec2vec_gnps_public": {
+    "reference_method": "weighted_spectral_entropy",
+    "candidate_method": "spec2vec_gnps_public",
+    "queries": 10995,
+    "corrected": 230,
+    "introduced": 348,
+    "net_corrected_minus_introduced": -118,
+    "risk_net_lambda2": -466,
+    "near_queries": 7592,
+    "near_corrected": 217,
+    "near_introduced": 321,
+    "formula_cluster_bootstrap": {
+      "cluster_unit": "query_formula",
+      "clusters": 4204,
+      "bootstrap_resamples": 10000,
+      "bootstrap_seed": 20272102,
+      "familywise_confidence_level": 0.95,
+      "per_interval_nominal_level": 0.9975,
+      "familywise_hypotheses": 20,
+      "tail_probability": 0.00125,
+      "metrics": {
+        "recall@1": {
+          "delta": -0.010732150977717144,
+          "ci_low": -0.018946097150589442,
+          "ci_high": -0.003611896252825903
+        },
+        "recall@2": {
+          "delta": -0.0050022737608003635,
+          "ci_low": -0.011641844564628419,
+          "ci_high": 0.0008711729210423207
+        },
+        "recall@3": {
+          "delta": -0.001455206912232833,
+          "ci_low": -0.006235626126697881,
+          "ci_high": 0.003173073806678188
+        },
+        "recall@5": {
+          "delta": 0.00018190086402910413,
+          "ci_low": -0.003819924493499623,
+          "ci_high": 0.004222539057603993
+        },
+        "recall@10": {
+          "delta": -0.00036380172805820825,
+          "ci_low": -0.003372852212375061,
+          "ci_high": 0.002784563002082173
+        },
+        "recall@20": {
+          "delta": 0.0,
+          "ci_low": -0.001641667162285191,
+          "ci_high": 0.0015822841895477182
+        },
+        "mrr": {
+          "delta": -0.006398750093284967,
+          "ci_low": -0.01135002164009795,
+          "ci_high": -0.0019989948847083656
+        },
+        "mean_rank_improvement": {
+          "delta": -0.015188722146430196,
+          "ci_low": -0.05877276398799306,
+          "ci_high": 0.0275542009222779
+        },
+        "macro_query_auroc": {
+          "delta": -0.004942775027533568,
+          "ci_low": -0.00930855926819242,
+          "ci_high": -0.0005455983746318905
+        },
+        "macro_query_average_precision": {
+          "delta": -0.006398750093284967,
+          "ci_low": -0.01135002164009795,
+          "ci_high": -0.0019989948847083656
+        }
+      }
+    },
+    "identity_cluster_bootstrap": {
+      "cluster_unit": "query_ik14",
+      "clusters": 5534,
+      "bootstrap_resamples": 10000,
+      "bootstrap_seed": 20272103,
+      "familywise_confidence_level": 0.95,
+      "per_interval_nominal_level": 0.9975,
+      "familywise_hypotheses": 20,
+      "tail_probability": 0.00125,
+      "metrics": {
+        "recall@1": {
+          "delta": -0.010732150977717144,
+          "ci_low": -0.017833589966504814,
+          "ci_high": -0.00363900865440211
+        },
+        "recall@2": {
+          "delta": -0.0050022737608003635,
+          "ci_low": -0.011038045583456009,
+          "ci_high": 0.0006362479549172878
+        },
+        "recall@3": {
+          "delta": -0.001455206912232833,
+          "ci_low": -0.006001937165215203,
+          "ci_high": 0.003002047197710572
+        },
+        "recall@5": {
+          "delta": 0.00018190086402910413,
+          "ci_low": -0.003914076537518835,
+          "ci_high": 0.00441077896086072
+        },
+        "recall@10": {
+          "delta": -0.00036380172805820825,
+          "ci_low": -0.003186020793810814,
+          "ci_high": 0.002684229109403638
+        },
+        "recall@20": {
+          "delta": 0.0,
+          "ci_low": -0.0016366620093257052,
+          "ci_high": 0.001548412217929678
+        },
+        "mrr": {
+          "delta": -0.006398750093284967,
+          "ci_low": -0.010730413534125818,
+          "ci_high": -0.002015149865471659
+        },
+        "mean_rank_improvement": {
+          "delta": -0.015188722146430196,
+          "ci_low": -0.05483680285124561,
+          "ci_high": 0.025043634733992647
+        },
+        "macro_query_auroc": {
+          "delta": -0.004942775027533568,
+          "ci_low": -0.00908900554822048,
+          "ci_high": -0.0006917998900240434
+        },
+        "macro_query_average_precision": {
+          "delta": -0.006398750093284967,
+          "ci_low": -0.010730413534125818,
+          "ci_high": -0.002015149865471659
+        }
+      }
+    }
+  },
+  "entropy_raw_public": {
+    "reference_method": "weighted_spectral_entropy",
+    "candidate_method": "entropy_raw_public",
+    "queries": 10995,
+    "corrected": 166,
+    "introduced": 172,
+    "net_corrected_minus_introduced": -6,
+    "risk_net_lambda2": -178,
+    "near_queries": 7592,
+    "near_corrected": 156,
+    "near_introduced": 161,
+    "formula_cluster_bootstrap": {
+      "cluster_unit": "query_formula",
+      "clusters": 4204,
+      "bootstrap_resamples": 10000,
+      "bootstrap_seed": 20273102,
+      "familywise_confidence_level": 0.95,
+      "per_interval_nominal_level": 0.9975,
+      "familywise_hypotheses": 20,
+      "tail_probability": 0.00125,
+      "metrics": {
+        "recall@1": {
+          "delta": -0.0005457025920873125,
+          "ci_low": -0.005687719904365446,
+          "ci_high": 0.004715261000135894
+        },
+        "recall@2": {
+          "delta": 0.0036380172805820826,
+          "ci_low": -0.0010313979194425983,
+          "ci_high": 0.00819114702376187
+        },
+        "recall@3": {
+          "delta": 0.004001819008640291,
+          "ci_low": 0.000454979437289496,
+          "ci_high": 0.007708979656829047
+        },
+        "recall@5": {
+          "delta": 0.0047294224647567076,
+          "ci_low": 0.0016746528033185037,
+          "ci_high": 0.008060198497576682
+        },
+        "recall@10": {
+          "delta": 0.0018190086402910413,
+          "ci_low": -0.00045639260430368735,
+          "ci_high": 0.004119881067338017
+        },
+        "recall@20": {
+          "delta": 0.001091405184174625,
+          "ci_low": 8.985932415382361e-05,
+          "ci_high": 0.002527418262066776
+        },
+        "mrr": {
+          "delta": 0.0013420859956948027,
+          "ci_low": -0.001775700794726759,
+          "ci_high": 0.00453002862799641
+        },
+        "mean_rank_improvement": {
+          "delta": 0.055206912232833104,
+          "ci_low": 0.02582963479966471,
+          "ci_high": 0.09183464481722035
+        },
+        "macro_query_auroc": {
+          "delta": 0.003067372700473285,
+          "ci_low": -9.366438754047871e-05,
+          "ci_high": 0.0062174611953044545
+        },
+        "macro_query_average_precision": {
+          "delta": 0.0013420859956948027,
+          "ci_low": -0.001775700794726759,
+          "ci_high": 0.00453002862799641
+        }
+      }
+    },
+    "identity_cluster_bootstrap": {
+      "cluster_unit": "query_ik14",
+      "clusters": 5534,
+      "bootstrap_resamples": 10000,
+      "bootstrap_seed": 20273103,
+      "familywise_confidence_level": 0.95,
+      "per_interval_nominal_level": 0.9975,
+      "familywise_hypotheses": 20,
+      "tail_probability": 0.00125,
+      "metrics": {
+        "recall@1": {
+          "delta": -0.0005457025920873125,
+          "ci_low": -0.005681921158906485,
+          "ci_high": 0.00473071436109544
+        },
+        "recall@2": {
+          "delta": 0.0036380172805820826,
+          "ci_low": -0.0009548146763586256,
+          "ci_high": 0.008314129514736389
+        },
+        "recall@3": {
+          "delta": 0.004001819008640291,
+          "ci_low": 0.0005906603204596216,
+          "ci_high": 0.00759716087691564
+        },
+        "recall@5": {
+          "delta": 0.0047294224647567076,
+          "ci_low": 0.0016356184294591917,
+          "ci_high": 0.007869450583215124
+        },
+        "recall@10": {
+          "delta": 0.0018190086402910413,
+          "ci_low": -0.0005459760428461902,
+          "ci_high": 0.004276426966118193
+        },
+        "recall@20": {
+          "delta": 0.001091405184174625,
+          "ci_low": 9.088430428065073e-05,
+          "ci_high": 0.0023670793882010197
+        },
+        "mrr": {
+          "delta": 0.0013420859956948027,
+          "ci_low": -0.0018316688121363162,
+          "ci_high": 0.004624001714681209
+        },
+        "mean_rank_improvement": {
+          "delta": 0.055206912232833104,
+          "ci_low": 0.02350291811086267,
+          "ci_high": 0.08954557480280481
+        },
+        "macro_query_auroc": {
+          "delta": 0.003067372700473285,
+          "ci_low": -0.00014061438548671368,
+          "ci_high": 0.006363875401175554
+        },
+        "macro_query_average_precision": {
+          "delta": 0.0013420859956948027,
+          "ci_low": -0.0018316688121363162,
+          "ci_high": 0.004624001714681209
+        }
+      }
+    }
+  },
+  "denoising_search_public": {
+    "reference_method": "weighted_spectral_entropy",
+    "candidate_method": "denoising_search_public",
+    "queries": 10995,
+    "corrected": 190,
+    "introduced": 216,
+    "net_corrected_minus_introduced": -26,
+    "risk_net_lambda2": -242,
+    "near_queries": 7592,
+    "near_corrected": 177,
+    "near_introduced": 204,
+    "formula_cluster_bootstrap": {
+      "cluster_unit": "query_formula",
+      "clusters": 4204,
+      "bootstrap_resamples": 10000,
+      "bootstrap_seed": 20274102,
+      "familywise_confidence_level": 0.95,
+      "per_interval_nominal_level": 0.9975,
+      "familywise_hypotheses": 20,
+      "tail_probability": 0.00125,
+      "metrics": {
+        "recall@1": {
+          "delta": -0.0023647112323783538,
+          "ci_low": -0.008156575450499115,
+          "ci_high": 0.0036550216610498946
+        },
+        "recall@2": {
+          "delta": 0.0033651659845384267,
+          "ci_low": -0.0012054631714353277,
+          "ci_high": 0.00790826186876104
+        },
+        "recall@3": {
+          "delta": 0.0020009095043201455,
+          "ci_low": -0.00191851628221739,
+          "ci_high": 0.006074846471396406
+        },
+        "recall@5": {
+          "delta": 0.004274670304683947,
+          "ci_low": 0.0009149578614319237,
+          "ci_high": 0.007930185819854248
+        },
+        "recall@10": {
+          "delta": 0.001455206912232833,
+          "ci_low": -0.0013534219023312152,
+          "ci_high": 0.0044132922348595295
+        },
+        "recall@20": {
+          "delta": 0.0010004547521600727,
+          "ci_low": -0.0001842045340952762,
+          "ci_high": 0.0024008174885896518
+        },
+        "mrr": {
+          "delta": 0.00015892079354687673,
+          "ci_low": -0.003377165477655094,
+          "ci_high": 0.0037442094474049318
+        },
+        "mean_rank_improvement": {
+          "delta": 0.045929968167348796,
+          "ci_low": 0.009150362461239393,
+          "ci_high": 0.08664425689730623
+        },
+        "macro_query_auroc": {
+          "delta": 0.0021120616857851627,
+          "ci_low": -0.001223694489409632,
+          "ci_high": 0.00544046666295272
+        },
+        "macro_query_average_precision": {
+          "delta": 0.00015892079354687673,
+          "ci_low": -0.003377165477655094,
+          "ci_high": 0.0037442094474049318
+        }
+      }
+    },
+    "identity_cluster_bootstrap": {
+      "cluster_unit": "query_ik14",
+      "clusters": 5534,
+      "bootstrap_resamples": 10000,
+      "bootstrap_seed": 20274103,
+      "familywise_confidence_level": 0.95,
+      "per_interval_nominal_level": 0.9975,
+      "familywise_hypotheses": 20,
+      "tail_probability": 0.00125,
+      "metrics": {
+        "recall@1": {
+          "delta": -0.0023647112323783538,
+          "ci_low": -0.008463215830866259,
+          "ci_high": 0.0036375223375600734
+        },
+        "recall@2": {
+          "delta": 0.0033651659845384267,
+          "ci_low": -0.0016377782707317236,
+          "ci_high": 0.00813740217311623
+        },
+        "recall@3": {
+          "delta": 0.0020009095043201455,
+          "ci_low": -0.002045437355046149,
+          "ci_high": 0.006093963325394547
+        },
+        "recall@5": {
+          "delta": 0.004274670304683947,
+          "ci_low": 0.0010917028175091248,
+          "ci_high": 0.007777742468826192
+        },
+        "recall@10": {
+          "delta": 0.001455206912232833,
+          "ci_low": -0.0013645669080502598,
+          "ci_high": 0.004407393904300798
+        },
+        "recall@20": {
+          "delta": 0.0010004547521600727,
+          "ci_low": -0.0002728264823572208,
+          "ci_high": 0.002454546651389973
+        },
+        "mrr": {
+          "delta": 0.00015892079354687673,
+          "ci_low": -0.00348065411141661,
+          "ci_high": 0.0038340824180142104
+        },
+        "mean_rank_improvement": {
+          "delta": 0.045929968167348796,
+          "ci_low": 0.010274591049637884,
+          "ci_high": 0.08654115205527564
+        },
+        "macro_query_auroc": {
+          "delta": 0.0021120616857851627,
+          "ci_low": -0.0013613702601076988,
+          "ci_high": 0.005656504444584102
+        },
+        "macro_query_average_precision": {
+          "delta": 0.00015892079354687673,
+          "ci_low": -0.00348065411141661,
+          "ci_high": 0.0038340824180142104
+        }
+      }
+    }
+  },
+  "spec2vec_2026_retrained": {
+    "reference_method": "weighted_spectral_entropy",
+    "candidate_method": "spec2vec_2026_retrained",
+    "queries": 10995,
+    "corrected": 210,
+    "introduced": 351,
+    "net_corrected_minus_introduced": -141,
+    "risk_net_lambda2": -492,
+    "near_queries": 7592,
+    "near_corrected": 192,
+    "near_introduced": 330,
+    "formula_cluster_bootstrap": {
+      "cluster_unit": "query_formula",
+      "clusters": 4204,
+      "bootstrap_resamples": 10000,
+      "bootstrap_seed": 20275102,
+      "familywise_confidence_level": 0.95,
+      "per_interval_nominal_level": 0.9975,
+      "familywise_hypotheses": 20,
+      "tail_probability": 0.00125,
+      "metrics": {
+        "recall@1": {
+          "delta": -0.012824010914051841,
+          "ci_low": -0.020604261241505408,
+          "ci_high": -0.005528073301329805
+        },
+        "recall@2": {
+          "delta": -0.0047294224647567076,
+          "ci_low": -0.01062296419030303,
+          "ci_high": 0.0007408785121409217
+        },
+        "recall@3": {
+          "delta": -0.0011823556161891769,
+          "ci_low": -0.005160004956343126,
+          "ci_high": 0.0030290081323397213
+        },
+        "recall@5": {
+          "delta": 0.0011823556161891769,
+          "ci_low": -0.0023823943298932285,
+          "ci_high": 0.004869487519006644
+        },
+        "recall@10": {
+          "delta": -0.0006366530241018644,
+          "ci_low": -0.0031221164353461323,
+          "ci_high": 0.0020069345648355548
+        },
+        "recall@20": {
+          "delta": 0.00045475216007276033,
+          "ci_low": -0.0008281218552447139,
+          "ci_high": 0.001729023968125442
+        },
+        "mrr": {
+          "delta": -0.007190774911949218,
+          "ci_low": -0.011819491915074651,
+          "ci_high": -0.0029406283272609933
+        },
+        "mean_rank_improvement": {
+          "delta": -0.009822646657571623,
+          "ci_low": -0.043353455226977713,
+          "ci_high": 0.023191240749321627
+        },
+        "macro_query_auroc": {
+          "delta": -0.005879874569981995,
+          "ci_low": -0.010289811602049344,
+          "ci_high": -0.0016308308752835071
+        },
+        "macro_query_average_precision": {
+          "delta": -0.007190774911949218,
+          "ci_low": -0.011819491915074651,
+          "ci_high": -0.0029406283272609933
+        }
+      }
+    },
+    "identity_cluster_bootstrap": {
+      "cluster_unit": "query_ik14",
+      "clusters": 5534,
+      "bootstrap_resamples": 10000,
+      "bootstrap_seed": 20275103,
+      "familywise_confidence_level": 0.95,
+      "per_interval_nominal_level": 0.9975,
+      "familywise_hypotheses": 20,
+      "tail_probability": 0.00125,
+      "metrics": {
+        "recall@1": {
+          "delta": -0.012824010914051841,
+          "ci_low": -0.02025524665915304,
+          "ci_high": -0.005595596217611705
+        },
+        "recall@2": {
+          "delta": -0.0047294224647567076,
+          "ci_low": -0.010320587194008222,
+          "ci_high": 0.0008187786538617974
+        },
+        "recall@3": {
+          "delta": -0.0011823556161891769,
+          "ci_low": -0.005093151604233693,
+          "ci_high": 0.0029113416288486017
+        },
+        "recall@5": {
+          "delta": 0.0011823556161891769,
+          "ci_low": -0.0024543248898123756,
+          "ci_high": 0.004818626346501289
+        },
+        "recall@10": {
+          "delta": -0.0006366530241018644,
+          "ci_low": -0.0034551736679396252,
+          "ci_high": 0.0020005460746823182
+        },
+        "recall@20": {
+          "delta": 0.00045475216007276033,
+          "ci_low": -0.0007280339378992455,
+          "ci_high": 0.0017286905612647334
+        },
+        "mrr": {
+          "delta": -0.007190774911949218,
+          "ci_low": -0.011511334092564999,
+          "ci_high": -0.0029971990614541732
+        },
+        "mean_rank_improvement": {
+          "delta": -0.009822646657571623,
+          "ci_low": -0.04618974846997498,
+          "ci_high": 0.023867109305214945
+        },
+        "macro_query_auroc": {
+          "delta": -0.005879874569981995,
+          "ci_low": -0.010250969350503207,
+          "ci_high": -0.0017452272806430709
+        },
+        "macro_query_average_precision": {
+          "delta": -0.007190774911949218,
+          "ci_low": -0.011511334092564999,
+          "ci_high": -0.0029971990614541732
+        }
+      }
+    }
+  },
+  "full23_v132": {
+    "reference_method": "weighted_spectral_entropy",
+    "candidate_method": "full23_v132",
+    "queries": 10995,
+    "corrected": 223,
+    "introduced": 113,
+    "net_corrected_minus_introduced": 110,
+    "risk_net_lambda2": -3,
+    "near_queries": 7592,
+    "near_corrected": 210,
+    "near_introduced": 110,
+    "formula_cluster_bootstrap": {
+      "cluster_unit": "query_formula",
+      "clusters": 4204,
+      "bootstrap_resamples": 10000,
+      "bootstrap_seed": 20276102,
+      "familywise_confidence_level": 0.95,
+      "per_interval_nominal_level": 0.9975,
+      "familywise_hypotheses": 20,
+      "tail_probability": 0.00125,
+      "metrics": {
+        "recall@1": {
+          "delta": 0.010004547521600727,
+          "ci_low": 0.004636588355497699,
+          "ci_high": 0.01554779842427177
+        },
+        "recall@2": {
+          "delta": 0.010004547521600727,
+          "ci_low": 0.005871381668946648,
+          "ci_high": 0.014542837169678354
+        },
+        "recall@3": {
+          "delta": 0.006184629376989541,
+          "ci_low": 0.0033550912718521416,
+          "ci_high": 0.00958852385145262
+        },
+        "recall@5": {
+          "delta": 0.0050022737608003635,
+          "ci_low": 0.0024738830305349167,
+          "ci_high": 0.007945361741558882
+        },
+        "recall@10": {
+          "delta": 0.0018190086402910413,
+          "ci_low": 0.0002262172393636593,
+          "ci_high": 0.0036613032890466055
+        },
+        "recall@20": {
+          "delta": 0.0008185538881309686,
+          "ci_low": -9.113716443523009e-05,
+          "ci_high": 0.0018712569362706556
+        },
+        "mrr": {
+          "delta": 0.00791875799814854,
+          "ci_low": 0.004835575923176208,
+          "ci_high": 0.011162002763046665
+        },
+        "mean_rank_improvement": {
+          "delta": 0.06912232833105958,
+          "ci_low": 0.04797102058374932,
+          "ci_high": 0.09322237020361633
+        },
+        "macro_query_auroc": {
+          "delta": 0.005968426101501847,
+          "ci_low": 0.003609947490671705,
+          "ci_high": 0.008467084046889058
+        },
+        "macro_query_average_precision": {
+          "delta": 0.00791875799814854,
+          "ci_low": 0.004835575923176208,
+          "ci_high": 0.011162002763046665
+        }
+      }
+    },
+    "identity_cluster_bootstrap": {
+      "cluster_unit": "query_ik14",
+      "clusters": 5534,
+      "bootstrap_resamples": 10000,
+      "bootstrap_seed": 20276103,
+      "familywise_confidence_level": 0.95,
+      "per_interval_nominal_level": 0.9975,
+      "familywise_hypotheses": 20,
+      "tail_probability": 0.00125,
+      "metrics": {
+        "recall@1": {
+          "delta": 0.010004547521600727,
+          "ci_low": 0.0044101599128979155,
+          "ci_high": 0.015646324073419433
+        },
+        "recall@2": {
+          "delta": 0.010004547521600727,
+          "ci_low": 0.005685552870073133,
+          "ci_high": 0.014272738065740857
+        },
+        "recall@3": {
+          "delta": 0.006184629376989541,
+          "ci_low": 0.0032734695522758277,
+          "ci_high": 0.009282863700913127
+        },
+        "recall@5": {
+          "delta": 0.0050022737608003635,
+          "ci_low": 0.0023646029390753352,
+          "ci_high": 0.007774923189483016
+        },
+        "recall@10": {
+          "delta": 0.0018190086402910413,
+          "ci_low": 0.00027264049306073064,
+          "ci_high": 0.0036398384487556466
+        },
+        "recall@20": {
+          "delta": 0.0008185538881309686,
+          "ci_low": -0.00013651431610280145,
+          "ci_high": 0.001911959068918601
+        },
+        "mrr": {
+          "delta": 0.00791875799814854,
+          "ci_low": 0.004821542167501771,
+          "ci_high": 0.011172077466244447
+        },
+        "mean_rank_improvement": {
+          "delta": 0.06912232833105958,
+          "ci_low": 0.04843546435707579,
+          "ci_high": 0.09431134309183405
+        },
+        "macro_query_auroc": {
+          "delta": 0.005968426101501847,
+          "ci_low": 0.003739800080632051,
+          "ci_high": 0.008448340581172262
+        },
+        "macro_query_average_precision": {
+          "delta": 0.00791875799814854,
+          "ci_low": 0.004821542167501771,
+          "ci_high": 0.011172077466244447
+        }
+      }
+    }
+  }
+}

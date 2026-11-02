@@ -1,0 +1,152 @@
+{
+  "schema": "mega_identity_method_registry_v1",
+  "created_on": "2026-11-02",
+  "primary_task": "query experimental MS/MS to reference experimental MS/MS identity ranking on an identical candidate-molecule axis",
+  "same_axis_main_table": [
+    {
+      "id": "full23_v132",
+      "display_name": "Full23 v1.3.2",
+      "status": "local_frozen_candidate",
+      "implementation": "deploy/unified_additive_full23_v132",
+      "training_overlap_rule": "Report development and external roles separately; never reuse GNPS or Enveda as independent confirmation."
+    },
+    {
+      "id": "wse",
+      "display_name": "Weighted spectral entropy",
+      "status": "implemented_and_same_axis_scored",
+      "package_version": "ms_entropy 1.5.3",
+      "license": "Apache-2.0",
+      "source_url": "https://github.com/YuanyueLi/MSEntropy"
+    },
+    {
+      "id": "official_finetuned_dreams",
+      "display_name": "Official fine-tuned DreaMS",
+      "status": "implemented_and_same_axis_scored",
+      "source_url": "https://github.com/pluskal-lab/DreaMS",
+      "contamination_boundary": "Large self-supervised pretraining includes MassIVE/GNPS-family spectra; exact exposure is not fully excluded."
+    },
+    {
+      "id": "specembedding",
+      "display_name": "SpecEmbedding",
+      "status": "official_code_and_author_space_checkpoint_materialized_forward_tested",
+      "repo_path": "data/external/sota_identity_methods_20261102/SpecEmbedding",
+      "repo_commit": "c16205c7469f089eb5462ec692b9755d455ca139",
+      "checkpoint_path": "data/external/sota_identity_methods_20261102/SpecEmbedding/model/transformer-SupConWithTanimotoLoss-Augmentation/model.ckpt",
+      "checkpoint_sha256": "0ca0aa002a0d061a95410f7a4055e82c7fcb428d0ba04b5714ac3a4e7f0f5cca",
+      "checkpoint_bytes": 31572706,
+      "checkpoint_source": "https://huggingface.co/spaces/xp113280/SpecEmbedding",
+      "checkpoint_source_commit": "26665447238100728da3640675927f2c8bfb10cd",
+      "checkpoint_archive_url": "https://figshare.com/articles/dataset/Raw_Data_and_trained_model/28876751",
+      "figshare_network_note": "Direct archive download returned HTTP 403 from this network; the authors' official Hugging Face Space supplied the exact executable checkpoint.",
+      "adapter": "tasks/public_sota_embedding_adapter.py",
+      "license_boundary": "Figshare model/data are CC BY 4.0; cloned code repository has no explicit license.",
+      "contamination_boundary": "Training uses GNPS/MoNA/MTBLS1572-derived data; GNPS comparison is consumed development only."
+    },
+    {
+      "id": "msbert",
+      "display_name": "MSBERT",
+      "status": "official_code_and_historical_lfs_checkpoint_materialized",
+      "repo_path": "data/external/sota_identity_methods_20261102/MSBERT",
+      "repo_commit": "4b1e85e78221832845b2a6b493e9f6b0c62b2c27",
+      "checkpoint_path": "data/external/sota_identity_methods_20261102/MSBERT/model/MSBERT.pkl",
+      "checkpoint_sha256": "f6a50e1a5650504370e563a9daf9117b4f4ecd60f5ba508dce2ee9e81f064605",
+      "checkpoint_bytes": 486361781,
+      "adapter": "tasks/public_sota_embedding_adapter.py",
+      "forward_test": "finite unit-normalized 512-dimensional embeddings",
+      "license": "MIT",
+      "contamination_boundary": "Trained directly on filtered GNPS; GNPS comparison is contaminated development evidence, not external confirmation."
+    },
+    {
+      "id": "spec2vec",
+      "display_name": "Spec2Vec",
+      "status": "package_and_public_models_available_same_axis_scored",
+      "package_version": "0.9.1",
+      "license": "Apache-2.0",
+      "source_url": "https://github.com/iomega/spec2vec",
+      "contamination_boundary": "Public model trained on GNPS AllPositive."
+    }
+  ],
+  "same_axis_auxiliary_table": [
+    {
+      "id": "ms2deepscore_2",
+      "display_name": "MS2DeepScore 2.0",
+      "status": "package_and_public_model_available_same_axis_scored",
+      "installed_package_version": "2.11.0",
+      "publication_reproduction_target": "software 2.5.3 with model v5",
+      "task_boundary": "Supervised chemical-similarity scoring rather than exact-identity training; report as an auxiliary comparator.",
+      "source_url": "https://github.com/matchms/ms2deepscore"
+    },
+    {
+      "id": "transexion",
+      "display_name": "TransExION",
+      "status": "public_code_and_model_available_not_yet_adapted",
+      "task_boundary": "Learned spectrum-pair structural-similarity score rather than an exact-identity-specific objective; optional same-axis auxiliary comparator.",
+      "contamination_boundary": "Training uses GNPS-derived data; any GNPS result is contaminated development evidence.",
+      "source_url": "https://github.com/banhdzui/TransExION"
+    }
+  ],
+  "native_system_or_non_axis_comparisons": [
+    {
+      "id": "ms2query_1_5_3",
+      "display_name": "MS2Query 1.5.3",
+      "status": "official_code_cloned_native_assets_not_materialized",
+      "repo_path": "data/external/sota_identity_methods_20261102/ms2query",
+      "repo_commit": "8e6e410a30f70962e7677ea633bda299bf5f3042",
+      "exclusion_reason": "Native system changes retrieval and depends on whole-library neighbourhood features. It cannot be inserted into a frozen small candidate graph and called same-axis.",
+      "source_url": "https://github.com/iomega/ms2query"
+    },
+    {
+      "id": "ms2query_2",
+      "display_name": "MS2Query 2",
+      "status": "prototype_repository_cloned_not_a_validated_main_comparator",
+      "repo_path": "data/external/sota_identity_methods_20261102/ms2query_2",
+      "repo_commit": "0ca72ef1160f1ec1f7d2c3902d0cdb54dd2de029",
+      "source_url": "https://github.com/matchms/ms2query_2"
+    },
+    {
+      "id": "lsm_ms2",
+      "display_name": "LSM-MS2",
+      "status": "published_preprint_no_public_reproducible_checkpoint_or_complete_library",
+      "exclusion_reason": "Published retrieval protocol uses a 1.8M reference library with incomplete query coverage and commercial/internal data, so its absolute values cannot be mixed into the fixed-axis ladder.",
+      "reported_massspecgym_metrics": {
+        "spectra": 225832,
+        "analytes": 28923,
+        "per_spectrum_recall_at_1": 0.739,
+        "per_spectrum_recall_at_5": 0.774,
+        "auc": 0.972,
+        "per_analyte_recall_at_1": 0.804
+      },
+      "source_url": "https://arxiv.org/abs/2510.26715"
+    },
+    {
+      "id": "structure_retrieval_family",
+      "display_name": "JESTR/MIST/ESP/MVP and related spectrum-to-structure systems",
+      "status": "different_task",
+      "exclusion_reason": "Candidate molecules are scored against spectra rather than query spectra being matched to experimental reference spectra. Keep in a separate task table."
+    }
+  ],
+  "required_report_metrics": [
+    "recall@1",
+    "recall@2",
+    "recall@3",
+    "recall@5",
+    "recall@10",
+    "recall@20",
+    "mrr",
+    "mean_rank",
+    "median_rank",
+    "near_recall@1",
+    "near_mrr",
+    "macro_query_auroc",
+    "macro_query_average_precision",
+    "micro_candidate_auroc",
+    "micro_candidate_average_precision",
+    "corrected",
+    "introduced",
+    "paired_cluster_confidence_interval",
+    "roc_curve",
+    "precision_recall_curve",
+    "runtime",
+    "peak_memory"
+  ]
+}
