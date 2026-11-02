@@ -15,10 +15,12 @@ sys.path.insert(0, str(ROOT / "tasks"))
 from public_sota_embedding_adapter import (  # noqa: E402
     _lfs_pointer,
     _msbert_batches,
+    _panel_rows,
     _specembedding_batches,
     load_embedding_cache,
     main,
     score_molecules,
+    subset_panel_to_supported_rows,
 )
 from evaluate_mega_identity_benchmark import (  # noqa: E402
     NpzMemmapStore,
@@ -45,7 +47,28 @@ def test_official_preprocessing_shapes() -> None:
     assert m_rows.tolist() == [0, 1]
     assert token.shape == (2, 100) and m_intensity.shape == (2, 1, 100)
     assert token[0, 0] == 10002  # precursor 100.00 + PAD/MASK offset
-    assert np.isclose(m_intensity[0, 0, 0], 0.5)  # official precursor weight 2 / peak max 4
+    assert np.isclose(m_intensity[0, 0, 0], 1.0)  # official precursor weight 2 / joint max 2
+    assert np.isclose(m_intensity[0, 0, 2], 0.5)  # normalised peak max 1 / joint max 2
+
+
+def test_msbert_official_mass_domain() -> None:
+    records = [
+        (0, 1062.61, np.asarray([[20.0, 40.0], [1.0, 2.0]], np.float32)),
+        (
+            1,
+            999.98,
+            np.asarray(
+                [[5.0, 10.0, 999.99, 1000.0, 1200.0], [9.0, 1.0, 4.0, 8.0, 7.0]],
+                np.float32,
+            ),
+        ),
+    ]
+    rows, token, intensity = next(_msbert_batches(records, 8))
+    assert rows.tolist() == [1]  # official PrecursorFilter drops the whole first spectrum
+    assert token[0, 0] == 100000  # 999.98 + PAD/MASK offset
+    assert token[0, 1:3].tolist() == [1002, 100001]  # fragments retain only 10 <= m/z < 1000
+    assert np.isclose(intensity[0, 0, 0], 1.0)
+    assert np.isclose(intensity[0, 0, 2], 0.5)
 
 
 def test_lfs_pointer_is_not_a_checkpoint(tmp_path: Path) -> None:
@@ -56,6 +79,22 @@ def test_lfs_pointer_is_not_a_checkpoint(tmp_path: Path) -> None:
         encoding="ascii",
     )
     assert _lfs_pointer(pointer) == {"pointer": True, "sha256": "a" * 64, "bytes": 123}
+
+
+def test_panel_row_union_is_sorted_and_exact(tmp_path: Path) -> None:
+    first = tmp_path / "first.npz"
+    second = tmp_path / "second.npz"
+    np.savez_compressed(
+        first,
+        query_row=np.asarray([9, 1], np.int64),
+        candidate_row=np.asarray([7, 3, 9], np.int64),
+    )
+    np.savez_compressed(
+        second,
+        query_row=np.asarray([5], np.int64),
+        candidate_row=np.asarray([3, 11], np.int64),
+    )
+    assert _panel_rows([first, second]).tolist() == [1, 3, 5, 7, 9, 11]
 
 
 def test_standard_molecule_score_contract(tmp_path: Path) -> None:
@@ -178,10 +217,68 @@ def test_standard_molecule_score_contract(tmp_path: Path) -> None:
         raise AssertionError("merge accepted a score cache from a different panel axis")
 
 
+def test_common_domain_panel_keeps_only_complete_query_blocks(tmp_path: Path) -> None:
+    panel = {
+        "schema_version": np.asarray("synthetic_panel_v1"),
+        "query_row": np.asarray([0, 1, 2], np.int64),
+        "query_ptr": np.asarray([0, 2, 4, 6], np.int64),
+        "query_formula": np.asarray(["C1", "C2", "C3"]),
+        "near_query": np.asarray([1, 0, 1], bool),
+        "molecule_ptr": np.asarray([0, 1, 3, 4, 6, 7, 9], np.int64),
+        "molecule_label": np.asarray([1, 0, 1, 0, 1, 0], bool),
+        "molecule_ik14": np.asarray([f"M{x:013d}" for x in range(6)]),
+        "candidate_row": np.asarray([10, 11, 12, 13, 14, 15, 16, 17, 18], np.int64),
+    }
+    supported = np.asarray([0, 2, 10, 11, 12, 16, 17], np.int64)
+    subset, counts = subset_panel_to_supported_rows(panel, supported)
+    assert counts == {
+        "original_N_Q": 3,
+        "original_N_E": 6,
+        "original_N_P": 9,
+        "retained_N_Q": 1,
+        "retained_N_E": 2,
+        "retained_N_P": 3,
+        "dropped_N_Q": 2,
+        "dropped_query_row_unavailable": 1,
+        "dropped_incomplete_candidate_block": 1,
+    }
+    assert subset["query_row"].tolist() == [0]
+    assert subset["query_ptr"].tolist() == [0, 2]
+    assert subset["molecule_ptr"].tolist() == [0, 1, 3]
+    assert subset["candidate_row"].tolist() == [10, 11, 12]
+    assert subset["molecule_label"].tolist() == [True, False]
+    assert subset["source_query_index"].tolist() == [0]
+    assert subset["source_molecule_index"].tolist() == [0, 1]
+    assert subset["source_pair_index"].tolist() == [0, 1, 2]
+    assert str(subset["schema_version"]) == "synthetic_panel_v1"
+
+    panel_path = tmp_path / "panel.npz"
+    embeddings_path = tmp_path / "embeddings.npz"
+    output = tmp_path / "common_domain.npz"
+    report = tmp_path / "common_domain.json"
+    np.savez_compressed(panel_path, **panel)
+    np.savez_compressed(
+        embeddings_path,
+        rows=supported,
+        embeddings=np.eye(len(supported), dtype=np.float32),
+    )
+    main([
+        "subset-panel", "--panel", str(panel_path), "--embeddings", str(embeddings_path),
+        "--output", str(output), "--report", str(report),
+    ])
+    body = json.loads(report.read_text(encoding="utf-8"))
+    assert body["retained_N_Q"] == 1 and body["retained_N_E"] == 2
+    with np.load(output, allow_pickle=False) as saved:
+        assert saved["candidate_row"].tolist() == [10, 11, 12]
+
+
 if __name__ == "__main__":
     with tempfile.TemporaryDirectory() as directory:
         tmp = Path(directory)
         test_official_preprocessing_shapes()
+        test_msbert_official_mass_domain()
         test_lfs_pointer_is_not_a_checkpoint(tmp)
+        test_panel_row_union_is_sorted_and_exact(tmp)
         test_standard_molecule_score_contract(tmp)
+        test_common_domain_panel_keeps_only_complete_query_blocks(tmp)
     print("PASS: public SOTA embedding adapter contracts")

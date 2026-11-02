@@ -32,6 +32,7 @@ import hashlib
 import json
 import subprocess
 import sys
+import time
 from pathlib import Path
 from typing import Iterable, Sequence
 
@@ -185,6 +186,46 @@ def _manifest_rows(path: Path | None, row_column: str) -> np.ndarray | None:
     return rows
 
 
+def _panel_rows(paths: Sequence[Path]) -> np.ndarray:
+    selected: list[np.ndarray] = []
+    for path in paths:
+        if not path.is_file():
+            raise FileNotFoundError(path)
+        with np.load(path, allow_pickle=False) as body:
+            missing = {"query_row", "candidate_row"} - set(body.files)
+            if missing:
+                raise RuntimeError(f"row-selection panel misses {sorted(missing)}: {path}")
+            query = np.asarray(body["query_row"], np.int64)
+            candidate = np.asarray(body["candidate_row"], np.int64)
+        if query.ndim != 1 or candidate.ndim != 1 or not len(query) or not len(candidate):
+            raise RuntimeError(f"row-selection panel has malformed row arrays: {path}")
+        if np.any(query < 0) or np.any(candidate < 0):
+            raise RuntimeError(f"row-selection panel contains negative rows: {path}")
+        selected.extend((query, candidate))
+    if not selected:
+        raise RuntimeError("at least one row-selection panel is required")
+    return np.unique(np.concatenate(selected)).astype(np.int64, copy=False)
+
+
+def _progress_records(
+    records: Iterable[tuple[int, float, np.ndarray]], every: int, method: str,
+) -> Iterable[tuple[int, float, np.ndarray]]:
+    started = time.monotonic()
+    count = 0
+    for record in records:
+        count += 1
+        yield record
+        if every and count % every == 0:
+            elapsed = max(time.monotonic() - started, 1e-9)
+            print(json.dumps({
+                "status": "PUBLIC_SOTA_ENCODING_PROGRESS",
+                "method": method,
+                "selected_records": count,
+                "elapsed_seconds": round(elapsed, 3),
+                "selected_records_per_second": round(count / elapsed, 3),
+            }), flush=True)
+
+
 def _selected_records(mgf: Path, rows: np.ndarray | None) -> Iterable[tuple[int, float, np.ndarray]]:
     # Reuse the project's canonical MGF order/parser contract.
     from encode_unified_library_for_p2b import iter_mgf
@@ -281,9 +322,22 @@ def _msbert_batches(
     tokens: list[np.ndarray] = []
     intensities: list[np.ndarray] = []
     for row, precursor, raw in records:
-        peaks = _top_peaks(_valid_peaks(raw), 99)
+        # The official GNPS preparation calls PrecursorFilter before tokenising:
+        # spectra whose precursor is >=1000 Da are outside the checkpoint's
+        # 0.00--999.99 vocabulary and are omitted, not clipped or remapped.
+        if not np.isfinite(precursor) or precursor < 0 or precursor >= 1000:
+            continue
+        # Official MinimalProcessing applies select_by_mz(10, 1000) and
+        # normalize_intensities before ProDataset selects the top 99 peaks.
+        peaks = _valid_peaks(raw)
+        peaks = peaks[(peaks[:, 0] >= 10.0) & (peaks[:, 0] < 1000.0)]
+        if not len(peaks):
+            continue
+        peaks = _top_peaks(peaks, 99)
+        peak_intensity = peaks[:, 1].astype(np.float32)
+        peak_intensity /= float(np.max(peak_intensity))
         ids = np.asarray([_msbert_token(precursor), *(_msbert_token(x) for x in peaks[:, 0])], np.int64)
-        weight = np.concatenate(([2.0], peaks[:, 1])).astype(np.float32)
+        weight = np.concatenate(([2.0], peak_intensity)).astype(np.float32)
         weight /= float(np.max(weight))
         ids = np.pad(ids, (0, 100 - len(ids)))
         weight = np.pad(weight, (0, 100 - len(weight)))[None, :]
@@ -376,6 +430,112 @@ def load_embedding_cache(path: Path) -> tuple[np.ndarray, np.ndarray]:
     return rows, embeddings
 
 
+def embedding_cache_rows(path: Path) -> np.ndarray:
+    with np.load(path, allow_pickle=False) as body:
+        if "rows" not in body.files:
+            raise RuntimeError(f"embedding cache lacks rows: {path}")
+        rows = np.asarray(body["rows"], np.int64)
+    if (
+        rows.ndim != 1 or not len(rows) or np.any(rows < 0)
+        or len(np.unique(rows)) != len(rows)
+        or not np.array_equal(rows, np.sort(rows))
+    ):
+        raise RuntimeError("embedding cache row registry is malformed or unsorted")
+    return rows
+
+
+def subset_panel_to_supported_rows(
+    panel: dict[str, np.ndarray], supported_rows: np.ndarray,
+) -> tuple[dict[str, np.ndarray], dict[str, int]]:
+    required = {"query_row", "query_ptr", "molecule_ptr", "candidate_row"}
+    missing = sorted(required - set(panel))
+    if missing:
+        raise RuntimeError(f"panel misses required arrays: {missing}")
+    query_row = np.asarray(panel["query_row"], np.int64)
+    query_ptr = np.asarray(panel["query_ptr"], np.int64)
+    molecule_ptr = np.asarray(panel["molecule_ptr"], np.int64)
+    candidate_row = np.asarray(panel["candidate_row"], np.int64)
+    n_q = len(query_row)
+    n_e = len(molecule_ptr) - 1
+    n_p = len(candidate_row)
+    if (
+        query_row.ndim != 1 or query_ptr.ndim != 1 or molecule_ptr.ndim != 1
+        or candidate_row.ndim != 1 or len(query_ptr) != n_q + 1
+        or query_ptr[0] != 0 or query_ptr[-1] != n_e
+        or molecule_ptr[0] != 0 or molecule_ptr[-1] != n_p
+        or np.any(np.diff(query_ptr) < 1) or np.any(np.diff(molecule_ptr) < 1)
+    ):
+        raise RuntimeError("panel pointer contract is malformed or contains empty candidates")
+    supported_rows = np.asarray(supported_rows, np.int64)
+    if (
+        supported_rows.ndim != 1 or not len(supported_rows) or np.any(supported_rows < 0)
+        or len(np.unique(supported_rows)) != len(supported_rows)
+    ):
+        raise RuntimeError("supported row registry is malformed")
+    query_supported = np.isin(query_row, supported_rows)
+    pair_supported = np.isin(candidate_row, supported_rows)
+    keep = np.zeros(n_q, dtype=bool)
+    for query in range(n_q):
+        molecule_start = int(query_ptr[query])
+        molecule_stop = int(query_ptr[query + 1])
+        pair_start = int(molecule_ptr[molecule_start])
+        pair_stop = int(molecule_ptr[molecule_stop])
+        keep[query] = bool(query_supported[query] and np.all(pair_supported[pair_start:pair_stop]))
+    query_indices = np.flatnonzero(keep).astype(np.int64)
+    if not len(query_indices):
+        raise RuntimeError("embedding cache supports no complete query block")
+    molecule_indices = np.concatenate([
+        np.arange(query_ptr[q], query_ptr[q + 1], dtype=np.int64) for q in query_indices
+    ])
+    pair_indices = np.concatenate([
+        np.arange(molecule_ptr[m], molecule_ptr[m + 1], dtype=np.int64)
+        for m in molecule_indices
+    ])
+    molecule_counts = np.asarray(
+        [query_ptr[q + 1] - query_ptr[q] for q in query_indices], np.int64,
+    )
+    pair_counts = np.asarray(
+        [molecule_ptr[m + 1] - molecule_ptr[m] for m in molecule_indices], np.int64,
+    )
+    subset: dict[str, np.ndarray] = {}
+    for key, value in panel.items():
+        array = np.asarray(value)
+        if key == "query_ptr":
+            subset[key] = np.concatenate((np.asarray([0], np.int64), np.cumsum(molecule_counts)))
+        elif key == "molecule_ptr":
+            subset[key] = np.concatenate((np.asarray([0], np.int64), np.cumsum(pair_counts)))
+        elif array.ndim == 0:
+            subset[key] = array
+        elif array.shape[0] == n_q and key not in {"molecule_ptr", "candidate_row"}:
+            subset[key] = array[query_indices]
+        elif array.shape[0] == n_e and key != "candidate_row":
+            subset[key] = array[molecule_indices]
+        elif array.shape[0] == n_p:
+            subset[key] = array[pair_indices]
+        else:
+            raise RuntimeError(
+                f"cannot assign panel member to query/molecule/pair axis: {key} shape={array.shape}"
+            )
+    for key in ("source_query_index", "source_molecule_index", "source_pair_index"):
+        if key in subset:
+            raise RuntimeError(f"source panel already reserves common-domain index member: {key}")
+    subset["source_query_index"] = query_indices
+    subset["source_molecule_index"] = molecule_indices
+    subset["source_pair_index"] = pair_indices
+    counts = {
+        "original_N_Q": int(n_q),
+        "original_N_E": int(n_e),
+        "original_N_P": int(n_p),
+        "retained_N_Q": int(len(query_indices)),
+        "retained_N_E": int(len(molecule_indices)),
+        "retained_N_P": int(len(pair_indices)),
+        "dropped_N_Q": int(n_q - len(query_indices)),
+        "dropped_query_row_unavailable": int(np.sum(~query_supported)),
+        "dropped_incomplete_candidate_block": int(np.sum(query_supported & ~keep)),
+    }
+    return subset, counts
+
+
 def score_molecules(panel: dict[str, np.ndarray], rows: np.ndarray, embeddings: np.ndarray) -> np.ndarray:
     required = {"query_row", "query_ptr", "molecule_ptr", "candidate_row"}
     missing = sorted(required - set(panel))
@@ -449,8 +609,22 @@ def encode_command(args: argparse.Namespace) -> None:
             raise RuntimeError("CUDA requested but unavailable")
     if args.output.exists() or args.report.exists():
         raise FileExistsError("refusing to overwrite an embedding cache or report")
-    rows = _manifest_rows(manifest, args.row_column)
-    records = _selected_records(mgf, rows)
+    manifest_rows = _manifest_rows(manifest, args.row_column)
+    row_panels = list(args.row_panel or [])
+    if row_panels:
+        rows = _panel_rows(row_panels)
+        if manifest_rows is not None:
+            absent = np.setdiff1d(rows, manifest_rows, assume_unique=True)
+            if len(absent):
+                raise RuntimeError(
+                    f"row-selection panels contain {len(absent)} rows absent from manifest; "
+                    f"first={absent[:5].tolist()}"
+                )
+    else:
+        rows = manifest_rows
+    records = _progress_records(
+        _selected_records(mgf, rows), args.progress_every, args.method,
+    )
     if args.method == "specembedding":
         encoded_rows, embeddings = encode_specembedding(
             repo, checkpoint, records, args.device, args.batch_size,
@@ -460,7 +634,10 @@ def encode_command(args: argparse.Namespace) -> None:
         encoded_rows, embeddings = encode_msbert(
             repo, checkpoint, records, args.device, args.batch_size,
         )
-        preprocessing = "official 0.01-Da vocabulary; top-99 peaks plus precursor token"
+        preprocessing = (
+            "official precursor<1000 domain; 10<=fragment_mz<1000; peak max normalisation; "
+            "top-99 peaks plus precursor token; precursor/peak weights jointly normalised"
+        )
     if not len(encoded_rows):
         raise RuntimeError("no MGF records were encoded")
     args.output.parent.mkdir(parents=True, exist_ok=True)
@@ -473,7 +650,15 @@ def encode_command(args: argparse.Namespace) -> None:
         "mgf": str(mgf.resolve()),
         "mgf_sha256": sha256_file(mgf),
         "manifest": None if manifest is None else str(manifest.resolve()),
+        "row_selection": "all_manifest_rows" if not row_panels else "union_of_panel_query_and_candidate_rows",
+        "row_selection_panels": [
+            {"path": str(path.resolve()), "sha256": sha256_file(path)} for path in row_panels
+        ],
         "rows": int(len(encoded_rows)),
+        "requested_rows": None if rows is None else int(len(rows)),
+        "official_domain_excluded_rows": (
+            None if rows is None else np.setdiff1d(rows, encoded_rows, assume_unique=True).tolist()
+        ),
         "dimension": int(embeddings.shape[1]),
         "maximum_norm_error": float(np.max(np.abs(np.linalg.norm(embeddings, axis=1) - 1))),
         "preprocessing": preprocessing,
@@ -528,6 +713,41 @@ def score_command(args: argparse.Namespace) -> None:
         "candidate_molecules": n_e,
         "reference_spectrum_edges": n_p,
         "aggregation": "maximum cosine over reference spectra within candidate molecule",
+        "output": str(args.output.resolve()),
+        "output_sha256": sha256_file(args.output),
+    }
+    args.report.parent.mkdir(parents=True, exist_ok=True)
+    _write_json(args.report, report)
+    print(json.dumps(report, indent=2), flush=True)
+
+
+def subset_panel_command(args: argparse.Namespace) -> None:
+    if not args.panel.is_file():
+        raise FileNotFoundError(args.panel)
+    if not args.embeddings.is_file():
+        raise FileNotFoundError(args.embeddings)
+    if args.output.exists() or args.report.exists():
+        raise FileExistsError("refusing to overwrite a common-domain panel or report")
+    with np.load(args.panel, allow_pickle=False) as body:
+        panel = {key: np.asarray(body[key]) for key in body.files}
+    supported_rows = embedding_cache_rows(args.embeddings)
+    subset, counts = subset_panel_to_supported_rows(panel, supported_rows)
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    np.savez_compressed(args.output, **subset)
+    report = {
+        "schema": "public_sota_common_domain_panel_v1",
+        "status": "complete",
+        "selection_rule": (
+            "retain a query iff query_row and every candidate_row in its complete query block "
+            "occur in the embedding cache"
+        ),
+        "source_panel": str(args.panel.resolve()),
+        "source_panel_sha256": sha256_file(args.panel),
+        "embedding_cache": str(args.embeddings.resolve()),
+        "embedding_cache_sha256": sha256_file(args.embeddings),
+        "supported_spectrum_rows": int(len(supported_rows)),
+        **counts,
+        "retained_query_fraction": counts["retained_N_Q"] / counts["original_N_Q"],
         "output": str(args.output.resolve()),
         "output_sha256": sha256_file(args.output),
     }
@@ -643,6 +863,17 @@ def parser() -> argparse.ArgumentParser:
     )
     encode.add_argument("--manifest", type=Path)
     encode.add_argument("--row-column", default="row")
+    encode.add_argument(
+        "--row-panel", type=Path, action="append",
+        help=(
+            "Encode only the sorted union of query_row/candidate_row from this panel NPZ. "
+            "Repeat for multiple panels; scores on those panels are exactly unchanged."
+        ),
+    )
+    encode.add_argument(
+        "--progress-every", type=int, default=10_000,
+        help="Emit one JSON progress line per N selected spectra; 0 disables progress.",
+    )
     encode.add_argument("--device", default="cuda")
     encode.add_argument("--batch-size", type=int, default=128)
     encode.add_argument("--output", type=Path, required=True)
@@ -663,6 +894,16 @@ def parser() -> argparse.ArgumentParser:
     score.add_argument("--report", type=Path, required=True)
     score.set_defaults(function=score_command)
 
+    subset_panel = sub.add_parser(
+        "subset-panel",
+        help="Build a complete-query panel on the row domain supported by an embedding cache.",
+    )
+    subset_panel.add_argument("--panel", type=Path, required=True)
+    subset_panel.add_argument("--embeddings", type=Path, required=True)
+    subset_panel.add_argument("--output", type=Path, required=True)
+    subset_panel.add_argument("--report", type=Path, required=True)
+    subset_panel.set_defaults(function=subset_panel_command)
+
     merge = sub.add_parser("merge", help="Merge standard score caches for the mega evaluator.")
     merge.add_argument("--score-cache", type=Path, action="append", required=True)
     merge.add_argument("--output", type=Path, required=True)
@@ -674,6 +915,8 @@ def main(argv: Sequence[str] | None = None) -> None:
     args = parser().parse_args(argv)
     if getattr(args, "batch_size", 1) < 1:
         raise ValueError("batch-size must be positive")
+    if getattr(args, "progress_every", 0) < 0:
+        raise ValueError("progress-every must be non-negative")
     args.function(args)
 
 
