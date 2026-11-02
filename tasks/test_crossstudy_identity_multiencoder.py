@@ -354,9 +354,12 @@ def main() -> None:
     runner = Path(__file__).with_name(
         "run_msv000095331_integrated_multiencoder_identity.sbatch"
     ).read_text(encoding="utf-8")
-    assert "enveda_no_query_context_diagnostic_run_2413878" in runner
+    assert "deploy/unified_additive_full23_v1/assets/unified_candidate_integrator.pt" in runner
     assert 'ENVEDA_INTEGRATOR_ARM="additive_linear_control"' in runner
     assert "APP_MULTI_ENCODER_REUSING_FROZEN_EMBEDDINGS" in runner
+    assert "build_full23_application_evidence.py" in runner
+    assert "unified_additive_release.py" in runner
+    assert "verify_full23_application_replay.py" in runner
     assert "glob('enveda_unified_candidate_integrator_run_" not in runner
     print("PASS: cross-study identity multi-encoder contracts", flush=True)
 

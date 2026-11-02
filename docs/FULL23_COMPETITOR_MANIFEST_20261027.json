@@ -1,0 +1,122 @@
+{
+  "schema": "full23_competitor_manifest_v1",
+  "date": "2026-10-27",
+  "task": "reference-spectrum identity ranking on one frozen 10-ppm candidate axis",
+  "evaluation_role": "development_consumed",
+  "axis": {
+    "dataset": "GNPS Gold/Silver clean v1",
+    "identity_disjoint_queries": 10995,
+    "identity_disjoint_candidates": 175171,
+    "formula_disjoint_queries": 5261,
+    "formula_disjoint_candidates": 47724,
+    "frozen_ladder": "deliverables/GLM_gnps_article_ladder/run15/ladder_full.csv",
+    "verification": "deliverables/GLM_gnps_article_ladder/run15/verification_report.json",
+    "score_bundle": "data/validation/GLM_gnps_article_benchmark_s2v26/run15/bundle/method_scores.npz",
+    "claim_boundary": "same-axis development comparison only; not untouched external SOTA evidence"
+  },
+  "frozen_report_note": "verification_report.json retains a historical missing_baselines text entry even though its methods list and ladder already contain Spec2Vec and MS2DeepScore. Preserve the frozen report; use this manifest for current execution status.",
+  "completed_same_axis_methods": [
+    {
+      "method": "official_finetuned_dreams",
+      "status": "complete_reuse",
+      "recall1_identity": 0.8535698044565712,
+      "recall1_formula": 0.8680859152252424
+    },
+    {
+      "method": "noise_v1",
+      "status": "complete_reuse",
+      "recall1_identity": 0.8655752614824921,
+      "recall1_formula": 0.880631058734081
+    },
+    {
+      "method": "weighted_spectral_entropy",
+      "status": "complete_reuse",
+      "recall1_identity": 0.8736698499317872,
+      "recall1_formula": 0.882721915985554
+    },
+    {
+      "method": "spec2vec_gnps_public",
+      "status": "complete_reuse_no_rerun",
+      "package": "spec2vec==0.8.0",
+      "model_file": "spec2vec_AllPositive_ratio05_filtered_iter_15.model",
+      "model_md5": "d2776c240ca98f12b7cabdc4b4ee26b6",
+      "training_overlap": "GNPS ecosystem; community-practice baseline, not strict OOD",
+      "recall1_identity": 0.86293769895407,
+      "mrr_identity": 0.910204922829751,
+      "near_recall1_identity": 0.8113804004214963,
+      "pooled_auroc_identity": 0.9336219209376441,
+      "recall1_formula": 0.8743584869796617,
+      "mrr_formula": 0.9236716313121758,
+      "near_recall1_formula": 0.7870244565217391,
+      "pooled_auroc_formula": 0.9170352772552619,
+      "artifact_warning": "Do not substitute the locally present UniqueInchikeys iter-50 model (MD5 a7333c19ace863c5a0a04abc89600f49) for this result."
+    },
+    {
+      "method": "spec2vec_2026_retrained",
+      "status": "complete_reuse_no_rerun",
+      "recall1_identity": 0.8608458390177354,
+      "recall1_formula": 0.8724577076601406,
+      "training_overlap": "GNPS-derived retraining; community-practice baseline"
+    },
+    {
+      "method": "ms2deepscore_2x_public",
+      "status": "complete_reuse_no_rerun",
+      "package": "ms2deepscore==2.4.0",
+      "model_file": "ms2deepscore_model.pt",
+      "model_md5": "d5cbf4694a1c476ae59e0c810f56c320",
+      "model_identity": "public dual-mode 2024 artifact",
+      "training_overlap": "GNPS/MoNA/MassBank/MSnLib ecosystem; community-practice baseline, not strict OOD",
+      "recall1_identity": 0.7911778080945885,
+      "mrr_identity": 0.8636505070873445,
+      "near_recall1_identity": 0.7240516332982087,
+      "pooled_auroc_identity": 0.8993651304906228,
+      "recall1_formula": 0.8146740163467021,
+      "mrr_formula": 0.8873661692492265,
+      "near_recall1_formula": 0.7061820652173914,
+      "pooled_auroc_formula": 0.8817793515575107
+    },
+    {
+      "method": "unified_additive_full23_v1",
+      "status": "released_development_candidate",
+      "checkpoint_sha256": "7f1309e2a89ef3640d9b6871a821df6866f2528e629547075d5305ab6707d717",
+      "recall1_identity": 0.8824920418371988,
+      "recall1_formula": 0.8952670594943927
+    }
+  ],
+  "pending_or_conditional_methods": [
+    {
+      "method": "MSBERT",
+      "priority": "P0_only_new_direct_representation_baseline",
+      "status": "checkpoint_available_not_yet_scored",
+      "code": "https://github.com/zhanghailiangcsu/MSBERT",
+      "code_revision": "4b1e85e78221832845b2a6b493e9f6b0c62b2c27",
+      "checkpoint": "model/MSBERT.pkl",
+      "checkpoint_bytes": 486361781,
+      "checkpoint_sha256": "f6a50e1a5650504370e563a9daf9117b4f4ecd60f5ba508dce2ee9e81f064605",
+      "checkpoint_revision": "cd2e71696015053593625ca1f7babe17ccc8c36f",
+      "training_overlap": "trained/tested on GNPS; community-practice baseline only",
+      "execution": "offline isolated environment; encode each registered spectrum once, then score the frozen candidate edges",
+      "server_transfer": "source archive, checkpoint, and only missing offline wheels; do not transfer GNPS training data"
+    },
+    {
+      "method": "MS2DeepScore_2_5_3_or_paper_release",
+      "priority": "conditional",
+      "status": "do_not_run_until_artifact_difference_is_proven",
+      "reason": "The frozen 2.4.0/public-dual-2024 result already exists. A package-version change alone is not a new method result."
+    },
+    {
+      "method": "MS2Query",
+      "priority": "prior_art_or_optional_native_application",
+      "status": "not_required_on_fixed_10ppm_axis",
+      "code": "https://github.com/iomega/ms2query",
+      "native_task": "full-library MS2DeepScore top-2000 retrieval followed by five-feature random-forest exact/analogue ranking",
+      "reason": "Removing its library-neighbourhood and retrieval inputs would create a project-specific adaptation, not the official method."
+    }
+  ],
+  "no_rerun_policy": [
+    "Do not re-encode or rescore Spec2Vec public, Spec2Vec-2026 or the frozen MS2DeepScore 2.x artifact.",
+    "Do not let a competitor-specific threshold change the shared query or candidate denominator.",
+    "Keep all GNPS comparisons labelled development/consumed and disclose public-model training overlap.",
+    "Only MSBERT is authorized as the next direct representation baseline, subject to exact artifact and environment registration."
+  ]
+}

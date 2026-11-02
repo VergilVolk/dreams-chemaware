@@ -9,9 +9,11 @@ not duplicate or alter the learned scoring mathematics.
 - `assets/unified_candidate_integrator.pt`: the frozen integrator checkpoint.
 - `manifest.json`: exact arm, feature order, component registry, hashes and
   scientific boundary.
+- `model_status.json`: concise current selection, dataset roles, inference
+  semantics, successor verdict and application readiness.
 - `evidence_manifest_template.json`: provenance sidecar required by the CLI.
-- `evidence/*.json`: the four original, byte-identical selection, transfer and
-  strict-refit ablation reports supporting the frozen choice.
+- `evidence/*.json`: the four original selection, transfer and strict-refit
+  ablation reports, validated by canonical-LF content hashes across platforms.
 - `tasks/unified_additive_release.py`: fixed-axis inference wrapper.
 - The bundle builder also includes the two original core modules used for
   feature construction and scoring.
@@ -82,6 +84,14 @@ any candidate abstains the whole nonempty query; candidates are never deleted
 to make a query easier. Zero-candidate queries remain in the query registry.
 Singletons receive a ranking-support score but are marked
 `singleton_hypothesis`, not accepted as calibrated identities.
+
+For the frozen MSV000095331 cross-study identity axis, the repository's
+`tasks/build_full23_application_evidence.py` converts the existing scorer TSVs
+and four encoder-cache sidecars into this exact NPZ/manifest contract. The
+single Slurm entrypoint
+`tasks/run_msv000095331_integrated_multiencoder_identity.sbatch` then invokes
+this release wrapper and verifies its scores against the original application
+scorer; it does not reimplement the model.
 
 ## Build a portable archive
 

@@ -35,6 +35,18 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def sha256_text_lf(path: Path) -> str:
+    """Hash tracked text using Git's canonical LF representation.
+
+    The frozen report identities were registered from Linux/LF bytes.  Git may
+    materialize the same JSON as CRLF on Windows, so source validation must not
+    confuse a checkout convention with scientific-content drift.  Bundle file
+    checksums remain raw-byte hashes below.
+    """
+    canonical = path.read_bytes().replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+    return hashlib.sha256(canonical).hexdigest()
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
@@ -59,7 +71,7 @@ def main() -> None:
         raise RuntimeError("Full23 source package lacks the four selection reports")
     for report in reports:
         path = SOURCE_PACKAGE / str(report.get("path", ""))
-        if not path.is_file() or sha256(path) != str(report.get("sha256", "")):
+        if not path.is_file() or sha256_text_lf(path) != str(report.get("sha256", "")):
             raise RuntimeError(f"Full23 selection-evidence mismatch: {path}")
     frozen_sources = manifest.get("runtime_source_sha256_at_freeze", [])
     if len(frozen_sources) != 2:
