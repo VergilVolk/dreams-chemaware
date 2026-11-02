@@ -6,14 +6,14 @@ Date: 2026-11-02
 
 Two distinct deliverables are now materialized locally:
 
-1. an 18-method same-axis identity-ranking ladder with complete Top-k, rank,
+1. an 18-scorer same-axis ladder with complete Top-k, rank,
    near-subset, ROC and precision--recall outputs; and
-2. a score-blind GNPS2 multi-source benchmark preflight whose separate
-   identity-verification axis contains 10,747,002 unique labelled spectrum
+2. a score-blind seven-source GNPS2 benchmark preflight whose separate
+   identity-verification axis contains 14,950,709 unique labelled spectrum
    pairs.
 
 The completed ladder uses consumed GNPS development panels. Full23 v1.3.2 is
-the current leader on both panels, but this is development evidence rather
+the Recall@1 leader on both panels, but this is development evidence rather
 than unopened external SOTA confirmation. The new ten-million-pair resource
 is pre-exclusion capacity and remains blocked from external claims until all
 consumed MassSpecGym and MoNA exclusion assets are present.
@@ -23,8 +23,8 @@ consumed MassSpecGym and MoNA exclusion assets are present.
 | Symbol | Meaning |
 |---|---|
 | `N_Q` | labelled query spectra |
-| `N_I` | independent identity clusters |
-| `N_F` | independent formula clusters |
+| `N_I` | unique query IK14 identity clusters |
+| `N_F` | unique query formula clusters |
 | `N_E` | query-to-candidate-molecule edges |
 | `N_P` | natural query-to-reference-spectrum comparisons in Top-k ranking |
 | `N_pairs` | labelled pairs in the separate verification task |
@@ -47,12 +47,12 @@ candidate block is imputed.
 
 | Panel / method | R@1 | R@2 | R@3 | R@5 | R@10 | R@20 | MRR | Macro AUROC | Micro AUROC | Micro AP | Near R@1 |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| Identity / Full23 v1.3.2 | **88.400%** | **94.009%** | **95.939%** | **97.505%** | **98.880%** | **99.754%** | **0.9247** | **0.9497** | **0.9587** | **0.8445** | **83.870%** |
+| Identity / Full23 v1.3.2 | **88.400%** | **94.009%** | **95.939%** | **97.505%** | **98.880%** | 99.754% | **0.9247** | **0.9497** | **0.9587** | **0.8445** | **83.870%** |
 | Identity / WSE | 87.417% | 93.007% | 95.320% | 97.004% | 98.698% | 99.672% | 0.9168 | 0.9437 | 0.9423 | 0.7566 | 82.577% |
 | Identity / official DreaMS | 85.387% | 92.315% | 95.010% | 97.014% | 98.762% | 99.763% | 0.9053 | 0.9377 | 0.9322 | 0.6817 | 79.979% |
 | Identity / MSBERT official | 81.899% | 89.985% | 93.435% | 96.030% | 98.306% | 99.727% | 0.8812 | 0.9183 | 0.8947 | 0.5408 | 75.481% |
 | Identity / SpecEmbedding official | 75.262% | 85.887% | 90.922% | 94.956% | 97.970% | 99.599% | 0.8374 | 0.8915 | 0.8563 | 0.4994 | 66.843% |
-| Formula / Full23 v1.3.2 | **89.644%** | **95.755%** | **97.658%** | **98.972%** | **99.695%** | 99.962% | **0.9376** | **0.9470** | **0.9539** | **0.8744** | **82.369%** |
+| Formula / Full23 v1.3.2 | **89.644%** | **95.755%** | **97.658%** | 98.972% | 99.695% | 99.962% | **0.9376** | **0.9470** | **0.9539** | **0.8744** | **82.369%** |
 | Formula / WSE | 88.311% | 94.517% | 97.144% | 98.686% | 99.657% | 99.962% | 0.9281 | 0.9394 | 0.9285 | 0.7811 | 80.157% |
 | Formula / official DreaMS | 86.865% | 94.384% | 97.068% | 98.667% | 99.581% | 99.981% | 0.9205 | 0.9325 | 0.9073 | 0.6802 | 78.080% |
 | Formula / MSBERT official | 83.571% | 92.442% | 96.155% | 98.172% | 99.543% | **100.000%** | 0.8994 | 0.9124 | 0.8606 | 0.5569 | 73.315% |
@@ -91,36 +91,40 @@ The detailed result record is
 
 ## New GNPS2 multi-source benchmark
 
-The strict inventory combines BMDMS-NP, PNNL lipid positive and negative, and
-MCE-DRUG. PNNL-negative has no usable identity truth and PNNL-positive has only
-2/30,574 verifiable structures, so PNNL remains annotation-only. MCE-DRUG is a
-separate Q3 stratum.
+The strict seven-source inventory combines BMDMS-NP, PNNL lipid positive and
+negative, MCE-DRUG, BERKELEY-LAB, and Birmingham UHPLC-MS positive and
+negative. PNNL-negative has no usable identity truth and PNNL-positive has only
+2/30,574 verifiable structures, so PNNL remains annotation-only. MCE-DRUG and
+other quality-3 records are a separate Q3 stratum. The three newly downloaded
+GNPS2 sources contain 39,230 spectra in total and are fixed by their source
+hashes in `tasks/gnps2_standard_mega_sources_v2.json`.
 
 ### Natural 10-ppm Top-k capacity
 
 | Stratum | N_Q | N_I | N_F | N_E | N_P |
 |---|---:|---:|---:|---:|---:|
-| Q1/Q2 primary | 17,406 | 863 | 361 | 56,135 | 1,139,056 |
-| Q3 separate | 2,251 | 652 | 502 | 5,162 | 16,969 |
-| Q1/Q2/Q3 expanded | 21,828 | 1,776 | 1,086 | 68,301 | 1,147,641 |
+| Q1/Q2 primary | 19,703 | 1,117 | 477 | 62,617 | 1,127,864 |
+| Q3 separate | 7,729 | 3,086 | 1,818 | 26,110 | 49,681 |
+| Q1/Q2/Q3 expanded | 29,332 | 4,567 | 2,546 | 108,037 | 1,228,074 |
 
-This honest Top-k task does not reach ten million comparisons. A scan of the
-13 next-largest GNPS2 Standard sources gives a loose combined upper bound of
-2,488,476 comparisons before strict filtering, so source aggregation cannot
-legitimately manufacture a ten-million natural Top-k panel.
+This honest Top-k task does not reach ten million comparisons. Even after the
+three best unused GNPS2 additions, source aggregation cannot legitimately
+manufacture a ten-million natural Top-k panel.
 
 ### Separate ten-million-pair verification axis
 
 | Stratum | N_Q | N_I | N_F | Positive pairs | Negative pairs | N_pairs |
 |---|---:|---:|---:|---:|---:|---:|
-| Q1/Q2 primary | 40,750 | 2,089 | 1,546 | 296,959 | 6,990,415 | 7,287,374 |
-| Q3 separate | 9,138 | 2,644 | 2,494 | 33,363 | 654,817 | 688,180 |
-| Q1/Q2/Q3 expanded | 51,666 | 4,663 | 3,909 | 336,251 | 10,410,751 | **10,747,002** |
+| Q1/Q2 primary | 48,272 | 2,619 | 1,914 | 346,544 | 8,092,592 | 8,439,136 |
+| Q3 separate | 17,689 | 6,203 | 4,915 | 44,389 | 1,572,348 | 1,616,737 |
+| Q1/Q2/Q3 expanded | 60,925 | 8,284 | 6,139 | 356,255 | 14,594,454 | **14,950,709** |
 
-The materialized index has 10,747,002 unique pairs, zero self-pairs, disjoint
-query/reference axes, no positive identity mismatch, and no negative identity,
-polarity, adduct or 2-Da-window violation. Its SHA-256 is
-`1fc260c761191c1753154e275d13e2d2b90e678aa794ed1aa40cf2df10346882`.
+The materialized pair index is generated from the exact same score-blind
+inventory and is checked for unique query/reference pairs, zero self-pairs,
+disjoint query/reference axes, positive identity consistency, and negative
+identity, polarity, adduct and 2-Da-window consistency.
+It is 24,571,375 bytes with SHA-256
+`dffce092d30890cf7ad6c4485b94077d6802f4b1e2763703274fb59c1e8e0462`.
 
 This axis supports ROC, PR, AUROC, average precision and sensitivity at fixed
 false-positive rates. Top-k remains reported only on the natural candidate
@@ -130,12 +134,15 @@ graph above.
 
 Reproducible experimental-spectrum identity methods belong in the same-axis
 ladder. MS2DeepScore 2.0 and TransExION can be included only as auxiliary
-structural-similarity scorers. MS2Query must be evaluated as its native whole-
-library system. LSM-MS2 and PRISM remain reported-only because a complete
-reproducible checkpoint/reference package is unavailable. MSAlign, GLMR and
-MS2-SMILES AlignNet address spectrum-to-structure retrieval and belong in a
-separate table rather than having their published Recall@k mixed with
-experimental-spectrum identity Recall@k.
+structural-similarity scorers. MS2Query 1.5.4 must be evaluated as its native
+whole-library system; its positive and negative assets are public. LSM-MS2 is
+the same scientific identity-retrieval task but remains reported-only because
+its mixed 1.8M library and checkpoint are not publicly reproducible. MSAlign
+and MSAlign+ now have official MIT code and public pretrained archives, but
+they, GLMR and MS2-SMILES AlignNet address spectrum-to-structure retrieval and
+belong in a separate table rather than having their published Recall@k mixed
+with experimental-spectrum identity Recall@k. The matching public MSAN release
+remains provenance-pending and is not labelled official.
 
 The machine-readable status is in `tasks/mega_sota_methods_v1.json`.
 
@@ -148,9 +155,15 @@ The current defensible claim is:
 > panels.
 
 It is not yet defensible to claim field-wide or independently confirmed SOTA.
-The GNPS2 ten-million-pair resource remains
-`GNPS2_STANDARD_MEGA_PREFLIGHT_BLOCKED_NOT_EXTERNAL`: known GNPS exclusions
-already reduce the identity-disjoint pair capacity to 8,016,818, and the
+The GNPS2 14.95-million-pair resource remains
+`GNPS2_STANDARD_MEGA_PREFLIGHT_BLOCKED_NOT_EXTERNAL`: currently available
+GNPS, MassBank and MSnLib consumed-source exclusions reduce the
+identity-disjoint pair capacity to 11,721,176, and the
 required MassSpecGym and MoNA positive/negative exclusions are not locally
 complete. The panel must be rebuilt after those exclusions before any score is
 read or final claim is made.
+
+The seven-source forecast and source hashes are bound to
+`data/validation/gnps2_standard_mega_7source_preflight_v1_20261102/report.json`;
+the earlier four-source v4 report remains a historical build and is not the
+evidence source for the seven-source counts above.

@@ -1,0 +1,57 @@
+{
+  "schema": "gnps2_standard_mega_source_manifest_v1",
+  "dataset_id": "gnps2_standard_mega_7source_20261102",
+  "sources": [
+    {
+      "source_id": "BMDMS-NP",
+      "mgf": "../data/external/gnps2_standard_mega_20261102/BMDMS-NP.mgf",
+      "required": true
+    },
+    {
+      "source_id": "PNNL-LIPIDS-POSITIVE",
+      "mgf": "../data/external/gnps2_standard_mega_20261102/PNNL-LIPIDS-POSITIVE.mgf",
+      "slim_metadata": "../data/external/gnps2_standard_mega_20261102/PNNL-LIPIDS-POSITIVE.slim.json",
+      "official_metadata_url": "https://library.gnps2.org/api/libraries/PNNL-LIPIDS-POSITIVE/spectra",
+      "required": true
+    },
+    {
+      "source_id": "PNNL-LIPIDS-NEGATIVE",
+      "mgf": "../data/external/gnps2_standard_mega_20261102/PNNL-LIPIDS-NEGATIVE.mgf",
+      "slim_metadata": "../data/external/gnps2_standard_mega_20261102/PNNL-LIPIDS-NEGATIVE.slim.json",
+      "official_metadata_url": "https://library.gnps2.org/api/libraries/PNNL-LIPIDS-NEGATIVE/spectra",
+      "required": true
+    },
+    {
+      "source_id": "MCE-DRUG",
+      "mgf": "../data/external/gnps2_standard_mega_20261102/MCE-DRUG.mgf",
+      "required": true
+    },
+    {
+      "source_id": "BERKELEY-LAB",
+      "mgf": "../data/external/gnps2_standard_expansion_20261102/BERKELEY-LAB.mgf",
+      "official_mgf_url": "https://library.gnps2.org/api/libraries/BERKELEY-LAB/mgf",
+      "expected_bytes": 36479098,
+      "expected_spectra": 24992,
+      "expected_sha256": "0b115429997a15313d33c0918453a842f44abc2bf3dd231d97d3bb78f29ba400",
+      "required": true
+    },
+    {
+      "source_id": "BIRMINGHAM-UHPLC-MS-NEG",
+      "mgf": "../data/external/gnps2_standard_expansion_20261102/BIRMINGHAM-UHPLC-MS-NEG.mgf",
+      "official_mgf_url": "https://library.gnps2.org/api/libraries/BIRMINGHAM-UHPLC-MS-NEG/mgf",
+      "expected_bytes": 8656218,
+      "expected_spectra": 7198,
+      "expected_sha256": "aa45a01477f6c6911ea5f2f55c59d38ee6638d4d5f83fa97ec54ed98b8fce311",
+      "required": true
+    },
+    {
+      "source_id": "BIRMINGHAM-UHPLC-MS-POS",
+      "mgf": "../data/external/gnps2_standard_expansion_20261102/BIRMINGHAM-UHPLC-MS-POS.mgf",
+      "official_mgf_url": "https://library.gnps2.org/api/libraries/BIRMINGHAM-UHPLC-MS-POS/mgf",
+      "expected_bytes": 9934405,
+      "expected_spectra": 7040,
+      "expected_sha256": "04e5ee42b55bd588da71e041937da8f22c6e03c68408829bd373d1fed3958ef3",
+      "required": true
+    }
+  ]
+}

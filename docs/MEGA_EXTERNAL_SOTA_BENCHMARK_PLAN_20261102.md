@@ -180,13 +180,13 @@ merely because it emits one scalar for a spectrum pair.
 | SpecEmbedding (2025) | identity plus structural-similarity retrieval | official checkpoint run on the complete frozen axis; GNPS is training-contaminated |
 | MS2DeepScore 2.0 (2026) | molecular fingerprint-similarity prediction | same-axis **auxiliary** comparator, not relabelled as identity training |
 | TransExION (2024) | pairwise structural similarity and analogue interpretation | same-axis **auxiliary** comparator; official gradient-hook inference and its resource cost are preserved |
-| MS2Query (2023) | whole-library retrieval plus neighbourhood-feature reranking | native-system table only; inserting its RF score into the frozen small candidate graph would change the method |
+| MS2Query 1.5.4 (2023) | whole-library retrieval plus neighbourhood-feature reranking | native-system table only; official positive/negative model and library assets are public, but inserting its RF score into the frozen small candidate graph would change the method |
 | MS2Query 2 | prototype library/retrieval framework | prototype only; no paper-grade frozen reranker yet |
-| LSM-MS2 (2025 preprint) | large-library MS/MS retrieval | reported-only frontier because no public reproducible checkpoint/reference library is available |
+| LSM-MS2 (2025 preprint) | large-library spectrum-to-spectrum identity retrieval | same-task reported-only frontier because its 1.8M mixed public/internal library and checkpoint are not publicly reproducible |
 | PRISM | proprietary large foundation model | reported-only; model, training corpus and executable code are unavailable |
-| MSAlign (2026) | spectrum-to-molecule representation alignment | separate structure-retrieval table; strongest checkpoints are not publicly executable on this axis |
+| MSAlign / MSAlign+ (2026) | spectrum-to-molecule representation alignment | official MIT code and MassSpecGym formula/MCES checkpoint archives are public; run only in a separate structure-retrieval table |
 | GLMR (AAAI 2026) | generative spectrum-to-molecule retrieval and reranking | separate structure-retrieval table; no reproducible same-axis package located |
-| MS2-SMILES AlignNet / MSAN (2026) | spectrum-to-SMILES alignment on CASMI | separate structure-retrieval table; not an experimental-spectrum identity method |
+| MS2-SMILES AlignNet / MSAN (2026) | spectrum-to-SMILES alignment on CASMI | separate structure-retrieval table; a matching candidate public release exists but its provenance is not yet verified |
 
 MIST, CSI:FingerID/SIRIUS, JESTR, ESP, MVP, MSAlign, GLMR, MSAN and related systems rank molecular
 structures conditioned on a query spectrum.  De-novo generators answer yet

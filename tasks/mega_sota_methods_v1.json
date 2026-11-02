@@ -76,6 +76,7 @@
       "installed_package_version": "2.11.0",
       "publication_reproduction_target": "software 2.5.3 with model v5",
       "task_boundary": "Supervised chemical-similarity scoring rather than exact-identity training; report as an auxiliary comparator.",
+      "contamination_boundary": "The public model training corpus includes GNPS, MoNA, MassBank and MSnLib-family data; GNPS evaluation is contaminated development evidence.",
       "source_url": "https://github.com/matchms/ms2deepscore"
     },
     {
@@ -97,11 +98,16 @@
   ],
   "native_system_or_non_axis_comparisons": [
     {
-      "id": "ms2query_1_5_3",
-      "display_name": "MS2Query 1.5.3",
-      "status": "official_code_cloned_native_assets_not_materialized",
+      "id": "ms2query_1_5_4",
+      "display_name": "MS2Query 1.5.4",
+      "status": "official_code_cloned_native_positive_and_negative_assets_public_not_materialized",
+      "package_version": "1.5.4",
       "repo_path": "data/external/sota_identity_methods_20261102/ms2query",
       "repo_commit": "8e6e410a30f70962e7677ea633bda299bf5f3042",
+      "positive_asset_concept_record": "https://zenodo.org/records/6124552",
+      "positive_asset_latest_record": "https://zenodo.org/records/13348638",
+      "negative_asset_concept_record": "https://zenodo.org/records/7104184",
+      "negative_asset_latest_record": "https://zenodo.org/records/13348683",
       "exclusion_reason": "Native system changes retrieval and depends on whole-library neighbourhood features. It cannot be inserted into a frozen small candidate graph and called same-axis.",
       "source_url": "https://github.com/iomega/ms2query"
     },
@@ -116,7 +122,7 @@
     {
       "id": "lsm_ms2",
       "display_name": "LSM-MS2",
-      "status": "published_preprint_no_public_reproducible_checkpoint_or_complete_library",
+      "status": "same_task_reported_only_no_public_reproducible_checkpoint_or_complete_library",
       "exclusion_reason": "Published retrieval protocol uses a 1.8M reference library with incomplete query coverage and commercial/internal data, so its absolute values cannot be mixed into the fixed-axis ladder.",
       "reported_massspecgym_metrics": {
         "spectra": 225832,
@@ -131,8 +137,20 @@
     {
       "id": "msalign_2026",
       "display_name": "MSAlign",
-      "status": "different_task_reported_only_code_and_frozen_checkpoints_not_public",
-      "exclusion_reason": "Aligns a query spectrum to candidate molecular structures, not to experimental reference spectra. The strongest reported model/checkpoints are not publicly executable on the frozen spectrum-to-spectrum axis.",
+      "status": "different_task_official_mit_code_cloned_and_pretrained_archives_public",
+      "repo_path": "data/external/sota_identity_methods_20261102/MSAlign-NeurIPS2026",
+      "repo_commit": "d365d1fd7ffb2872cbaef7c7d810ad1962ff0acc",
+      "license": "MIT",
+      "checkpoint_record": "https://zenodo.org/records/23372807",
+      "checkpoint_record_doi": "10.5281/zenodo.23372807",
+      "checkpoint_scope": "MSAlign and MSAlign+ archives for MassSpecGym formula and MCES protocols",
+      "checkpoint_archives": [
+        {"name": "msalign_massspecgym_mces_1.zip", "bytes": 50947869, "md5": "c705b270a5dbc72aed8a264d64e2913c"},
+        {"name": "msalign_massspecgym_formula_seed0.zip", "bytes": 66546456, "md5": "251c9c59fdb0d0ee40bcea9c116c9745"},
+        {"name": "msalign_star_massspecgym_mces_1.zip", "bytes": 288157301, "md5": "8a096ae82cd1f856684df689ca2478fd"},
+        {"name": "msalign_star_massspecgym_formula_seed0.zip", "bytes": 350744473, "md5": "d3009e5244d3002f06b8165b6bf40081"}
+      ],
+      "exclusion_reason": "Aligns a query spectrum to candidate molecular structures, not to experimental reference spectra. Public code and checkpoints permit a separate structure-retrieval evaluation, but its Recall values cannot be inserted into the spectrum-to-spectrum identity ladder.",
       "source_url": "https://arxiv.org/abs/2605.19752"
     },
     {
@@ -145,8 +163,13 @@
     {
       "id": "ms2_smiles_alignnet_2026",
       "display_name": "MS2-SMILES AlignNet (MSAN)",
-      "status": "different_task_reported_only_no_verified_executable_release",
-      "exclusion_reason": "Cross-modal spectrum-to-SMILES candidate retrieval on CASMI is not query-spectrum to reference-spectrum identity matching. No verified official runnable package/checkpoint for the present axis was located.",
+      "status": "different_task_public_candidate_release_provenance_pending",
+      "candidate_release": "https://huggingface.co/monaaaaaa/MS2-SMILES-AlignNet",
+      "candidate_release_revision": "eeabcff66b92ad6c0bd4965992b56c779b26b0d2",
+      "candidate_positive_checkpoint": {"bytes": 353182004, "sha256": "7d1af15051dc30cd19731f73d5217916eba3676a55e5ddb5733818cd43e89f29"},
+      "candidate_negative_checkpoint": {"bytes": 353182004, "sha256": "79c69f99fab787d1cf167842ad2a10fface014bac37fb19b689750c16701f578"},
+      "candidate_release_boundary": "A matching public code repository and historical positive/negative checkpoint pointers exist, but the paper does not link the repository and author provenance is not yet verified; do not call it an official checkpoint.",
+      "exclusion_reason": "Cross-modal spectrum-to-SMILES candidate retrieval on CASMI is not query-spectrum to reference-spectrum identity matching. Any verified execution belongs in a separate structure-retrieval table.",
       "source_url": "https://doi.org/10.1016/j.talanta.2026.130121"
     },
     {
