@@ -1,0 +1,128 @@
+{
+  "schema": "dreams_unified_additive_full23_v131",
+  "release_date": "2026-11-02",
+  "release_status": "formal consumed-development incremental release",
+  "scientific_boundary": "Fit on consumed Enveda-180 meta-development and selected on consumed GNPS development; not external confirmation.",
+  "architecture": {
+    "parent": "Full23 v1 candidate-level scalar evidence integrator",
+    "residual": "four-encoder full-embedding tensor-set readout",
+    "encoders": [
+      "Noise V1",
+      "ChemAware Stage-1",
+      "ChemAware Phase-A",
+      "Noise-ChemAware FullMSG"
+    ],
+    "score": "Full23_v1_score + bounded_query_centered_embedding_residual",
+    "v131_training_repairs": [
+      "anchor-correct multiplier reduced from 2 to 1",
+      "regularize query-centred raw residual before bounded tanh"
+    ]
+  },
+  "assets": {
+    "parent_checkpoint": "assets/full23_v1_parent.pt",
+    "parent_checkpoint_sha256": "7f1309e2a89ef3640d9b6871a821df6866f2528e629547075d5305ab6707d717",
+    "readout_checkpoint": "assets/full23_v131_query_centered_raw_penalty_readout.pt",
+    "readout_sha256": "6603013a04fdc26946445a6ba1ed566d768bac49423046ce3922daac79fe637e"
+  },
+  "runtime": {
+    "entrypoint": "runtime/full23_v131_release.py",
+    "class": "FrozenFull23V131",
+    "missing_representation_semantics": "keep_parent_score"
+  },
+  "selection_policy": {
+    "primary_endpoint": "query-balanced unique-query Top-1 point estimate",
+    "winner": "highest point estimate across formal v1.3 and six fixed arms",
+    "tie_break": "earlier and simpler cumulative arm",
+    "risk_net_lambda2": "descriptive only; never a veto"
+  },
+  "source_run": "data/validation/full23_v13_cumulative_repairs_run_2434084",
+  "readout_contract": {
+    "schema": "full23_anchored_tensor_set_readout_v1",
+    "model_role": "Full23_v13_cumulative_01",
+    "settings": {
+      "encoder_names": [
+        "noise_v1",
+        "chemaware_stage1",
+        "chemaware_phasea",
+        "noise_chemaware_fullmsg"
+      ],
+      "embedding_dimension": 1024,
+      "pair_dimension": 64,
+      "encoder_dimension": 64,
+      "attention_heads": 4,
+      "fusion_hidden": 128,
+      "top_k": 3,
+      "include_reference_count": false,
+      "query_center_raw_residual": true,
+      "include_anchor_context": false,
+      "include_signed_difference": false
+    },
+    "interventions": [
+      "anchor_correct_multiplier_2_to_1",
+      "penalize_query_centered_raw_residual"
+    ],
+    "training": {
+      "source": "Enveda-180 consumed meta-development",
+      "epochs": 6,
+      "seed": 20261031,
+      "warm_start": false,
+      "anchor_correct_multiplier": 1.0
+    }
+  },
+  "data_roles": {
+    "enveda180": {
+      "role": "consumed meta-development fitting",
+      "identity_queries": 25000,
+      "formula_queries": 9435
+    },
+    "gnps_gold_silver": {
+      "role": "consumed development and model selection",
+      "identity_queries": 10995,
+      "formula_queries": 5261,
+      "query_balanced_unique_queries": 11019
+    }
+  },
+  "development_result": {
+    "panels": {
+      "identity_disjoint": {
+        "queries": 10995,
+        "formal_v13_recall1": 0.8829467939972715,
+        "v131_recall1": 0.8833105957253297,
+        "delta_pp": 0.036380172805816624,
+        "formal_v13_mrr": 0.9240482662200082,
+        "v131_mrr": 0.9243132851912191,
+        "corrected": 55,
+        "introduced": 51,
+        "risk_net_lambda2_descriptive_only": -47
+      },
+      "formula_disjoint": {
+        "queries": 5261,
+        "formal_v13_recall1": 0.8964075270861053,
+        "v131_recall1": 0.8956472153582969,
+        "delta_pp": -0.07603117278083271,
+        "formal_v13_mrr": 0.937277608564211,
+        "v131_mrr": 0.9371485842190082,
+        "corrected": 28,
+        "introduced": 32,
+        "risk_net_lambda2_descriptive_only": -36
+      }
+    },
+    "query_balanced_joint": {
+      "unique_queries": 11019,
+      "formal_v13_top1": 0.8834286232870496,
+      "v131_top1": 0.8839277611398494,
+      "delta_pp": 0.04991378527997581,
+      "formal_v13_mrr": 0.9245546039200911,
+      "v131_mrr": 0.9249108126311878
+    }
+  },
+  "evidence": {
+    "training": "evidence/training_report.json",
+    "training_contract": "evidence/training_contract.json",
+    "gnps_selection": "evidence/gnps_development_selection_report.json",
+    "candidate_predictions_identity": "evidence/candidate_predictions_identity_disjoint.npz",
+    "candidate_predictions_formula": "evidence/candidate_predictions_formula_disjoint.npz",
+    "parent_manifest": "evidence/parent_v13_manifest.json",
+    "checksums": "checksums.sha256"
+  }
+}

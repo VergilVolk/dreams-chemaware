@@ -1,0 +1,531 @@
+{
+  "status": "FULL23_V13_CUMULATIVE_REPAIRS_TRAINING_COMPLETE",
+  "dataset": {
+    "name": "Enveda-180",
+    "role": "consumed meta-development",
+    "queries": {
+      "identity_disjoint": 25000,
+      "formula_disjoint": 9435
+    }
+  },
+  "arm_order": [
+    "0",
+    "01",
+    "012",
+    "0123",
+    "01234",
+    "012345"
+  ],
+  "arms": {
+    "0": {
+      "settings": {
+        "encoder_names": [
+          "noise_v1",
+          "chemaware_stage1",
+          "chemaware_phasea",
+          "noise_chemaware_fullmsg"
+        ],
+        "embedding_dimension": 1024,
+        "pair_dimension": 64,
+        "encoder_dimension": 64,
+        "attention_heads": 4,
+        "fusion_hidden": 128,
+        "top_k": 3,
+        "include_reference_count": false,
+        "query_center_raw_residual": true,
+        "include_anchor_context": false,
+        "include_signed_difference": false
+      },
+      "interventions": [
+        "anchor_correct_multiplier_2_to_1"
+      ],
+      "residual_penalty_space": "bounded",
+      "bound_rule": "legacy_median",
+      "residual_bound": 0.6255066394805908,
+      "trainable_parameters": 625345,
+      "training_history": [
+        {
+          "loss": 0.7835571688002871,
+          "listwise": 0.5598425765884648,
+          "hardest_pairwise": 0.44391583892257835,
+          "epoch": 1
+        },
+        {
+          "loss": 0.7255277388730659,
+          "listwise": 0.519408056973916,
+          "hardest_pairwise": 0.4068590858138763,
+          "epoch": 2
+        },
+        {
+          "loss": 0.7075469414589216,
+          "listwise": 0.5065929803949274,
+          "hardest_pairwise": 0.3958606491540538,
+          "epoch": 3
+        },
+        {
+          "loss": 0.6973484543884523,
+          "listwise": 0.4992574374857965,
+          "hardest_pairwise": 0.38985116338264697,
+          "epoch": 4
+        },
+        {
+          "loss": 0.6888947129127783,
+          "listwise": 0.49309145626182455,
+          "hardest_pairwise": 0.3850190989122871,
+          "epoch": 5
+        },
+        {
+          "loss": 0.6862745185519586,
+          "listwise": 0.49134706650978377,
+          "hardest_pairwise": 0.38328073409509394,
+          "epoch": 6
+        }
+      ]
+    },
+    "01": {
+      "settings": {
+        "encoder_names": [
+          "noise_v1",
+          "chemaware_stage1",
+          "chemaware_phasea",
+          "noise_chemaware_fullmsg"
+        ],
+        "embedding_dimension": 1024,
+        "pair_dimension": 64,
+        "encoder_dimension": 64,
+        "attention_heads": 4,
+        "fusion_hidden": 128,
+        "top_k": 3,
+        "include_reference_count": false,
+        "query_center_raw_residual": true,
+        "include_anchor_context": false,
+        "include_signed_difference": false
+      },
+      "interventions": [
+        "anchor_correct_multiplier_2_to_1",
+        "penalize_query_centered_raw_residual"
+      ],
+      "residual_penalty_space": "raw",
+      "bound_rule": "legacy_median",
+      "residual_bound": 0.6255066394805908,
+      "trainable_parameters": 625345,
+      "training_history": [
+        {
+          "loss": 0.7860304363131095,
+          "listwise": 0.5596610190975986,
+          "hardest_pairwise": 0.44374332856273335,
+          "epoch": 1
+        },
+        {
+          "loss": 0.7310825766588497,
+          "listwise": 0.5193917788674427,
+          "hardest_pairwise": 0.40647753088309974,
+          "epoch": 2
+        },
+        {
+          "loss": 0.7154377716395872,
+          "listwise": 0.5077533222784283,
+          "hardest_pairwise": 0.3959252305703425,
+          "epoch": 3
+        },
+        {
+          "loss": 0.7052828418443604,
+          "listwise": 0.5004263914115065,
+          "hardest_pairwise": 0.3891721317342066,
+          "epoch": 4
+        },
+        {
+          "loss": 0.6954925287598042,
+          "listwise": 0.4934294000565092,
+          "hardest_pairwise": 0.3821692560789506,
+          "epoch": 5
+        },
+        {
+          "loss": 0.6879878143132278,
+          "listwise": 0.4878804525603248,
+          "hardest_pairwise": 0.3773064430165502,
+          "epoch": 6
+        }
+      ]
+    },
+    "012": {
+      "settings": {
+        "encoder_names": [
+          "noise_v1",
+          "chemaware_stage1",
+          "chemaware_phasea",
+          "noise_chemaware_fullmsg"
+        ],
+        "embedding_dimension": 1024,
+        "pair_dimension": 64,
+        "encoder_dimension": 64,
+        "attention_heads": 4,
+        "fusion_hidden": 128,
+        "top_k": 3,
+        "include_reference_count": false,
+        "query_center_raw_residual": true,
+        "include_anchor_context": false,
+        "include_signed_difference": false
+      },
+      "interventions": [
+        "anchor_correct_multiplier_2_to_1",
+        "penalize_query_centered_raw_residual",
+        "expand_pairwise_capacity_to_training_error_q75"
+      ],
+      "residual_penalty_space": "raw",
+      "bound_rule": "error_q75",
+      "residual_bound": 1.1375049352645874,
+      "trainable_parameters": 625345,
+      "training_history": [
+        {
+          "loss": 0.7558524818936331,
+          "listwise": 0.5369558060682998,
+          "hardest_pairwise": 0.4252900395860242,
+          "epoch": 1
+        },
+        {
+          "loss": 0.6765157626872127,
+          "listwise": 0.47845344439267257,
+          "hardest_pairwise": 0.37183144183863376,
+          "epoch": 2
+        },
+        {
+          "loss": 0.6547522595794298,
+          "listwise": 0.4623652270752942,
+          "hardest_pairwise": 0.35695793447318147,
+          "epoch": 3
+        },
+        {
+          "loss": 0.6379539488869989,
+          "listwise": 0.4501536438834654,
+          "hardest_pairwise": 0.34583419311028135,
+          "epoch": 4
+        },
+        {
+          "loss": 0.6220018216351854,
+          "listwise": 0.43858970189241475,
+          "hardest_pairwise": 0.33464709354685296,
+          "epoch": 5
+        },
+        {
+          "loss": 0.607306516108035,
+          "listwise": 0.4280027723955117,
+          "hardest_pairwise": 0.32469112087312835,
+          "epoch": 6
+        }
+      ]
+    },
+    "0123": {
+      "settings": {
+        "encoder_names": [
+          "noise_v1",
+          "chemaware_stage1",
+          "chemaware_phasea",
+          "noise_chemaware_fullmsg"
+        ],
+        "embedding_dimension": 1024,
+        "pair_dimension": 64,
+        "encoder_dimension": 64,
+        "attention_heads": 4,
+        "fusion_hidden": 128,
+        "top_k": 3,
+        "include_reference_count": false,
+        "query_center_raw_residual": true,
+        "include_anchor_context": true,
+        "include_signed_difference": false
+      },
+      "interventions": [
+        "anchor_correct_multiplier_2_to_1",
+        "penalize_query_centered_raw_residual",
+        "expand_pairwise_capacity_to_training_error_q75",
+        "add_query_relative_full23_anchor_context"
+      ],
+      "residual_penalty_space": "raw",
+      "bound_rule": "error_q75",
+      "residual_bound": 1.1375049352645874,
+      "trainable_parameters": 625729,
+      "training_history": [
+        {
+          "loss": 0.7561704941876966,
+          "listwise": 0.5374491717309733,
+          "hardest_pairwise": 0.4258614944416438,
+          "epoch": 1
+        },
+        {
+          "loss": 0.6727648341431401,
+          "listwise": 0.4772269202238081,
+          "hardest_pairwise": 0.37161844980287295,
+          "epoch": 2
+        },
+        {
+          "loss": 0.6480177239212652,
+          "listwise": 0.4595345406528575,
+          "hardest_pairwise": 0.3559793744679317,
+          "epoch": 3
+        },
+        {
+          "loss": 0.6331910397544971,
+          "listwise": 0.4485672860910413,
+          "hardest_pairwise": 0.3459782958113204,
+          "epoch": 4
+        },
+        {
+          "loss": 0.6167502386267544,
+          "listwise": 0.4370205739203468,
+          "hardest_pairwise": 0.3351693023826744,
+          "epoch": 5
+        },
+        {
+          "loss": 0.5995503045537258,
+          "listwise": 0.42453604279078566,
+          "hardest_pairwise": 0.3243520682862952,
+          "epoch": 6
+        }
+      ]
+    },
+    "01234": {
+      "settings": {
+        "encoder_names": [
+          "noise_v1",
+          "chemaware_stage1",
+          "chemaware_phasea",
+          "noise_chemaware_fullmsg"
+        ],
+        "embedding_dimension": 1024,
+        "pair_dimension": 128,
+        "encoder_dimension": 64,
+        "attention_heads": 4,
+        "fusion_hidden": 128,
+        "top_k": 3,
+        "include_reference_count": false,
+        "query_center_raw_residual": true,
+        "include_anchor_context": true,
+        "include_signed_difference": false
+      },
+      "interventions": [
+        "anchor_correct_multiplier_2_to_1",
+        "penalize_query_centered_raw_residual",
+        "expand_pairwise_capacity_to_training_error_q75",
+        "add_query_relative_full23_anchor_context",
+        "increase_pair_dimension_64_to_128"
+      ],
+      "residual_penalty_space": "raw",
+      "bound_rule": "error_q75",
+      "residual_bound": 1.1375049352645874,
+      "trainable_parameters": 1183809,
+      "training_history": [
+        {
+          "loss": 0.7534977356455963,
+          "listwise": 0.5354741959968364,
+          "hardest_pairwise": 0.42428916353562063,
+          "epoch": 1
+        },
+        {
+          "loss": 0.6725826960265611,
+          "listwise": 0.4770006264214289,
+          "hardest_pairwise": 0.37114527898445615,
+          "epoch": 2
+        },
+        {
+          "loss": 0.64866502771532,
+          "listwise": 0.4600032515256877,
+          "hardest_pairwise": 0.3561216004753163,
+          "epoch": 3
+        },
+        {
+          "loss": 0.6316918867455393,
+          "listwise": 0.44749699213924143,
+          "hardest_pairwise": 0.34518731202415426,
+          "epoch": 4
+        },
+        {
+          "loss": 0.6135310323805366,
+          "listwise": 0.43480754508456876,
+          "hardest_pairwise": 0.3331793188607768,
+          "epoch": 5
+        },
+        {
+          "loss": 0.5980131949531935,
+          "listwise": 0.4234530141596952,
+          "hardest_pairwise": 0.32372139780526027,
+          "epoch": 6
+        }
+      ]
+    },
+    "012345": {
+      "settings": {
+        "encoder_names": [
+          "noise_v1",
+          "chemaware_stage1",
+          "chemaware_phasea",
+          "noise_chemaware_fullmsg"
+        ],
+        "embedding_dimension": 1024,
+        "pair_dimension": 128,
+        "encoder_dimension": 64,
+        "attention_heads": 4,
+        "fusion_hidden": 128,
+        "top_k": 3,
+        "include_reference_count": false,
+        "query_center_raw_residual": true,
+        "include_anchor_context": true,
+        "include_signed_difference": true
+      },
+      "interventions": [
+        "anchor_correct_multiplier_2_to_1",
+        "penalize_query_centered_raw_residual",
+        "expand_pairwise_capacity_to_training_error_q75",
+        "add_query_relative_full23_anchor_context",
+        "increase_pair_dimension_64_to_128",
+        "add_signed_query_minus_reference_channel"
+      ],
+      "residual_penalty_space": "raw",
+      "bound_rule": "error_q75",
+      "residual_bound": 1.1375049352645874,
+      "trainable_parameters": 1708097,
+      "training_history": [
+        {
+          "loss": 0.6902824644546536,
+          "listwise": 0.48929433943607087,
+          "hardest_pairwise": 0.383294875704181,
+          "epoch": 1
+        },
+        {
+          "loss": 0.616418871665305,
+          "listwise": 0.43657448830760287,
+          "hardest_pairwise": 0.3373125105810453,
+          "epoch": 2
+        },
+        {
+          "loss": 0.5831658605948885,
+          "listwise": 0.41321582352360176,
+          "hardest_pairwise": 0.3158926270125988,
+          "epoch": 3
+        },
+        {
+          "loss": 0.553071438399921,
+          "listwise": 0.3919699674965943,
+          "hardest_pairwise": 0.29667534472695395,
+          "epoch": 4
+        },
+        {
+          "loss": 0.5210623535211072,
+          "listwise": 0.369214197395032,
+          "hardest_pairwise": 0.27635761506756534,
+          "epoch": 5
+        },
+        {
+          "loss": 0.49479859663101794,
+          "listwise": 0.3501852058036017,
+          "hardest_pairwise": 0.26047572566922095,
+          "epoch": 6
+        }
+      ]
+    }
+  },
+  "bound_calibration": {
+    "legacy": {
+      "rule": "half_min_weighted_median_parent_error_deficit_and_q25_correct_margin_v1",
+      "source": "Enveda-180 five-fold formula-OOF Full23 parent only",
+      "gnps_accessed": false,
+      "residual_bound_per_candidate": 0.6255066394805908,
+      "maximum_pairwise_shift": 1.2510132789611816,
+      "weighted_parent_error_deficit": {
+        "q25": 0.5414094924926758,
+        "median": 1.2510132789611816,
+        "q75": 2.275009870529175
+      },
+      "weighted_correct_parent_margin": {
+        "q25": 1.727618932723999,
+        "median": 3.421525239944458,
+        "q75": 5.386312007904053
+      },
+      "weighted_error_reachable_fraction": 0.5001194743130227,
+      "weighted_correct_decision_structurally_protected_fraction": 0.8192640917496,
+      "zero_deficit_tie_errors": 0,
+      "panel_counts": {
+        "identity_disjoint": {
+          "queries": 25000,
+          "correct_parent_queries": 19398,
+          "positive_deficit_parent_errors": 5602
+        },
+        "formula_disjoint": {
+          "queries": 9435,
+          "correct_parent_queries": 8122,
+          "positive_deficit_parent_errors": 1313
+        }
+      }
+    },
+    "expanded": {
+      "rule": "half_min_training_error_q75_and_correct_margin_median_v1",
+      "source": "Enveda-180 five-fold formula-OOF Full23 parent only",
+      "gnps_accessed": false,
+      "residual_bound_per_candidate": 1.1375049352645874,
+      "maximum_pairwise_shift": 2.275009870529175,
+      "training_error_q75": 2.275009870529175,
+      "training_correct_margin_median_cap": 3.421525239944458
+    }
+  },
+  "reference_multiplicity": {
+    "identity_disjoint": {
+      "noise_v1": {
+        "1": 665459,
+        "2": 2843,
+        "3": 156
+      },
+      "chemaware_stage1": {
+        "1": 665459,
+        "2": 2843,
+        "3": 156
+      },
+      "chemaware_phasea": {
+        "1": 665459,
+        "2": 2843,
+        "3": 156
+      },
+      "noise_chemaware_fullmsg": {
+        "1": 665459,
+        "2": 2843,
+        "3": 156
+      }
+    },
+    "formula_disjoint": {
+      "noise_v1": {
+        "1": 58418,
+        "2": 339,
+        "3": 0
+      },
+      "chemaware_stage1": {
+        "1": 58418,
+        "2": 339,
+        "3": 0
+      },
+      "chemaware_phasea": {
+        "1": 58418,
+        "2": 339,
+        "3": 0
+      },
+      "noise_chemaware_fullmsg": {
+        "1": 58418,
+        "2": 339,
+        "3": 0
+      }
+    }
+  },
+  "embedding_score_alignment_max_abs_drift": {
+    "identity_disjoint": {
+      "noise_v1": 0.0,
+      "chemaware_stage1": 0.0,
+      "chemaware_phasea": 0.0,
+      "noise_chemaware_fullmsg": 0.0
+    },
+    "formula_disjoint": {
+      "noise_v1": 0.0,
+      "chemaware_stage1": 0.0,
+      "chemaware_phasea": 0.0,
+      "noise_chemaware_fullmsg": 0.0
+    }
+  },
+  "cache_policy": "panels and four embedding banks loaded once; arms trained sequentially",
+  "gnps_access": "none during fitting"
+}
