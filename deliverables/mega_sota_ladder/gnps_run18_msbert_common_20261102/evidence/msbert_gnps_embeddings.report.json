@@ -1,0 +1,80 @@
+{
+  "schema": "public_sota_spectrum_embedding_cache_v1",
+  "status": "complete",
+  "method": "msbert",
+  "asset": {
+    "method": "msbert",
+    "repository": "D:\\DreaMS\\data\\external\\sota_identity_methods_20261102\\MSBERT",
+    "repository_present": true,
+    "repository_revision": "4b1e85e78221832845b2a6b493e9f6b0c62b2c27",
+    "checkpoint": "D:\\DreaMS\\data\\external\\sota_identity_methods_20261102\\MSBERT\\model\\MSBERT.pkl",
+    "checkpoint_present": true,
+    "official_distribution": {
+      "repository": "https://github.com/zhanghailiangcsu/MSBERT",
+      "checkpoint_sha256": "f6a50e1a5650504370e563a9daf9117b4f4ecd60f5ba508dce2ee9e81f064605",
+      "checkpoint_bytes": 486361781
+    },
+    "checkpoint_bytes": 486361781,
+    "checkpoint_sha256": "f6a50e1a5650504370e563a9daf9117b4f4ecd60f5ba508dce2ee9e81f064605",
+    "status": "ready",
+    "expected_checkpoint_sha256": "f6a50e1a5650504370e563a9daf9117b4f4ecd60f5ba508dce2ee9e81f064605"
+  },
+  "mgf": "D:\\DreaMS\\data\\validation\\gnps_gold_silver_10ppm_benchmark_v1\\spectra.mgf",
+  "mgf_sha256": "b813c9e85cdfa4c85d0c6585ffa0f6ffa03e74fa4ce5f12af861d219bd95afae",
+  "manifest": "D:\\DreaMS\\data\\validation\\gnps_gold_silver_10ppm_benchmark_v1\\manifest.csv.gz",
+  "row_selection": "union_of_panel_query_and_candidate_rows",
+  "row_selection_panels": [
+    {
+      "path": "D:\\DreaMS\\data\\validation\\GLM_gnps_identity_panel_reconstruction\\panel_identity_disjoint.npz",
+      "sha256": "da006e1d2e2650b9383d07ebdc92477e37b4ab93537f1f8bcb9ca30153ab1521"
+    },
+    {
+      "path": "D:\\DreaMS\\data\\validation\\gnps_gold_silver_10ppm_benchmark_v1\\panel_formula_disjoint.npz",
+      "sha256": "efbd24ca71c9570785bcc9c50c5cb2b79d15b6125b94bc3348ce331ee74a7fa1"
+    }
+  ],
+  "rows": 52836,
+  "requested_rows": 52871,
+  "official_domain_excluded_rows": [
+    225,
+    277,
+    865,
+    866,
+    868,
+    1001,
+    1002,
+    1233,
+    1234,
+    1235,
+    79350,
+    79375,
+    79515,
+    79516,
+    79590,
+    79591,
+    79593,
+    79594,
+    79633,
+    79634,
+    221521,
+    240851,
+    246678,
+    328232,
+    328233,
+    328234,
+    328562,
+    328563,
+    328564,
+    328565,
+    328566,
+    328567,
+    328569,
+    328581,
+    328593
+  ],
+  "dimension": 512,
+  "maximum_norm_error": 1.7881393432617188e-07,
+  "preprocessing": "official precursor<1000 domain; 10<=fragment_mz<1000; peak max normalisation; top-99 peaks plus precursor token; precursor/peak weights jointly normalised",
+  "output": "D:\\DreaMS\\data\\validation\\sota_identity_method_assets_20261102\\msbert_gnps_embeddings.npz",
+  "output_sha256": "59f31e0b906a5b3d3d701ef2848b703d91a7a6d3b5c70d27c910eeefbb05943a"
+}

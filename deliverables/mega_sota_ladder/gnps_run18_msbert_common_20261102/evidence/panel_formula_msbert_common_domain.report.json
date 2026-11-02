@@ -1,0 +1,22 @@
+{
+  "schema": "public_sota_common_domain_panel_v1",
+  "status": "complete",
+  "selection_rule": "retain a query iff query_row and every candidate_row in its complete query block occur in the embedding cache",
+  "source_panel": "D:\\DreaMS\\data\\validation\\gnps_gold_silver_10ppm_benchmark_v1\\panel_formula_disjoint.npz",
+  "source_panel_sha256": "efbd24ca71c9570785bcc9c50c5cb2b79d15b6125b94bc3348ce331ee74a7fa1",
+  "embedding_cache": "D:\\DreaMS\\data\\validation\\sota_identity_method_assets_20261102\\msbert_gnps_embeddings.npz",
+  "embedding_cache_sha256": "59f31e0b906a5b3d3d701ef2848b703d91a7a6d3b5c70d27c910eeefbb05943a",
+  "supported_spectrum_rows": 52836,
+  "original_N_Q": 5261,
+  "original_N_E": 24401,
+  "original_N_P": 47724,
+  "retained_N_Q": 5253,
+  "retained_N_E": 24385,
+  "retained_N_P": 47682,
+  "dropped_N_Q": 8,
+  "dropped_query_row_unavailable": 8,
+  "dropped_incomplete_candidate_block": 0,
+  "retained_query_fraction": 0.9984793765443832,
+  "output": "D:\\DreaMS\\data\\validation\\sota_identity_method_assets_20261102\\panel_formula_msbert_common_domain.npz",
+  "output_sha256": "514254b3d9bf09e0c442c00efdd63db58a4527abed9c8dd6b8e1e9ad207e4ba1"
+}
