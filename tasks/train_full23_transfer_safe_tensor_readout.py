@@ -40,7 +40,10 @@ ARMS = {
 }
 
 
-def fit_arm(settings, panels, occurrences, banks, device, residual_bound):
+def fit_arm(
+    settings, panels, occurrences, banks, device, residual_bound,
+    *, anchor_correct_multiplier=ANCHOR_CORRECT_MULTIPLIER,
+):
     _seed(TRAIN_SEED, device)
     model = Full23TensorSetReadout(settings, residual_bound).to(device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=LEARNING_RATE,
@@ -68,7 +71,7 @@ def fit_arm(settings, panels, occurrences, banks, device, residual_bound):
             ranking, parts = weighted_anchor_safe_ranking_loss(
                 logits, anchor_t, ptr, labels, weights,
                 pairwise_margin=PAIRWISE_MARGIN, pairwise_weight=PAIRWISE_WEIGHT,
-                anchor_correct_multiplier=ANCHOR_CORRECT_MULTIPLIER,
+                anchor_correct_multiplier=anchor_correct_multiplier,
             )
             loss = ranking + ANCHOR_STRENGTH * weighted_query_residual_penalty(
                 logits - anchor_t, ptr, weights,
