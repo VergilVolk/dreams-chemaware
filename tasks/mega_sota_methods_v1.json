@@ -79,9 +79,17 @@
     {
       "id": "transexion",
       "display_name": "TransExION",
-      "status": "public_code_and_model_available_not_yet_adapted",
+      "status": "official_code_model_and_same_axis_adapter_verified_full_run_pending",
+      "repo_path": "data/external/sota_identity_methods_20261102/TransExION",
+      "repo_commit": "82d810d87d60e10042dd8617e3ae514c43615fb5",
+      "checkpoint_path": "data/external/sota_identity_methods_20261102/TransExION/model/GNPS_MassBank.ms.model",
+      "checkpoint_sha256": "1ad288151e7990408745451d0f0892b6183814c51bd8a9f21cdd09b1fbc3295a",
+      "checkpoint_bytes": 8403857,
+      "adapter": "tasks/transexion_same_axis_adapter.py",
       "task_boundary": "Learned spectrum-pair structural-similarity score rather than an exact-identity-specific objective; optional same-axis auxiliary comparator.",
       "contamination_boundary": "Training uses GNPS-derived data; any GNPS result is contaminated development evidence.",
+      "runtime_boundary": "The official attention-gradient hook requires gradient-enabled inference and has high CPU-memory cost; use a small batch or GPU and report resource use.",
+      "license_boundary": "The official repository has no explicit software license; do not redistribute code or weights without permission.",
       "source_url": "https://github.com/banhdzui/TransExION"
     }
   ],
