@@ -184,8 +184,11 @@ merely because it emits one scalar for a spectrum pair.
 | MS2Query 2 | prototype library/retrieval framework | prototype only; no paper-grade frozen reranker yet |
 | LSM-MS2 (2025 preprint) | large-library MS/MS retrieval | reported-only frontier because no public reproducible checkpoint/reference library is available |
 | PRISM | proprietary large foundation model | reported-only; model, training corpus and executable code are unavailable |
+| MSAlign (2026) | spectrum-to-molecule representation alignment | separate structure-retrieval table; strongest checkpoints are not publicly executable on this axis |
+| GLMR (AAAI 2026) | generative spectrum-to-molecule retrieval and reranking | separate structure-retrieval table; no reproducible same-axis package located |
+| MS2-SMILES AlignNet / MSAN (2026) | spectrum-to-SMILES alignment on CASMI | separate structure-retrieval table; not an experimental-spectrum identity method |
 
-MIST, CSI:FingerID/SIRIUS, JESTR, ESP, MVP and related systems rank molecular
+MIST, CSI:FingerID/SIRIUS, JESTR, ESP, MVP, MSAlign, GLMR, MSAN and related systems rank molecular
 structures conditioned on a query spectrum.  De-novo generators answer yet
 another task.  Their published Recall@k values therefore go in separate task
 tables rather than being mixed with experimental-spectrum identity retrieval.

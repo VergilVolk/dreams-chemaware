@@ -127,6 +127,27 @@
       "source_url": "https://arxiv.org/abs/2510.26715"
     },
     {
+      "id": "msalign_2026",
+      "display_name": "MSAlign",
+      "status": "different_task_reported_only_code_and_frozen_checkpoints_not_public",
+      "exclusion_reason": "Aligns a query spectrum to candidate molecular structures, not to experimental reference spectra. The strongest reported model/checkpoints are not publicly executable on the frozen spectrum-to-spectrum axis.",
+      "source_url": "https://arxiv.org/abs/2605.19752"
+    },
+    {
+      "id": "glmr_2026",
+      "display_name": "GLMR",
+      "status": "different_task_reported_only_no_public_reproducible_package_located",
+      "exclusion_reason": "Generative spectrum-to-molecule retrieval and reranking on MassSpecGym/MassRET-20k is a different candidate object and protocol; published Recall values cannot be inserted into the experimental-spectrum identity ladder.",
+      "source_url": "https://doi.org/10.1609/aaai.v40i2.37132"
+    },
+    {
+      "id": "ms2_smiles_alignnet_2026",
+      "display_name": "MS2-SMILES AlignNet (MSAN)",
+      "status": "different_task_reported_only_no_verified_executable_release",
+      "exclusion_reason": "Cross-modal spectrum-to-SMILES candidate retrieval on CASMI is not query-spectrum to reference-spectrum identity matching. No verified official runnable package/checkpoint for the present axis was located.",
+      "source_url": "https://doi.org/10.1016/j.talanta.2026.130121"
+    },
+    {
       "id": "structure_retrieval_family",
       "display_name": "JESTR/MIST/ESP/MVP and related spectrum-to-structure systems",
       "status": "different_task",
