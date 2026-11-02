@@ -1,0 +1,23 @@
+{
+  "schema": "gnps2_mega_frozen_scoring_contract_v1",
+  "data_role": "known_overlap_development_stress_not_independent_external",
+  "training_or_tuning_allowed": false,
+  "threshold_selection_allowed": false,
+  "natural_topk": {
+    "axis": "available-exclusion Q1/Q2/Q3 natural 10-ppm molecule candidates",
+    "metrics": ["Recall@1", "Recall@2", "Recall@3", "Recall@5", "Recall@10", "Recall@20", "MRR", "mean_rank", "median_rank"],
+    "methods": ["WSE", "Official DreaMS", "Noise V1", "P2b-on-Noise", "Noise-MSG", "ChemAware Stage-1", "ChemAware Phase-A", "Noise-ChemAware FullMSG", "Full23 v1.3.2"]
+  },
+  "pairwise_stress": {
+    "axis": "14,950,709 pre-exclusion labelled spectrum pairs",
+    "metrics": ["AUROC", "AUPRC", "ROC curve", "PR curve", "runtime", "peak memory"],
+    "methods": ["WSE", "Official DreaMS", "Noise V1", "ChemAware Stage-1", "ChemAware Phase-A", "Noise-ChemAware FullMSG"],
+    "full23_excluded_reason": "Full23 scores candidate molecules in complete query blocks; it must not be fabricated as a singleton spectrum-pair metric."
+  },
+  "missing_semantics": {
+    "chemaware_v2": "unavailable exact no-op when candidate structure evidence is absent",
+    "bioaware": "not supplied without real event-level sample context",
+    "full23_v132_representation": "missing complete representation keeps frozen Full23 parent score"
+  },
+  "claim_boundary": "Known-overlap throughput and robustness evidence only. It cannot establish independent external superiority."
+}
