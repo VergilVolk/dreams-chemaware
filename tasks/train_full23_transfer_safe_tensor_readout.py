@@ -43,12 +43,16 @@ ARMS = {
 def fit_arm(
     settings, panels, occurrences, banks, device, residual_bound,
     *, anchor_correct_multiplier=ANCHOR_CORRECT_MULTIPLIER,
+    residual_penalty_space="bounded", arm_name="transfer_safe", groups=None,
 ):
+    if residual_penalty_space not in {"bounded", "raw"}:
+        raise ValueError("residual penalty space must be bounded or raw")
     _seed(TRAIN_SEED, device)
     model = Full23TensorSetReadout(settings, residual_bound).to(device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=LEARNING_RATE,
                                   weight_decay=WEIGHT_DECAY)
-    groups = _group_occurrences(panels, occurrences)
+    if groups is None:
+        groups = _group_occurrences(panels, occurrences)
     rng = np.random.default_rng(TRAIN_SEED)
     history = []
     for epoch in range(EPOCHS):
@@ -63,7 +67,7 @@ def fit_arm(
                 panels, chosen, TOPK_ARM,
             )
             anchor_t = torch.as_tensor(anchor, device=device)
-            logits = model(
+            logits, raw_residual, bounded_residual = model.forward_components(
                 anchor_t, torch.as_tensor(query, device=device),
                 torch.as_tensor(refs, device=device),
                 torch.as_tensor(mask, device=device), banks, query_ptr=ptr,
@@ -73,8 +77,11 @@ def fit_arm(
                 pairwise_margin=PAIRWISE_MARGIN, pairwise_weight=PAIRWISE_WEIGHT,
                 anchor_correct_multiplier=anchor_correct_multiplier,
             )
+            penalty_residual = (
+                raw_residual if residual_penalty_space == "raw" else bounded_residual
+            )
             loss = ranking + ANCHOR_STRENGTH * weighted_query_residual_penalty(
-                logits - anchor_t, ptr, weights,
+                penalty_residual, ptr, weights,
             )
             optimizer.zero_grad(set_to_none=True); loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), 5.0); optimizer.step()
@@ -84,7 +91,7 @@ def fit_arm(
             totals["hardest_pairwise"] += float(parts["hardest_pairwise"].detach().cpu()) * batch_mass
         row = {key: value / mass for key, value in totals.items()}
         row["epoch"] = epoch + 1; history.append(row)
-        print(json.dumps({"arm": "transfer_safe", **row}), flush=True)
+        print(json.dumps({"arm": arm_name, **row}), flush=True)
     return model.eval(), history
 
 

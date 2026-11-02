@@ -41,6 +41,8 @@ class TensorSetSettings:
     top_k: int = TOP_K
     include_reference_count: bool = True
     query_center_raw_residual: bool = False
+    include_anchor_context: bool = False
+    include_signed_difference: bool = False
 
 
 class Full23TensorSetReadout(nn.Module):
@@ -66,9 +68,13 @@ class Full23TensorSetReadout(nn.Module):
         # Crucially, q/r are not projected separately.  Every original
         # dimension can contribute to both difference and multiplicative
         # interactions before the learned bottleneck.
+        pair_input_width = (
+            (3 if settings.include_signed_difference else 2)
+            * settings.embedding_dimension
+        )
         self.pair_encoders = nn.ModuleDict({
             name: nn.Sequential(
-                nn.Linear(2 * settings.embedding_dimension, settings.pair_dimension),
+                nn.Linear(pair_input_width, settings.pair_dimension),
                 nn.GELU(),
                 nn.LayerNorm(settings.pair_dimension),
             )
@@ -104,8 +110,11 @@ class Full23TensorSetReadout(nn.Module):
             nn.Linear(2 * settings.encoder_dimension, settings.encoder_dimension),
         )
         self.cross_encoder_ffn_norm = nn.LayerNorm(settings.encoder_dimension)
+        residual_input_width = len(settings.encoder_names) * settings.encoder_dimension
+        if settings.include_anchor_context:
+            residual_input_width += 3
         self.residual_head = nn.Sequential(
-            nn.Linear(len(settings.encoder_names) * settings.encoder_dimension,
+            nn.Linear(residual_input_width,
                       settings.fusion_hidden),
             nn.GELU(),
             nn.Linear(settings.fusion_hidden, 1),
@@ -125,9 +134,13 @@ class Full23TensorSetReadout(nn.Module):
         query = F.normalize(query.to(dtype=dtype), dim=-1)
         references = F.normalize(references.to(dtype=dtype), dim=-1)
         expanded = query[:, None, :].expand_as(references)
-        interaction = torch.cat((
-            torch.abs(expanded - references), expanded * references,
-        ), dim=-1)
+        interactions = [
+            torch.abs(expanded - references),
+            expanded * references,
+        ]
+        if self.settings.include_signed_difference:
+            interactions.append(expanded - references)
+        interaction = torch.cat(interactions, dim=-1)
         pair = self.pair_encoders[name](interaction)
         attention_logits = self.reference_attention[name](pair).squeeze(-1)
         attention_logits = attention_logits.masked_fill(~mask, -torch.inf)
@@ -181,11 +194,92 @@ class Full23TensorSetReadout(nn.Module):
         reference_positions: torch.Tensor,
         reference_mask: torch.Tensor,
         banks: Mapping[str, torch.Tensor],
+        anchor: torch.Tensor | None = None,
+        query_ptr: np.ndarray | torch.Tensor | None = None,
     ) -> torch.Tensor:
         tokens = self.candidate_embedding_tokens(
             query_positions, reference_positions, reference_mask, banks,
         )
-        return self.residual_head(tokens.flatten(1)).squeeze(-1)
+        features = tokens.flatten(1)
+        if self.settings.include_anchor_context:
+            if anchor is None or query_ptr is None:
+                raise ValueError("anchor-context residual requires anchor and query_ptr")
+            features = torch.cat((
+                features,
+                self._anchor_context(anchor, query_ptr).to(dtype=features.dtype),
+            ), dim=1)
+        raw = self.residual_head(features).squeeze(-1)
+        if self.settings.query_center_raw_residual:
+            raw = self._center_within_query(raw, query_ptr)
+        return raw
+
+    @staticmethod
+    def _validated_ptr(
+        query_ptr: np.ndarray | torch.Tensor | None,
+        count: int,
+    ) -> np.ndarray:
+        if query_ptr is None:
+            raise ValueError("query-relative operation requires query_ptr")
+        ptr = np.asarray(
+            query_ptr.detach().cpu().numpy() if torch.is_tensor(query_ptr) else query_ptr,
+            dtype=np.int64,
+        )
+        if (
+            ptr.ndim != 1 or len(ptr) < 2 or ptr[0] != 0 or ptr[-1] != count
+            or np.any(np.diff(ptr) < 2)
+        ):
+            raise ValueError("query_ptr is malformed")
+        return ptr
+
+    @classmethod
+    def _center_within_query(
+        cls,
+        values: torch.Tensor,
+        query_ptr: np.ndarray | torch.Tensor | None,
+    ) -> torch.Tensor:
+        ptr = cls._validated_ptr(query_ptr, len(values))
+        centered = values.clone()
+        for left, right in zip(ptr[:-1], ptr[1:]):
+            left, right = int(left), int(right)
+            centered[left:right] = values[left:right] - values[left:right].mean()
+        return centered
+
+    @classmethod
+    def _anchor_context(
+        cls,
+        anchor: torch.Tensor,
+        query_ptr: np.ndarray | torch.Tensor | None,
+    ) -> torch.Tensor:
+        if anchor.ndim != 1:
+            raise ValueError("anchor score axis must be one-dimensional")
+        ptr = cls._validated_ptr(query_ptr, len(anchor))
+        context = torch.empty(
+            (len(anchor), 3), dtype=anchor.dtype, device=anchor.device,
+        )
+        for left, right in zip(ptr[:-1], ptr[1:]):
+            left, right = int(left), int(right)
+            local = anchor[left:right]
+            top_two = torch.topk(local, k=2).values
+            context[left:right, 0] = local - torch.mean(local)
+            context[left:right, 1] = local - top_two[0]
+            context[left:right, 2] = top_two[0] - top_two[1]
+        return context
+
+    def forward_components(
+        self,
+        anchor: torch.Tensor,
+        query_positions: torch.Tensor,
+        reference_positions: torch.Tensor,
+        reference_mask: torch.Tensor,
+        banks: Mapping[str, torch.Tensor],
+        query_ptr: np.ndarray | torch.Tensor | None = None,
+    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+        raw = self.raw_residual(
+            query_positions, reference_positions, reference_mask, banks,
+            anchor=anchor, query_ptr=query_ptr,
+        )
+        bounded = self.residual_bound * torch.tanh(raw / self.residual_bound)
+        return anchor + bounded, raw, bounded
 
     def residual(
         self,
@@ -194,23 +288,22 @@ class Full23TensorSetReadout(nn.Module):
         reference_mask: torch.Tensor,
         banks: Mapping[str, torch.Tensor],
         query_ptr: np.ndarray | torch.Tensor | None = None,
+        anchor: torch.Tensor | None = None,
     ) -> torch.Tensor:
-        raw = self.raw_residual(query_positions, reference_positions, reference_mask, banks)
-        if self.settings.query_center_raw_residual:
-            if query_ptr is None:
-                raise ValueError("query-centered residual requires query_ptr")
-            ptr = np.asarray(
-                query_ptr.detach().cpu().numpy() if torch.is_tensor(query_ptr) else query_ptr,
-                dtype=np.int64,
+        if anchor is None:
+            if self.settings.include_anchor_context:
+                raise ValueError("anchor-context residual requires anchor")
+            anchor = torch.zeros(
+                query_positions.shape[0],
+                dtype=self.residual_head[-1].weight.dtype,
+                device=query_positions.device,
             )
-            if ptr.ndim != 1 or ptr[0] != 0 or ptr[-1] != len(raw) or np.any(np.diff(ptr) < 2):
-                raise ValueError("query_ptr is malformed")
-            centered = raw.clone()
-            for left, right in zip(ptr[:-1], ptr[1:]):
-                left, right = int(left), int(right)
-                centered[left:right] = raw[left:right] - raw[left:right].mean()
-            raw = centered
-        return self.residual_bound * torch.tanh(raw / self.residual_bound)
+        _, _, bounded = self.forward_components(
+            anchor,
+            query_positions, reference_positions, reference_mask, banks,
+            query_ptr=query_ptr,
+        )
+        return bounded
 
     def forward(
         self,
@@ -221,10 +314,11 @@ class Full23TensorSetReadout(nn.Module):
         banks: Mapping[str, torch.Tensor],
         query_ptr: np.ndarray | torch.Tensor | None = None,
     ) -> torch.Tensor:
-        return anchor + self.residual(
-            query_positions, reference_positions, reference_mask, banks,
-            query_ptr,
+        logits, _, _ = self.forward_components(
+            anchor, query_positions, reference_positions, reference_mask, banks,
+            query_ptr=query_ptr,
         )
+        return logits
 
     @property
     def trainable_parameters(self) -> int:

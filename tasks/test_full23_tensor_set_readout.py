@@ -101,12 +101,33 @@ def main() -> None:
     safe = Full23TensorSetReadout(safe_settings, residual_bound=0.5)
     safe_initial = safe(anchor, query, refs, mask, banks, query_ptr=ptr)
     assert torch.equal(safe_initial, anchor)
+    safe_logits, safe_raw, safe_bounded = safe.forward_components(
+        anchor, query, refs, mask, banks, query_ptr=ptr,
+    )
+    assert torch.equal(safe_logits, anchor)
+    assert torch.equal(safe_raw, torch.zeros_like(safe_raw))
+    assert torch.equal(safe_bounded, torch.zeros_like(safe_bounded))
     try:
         safe(anchor, query, refs, mask, banks)
     except ValueError as error:
         assert "query_ptr" in str(error)
     else:
         raise AssertionError("query-centered model accepted missing query_ptr")
+
+    # Later cumulative v1.3 repairs may expose anchor competition and retain
+    # signed q-r information without changing the exact parent initialization.
+    richer_settings = TensorSetSettings(
+        embedding_dimension=12, pair_dimension=16, encoder_dimension=8,
+        attention_heads=2, fusion_hidden=16, include_reference_count=False,
+        query_center_raw_residual=True, include_anchor_context=True,
+        include_signed_difference=True,
+    )
+    richer = Full23TensorSetReadout(richer_settings, residual_bound=0.8)
+    richer_initial = richer(anchor, query, refs, mask, banks, query_ptr=ptr)
+    assert torch.equal(richer_initial, anchor)
+    context = richer._anchor_context(anchor, ptr)
+    assert context.shape == (count, 3)
+    assert torch.allclose(context[:3, 2], context[0, 2].expand(3))
 
     print("PASS: Full23 information-preserving tensor-set readout contracts")
 
