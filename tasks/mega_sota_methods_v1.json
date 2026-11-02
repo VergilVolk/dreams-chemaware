@@ -28,7 +28,7 @@
     {
       "id": "specembedding",
       "display_name": "SpecEmbedding",
-      "status": "official_code_and_author_space_checkpoint_materialized_forward_tested",
+      "status": "official_code_and_author_space_checkpoint_materialized_and_same_axis_scored",
       "repo_path": "data/external/sota_identity_methods_20261102/SpecEmbedding",
       "repo_commit": "c16205c7469f089eb5462ec692b9755d455ca139",
       "checkpoint_path": "data/external/sota_identity_methods_20261102/SpecEmbedding/model/transformer-SupConWithTanimotoLoss-Augmentation/model.ckpt",
@@ -39,19 +39,21 @@
       "checkpoint_archive_url": "https://figshare.com/articles/dataset/Raw_Data_and_trained_model/28876751",
       "figshare_network_note": "Direct archive download returned HTTP 403 from this network; the authors' official Hugging Face Space supplied the exact executable checkpoint.",
       "adapter": "tasks/public_sota_embedding_adapter.py",
+      "same_axis_result": "docs/GNPS_PUBLIC_EMBEDDING_COMMON_DOMAIN_RESULT_20261102.md",
       "license_boundary": "Figshare model/data are CC BY 4.0; cloned code repository has no explicit license.",
       "contamination_boundary": "Training uses GNPS/MoNA/MTBLS1572-derived data; GNPS comparison is consumed development only."
     },
     {
       "id": "msbert",
       "display_name": "MSBERT",
-      "status": "official_code_and_historical_lfs_checkpoint_materialized",
+      "status": "official_code_and_historical_lfs_checkpoint_materialized_and_same_axis_scored",
       "repo_path": "data/external/sota_identity_methods_20261102/MSBERT",
       "repo_commit": "4b1e85e78221832845b2a6b493e9f6b0c62b2c27",
       "checkpoint_path": "data/external/sota_identity_methods_20261102/MSBERT/model/MSBERT.pkl",
       "checkpoint_sha256": "f6a50e1a5650504370e563a9daf9117b4f4ecd60f5ba508dce2ee9e81f064605",
       "checkpoint_bytes": 486361781,
       "adapter": "tasks/public_sota_embedding_adapter.py",
+      "same_axis_result": "docs/GNPS_PUBLIC_EMBEDDING_COMMON_DOMAIN_RESULT_20261102.md",
       "forward_test": "finite unit-normalized 512-dimensional embeddings",
       "license": "MIT",
       "contamination_boundary": "Trained directly on filtered GNPS; GNPS comparison is contaminated development evidence, not external confirmation."
