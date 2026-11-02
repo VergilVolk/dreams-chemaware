@@ -1,0 +1,152 @@
+{
+  "status": "FULL23_V132_SAME_AXIS_SOTA_COMPARISON_COMPLETE",
+  "dataset": {
+    "name": "GNPS Gold/Silver 10-ppm [M+H]+ candidate benchmark",
+    "role": "consumed development",
+    "truth_status": "consumed",
+    "panels": {
+      "identity_disjoint": 10995,
+      "formula_disjoint": 5261
+    }
+  },
+  "method_count_in_ladder": 16,
+  "rank_summary": {
+    "identity_disjoint": {
+      "recall@1": {
+        "winner": "full23_v132",
+        "value": 0.8836743974533879
+      },
+      "mrr": {
+        "winner": "full23_v132",
+        "value": 0.9245224309211846
+      },
+      "near_recall@1": {
+        "winner": "full23_v132",
+        "value": 0.8382507903055848
+      },
+      "macro_query_auroc": {
+        "winner": "full23_v132",
+        "value": 0.9492511243475446
+      },
+      "micro_auroc": {
+        "winner": "full23_v132",
+        "value": 0.9585382756251873
+      },
+      "micro_auprc": {
+        "winner": "full23_v132",
+        "value": 0.8441359708767561
+      }
+    },
+    "formula_disjoint": {
+      "recall@1": {
+        "winner": "full23_v132",
+        "value": 0.8960273712222011
+      },
+      "mrr": {
+        "winner": "full23_v132",
+        "value": 0.937401832892234
+      },
+      "near_recall@1": {
+        "winner": "full23_v132",
+        "value": 0.8230298913043478
+      },
+      "macro_query_auroc": {
+        "winner": "full23_v132",
+        "value": 0.946531590092575
+      },
+      "micro_auroc": {
+        "winner": "full23_v132",
+        "value": 0.9538401998737979
+      },
+      "micro_auprc": {
+        "winner": "full23_v132",
+        "value": 0.8741531245268173
+      }
+    }
+  },
+  "paired_comparisons": {
+    "identity_disjoint": {
+      "full23_v132_vs_official_dreams": {
+        "queries": 10995,
+        "corrected": 533,
+        "introduced": 202,
+        "net_correct": 331,
+        "legacy_risk_net_lambda2": 129,
+        "recall1_formula_cluster_ci": {
+          "delta": 0.030104592996816736,
+          "delta_pp": 3.0104592996816737,
+          "ci_low": 0.024567782619659924,
+          "ci_high": 0.03552927431436078,
+          "ci_low_pp": 2.4567782619659924,
+          "ci_high_pp": 3.552927431436078,
+          "formula_clusters": 4204,
+          "bootstrap_resamples": 10000,
+          "seed": 20261102
+        },
+        "mrr_delta": 0.019358462735186432
+      },
+      "full23_v132_vs_weighted_spectral_entropy": {
+        "queries": 10995,
+        "corrected": 223,
+        "introduced": 113,
+        "net_correct": 110,
+        "legacy_risk_net_lambda2": -3,
+        "recall1_formula_cluster_ci": {
+          "delta": 0.010004547521600727,
+          "delta_pp": 1.0004547521600726,
+          "ci_low": 0.006306296905625121,
+          "ci_high": 0.013676612581179241,
+          "ci_low_pp": 0.6306296905625122,
+          "ci_high_pp": 1.3676612581179242,
+          "formula_clusters": 4204,
+          "bootstrap_resamples": 10000,
+          "seed": 20261103
+        },
+        "mrr_delta": 0.00791875799814854
+      }
+    },
+    "formula_disjoint": {
+      "full23_v132_vs_official_dreams": {
+        "queries": 5261,
+        "corrected": 252,
+        "introduced": 105,
+        "net_correct": 147,
+        "legacy_risk_net_lambda2": 42,
+        "recall1_formula_cluster_ci": {
+          "delta": 0.027941455996958752,
+          "delta_pp": 2.794145599695875,
+          "ci_low": 0.019570494172195984,
+          "ci_high": 0.03641297890451939,
+          "ci_low_pp": 1.9570494172195985,
+          "ci_high_pp": 3.6412978904519386,
+          "formula_clusters": 2210,
+          "bootstrap_resamples": 10000,
+          "seed": 20261112
+        },
+        "mrr_delta": 0.01716002675871222
+      },
+      "full23_v132_vs_weighted_spectral_entropy": {
+        "queries": 5261,
+        "corrected": 116,
+        "introduced": 46,
+        "net_correct": 70,
+        "legacy_risk_net_lambda2": 24,
+        "recall1_formula_cluster_ci": {
+          "delta": 0.013305455236647026,
+          "delta_pp": 1.3305455236647026,
+          "ci_low": 0.008024111118990396,
+          "ci_high": 0.018580626043855394,
+          "ci_low_pp": 0.8024111118990396,
+          "ci_high_pp": 1.8580626043855395,
+          "formula_clusters": 2210,
+          "bootstrap_resamples": 10000,
+          "seed": 20261113
+        },
+        "mrr_delta": 0.009439382231852145
+      }
+    }
+  },
+  "internal_B_reference": "B is reported separately because its score is nested OOF after fitting on GNPS labels; it is not a same-status cross-source comparator.",
+  "unavailable_endpoint": "Full23 pooled pairwise metrics are NA because the released endpoint is a molecule-candidate score after multi-reference aggregation.",
+  "claim_boundary": "Full23 v1.3.2 is the development leader among the 15 frozen comparator methods on the reported molecule-ranking endpoints. The comparator set includes public/classical methods and frozen project baselines. The 0.9 scale was chosen after inspecting GNPS. This is neither unopened external confirmation nor a field-wide SOTA claim."
+}

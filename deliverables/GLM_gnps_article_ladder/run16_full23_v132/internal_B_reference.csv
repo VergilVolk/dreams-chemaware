@@ -1,0 +1,3 @@
+panel,method,queries,recall@1,mrr,near_recall@1,macro_query_auroc,micro_auroc,micro_auprc,comparison_class
+identity_disjoint,B_gnps_nested_oof_internal_reference,10995,0.8859481582537517,0.9272460297232448,0.8411485774499473,0.9549366859599435,0.9543260879095478,0.8321570840055041,internal GNPS nested-OOF development reference; not a cross-source or external SOTA comparator
+formula_disjoint,B_gnps_nested_oof_internal_reference,5261,0.8984983843375784,0.9393683779924638,0.8271059782608695,0.9518604802877605,0.9507072656842597,0.8584583381471531,internal GNPS nested-OOF development reference; not a cross-source or external SOTA comparator
