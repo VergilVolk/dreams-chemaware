@@ -22,7 +22,6 @@ import render_dreams_volar_publication_suite as source  # noqa: E402
 
 
 ROOT = Path(__file__).resolve().parents[1]
-ARCHITECTURE_ASSET = ROOT / "assets/calms_architecture_source.png"
 METHOD_ID = "full23_v132"
 METHOD_NAME = "CALMS"
 EXPANDED_NAME = "Context-Aware Learning for Metabolite Annotation from Mass Spectra"
@@ -42,7 +41,8 @@ PUBLIC_METHODS = (
 
 DISPLAY = dict(source.DISPLAY)
 DISPLAY[METHOD_ID] = "CALMS (ours)"
-DISPLAY["official_dreams"] = "Fine-tuned DreaMS"
+DISPLAY["official_dreams"] = "DreaMS"
+DISPLAY["weighted_spectral_entropy"] = "WSE"
 
 COLORS = dict(source.COLORS)
 COLORS[METHOD_ID] = "#1557B0"
@@ -63,12 +63,6 @@ def arguments() -> argparse.Namespace:
         "--output",
         type=Path,
         default=ROOT / "deliverables/calms_project_summary_20261103",
-    )
-    parser.add_argument(
-        "--architecture-image",
-        type=Path,
-        default=ARCHITECTURE_ASSET,
-        help="Reader-approved architecture artwork. Its legacy title area is cropped at render time.",
     )
     parser.add_argument("--dpi", type=int, default=300)
     return parser.parse_args()
@@ -240,72 +234,78 @@ def draw_architecture(ax: plt.Axes) -> None:
     lane_h = 0.202
     lane_y = (0.690, 0.405, 0.120)
     lane_centers = tuple(y + lane_h / 2 for y in lane_y)
-    ax.plot([bus_left_x, bus_left_x], [lane_centers[-1], lane_centers[0]], color="#374151", lw=1.8)
+    ax.plot([bus_left_x, bus_left_x], [lane_centers[1], lane_centers[0]], color="#374151", lw=1.8)
     ax.plot([bus_right_x, bus_right_x], [lane_centers[-1], lane_centers[0]], color="#374151", lw=1.8)
     arrow(ax, (0.187, 0.505), (bus_left_x, 0.505))
 
     lane_specs = (
         (
             lane_y[0],
-            "Condition-robust spectral representations",
-            "Self-supervised embeddings preserve molecular identity\nacross acquisition conditions",
+            "Condition-robust spectral representation",
+            "Multi-condition spectra and targeted peak perturbations\nlearn stable molecular identity",
             "#E8F2FF",
             "#1769AA",
         ),
         (
             lane_y[1],
-            "Fragmentation evidence",
-            "Global spectral matching and local fragment /\nneutral-loss patterns",
+            "Fragmentation-structure consistency",
+            "Diagnostic fragments, neutral losses and candidate-specific\nchemical evidence separate related structures",
             "#EAF7E8",
             "#388E3C",
         ),
         (
             lane_y[2],
-            "Candidate chemistry",
-            "Candidate-specific chemical support relative to\nmatched chemical nulls",
+            "Sample-level metabolic context",
+            "Optional real-sample evidence refines ambiguous annotations;\nnot used for the GNPS results below",
             "#F4E8FA",
             "#7B2CBF",
         ),
     )
     for index, (yy, title, subtitle, face, edge) in enumerate(lane_specs):
-        rounded_box(ax, (lane_x, yy), lane_w, lane_h, face, edge, radius=0.018)
+        rounded_box(
+            ax,
+            (lane_x, yy),
+            lane_w,
+            lane_h,
+            face,
+            edge,
+            radius=0.018,
+            linestyle="--" if index == 2 else "-",
+        )
         ax.text(lane_x + 0.020, yy + 0.158, title, ha="left", va="center", fontsize=11.4, fontweight="bold", color=edge)
         ax.text(lane_x + 0.020, yy + 0.105, subtitle, ha="left", va="center", fontsize=8.4, color="#334155", linespacing=1.25)
         center = lane_centers[index]
-        arrow(ax, (bus_left_x, center), (lane_x, center))
-        arrow(ax, (lane_x + lane_w, center), (bus_right_x, center))
+        if index < 2:
+            arrow(ax, (bus_left_x, center), (lane_x, center))
+        arrow(
+            ax,
+            (lane_x + lane_w, center),
+            (bus_right_x, center),
+            color=edge if index == 2 else "#374151",
+            linestyle="--" if index == 2 else "-",
+        )
 
     draw_vector_glyph(ax, lane_x + 0.020, lane_y[0] + 0.026, 0.150, "#1769AA")
     draw_spectrum(ax, (lane_x + 0.020, lane_y[1] + 0.050), (0.105, 0.047), "#111827")
     draw_spectrum(ax, (lane_x + 0.158, lane_y[1] + 0.050), (0.105, 0.047), "#388E3C", flip=True)
     ax.text(lane_x + 0.143, lane_y[1] + 0.049, "<->", ha="center", va="center", fontsize=11, color="#334155")
-    draw_molecule(ax, (lane_x + 0.050, lane_y[2] + 0.045), 0.025, "#7B2CBF")
-    draw_vector_glyph(ax, lane_x + 0.095, lane_y[2] + 0.020, 0.120, "#7B2CBF")
-
-    # Optional real-sample context is explicit and separated from the GNPS benchmark.
-    rounded_box(
-        ax,
-        (lane_x + 0.020, 0.018),
-        0.260,
-        0.055,
-        "#FFFDF5",
-        "#B7791F",
-        radius=0.014,
-        linewidth=1.2,
-        linestyle="--",
+    network_nodes = (
+        (lane_x + 0.042, lane_y[2] + 0.044),
+        (lane_x + 0.102, lane_y[2] + 0.072),
+        (lane_x + 0.164, lane_y[2] + 0.036),
+        (lane_x + 0.225, lane_y[2] + 0.070),
     )
-    ax.text(
-        lane_x + 0.150,
-        0.045,
-        "Real-sample context when available (not used in GNPS benchmark)",
-        ha="center",
-        va="center",
-        fontsize=7.5,
-        color="#8A5A00",
-    )
-    arrow(ax, (lane_x + 0.150, 0.073), (lane_x + 0.150, lane_y[2]), color="#B7791F", linestyle="--", linewidth=1.1)
+    for left, right in zip(network_nodes[:-1], network_nodes[1:]):
+        ax.plot([left[0], right[0]], [left[1], right[1]], color="#A855F7", lw=1.3, alpha=0.75)
+    for index, (xx, yy) in enumerate(network_nodes):
+        ax.add_patch(Circle((xx, yy), 0.012 if index in (1, 2) else 0.009, facecolor="#F3E8FF", edgecolor="#7B2CBF", lw=1.3))
+    ax.text(lane_x + 0.278, lane_y[2] + 0.040, "when\navailable", ha="right", va="center", fontsize=7.2, color="#6B21A8")
+    rounded_box(ax, (0.030, 0.012), 0.145, 0.055, "#FAF5FF", "#7B2CBF", radius=0.012, linewidth=1.2, linestyle="--")
+    ax.text(0.1025, 0.039, "Real-sample profiles (optional)", ha="center", va="center", fontsize=7.7, color="#6B21A8", fontweight="bold")
+    arrow(ax, (0.175, 0.040), (lane_x, lane_centers[2]), color="#7B2CBF", linestyle="--", linewidth=1.2)
 
-    # CALMS annotation model.
+    # CALMS combines the three scientific evidence streams. Internal
+    # implementation names stay out of the reader-facing architecture.
     rounded_box(ax, (0.635, 0.235), 0.178, 0.530, "#FFF6DE", "#D97706", radius=0.022, linewidth=1.9)
     ax.add_patch(
         FancyBboxPatch(
@@ -317,14 +317,14 @@ def draw_architecture(ax: plt.Axes) -> None:
             edgecolor="none",
         )
     )
-    ax.text(0.724, 0.714, "CALMS annotation model", ha="center", va="center", fontsize=12.2, fontweight="bold", color="#713F12")
-    rounded_box(ax, (0.653, 0.535), 0.142, 0.092, "#E8F2FF", "#1769AA", radius=0.014, linewidth=1.3)
-    ax.text(0.724, 0.581, "Integrated evidence score", ha="center", va="center", fontsize=9.4, fontweight="bold", color="#0F3D75")
-    ax.add_patch(Circle((0.724, 0.482), 0.025, facecolor="white", edgecolor="#374151", lw=1.3))
-    ax.text(0.724, 0.482, "+", ha="center", va="center", fontsize=16, fontweight="bold")
-    rounded_box(ax, (0.653, 0.337), 0.142, 0.092, "#E8F2FF", "#1769AA", radius=0.014, linewidth=1.3)
-    ax.text(0.724, 0.383, "Full-embedding correction", ha="center", va="center", fontsize=9.3, fontweight="bold", color="#0F3D75")
-    ax.text(0.724, 0.286, r"$S(q,c)=S_{evidence}(q,c)+0.9\,r_{embed}(q,c)$", ha="center", va="center", fontsize=8.8, color="#713F12")
+    ax.text(0.724, 0.714, "CALMS", ha="center", va="center", fontsize=14.0, fontweight="bold", color="#713F12")
+    rounded_box(ax, (0.653, 0.500), 0.142, 0.126, "#E8F2FF", "#1769AA", radius=0.014, linewidth=1.3)
+    ax.text(0.724, 0.563, "Candidate-specific\nevidence integration", ha="center", va="center", fontsize=10.0, fontweight="bold", color="#0F3D75", linespacing=1.2)
+    ax.add_patch(Circle((0.724, 0.452), 0.023, facecolor="white", edgecolor="#374151", lw=1.3))
+    ax.text(0.724, 0.452, "↓", ha="center", va="center", fontsize=14, fontweight="bold")
+    rounded_box(ax, (0.653, 0.304), 0.142, 0.104, "#FFFDF7", "#D97706", radius=0.014, linewidth=1.3)
+    ax.text(0.724, 0.356, "Annotation confidence\nand evidence record", ha="center", va="center", fontsize=9.2, fontweight="bold", color="#713F12", linespacing=1.2)
+    ax.text(0.724, 0.270, "structure-aware, context-aware", ha="center", va="center", fontsize=7.7, color="#713F12")
     arrow(ax, (bus_right_x, 0.505), (0.635, 0.505))
 
     # Output: annotation rather than defining the method as a ranker.
@@ -445,26 +445,17 @@ def draw_roc(ax: plt.Axes, frame) -> None:
     )
 
 
-def render(output: Path, dpi: int, architecture_image: Path) -> list[str]:
+def render(output: Path, dpi: int) -> list[str]:
     output.mkdir(parents=True, exist_ok=True)
-    if not architecture_image.is_file():
-        raise FileNotFoundError(architecture_image)
     frames = source.common_frames()
     frame = frames[PANEL]
 
-    # Use the reader-approved architecture artwork directly.  Only the legacy
-    # title/subtitle strip is cropped; the architecture itself is untouched.
     fig = plt.figure(figsize=(15.2, 10.2))
     architecture = fig.add_axes((0.035, 0.400, 0.930, 0.515))
     ladder = fig.add_axes((0.175, 0.085, 0.285, 0.255))
     roc = fig.add_axes((0.565, 0.085, 0.285, 0.255))
 
-    artwork = plt.imread(architecture_image)
-    height, width = artwork.shape[:2]
-    crop = artwork[int(round(0.165 * height)) : int(round(0.995 * height)), int(round(0.004 * width)) : int(round(0.996 * width))]
-    architecture.imshow(crop, interpolation="lanczos")
-    architecture.set_axis_off()
-    architecture.text(-0.010, 1.015, "a", transform=architecture.transAxes, fontsize=16, fontweight="bold", va="top")
+    draw_architecture(architecture)
 
     draw_ladder(ladder, frame)
     draw_roc(roc, frame)
@@ -495,7 +486,7 @@ def render(output: Path, dpi: int, architecture_image: Path) -> list[str]:
         "public_method_name": METHOD_NAME,
         "expanded_name": EXPANDED_NAME,
         "frozen_implementation_alias": "Full23 v1.3.2",
-        "architecture_asset": str(architecture_image.relative_to(ROOT)),
+        "architecture_scope": "three reader-facing scientific modules; internal implementation names omitted",
         "panel": PANEL,
         "dataset_role": "consumed development",
         "queries": int(frame.iloc[0]["N_Q"]),
@@ -513,11 +504,11 @@ def render(output: Path, dpi: int, architecture_image: Path) -> list[str]:
     (output / "figure_manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     (output / "CAPTION.md").write_text(
         "# CALMS project summary figure\n\n"
-        "**a,** CALMS combines condition-robust spectral representations, fragmentation evidence and candidate-specific "
-        "chemistry before producing a metabolite annotation with an auditable evidence record. Real-sample context is an "
-        "optional extension and was not used in the GNPS benchmark. **b,** Recall@1 on the common-domain GNPS "
+        "**a,** CALMS combines condition-robust MS/MS representations with fragmentation-structure consistency evidence, "
+        "then optionally refines ambiguous annotations using real-sample metabolic context when that context is available. "
+        "The sample-context module was not used for the GNPS benchmark. **b,** Recall@1 on the common-domain GNPS "
         f"identity-disjoint development panel ({int(frame.iloc[0]['N_Q']):,} queries). CALMS reaches "
-        f"{100.0 * calms_r1:.2f}% and improves over official fine-tuned DreaMS by "
+        f"{100.0 * calms_r1:.2f}% and improves over DreaMS by "
         f"{100.0 * (calms_r1 - dreams_r1):.2f} percentage points. **c,** Candidate-level ROC curves on the same "
         f"query/candidate axis; CALMS achieves AUROC {calms_auc:.3f}. GNPS is a consumed development resource, not an "
         "unopened external confirmation set.\n",
@@ -529,7 +520,7 @@ def render(output: Path, dpi: int, architecture_image: Path) -> list[str]:
 def main() -> None:
     args = arguments()
     style()
-    files = render(args.output, args.dpi, args.architecture_image)
+    files = render(args.output, args.dpi)
     print(
         json.dumps(
             {
