@@ -8,6 +8,7 @@ formula-disjoint results in one visual comparison.
 from __future__ import annotations
 
 import argparse
+from io import BytesIO
 import json
 from pathlib import Path
 
@@ -17,12 +18,15 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 from matplotlib.patches import Circle, FancyArrowPatch, FancyBboxPatch, Polygon  # noqa: E402
 import numpy as np  # noqa: E402
+from PIL import Image  # noqa: E402
+from rdkit import Chem  # noqa: E402
+from rdkit.Chem.Draw import rdMolDraw2D  # noqa: E402
 
 import render_dreams_volar_publication_suite as source  # noqa: E402
 
 
 ROOT = Path(__file__).resolve().parents[1]
-ARCHITECTURE_ARTWORK = ROOT / "assets/calms_architecture_ai_v7.png"
+ARCHITECTURE_ARTWORK = ROOT / "assets/calms_architecture_ai_v9.png"
 METHOD_ID = "full23_v132"
 METHOD_NAME = "CALMS"
 EXPANDED_NAME = "Context-Aware Learning for Metabolite Annotation from Mass Spectra"
@@ -57,6 +61,15 @@ HIGHLIGHT_CURVES = (
     "ms2deepscore_2x_public",
     "msbert_official",
 )
+
+# Three chemically valid, mass-compatible C7H8O structural isomers.  The
+# background artwork intentionally contains no generated chemistry; RDKit
+# renders these structures deterministically in every export.
+ANNOTATION_CANDIDATES = {
+    "anisole": "COc1ccccc1",
+    "benzyl_alcohol": "OCc1ccccc1",
+    "o_cresol": "Cc1ccccc1O",
+}
 
 
 def arguments() -> argparse.Namespace:
@@ -380,13 +393,13 @@ def draw_ai_architecture(ax: plt.Axes) -> None:
     ax.text(-0.010, 1.015, "a", transform=ax.transAxes, fontsize=16, fontweight="bold", va="top")
 
     labels = (
-        (0.120, 0.826, "LC-MS/MS spectrum\nand candidate structures", "#214F73", 13.0),
-        (0.418, 0.906, "Condition-robust\nspectral representation", "#214F73", 12.2),
-        (0.418, 0.585, "Fragmentation chemistry-guided\ndiscrimination", "#214F73", 11.8),
-        (0.418, 0.250, "Biochemical relationships in\nbiological samples", "#214F73", 11.8),
-        (0.681, 0.525, "CALMS", "#214F73", 19.0),
-        (0.681, 0.420, "metabolite\nannotation", "#214F73", 12.6),
-        (0.875, 0.826, "Annotated candidate\nstructures", "#214F73", 13.0),
+        (0.120, 0.844, "LC-MS/MS spectra\nand candidate structures", "#214F73", 13.0),
+        (0.418, 0.922, "Condition-robust\nspectral representation", "#214F73", 12.7),
+        (0.418, 0.594, "Fragmentation chemistry-guided\ndiscrimination", "#214F73", 12.7),
+        (0.418, 0.298, "Biochemical relationships in\nbiological samples", "#214F73", 12.4),
+        (0.671, 0.548, "CALMS", "#214F73", 20.5),
+        (0.671, 0.448, "metabolite\nannotation", "#214F73", 13.4),
+        (0.862, 0.844, "Annotated candidate\nstructures", "#214F73", 13.0),
     )
     for xx, yy, label, color, fontsize in labels:
         ax.text(
@@ -401,6 +414,62 @@ def draw_ai_architecture(ax: plt.Axes) -> None:
             color=color,
             linespacing=1.12,
         )
+
+    # The same candidate identities are shown throughout the decision path.
+    # Input order presents the candidate set; the fragmentation panel marks
+    # benzyl alcohol as supported; the output panel places it first.
+    molecule_images = {
+        name: rdkit_molecule_rgba(smiles)
+        for name, smiles in ANNOTATION_CANDIDATES.items()
+    }
+
+    input_positions = (
+        ("anisole", (0.0380, 0.176, 0.046, 0.091)),
+        ("benzyl_alcohol", (0.0975, 0.176, 0.046, 0.091)),
+        ("o_cresol", (0.1570, 0.176, 0.046, 0.091)),
+    )
+    fragment_positions = (
+        ("anisole", (0.467, 0.489, 0.044, 0.035)),
+        ("benzyl_alcohol", (0.467, 0.439, 0.044, 0.035)),
+        ("o_cresol", (0.467, 0.388, 0.044, 0.035)),
+    )
+    output_positions = (
+        ("benzyl_alcohol", (0.8085, 0.5725, 0.116, 0.115)),
+        ("anisole", (0.8085, 0.3945, 0.116, 0.115)),
+        ("o_cresol", (0.8085, 0.2165, 0.116, 0.115)),
+    )
+    for name, bounds in (*input_positions, *fragment_positions, *output_positions):
+        place_molecule(ax, molecule_images[name], bounds)
+
+
+def rdkit_molecule_rgba(smiles: str) -> np.ndarray:
+    """Return a tightly cropped transparent RDKit depiction."""
+    molecule = Chem.MolFromSmiles(smiles)
+    if molecule is None:
+        raise ValueError(f"invalid candidate SMILES: {smiles}")
+    drawer = rdMolDraw2D.MolDraw2DCairo(360, 210)
+    options = drawer.drawOptions()
+    options.clearBackground = False
+    options.bondLineWidth = 2.4
+    options.padding = 0.10
+    rdMolDraw2D.PrepareAndDrawMolecule(drawer, molecule)
+    drawer.FinishDrawing()
+    image = Image.open(BytesIO(drawer.GetDrawingText())).convert("RGBA")
+    alpha_box = image.getchannel("A").getbbox()
+    if alpha_box is None:
+        raise RuntimeError(f"RDKit produced an empty depiction for {smiles}")
+    return np.asarray(image.crop(alpha_box))
+
+
+def place_molecule(
+    ax: plt.Axes,
+    image: np.ndarray,
+    bounds: tuple[float, float, float, float],
+) -> None:
+    """Fit one deterministic molecule inside an axes-fraction slot."""
+    inset = ax.inset_axes(bounds, transform=ax.transAxes, zorder=8)
+    inset.imshow(image, interpolation="lanczos")
+    inset.set_axis_off()
 
 
 def draw_ladder(ax: plt.Axes, frame) -> None:
@@ -500,10 +569,10 @@ def render(output: Path, dpi: int) -> list[str]:
     frames = source.common_frames()
     frame = frames[PANEL]
 
-    fig = plt.figure(figsize=(15.2, 10.2))
-    architecture = fig.add_axes((0.035, 0.400, 0.930, 0.515))
-    ladder = fig.add_axes((0.175, 0.085, 0.285, 0.255))
-    roc = fig.add_axes((0.565, 0.085, 0.285, 0.255))
+    fig = plt.figure(figsize=(15.2, 11.0))
+    architecture = fig.add_axes((0.035, 0.408, 0.930, 0.494))
+    ladder = fig.add_axes((0.175, 0.065, 0.285, 0.270))
+    roc = fig.add_axes((0.565, 0.065, 0.285, 0.270))
 
     draw_ai_architecture(architecture)
 
@@ -538,7 +607,7 @@ def render(output: Path, dpi: int) -> list[str]:
         "frozen_implementation_alias": "Full23 v1.3.2",
         "architecture_asset": str(ARCHITECTURE_ARTWORK.relative_to(ROOT)),
         "architecture_prompt_record": "deliverables/calms_project_summary_20261103/ARTWORK_PROMPT.md",
-        "architecture_scope": "three reader-facing scientific modules; AI-drawn text-free artwork with deterministic code typography",
+        "architecture_scope": "three reader-facing scientific modules; AI-drawn text-free layout with deterministic code typography and RDKit molecular structures",
         "panel": PANEL,
         "dataset_role": "consumed development",
         "queries": int(frame.iloc[0]["N_Q"]),

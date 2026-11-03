@@ -4,11 +4,13 @@ The architecture artwork was produced with the built-in image-generation tool an
 
 ## Final edit prompt
 
-Preserve a wide scientific workflow with one LC-MS/MS input panel, three parallel evidence panels, one blank CALMS integration panel and one ranked annotation-output panel. Add a separate pale-academic-blue title header box to the input panel, each of the three evidence panels and the output panel, with a thin muted-blue divider and enough vertical space for centered two-line titles. Do not add a header box to the central CALMS panel. Use a pure white background, very pale academic-blue body fills, navy line art and thin blue arrows. Keep the self-explanatory icons: three perturbed spectra converging to a stable embedding; diagnostic peaks connected to fragments and selected versus rejected candidates; biological sample vials connected to a metabolite network; and an ordered 1/2/3 candidate output. Include no captions, headings, legends, pseudo-text, watermarks, gradients, shadows or 3D effects.
+Preserve a wide scientific workflow with one LC-MS/MS input panel, three parallel evidence panels, one blank CALMS integration panel and one ranked annotation-output panel. Increase the architecture height by approximately 15--18% so the workflow no longer looks vertically compressed. Keep pale-academic-blue title headers on the input, evidence and output panels; keep the central CALMS panel header-free. Retain three distinct MS/MS spectra in the input and leave three blank structure slots below them. Retain the diagnostic peaks, fragment arrows and check/cross marks in the fragmentation panel, but leave all candidate-structure slots blank. Redesign the output as three substantial full-width candidate cards with rank badges, a blank central structure slot and a check on rank 1. Remove every generated molecular structure from the raster. Use a pure white background, very pale academic-blue fills, navy line art and thin blue arrows. Include no prose, pseudo-text, watermark, shadow or 3D effect.
+
+All visible molecular structures are drawn after generation by RDKit from fixed SMILES, not by the image model. The three candidates are the valid C7H8O structural isomers anisole (`COc1ccccc1`), benzyl alcohol (`OCc1ccccc1`) and o-cresol (`Cc1ccccc1O`).
 
 ## Reader-facing labels added in code
 
-- LC-MS/MS spectrum and candidate structures
+- LC-MS/MS spectra and candidate structures
 - Condition-robust spectral representation
 - Fragmentation chemistry-guided discrimination
 - Biochemical relationships in biological samples
