@@ -42,6 +42,7 @@ PUBLIC_METHODS = (
 
 DISPLAY = dict(source.DISPLAY)
 DISPLAY[METHOD_ID] = "CALMS (ours)"
+DISPLAY["official_dreams"] = "Fine-tuned DreaMS"
 
 COLORS = dict(source.COLORS)
 COLORS[METHOD_ID] = "#1557B0"
@@ -453,10 +454,10 @@ def render(output: Path, dpi: int, architecture_image: Path) -> list[str]:
 
     # Use the reader-approved architecture artwork directly.  Only the legacy
     # title/subtitle strip is cropped; the architecture itself is untouched.
-    fig = plt.figure(figsize=(15.2, 11.0))
-    architecture = fig.add_axes((0.035, 0.415, 0.930, 0.480))
-    ladder = fig.add_axes((0.115, 0.090, 0.345, 0.265))
-    roc = fig.add_axes((0.565, 0.090, 0.315, 0.265))
+    fig = plt.figure(figsize=(15.2, 10.2))
+    architecture = fig.add_axes((0.035, 0.400, 0.930, 0.515))
+    ladder = fig.add_axes((0.175, 0.085, 0.285, 0.255))
+    roc = fig.add_axes((0.565, 0.085, 0.285, 0.255))
 
     artwork = plt.imread(architecture_image)
     height, width = artwork.shape[:2]
@@ -471,26 +472,9 @@ def render(output: Path, dpi: int, architecture_image: Path) -> list[str]:
     fig.suptitle(
         f"{METHOD_NAME}: {EXPANDED_NAME}",
         x=0.500,
-        y=0.978,
-        fontsize=22,
+        y=0.963,
+        fontsize=21,
         fontweight="bold",
-    )
-    fig.text(
-        0.500,
-        0.942,
-        "Spectral representations, fragmentation matching and candidate chemistry are integrated for metabolite annotation.",
-        ha="center",
-        fontsize=12.0,
-        color="#334155",
-    )
-    fig.text(
-        0.500,
-        0.025,
-        "GNPS common-domain identity-disjoint development panel; all methods share the same query and candidate axis. "
-        "MS2DeepScore 2.x is dashed because its native objective is structural similarity rather than exact annotation.",
-        ha="center",
-        fontsize=8.8,
-        color="#475569",
     )
 
     stem = output / "calms_project_summary"
