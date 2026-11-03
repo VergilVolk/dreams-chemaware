@@ -1,0 +1,401 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="684pt" height="513.36pt" viewBox="0 0 684 513.36" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-11-03T14:01:45.504345</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.8, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 513.36 
+L 684 513.36 
+L 684 -0 
+L 0 -0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 12.78 103.1112 
+L 196.92 103.1112 
+Q 201.384 103.1112 201.384 98.676 
+L 201.384 43.236 
+Q 201.384 38.8008 196.92 38.8008 
+L 12.78 38.8008 
+Q 8.316 38.8008 8.316 43.236 
+L 8.316 98.676 
+Q 8.316 103.1112 12.78 103.1112 
+z
+" clip-path="url(#p8238cafc17)" style="fill: #eaf1f7; stroke: #205a8d; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 233.19 103.1112 
+L 428.49 103.1112 
+Q 432.954 103.1112 432.954 98.676 
+L 432.954 43.236 
+Q 432.954 38.8008 428.49 38.8008 
+L 233.19 38.8008 
+Q 228.726 38.8008 228.726 43.236 
+L 228.726 98.676 
+Q 228.726 103.1112 233.19 103.1112 
+z
+" clip-path="url(#p8238cafc17)" style="fill: #eaf1f7; stroke: #205a8d; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 464.76 103.1112 
+L 660.06 103.1112 
+Q 664.524 103.1112 664.524 98.676 
+L 664.524 43.236 
+Q 664.524 38.8008 660.06 38.8008 
+L 464.76 38.8008 
+Q 460.296 38.8008 460.296 43.236 
+L 460.296 98.676 
+Q 460.296 103.1112 464.76 103.1112 
+z
+" clip-path="url(#p8238cafc17)" style="fill: #eaf1f7; stroke: #205a8d; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 12.78 208.4472 
+L 196.92 208.4472 
+Q 201.384 208.4472 201.384 204.012 
+L 201.384 148.572 
+Q 201.384 144.1368 196.92 144.1368 
+L 12.78 144.1368 
+Q 8.316 144.1368 8.316 148.572 
+L 8.316 204.012 
+Q 8.316 208.4472 12.78 208.4472 
+z
+" clip-path="url(#p8238cafc17)" style="fill: #eaf1f7; stroke: #205a8d; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 233.19 208.4472 
+L 428.49 208.4472 
+Q 432.954 208.4472 432.954 204.012 
+L 432.954 148.572 
+Q 432.954 144.1368 428.49 144.1368 
+L 233.19 144.1368 
+Q 228.726 144.1368 228.726 148.572 
+L 228.726 204.012 
+Q 228.726 208.4472 233.19 208.4472 
+z
+" clip-path="url(#p8238cafc17)" style="fill: #eaf1f7; stroke: #205a8d; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 464.76 208.4472 
+L 660.06 208.4472 
+Q 664.524 208.4472 664.524 204.012 
+L 664.524 148.572 
+Q 664.524 144.1368 660.06 144.1368 
+L 464.76 144.1368 
+Q 460.296 144.1368 460.296 148.572 
+L 460.296 204.012 
+Q 460.296 208.4472 464.76 208.4472 
+z
+" clip-path="url(#p8238cafc17)" style="fill: #eaf1f7; stroke: #205a8d; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 12.78 299.9232 
+L 196.92 299.9232 
+Q 201.384 299.9232 201.384 295.488 
+L 201.384 237.276 
+Q 201.384 232.8408 196.92 232.8408 
+L 12.78 232.8408 
+Q 8.316 232.8408 8.316 237.276 
+L 8.316 295.488 
+Q 8.316 299.9232 12.78 299.9232 
+z
+" clip-path="url(#p8238cafc17)" style="fill: #eaf1f7; stroke: #205a8d; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 233.19 299.9232 
+L 428.49 299.9232 
+Q 432.954 299.9232 432.954 295.488 
+L 432.954 237.276 
+Q 432.954 232.8408 428.49 232.8408 
+L 233.19 232.8408 
+Q 228.726 232.8408 228.726 237.276 
+L 228.726 295.488 
+Q 228.726 299.9232 233.19 299.9232 
+z
+" clip-path="url(#p8238cafc17)" style="fill: #eaf1f7; stroke: #205a8d; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_10">
+    <path d="M 464.76 299.9232 
+L 660.06 299.9232 
+Q 664.524 299.9232 664.524 295.488 
+L 664.524 237.276 
+Q 664.524 232.8408 660.06 232.8408 
+L 464.76 232.8408 
+Q 460.296 232.8408 460.296 237.276 
+L 460.296 295.488 
+Q 460.296 299.9232 464.76 299.9232 
+z
+" clip-path="url(#p8238cafc17)" style="fill: #eaf1f7; stroke: #205a8d; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_11">
+    <path d="M 233.19 394.1712 
+L 428.49 394.1712 
+Q 432.954 394.1712 432.954 389.736 
+L 432.954 334.296 
+Q 432.954 329.8608 428.49 329.8608 
+L 233.19 329.8608 
+Q 228.726 329.8608 228.726 334.296 
+L 228.726 389.736 
+Q 228.726 394.1712 233.19 394.1712 
+z
+" clip-path="url(#p8238cafc17)" style="fill: #eaf1f7; stroke: #205a8d; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_12">
+    <path d="M 464.76 394.1712 
+L 660.06 394.1712 
+Q 664.524 394.1712 664.524 389.736 
+L 664.524 334.296 
+Q 664.524 329.8608 660.06 329.8608 
+L 464.76 329.8608 
+Q 460.296 329.8608 460.296 334.296 
+L 460.296 389.736 
+Q 460.296 394.1712 464.76 394.1712 
+z
+" clip-path="url(#p8238cafc17)" style="fill: #eaf1f7; stroke: #205a8d; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_13">
+    <path d="M 12.78 502.2792 
+L 305.73 502.2792 
+Q 310.194 502.2792 310.194 497.844 
+L 310.194 442.404 
+Q 310.194 437.9688 305.73 437.9688 
+L 12.78 437.9688 
+Q 8.316 437.9688 8.316 442.404 
+L 8.316 497.844 
+Q 8.316 502.2792 12.78 502.2792 
+z
+" clip-path="url(#p8238cafc17)" style="fill: #f1f5ec; stroke: #205a8d; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_14">
+    <path d="M 353.16 502.2792 
+L 660.06 502.2792 
+Q 664.524 502.2792 664.524 497.844 
+L 664.524 442.404 
+Q 664.524 437.9688 660.06 437.9688 
+L 353.16 437.9688 
+Q 348.696 437.9688 348.696 442.404 
+L 348.696 497.844 
+Q 348.696 502.2792 353.16 502.2792 
+z
+" clip-path="url(#p8238cafc17)" style="fill: #f1f5ec; stroke: #205a8d; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="line2d_1">
+    <path d="M 104.85 38.8008 
+L 104.85 31.0392 
+L 562.41 31.0392 
+" clip-path="url(#p8238cafc17)" style="fill: none; stroke: #205a8d; stroke-width: 1.4; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_2">
+    <path d="M 330.84 38.8008 
+L 330.84 31.0392 
+" clip-path="url(#p8238cafc17)" style="fill: none; stroke: #205a8d; stroke-width: 1.4; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_3">
+    <path d="M 660.06 179.064 
+L 668.43 179.064 
+L 668.43 359.244 
+" clip-path="url(#p8238cafc17)" style="fill: none; stroke: #205a8d; stroke-width: 1.3; stroke-linecap: square"/>
+   </g>
+   <g id="text_1">
+    <text style="font-weight: 700; font-size: 14px; font-family: 'DejaVu Sans'; text-anchor: start" x="7.2" y="18.288" transform="rotate(-0 7.2 18.288)">a  Learning spectral representations</text>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'" transform="translate(57.480469 62.517563)">Peak perturbations</text>
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'" transform="translate(61.820312 73.715375)">Matched controls</text>
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'" transform="translate(47.433594 84.913188)">Multi-condition spectra</text>
+   </g>
+   <g id="text_3">
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'" transform="translate(267.893125 62.517563)">Fragmentation chemistry</text>
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'" transform="translate(276.411094 73.715375)">Structure-conditioned</text>
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'" transform="translate(288.226719 84.913188)">training relations</text>
+   </g>
+   <g id="text_4">
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'" transform="translate(504.601406 62.517563)">Four adapted encoders</text>
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'" transform="translate(517.527187 73.715375)">1024-dimensional</text>
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'" transform="translate(509.864687 84.913188)">spectral embeddings</text>
+   </g>
+   <g id="patch_15">
+    <path d="M 562.41 33.036448 
+Q 562.41 34.918025 562.41 35.010747 
+" style="fill: none; stroke: #205a8d; stroke-width: 1.6; stroke-linecap: round"/>
+    <path d="M 564.41 31.010747 
+L 562.41 35.010747 
+L 560.41 31.010747 
+z
+" style="fill: #205a8d; stroke: #205a8d; stroke-width: 1.6; stroke-linecap: round"/>
+   </g>
+   <g id="text_5">
+    <text style="font-weight: 700; font-size: 14px; font-family: 'DejaVu Sans'; text-anchor: start" x="7.2" y="126.396" transform="rotate(-0 7.2 126.396)">b  CALMS inference</text>
+   </g>
+   <g id="text_6">
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'" transform="translate(40.149219 167.853563)">Query MS/MS + precursor</text>
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'" transform="translate(52.407031 179.051375)">Candidate structures</text>
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'" transform="translate(34.695312 190.249188)">Measured reference spectra</text>
+   </g>
+   <g id="text_7">
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'" transform="translate(252.912656 167.853563)">Spectral and chemical features</text>
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'" transform="translate(270.286094 179.051375)">7 scores + 7 percentiles</text>
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'" transform="translate(239.444687 190.249188)">3 agreement + 6 chemistry features</text>
+   </g>
+   <g id="text_8">
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'" transform="translate(487.363125 173.452469)">Standardization + linear layer</text>
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'" transform="translate(491.036562 184.650281)">Base candidate score b(q, c)</text>
+   </g>
+   <g id="patch_16">
+    <path d="M 204.499182 176.292 
+Q 216.448906 176.292 226.609776 176.292 
+" style="fill: none; stroke: #205a8d; stroke-width: 1.6; stroke-linecap: round"/>
+    <path d="M 222.609776 174.292 
+L 226.609776 176.292 
+L 222.609776 178.292 
+z
+" style="fill: #205a8d; stroke: #205a8d; stroke-width: 1.6; stroke-linecap: round"/>
+   </g>
+   <g id="patch_17">
+    <path d="M 436.071566 176.292 
+Q 446.62579 176.292 455.39116 176.292 
+" style="fill: none; stroke: #205a8d; stroke-width: 1.6; stroke-linecap: round"/>
+    <path d="M 451.39116 174.292 
+L 455.39116 176.292 
+L 451.39116 178.292 
+z
+" style="fill: #205a8d; stroke: #205a8d; stroke-width: 1.6; stroke-linecap: round"/>
+   </g>
+   <g id="text_9">
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'" transform="translate(47.535156 257.77825)">Full-vector interactions</text>
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'" transform="translate(64.34375 269.028563)">[ |q − r| ; q ⊙ r ]</text>
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'" transform="translate(34.333594 280.5045)">2048 → 64 for each encoder</text>
+   </g>
+   <g id="text_10">
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'" transform="translate(271.822031 257.943562)">Reference-set attention</text>
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'" transform="translate(248.25875 269.141375)">Up to 3 references per candidate</text>
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'" transform="translate(250.461875 280.339187)">Weighted mean + SD: 128 → 64</text>
+   </g>
+   <g id="text_11">
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'" transform="translate(502.146719 257.943562)">Cross-encoder attention</text>
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'" transform="translate(497.231094 269.141375)">4 tokens × 64 dimensions</text>
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'" transform="translate(491.192031 280.339187)">4 heads; FFN 64 → 128 → 64</text>
+   </g>
+   <g id="patch_18">
+    <path d="M 104.85 211.556496 
+Q 104.85 220.641876 104.85 227.938402 
+" style="fill: none; stroke: #205a8d; stroke-width: 1.6; stroke-linecap: round"/>
+    <path d="M 106.85 223.938402 
+L 104.85 227.938402 
+L 102.85 223.938402 
+z
+" style="fill: #205a8d; stroke: #205a8d; stroke-width: 1.6; stroke-linecap: round"/>
+   </g>
+   <g id="patch_19">
+    <path d="M 204.499182 267.768 
+Q 216.448906 267.768 226.609776 267.768 
+" style="fill: none; stroke: #205a8d; stroke-width: 1.6; stroke-linecap: round"/>
+    <path d="M 222.609776 265.768 
+L 226.609776 267.768 
+L 222.609776 269.768 
+z
+" style="fill: #205a8d; stroke: #205a8d; stroke-width: 1.6; stroke-linecap: round"/>
+   </g>
+   <g id="patch_20">
+    <path d="M 436.071566 267.768 
+Q 446.62579 267.768 455.39116 267.768 
+" style="fill: none; stroke: #205a8d; stroke-width: 1.6; stroke-linecap: round"/>
+    <path d="M 451.39116 265.768 
+L 455.39116 267.768 
+L 451.39116 269.768 
+z
+" style="fill: #205a8d; stroke: #205a8d; stroke-width: 1.6; stroke-linecap: round"/>
+   </g>
+   <g id="text_12">
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'" transform="translate(257.057969 353.577562)">Residual head 256 → 128 → 1</text>
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'" transform="translate(252.703281 364.775375)">Query centering + B tanh(· / B)</text>
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'" transform="translate(299.365 375.973187)">B = 0.62551</text>
+   </g>
+   <g id="text_13">
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'" transform="translate(483.442031 353.577562)">Final score: b(q, c) + 0.9 δ(q, c)</text>
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'" transform="translate(514.192812 364.775375)">Candidate ordering</text>
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'" transform="translate(489.408437 375.973187)">Top-k metabolite annotations</text>
+   </g>
+   <g id="patch_21">
+    <path d="M 560.420652 301.270134 
+Q 446.623461 314.892184 334.602445 328.301618 
+" style="fill: none; stroke: #205a8d; stroke-width: 1.6; stroke-linecap: round"/>
+    <path d="M 338.811803 329.812017 
+L 334.602445 328.301618 
+L 338.336378 325.840371 
+z
+" style="fill: #205a8d; stroke: #205a8d; stroke-width: 1.6; stroke-linecap: round"/>
+   </g>
+   <g id="patch_22">
+    <path d="M 436.071566 362.016 
+Q 446.62579 362.016 455.39116 362.016 
+" style="fill: none; stroke: #205a8d; stroke-width: 1.6; stroke-linecap: round"/>
+    <path d="M 451.39116 360.016 
+L 455.39116 362.016 
+L 451.39116 364.016 
+z
+" style="fill: #205a8d; stroke: #205a8d; stroke-width: 1.6; stroke-linecap: round"/>
+   </g>
+   <g id="patch_23">
+    <path d="M 666.431499 359.244 
+Q 664.245963 359.244 663.849281 359.244 
+" style="fill: none; stroke: #205a8d; stroke-width: 1.6; stroke-linecap: round"/>
+    <path d="M 667.849281 361.244 
+L 663.849281 359.244 
+L 667.849281 357.244 
+z
+" style="fill: #205a8d; stroke: #205a8d; stroke-width: 1.6; stroke-linecap: round"/>
+   </g>
+   <g id="text_14">
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; fill: #555555" transform="translate(12.78 323.098187)">Frozen encoders during</text>
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; fill: #555555" transform="translate(12.78 334.296)">final scoring-model training</text>
+   </g>
+   <g id="text_15">
+    <text style="font-weight: 700; font-size: 14px; font-family: 'DejaVu Sans'; text-anchor: start" x="7.2" y="420.228" transform="rotate(-0 7.2 420.228)">c  Sample-context extension (separately evaluated)</text>
+   </g>
+   <g id="text_16">
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'" transform="translate(11.856562 467.284469)">Sample metabolites + candidate biochemical relationships</text>
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'" transform="translate(17.016719 478.482281)">Catalogue support and metabolic-neighborhood features</text>
+   </g>
+   <g id="text_17">
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'" transform="translate(413.977187 461.685563)">Context-dependent candidate choice</text>
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'" transform="translate(401.117031 472.883375)">Evaluated on 1,631 sample-linked spectra</text>
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'" transform="translate(420.773281 484.081187)">Not used for the GNPS benchmark</text>
+   </g>
+   <g id="patch_24">
+    <path d="M 313.306798 470.124 
+Q 329.441393 470.124 343.787134 470.124 
+" style="fill: none; stroke: #205a8d; stroke-width: 1.6; stroke-linecap: round"/>
+    <path d="M 339.787134 468.124 
+L 343.787134 470.124 
+L 339.787134 472.124 
+z
+" style="fill: #205a8d; stroke: #205a8d; stroke-width: 1.6; stroke-linecap: round"/>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p8238cafc17">
+   <rect x="7.2" y="7.2" width="669.6" height="498.96"/>
+  </clipPath>
+ </defs>
+</svg>
