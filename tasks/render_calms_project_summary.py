@@ -22,7 +22,7 @@ import render_dreams_volar_publication_suite as source  # noqa: E402
 
 
 ROOT = Path(__file__).resolve().parents[1]
-ARCHITECTURE_ARTWORK = ROOT / "assets/calms_architecture_ai_v4.png"
+ARCHITECTURE_ARTWORK = ROOT / "assets/calms_architecture_ai_v5.png"
 METHOD_ID = "full23_v132"
 METHOD_NAME = "CALMS"
 EXPANDED_NAME = "Context-Aware Learning for Metabolite Annotation from Mass Spectra"
@@ -47,6 +47,7 @@ DISPLAY["weighted_spectral_entropy"] = "WSE"
 
 COLORS = dict(source.COLORS)
 COLORS[METHOD_ID] = "#1557B0"
+COLORS["specembedding_official"] = "#86B6D1"
 
 HIGHLIGHT_CURVES = (
     METHOD_ID,
@@ -78,6 +79,10 @@ def style() -> None:
             "axes.labelsize": 11,
             "axes.spines.top": False,
             "axes.spines.right": False,
+            "axes.edgecolor": "#A9CDE2",
+            "axes.labelcolor": "#214F73",
+            "xtick.color": "#365B73",
+            "ytick.color": "#365B73",
             "legend.frameon": False,
             "figure.facecolor": "white",
             "axes.facecolor": "white",
@@ -363,18 +368,25 @@ def draw_ai_architecture(ax: plt.Axes) -> None:
     if not ARCHITECTURE_ARTWORK.is_file():
         raise FileNotFoundError(ARCHITECTURE_ARTWORK)
     artwork = plt.imread(ARCHITECTURE_ARTWORK)
+    # Image-generation exports can contain a few black boundary rows.  Remove
+    # only those boundary rows before scaling so they cannot become rules in
+    # the publication figure.
+    row_brightness = artwork[..., :3].mean(axis=(1, 2))
+    content_rows = np.flatnonzero(row_brightness > 0.95)
+    if content_rows.size:
+        artwork = artwork[content_rows[0] : content_rows[-1] + 1]
     ax.imshow(artwork, interpolation="lanczos", aspect="auto")
     ax.set_axis_off()
     ax.text(-0.010, 1.015, "a", transform=ax.transAxes, fontsize=16, fontweight="bold", va="top")
 
     labels = (
-        (0.109, 0.850, "LC–MS/MS spectrum &\ncandidate structures", "#27313D", 11.0),
-        (0.418, 0.910, "Condition-robust spectral representation", "#27313D", 11.2),
-        (0.418, 0.592, "Fragmentation chemistry-guided discrimination", "#27313D", 10.5),
-        (0.418, 0.278, "Biochemical relationships in biological samples", "#27313D", 10.3),
-        (0.681, 0.520, "CALMS", "#315A7D", 15.0),
-        (0.681, 0.440, "metabolite\nannotation", "#315A7D", 11.2),
-        (0.879, 0.850, "Annotated candidate structures", "#27313D", 11.0),
+        (0.120, 0.858, "LC-MS/MS spectrum\nand candidate structures", "#214F73", 12.6),
+        (0.418, 0.906, "Condition-robust\nspectral representation", "#214F73", 12.2),
+        (0.418, 0.585, "Fragmentation chemistry-guided\ndiscrimination", "#214F73", 11.8),
+        (0.418, 0.258, "Biochemical relationships in\nbiological samples", "#214F73", 11.8),
+        (0.681, 0.525, "CALMS", "#214F73", 19.0),
+        (0.681, 0.420, "metabolite\nannotation", "#214F73", 12.6),
+        (0.875, 0.858, "Annotated candidate\nstructures", "#214F73", 12.6),
     )
     for xx, yy, label, color, fontsize in labels:
         ax.text(
@@ -387,6 +399,7 @@ def draw_ai_architecture(ax: plt.Axes) -> None:
             fontsize=fontsize,
             fontweight="bold",
             color=color,
+            linespacing=1.12,
         )
 
 
@@ -396,7 +409,7 @@ def draw_ladder(ax: plt.Axes, frame) -> None:
     xmin = 74.2
     for y, (method, row) in enumerate(data.iterrows()):
         value = 100.0 * float(row["recall@1"])
-        ax.hlines(y, xmin, value, color="#D7DEE8", lw=1.8, zorder=1)
+        ax.hlines(y, xmin, value, color="#CFE3EF", lw=1.8, zorder=1)
         ax.scatter(
             value,
             y,
@@ -413,13 +426,13 @@ def draw_ladder(ax: plt.Axes, frame) -> None:
             va="center",
             fontsize=9.0,
             fontweight="bold" if method == METHOD_ID else "normal",
-            color="#0F3D75" if method == METHOD_ID else "#374151",
+            color="#0F3D75" if method == METHOD_ID else "#365B73",
         )
     ax.set_yticks(yy, [DISPLAY[m] for m in data.index], fontsize=9.0)
     ax.set_xlim(xmin, 91.2)
     ax.set_xlabel("Recall@1 (%)")
     ax.set_title("Top-1 metabolite annotation accuracy\nGNPS identity-disjoint (n=10,983)", pad=10, fontweight="bold")
-    ax.grid(axis="x", alpha=0.18)
+    ax.grid(axis="x", color="#DCEAF3", alpha=0.85, linewidth=0.8)
     ax.text(-0.10, 1.08, "b", transform=ax.transAxes, fontsize=16, fontweight="bold", va="top")
 
     calms = float(frame.loc[METHOD_ID, "recall@1"])
@@ -455,13 +468,13 @@ def draw_roc(ax: plt.Axes, frame) -> None:
             label=label,
             zorder=4 if method == METHOD_ID else 3,
         )
-    ax.plot([0, 1], [0, 1], color="#94A3B8", lw=0.9, ls=":", zorder=1)
+    ax.plot([0, 1], [0, 1], color="#A9CDE2", lw=0.9, ls=":", zorder=1)
     ax.set_xlim(0, 1)
     ax.set_ylim(0, 1)
     ax.set_xlabel("False-positive rate")
     ax.set_ylabel("True-positive rate")
     ax.set_title("Candidate-level discrimination\nGNPS identity-disjoint", pad=10, fontweight="bold")
-    ax.grid(alpha=0.16)
+    ax.grid(color="#DCEAF3", alpha=0.85, linewidth=0.8)
     ax.legend(fontsize=8.0, loc="lower right", handlelength=2.6)
     ax.text(-0.10, 1.08, "c", transform=ax.transAxes, fontsize=16, fontweight="bold", va="top")
 
