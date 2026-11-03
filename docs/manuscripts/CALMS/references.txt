@@ -1,0 +1,31 @@
+[1] Wang, M.; Carver, J.J.; Phelan, V.V.; Sanchez, L.M.; Garg, N.; Peng, Y.; et al. Sharing and community curation of mass spectrometry data with Global Natural Products Social Molecular Networking. Nature Biotechnology 2016, 34, 828-837. https://doi.org/10.1038/nbt.3597
+
+[2] Li, Y.; Kind, T.; Folz, J.; Vaniya, A.; Mehta, S.S.; Fiehn, O.. Spectral entropy outperforms MS/MS dot product similarity for small-molecule compound identification. Nature Methods 2021, 18, 1524-1531. https://doi.org/10.1038/s41592-021-01331-z
+
+[3] Kong, F.; Shen, T.; Li, Y.; Bashar, A.; Bird, S.S.; Fiehn, O.. Denoising Search doubles the number of metabolite and exposome annotations in human plasma using an Orbitrap Astral mass spectrometer. Nature Methods 2025, 22, 1008-1016. https://doi.org/10.1038/s41592-025-02646-x
+
+[4] Huber, F.; Ridder, L.; Verhoeven, S.; Spaaks, J.H.; Diblen, F.; Rogers, S.; et al. Spec2Vec: Improved mass spectral similarity scoring through learning of structural relationships. PLOS Computational Biology 2021, 17, e1008724. https://doi.org/10.1371/journal.pcbi.1008724
+
+[5] Zhang, H.; Yang, Q.; Xie, T.; Wang, Y.; Zhang, Z.; Lu, H.. MSBERT: Embedding Tandem Mass Spectra into Chemically Rational Space by Mask Learning and Contrastive Learning. Analytical Chemistry 2024, 96, 16599-16608. https://doi.org/10.1021/acs.analchem.4c02426
+
+[6] Bushuiev, R.; Bushuiev, A.; Samusevich, R.; Brungs, C.; Sivic, J.; Pluskal, T.. Self-supervised learning of molecular representations from millions of tandem mass spectra using DreaMS. Nature Biotechnology 2026, 44, 630-640. https://doi.org/10.1038/s41587-025-02663-3
+
+[7] de Jonge, N.F.; Chekmeneva, E.; Schmid, R.; Joas, D.; Truong, L.; van der Hooft, J.J.J.; et al. Cross ionization mode chemical similarity prediction between tandem mass spectra in metabolomics. Nature Communications 2026, 17, 2483. https://doi.org/10.1038/s41467-026-69083-y
+
+[8] Dührkop, K.; Fleischauer, M.; Ludwig, M.; Aksenov, A.A.; Melnik, A.V.; Meusel, M.; et al. SIRIUS 4: a rapid tool for turning tandem mass spectra into metabolite structure information. Nature Methods 2019, 16, 299-302. https://doi.org/10.1038/s41592-019-0344-8
+
+[9] de Jonge, N.F.; Louwen, J.J.R.; Chekmeneva, E.; Camuzeaux, S.; Vermeir, F.J.; Jansen, R.S.; et al. MS2Query: reliable and scalable MS2 mass spectra-based analogue search. Nature Communications 2023, 14, 1752. https://doi.org/10.1038/s41467-023-37446-4
+
+[10] Zhou Chen, Y.; Hassoun, S.. Learning from All Views: A Multiview Contrastive Framework for Metabolite Annotation. Analytical Chemistry 2026, 98, 6598-6606. https://doi.org/10.1021/acs.analchem.5c05675
+
+[11] Shen, X.; Wang, R.; Xiong, X.; Yin, Y.; Cai, Y.; Ma, Z.; et al. Metabolic reaction network-based recursive metabolite annotation for untargeted metabolomics. Nature Communications 2019, 10, 1516. https://doi.org/10.1038/s41467-019-09550-x
+
+[12] Zhou, Z.; Luo, M.; Zhang, H.; Yin, Y.; Cai, Y.; Zhu, Z.. Metabolite annotation from knowns to unknowns through knowledge-guided multi-layer metabolic networking. Nature Communications 2022, 13, 6656. https://doi.org/10.1038/s41467-022-34537-6
+
+[13] Zhang, H.; Zeng, X.; Yin, Y.; Zhu, Z.. Knowledge and data-driven two-layer networking for accurate metabolite annotation in untargeted metabolomics. Nature Communications 2025, 16, 8118. https://doi.org/10.1038/s41467-025-63536-6
+
+[14] Bushuiev, R.; et al. MassSpecGym: A benchmark for the discovery and identification of molecules. Advances in Neural Information Processing Systems 2024, 37, Datasets and Benchmarks Track. https://proceedings.neurips.cc/paper_files/paper/2024/file/c6c31413d5c53b7d1c343c1498734b0f-Paper-Datasets_and_Benchmarks_Track.pdf
+
+[15] Sumner, L.W.; Amberg, A.; Barrett, D.; Beale, M.H.; Beger, R.; Daykin, C.A.; et al. Proposed minimum reporting standards for chemical analysis. Metabolomics 2007, 3, 211-221. https://doi.org/10.1007/s11306-007-0082-2
+
+[16] SpecEmbedding. Author-hosted model and application, revision 26665447238100728da3640675927f2c8bfb10cd. https://huggingface.co/spaces/xp113280/SpecEmbedding (accessed 3 November 2026).
