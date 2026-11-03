@@ -1,0 +1,106 @@
+{
+  "schema": "calms_frozen_release_v1",
+  "release_date": "2026-11-03",
+  "release_status": "frozen consumed-development release",
+  "public_identity": {
+    "method_name": "CALMS",
+    "expanded_name": "Context-Aware Learning for Metabolite Annotation from Mass Spectra",
+    "public_version": "1.0",
+    "frozen_implementation_alias": "Full23 v1.3.2"
+  },
+  "scope": {
+    "task": "closed-library metabolite candidate annotation",
+    "input": "fixed candidate axis with aligned spectral, representation and candidate-chemistry evidence",
+    "output": "candidate-level CALMS score and per-query annotation hypothesis",
+    "raw_mgf_to_all_evidence_included": false,
+    "calibrated_open_set_rejection_included": false,
+    "bioaware_included": false,
+    "bioaware_boundary": "separate conditional extension requiring real sample-level event context"
+  },
+  "architecture": {
+    "spectral_representation_encoders": [
+      "Noise V1",
+      "ChemAware Stage-1",
+      "ChemAware Phase-A",
+      "Noise-ChemAware FullMSG"
+    ],
+    "fragmentation_evidence": [
+      "weighted spectral entropy",
+      "frozen local spectral composite",
+      "frozen local spectral reranker"
+    ],
+    "candidate_chemistry": "ChemAware V2 continuous real-versus-null evidence when available",
+    "frozen_score": "candidate-evidence parent + 0.9 * embedding correction",
+    "missing_representation_semantics": "keep_parent_score",
+    "network_refit_for_public_release": false
+  },
+  "assets": {
+    "candidate_evidence_checkpoint": {
+      "path": "assets/calms_candidate_evidence.pt",
+      "sha256": "7f1309e2a89ef3640d9b6871a821df6866f2528e629547075d5305ab6707d717"
+    },
+    "embedding_corrector_checkpoint": {
+      "path": "assets/calms_embedding_corrector.pt",
+      "sha256": "6603013a04fdc26946445a6ba1ed566d768bac49423046ce3922daac79fe637e"
+    }
+  },
+  "runtime": {
+    "entrypoint": "calms.py",
+    "class": "CALMS",
+    "frozen_internal_entrypoint": "runtime/full23_v132_release.py",
+    "requirements": "requirements-runtime.txt"
+  },
+  "frozen_upstream_checkpoints": {
+    "noise_v1": "01ac8c7bfa75d89862e0b1eb2b5ffb297955cffae471fd483ad6c38d13f33beb",
+    "chemaware_stage1": "09c419dcabf2ff424fe38bb33eaefcd25ccab0b6d125daf03b7959c25fff5838",
+    "chemaware_phasea": "a8428329ca1d12bfe735f3f8b848ed020a8db18d0a654d4f62cdbeb006e61135",
+    "noise_chemaware_fullmsg": "4f61a4efefe734b2c6bc66c06b315c37164b67e0f424208c3b8c7f81e6618130",
+    "noise_msg": "d257c5b03185953e3098bc82a7d268ec4037df5dee15d4f4ee6d415c23466062",
+    "chemaware_v2_policy": "dc9d76dc439fca40db88e3a95ca33e6b59438a92e6a80080d8df77e4615e5a4a"
+  },
+  "data_roles": {
+    "enveda180": {
+      "role": "consumed meta-development fitting",
+      "identity_queries": 25000,
+      "formula_queries": 9435
+    },
+    "gnps_gold_silver": {
+      "role": "consumed development, selection and residual-amplitude calibration",
+      "identity_queries": 10995,
+      "formula_queries": 5261,
+      "query_balanced_unique_queries": 11019
+    }
+  },
+  "consumed_development_result": {
+    "identity_disjoint": {
+      "queries": 10995,
+      "recall_at_1": 0.8836743974533879,
+      "mrr": 0.9245224309211846,
+      "micro_auroc": 0.9585382756251873,
+      "micro_auprc": 0.8441359708767561,
+      "near_recall_at_1": 0.8382507903055848
+    },
+    "formula_disjoint": {
+      "queries": 5261,
+      "recall_at_1": 0.8960273712222011,
+      "mrr": 0.937401832892234,
+      "micro_auroc": 0.9538401998737979,
+      "micro_auprc": 0.8741531245268173,
+      "near_recall_at_1": 0.8230298913043478
+    },
+    "query_balanced_joint": {
+      "unique_queries": 11019,
+      "top1": 0.8842453943189037,
+      "mrr": 0.9251069705348163
+    }
+  },
+  "selection_disclosure": {
+    "primary_endpoint": "query-balanced unique-query Top-1 point estimate",
+    "residual_scale": 0.9,
+    "status": "post-result consumed-development amplitude calibration",
+    "risk_net_lambda2": "descriptive only; never a veto"
+  },
+  "scientific_boundary": "Fit on consumed Enveda-180 meta-development and selected/calibrated on consumed GNPS development; not external confirmation.",
+  "checksums": "checksums.sha256"
+}
+

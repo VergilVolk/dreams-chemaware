@@ -1,0 +1,251 @@
+{
+  "status": "FULL23_V132_RESIDUAL_SCALE_DEVELOPMENT_COMPLETE",
+  "method": {
+    "formula": "Full23_v1 + 0.9 * (Full23_v1.3.1 - Full23_v1)",
+    "residual_scale": 0.9,
+    "network_refit": false,
+    "upstream_checkpoints_changed": false
+  },
+  "dataset": {
+    "name": "GNPS Gold/Silver",
+    "role": "consumed development and post-result amplitude calibration",
+    "queries": {
+      "identity_disjoint": 10995,
+      "formula_disjoint": 5261
+    },
+    "query_balanced_unique_queries": 11019
+  },
+  "selection_disclosure": "The 0.9 residual scale was identified after inspection of consumed GNPS development predictions. It is a deployment calibration, not external confirmation or a prespecified confirmatory comparison.",
+  "metrics": {
+    "identity_disjoint": {
+      "full23_v1": {
+        "queries": 10995,
+        "recall@1": 0.8824920418371988,
+        "recall@2": 0.9394270122783083,
+        "recall@3": 0.9598908594815826,
+        "recall@5": 0.9748067303319691,
+        "recall@10": 0.9889040472942247,
+        "recall@20": 0.9975443383356071,
+        "mrr": 0.9237918445162012,
+        "mean_rank": 1.4242837653478855,
+        "median_rank": 1.0,
+        "macro_query_auroc": 0.9484928661164165,
+        "macro_query_auprc": 0.9237918445162012,
+        "micro_candidate_auroc": 0.9575939739072227,
+        "micro_candidate_auprc": 0.8447450083762998,
+        "mean_top1_top2_margin": 9.333136320133788,
+        "near": {
+          "queries": 7592,
+          "recall@1": 0.8369336143308747,
+          "mrr": 0.8942255329029963
+        }
+      },
+      "full23_v131": {
+        "queries": 10995,
+        "recall@1": 0.8833105957253297,
+        "recall@2": 0.9399727148703957,
+        "recall@3": 0.9593451568894952,
+        "recall@5": 0.9751705320600272,
+        "recall@10": 0.9887221464301955,
+        "recall@20": 0.9975443383356071,
+        "mrr": 0.9243132851912191,
+        "mean_rank": 1.417280582082765,
+        "median_rank": 1.0,
+        "macro_query_auroc": 0.9493056760310913,
+        "macro_query_auprc": 0.9243132851912191,
+        "micro_candidate_auroc": 0.9585775448942145,
+        "micro_candidate_auprc": 0.8435310953085061,
+        "mean_top1_top2_margin": 9.62175907274372,
+        "near": {
+          "queries": 7592,
+          "recall@1": 0.8375922023182297,
+          "mrr": 0.894634704323027
+        }
+      },
+      "full23_v132": {
+        "queries": 10995,
+        "recall@1": 0.8836743974533879,
+        "recall@2": 0.9401546157344247,
+        "recall@3": 0.9594361073215097,
+        "recall@5": 0.9750795816280128,
+        "recall@10": 0.9888130968622101,
+        "recall@20": 0.9975443383356071,
+        "mrr": 0.9245224309211846,
+        "mean_rank": 1.4170077307867213,
+        "median_rank": 1.0,
+        "macro_query_auroc": 0.9492511243475446,
+        "macro_query_auprc": 0.9245224309211846,
+        "micro_candidate_auroc": 0.9585382756251873,
+        "micro_candidate_auprc": 0.8441359708767561,
+        "mean_top1_top2_margin": 9.594687077878563,
+        "near": {
+          "queries": 7592,
+          "recall@1": 0.8382507903055848,
+          "mrr": 0.8950293683545226
+        }
+      }
+    },
+    "formula_disjoint": {
+      "full23_v1": {
+        "queries": 5261,
+        "recall@1": 0.8952670594943927,
+        "recall@2": 0.9566622315149211,
+        "recall@3": 0.9762402585059875,
+        "recall@5": 0.9897357916745866,
+        "recall@10": 0.9965785972248622,
+        "recall@20": 0.9996198441360958,
+        "mrr": 0.9368151602330116,
+        "mean_rank": 1.2375974149401254,
+        "median_rank": 1.0,
+        "macro_query_auroc": 0.9447173008904568,
+        "macro_query_auprc": 0.9368151602330116,
+        "micro_candidate_auroc": 0.9526615280080923,
+        "micro_candidate_auprc": 0.873951869990941,
+        "mean_top1_top2_margin": 10.063002153177425,
+        "near": {
+          "queries": 2944,
+          "recall@1": 0.8220108695652174,
+          "mrr": 0.8927847715725826
+        }
+      },
+      "full23_v131": {
+        "queries": 5261,
+        "recall@1": 0.8956472153582969,
+        "recall@2": 0.9574225432427296,
+        "recall@3": 0.9762402585059875,
+        "recall@5": 0.9897357916745866,
+        "recall@10": 0.9969587530887664,
+        "recall@20": 0.9996198441360958,
+        "mrr": 0.9371485842190082,
+        "mean_rank": 1.234556168028892,
+        "median_rank": 1.0,
+        "macro_query_auroc": 0.9465339839311917,
+        "macro_query_auprc": 0.9371485842190082,
+        "micro_candidate_auroc": 0.9538537307610644,
+        "micro_candidate_auprc": 0.8735984513495435,
+        "mean_top1_top2_margin": 10.366333047097637,
+        "near": {
+          "queries": 2944,
+          "recall@1": 0.8223505434782609,
+          "mrr": 0.8930579181725582
+        }
+      },
+      "full23_v132": {
+        "queries": 5261,
+        "recall@1": 0.8960273712222011,
+        "recall@2": 0.9576126211746816,
+        "recall@3": 0.9766204143698917,
+        "recall@5": 0.9897357916745866,
+        "recall@10": 0.9969587530887664,
+        "recall@20": 0.9996198441360958,
+        "mrr": 0.937401832892234,
+        "mean_rank": 1.2339859342330355,
+        "median_rank": 1.0,
+        "macro_query_auroc": 0.946531590092575,
+        "macro_query_auprc": 0.937401832892234,
+        "micro_candidate_auroc": 0.9538401998737979,
+        "micro_candidate_auprc": 0.8741531245268173,
+        "mean_top1_top2_margin": 10.336942880744292,
+        "near": {
+          "queries": 2944,
+          "recall@1": 0.8230298913043478,
+          "mrr": 0.8935104797451944
+        }
+      }
+    }
+  },
+  "comparisons": {
+    "identity_disjoint": {
+      "full23_v132_vs_full23_v131": {
+        "corrected": 11,
+        "introduced": 7,
+        "risk_net_lambda2": -3,
+        "recall1_formula_cluster_ci": {
+          "delta": 0.00036380172805820825,
+          "delta_pp": 0.03638017280582082,
+          "ci_low": -0.0003670743486904545,
+          "ci_high": 0.0011722536809106975,
+          "ci_low_pp": -0.03670743486904545,
+          "ci_high_pp": 0.11722536809106975,
+          "formula_clusters": 4204,
+          "bootstrap_resamples": 5000
+        },
+        "mrr_delta": 0.00020914572996544797
+      },
+      "full23_v132_vs_full23_v1": {
+        "corrected": 89,
+        "introduced": 76,
+        "risk_net_lambda2": -63,
+        "recall1_formula_cluster_ci": {
+          "delta": 0.0011823556161891769,
+          "delta_pp": 0.11823556161891768,
+          "ci_low": -0.0013005070367820817,
+          "ci_high": 0.0037379430491999224,
+          "ci_low_pp": -0.13005070367820817,
+          "ci_high_pp": 0.3737943049199922,
+          "formula_clusters": 4204,
+          "bootstrap_resamples": 5000
+        },
+        "mrr_delta": 0.0007305864049833482
+      }
+    },
+    "formula_disjoint": {
+      "full23_v132_vs_full23_v131": {
+        "corrected": 7,
+        "introduced": 5,
+        "risk_net_lambda2": -3,
+        "recall1_formula_cluster_ci": {
+          "delta": 0.00038015586390420075,
+          "delta_pp": 0.038015586390420075,
+          "ci_low": -0.0009630246687478239,
+          "ci_high": 0.001860153673811296,
+          "ci_low_pp": -0.09630246687478239,
+          "ci_high_pp": 0.18601536738112961,
+          "formula_clusters": 2210,
+          "bootstrap_resamples": 5000
+        },
+        "mrr_delta": 0.0002532486732258639
+      },
+      "full23_v132_vs_full23_v1": {
+        "corrected": 40,
+        "introduced": 36,
+        "risk_net_lambda2": -32,
+        "recall1_formula_cluster_ci": {
+          "delta": 0.0007603117278084015,
+          "delta_pp": 0.07603117278084015,
+          "ci_low": -0.002808068757174318,
+          "ci_high": 0.00439608751739154,
+          "ci_low_pp": -0.2808068757174318,
+          "ci_high_pp": 0.43960875173915404,
+          "formula_clusters": 2210,
+          "bootstrap_resamples": 5000
+        },
+        "mrr_delta": 0.0005866726592224045
+      }
+    }
+  },
+  "query_balanced_joint": {
+    "full23_v1": {
+      "unique_queries": 11019,
+      "top1_utility": 0.8828387330973773,
+      "mrr_utility": 0.9242147244587848,
+      "semantics": "each unique query has total mass one; a query present in k panels contributes the mean of its k panel-specific outcomes",
+      "naive_union_metric_reported": false
+    },
+    "full23_v131": {
+      "unique_queries": 11019,
+      "top1_utility": 0.8839277611398494,
+      "mrr_utility": 0.9249108126311878,
+      "semantics": "each unique query has total mass one; a query present in k panels contributes the mean of its k panel-specific outcomes",
+      "naive_union_metric_reported": false
+    },
+    "full23_v132": {
+      "unique_queries": 11019,
+      "top1_utility": 0.8842453943189037,
+      "mrr_utility": 0.9251069705348163,
+      "semantics": "each unique query has total mass one; a query present in k panels contributes the mean of its k panel-specific outcomes",
+      "naive_union_metric_reported": false
+    }
+  },
+  "claim_boundary": "Enveda-180 is consumed meta-development and GNPS is consumed development. A genuinely unopened source is required for confirmation."
+}
