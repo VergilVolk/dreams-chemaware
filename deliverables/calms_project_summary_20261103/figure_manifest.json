@@ -1,0 +1,23 @@
+{
+  "status": "CALMS_PROJECT_SUMMARY_COMPLETE",
+  "public_method_name": "CALMS",
+  "expanded_name": "Context-Aware Learning for Metabolite Annotation from Mass Spectra",
+  "frozen_implementation_alias": "Full23 v1.3.2",
+  "panel": "identity_disjoint",
+  "dataset_role": "consumed development",
+  "queries": 10983,
+  "calms": {
+    "recall_at_1": 0.8840025493945188,
+    "micro_candidate_auroc": 0.9587301806662384
+  },
+  "relative_to_official_finetuned_dreams": {
+    "recall_at_1_pp": 3.0137485204406844,
+    "top1_error_reduction_percent": 20.62305295950158,
+    "micro_candidate_auroc_absolute": 0.026575826687174176
+  },
+  "files": [
+    "calms_project_summary.png",
+    "calms_project_summary.pdf",
+    "calms_project_summary.svg"
+  ]
+}
