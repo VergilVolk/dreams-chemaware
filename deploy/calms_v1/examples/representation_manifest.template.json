@@ -1,0 +1,24 @@
+{
+  "schema": "calms_aligned_representation_v1",
+  "representation_sha256": "REPLACE_WITH_REPRESENTATION_FILE_SHA256",
+  "candidate_evidence_sha256": "REPLACE_WITH_CANDIDATE_EVIDENCE_FILE_SHA256",
+  "embedding_banks": {
+    "noise_v1": {
+      "sha256": "REPLACE_WITH_BANK_FILE_SHA256",
+      "encoder_checkpoint_sha256": "01ac8c7bfa75d89862e0b1eb2b5ffb297955cffae471fd483ad6c38d13f33beb"
+    },
+    "chemaware_stage1": {
+      "sha256": "REPLACE_WITH_BANK_FILE_SHA256",
+      "encoder_checkpoint_sha256": "09c419dcabf2ff424fe38bb33eaefcd25ccab0b6d125daf03b7959c25fff5838"
+    },
+    "chemaware_phasea": {
+      "sha256": "REPLACE_WITH_BANK_FILE_SHA256",
+      "encoder_checkpoint_sha256": "a8428329ca1d12bfe735f3f8b848ed020a8db18d0a654d4f62cdbeb006e61135"
+    },
+    "noise_chemaware_fullmsg": {
+      "sha256": "REPLACE_WITH_BANK_FILE_SHA256",
+      "encoder_checkpoint_sha256": "4f61a4efefe734b2c6bc66c06b315c37164b67e0f424208c3b8c7f81e6618130"
+    }
+  },
+  "claim_boundary": "Fixed candidate axis; no labels or biological responses enter scoring."
+}

@@ -1,0 +1,185 @@
+{
+  "schema": "full23_v13_cumulative_repairs_v1",
+  "arm_order": [
+    "0",
+    "01",
+    "012",
+    "0123",
+    "01234",
+    "012345"
+  ],
+  "arms": {
+    "0": {
+      "settings": {
+        "encoder_names": [
+          "noise_v1",
+          "chemaware_stage1",
+          "chemaware_phasea",
+          "noise_chemaware_fullmsg"
+        ],
+        "embedding_dimension": 1024,
+        "pair_dimension": 64,
+        "encoder_dimension": 64,
+        "attention_heads": 4,
+        "fusion_hidden": 128,
+        "top_k": 3,
+        "include_reference_count": false,
+        "query_center_raw_residual": true,
+        "include_anchor_context": false,
+        "include_signed_difference": false
+      },
+      "residual_penalty_space": "bounded",
+      "bound_rule": "legacy_median",
+      "interventions": [
+        "anchor_correct_multiplier_2_to_1"
+      ]
+    },
+    "01": {
+      "settings": {
+        "encoder_names": [
+          "noise_v1",
+          "chemaware_stage1",
+          "chemaware_phasea",
+          "noise_chemaware_fullmsg"
+        ],
+        "embedding_dimension": 1024,
+        "pair_dimension": 64,
+        "encoder_dimension": 64,
+        "attention_heads": 4,
+        "fusion_hidden": 128,
+        "top_k": 3,
+        "include_reference_count": false,
+        "query_center_raw_residual": true,
+        "include_anchor_context": false,
+        "include_signed_difference": false
+      },
+      "residual_penalty_space": "raw",
+      "bound_rule": "legacy_median",
+      "interventions": [
+        "anchor_correct_multiplier_2_to_1",
+        "penalize_query_centered_raw_residual"
+      ]
+    },
+    "012": {
+      "settings": {
+        "encoder_names": [
+          "noise_v1",
+          "chemaware_stage1",
+          "chemaware_phasea",
+          "noise_chemaware_fullmsg"
+        ],
+        "embedding_dimension": 1024,
+        "pair_dimension": 64,
+        "encoder_dimension": 64,
+        "attention_heads": 4,
+        "fusion_hidden": 128,
+        "top_k": 3,
+        "include_reference_count": false,
+        "query_center_raw_residual": true,
+        "include_anchor_context": false,
+        "include_signed_difference": false
+      },
+      "residual_penalty_space": "raw",
+      "bound_rule": "error_q75",
+      "interventions": [
+        "anchor_correct_multiplier_2_to_1",
+        "penalize_query_centered_raw_residual",
+        "expand_pairwise_capacity_to_training_error_q75"
+      ]
+    },
+    "0123": {
+      "settings": {
+        "encoder_names": [
+          "noise_v1",
+          "chemaware_stage1",
+          "chemaware_phasea",
+          "noise_chemaware_fullmsg"
+        ],
+        "embedding_dimension": 1024,
+        "pair_dimension": 64,
+        "encoder_dimension": 64,
+        "attention_heads": 4,
+        "fusion_hidden": 128,
+        "top_k": 3,
+        "include_reference_count": false,
+        "query_center_raw_residual": true,
+        "include_anchor_context": true,
+        "include_signed_difference": false
+      },
+      "residual_penalty_space": "raw",
+      "bound_rule": "error_q75",
+      "interventions": [
+        "anchor_correct_multiplier_2_to_1",
+        "penalize_query_centered_raw_residual",
+        "expand_pairwise_capacity_to_training_error_q75",
+        "add_query_relative_full23_anchor_context"
+      ]
+    },
+    "01234": {
+      "settings": {
+        "encoder_names": [
+          "noise_v1",
+          "chemaware_stage1",
+          "chemaware_phasea",
+          "noise_chemaware_fullmsg"
+        ],
+        "embedding_dimension": 1024,
+        "pair_dimension": 128,
+        "encoder_dimension": 64,
+        "attention_heads": 4,
+        "fusion_hidden": 128,
+        "top_k": 3,
+        "include_reference_count": false,
+        "query_center_raw_residual": true,
+        "include_anchor_context": true,
+        "include_signed_difference": false
+      },
+      "residual_penalty_space": "raw",
+      "bound_rule": "error_q75",
+      "interventions": [
+        "anchor_correct_multiplier_2_to_1",
+        "penalize_query_centered_raw_residual",
+        "expand_pairwise_capacity_to_training_error_q75",
+        "add_query_relative_full23_anchor_context",
+        "increase_pair_dimension_64_to_128"
+      ]
+    },
+    "012345": {
+      "settings": {
+        "encoder_names": [
+          "noise_v1",
+          "chemaware_stage1",
+          "chemaware_phasea",
+          "noise_chemaware_fullmsg"
+        ],
+        "embedding_dimension": 1024,
+        "pair_dimension": 128,
+        "encoder_dimension": 64,
+        "attention_heads": 4,
+        "fusion_hidden": 128,
+        "top_k": 3,
+        "include_reference_count": false,
+        "query_center_raw_residual": true,
+        "include_anchor_context": true,
+        "include_signed_difference": true
+      },
+      "residual_penalty_space": "raw",
+      "bound_rule": "error_q75",
+      "interventions": [
+        "anchor_correct_multiplier_2_to_1",
+        "penalize_query_centered_raw_residual",
+        "expand_pairwise_capacity_to_training_error_q75",
+        "add_query_relative_full23_anchor_context",
+        "increase_pair_dimension_64_to_128",
+        "add_signed_query_minus_reference_channel"
+      ]
+    }
+  },
+  "common_training": {
+    "source": "Enveda-180 consumed meta-development",
+    "epochs": 6,
+    "seed": 20261031,
+    "anchor_correct_multiplier": 1.0,
+    "warm_start": false
+  }
+}
