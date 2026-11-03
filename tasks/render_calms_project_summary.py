@@ -22,6 +22,7 @@ import render_dreams_volar_publication_suite as source  # noqa: E402
 
 
 ROOT = Path(__file__).resolve().parents[1]
+ARCHITECTURE_ASSET = ROOT / "assets/calms_architecture_source.png"
 METHOD_ID = "full23_v132"
 METHOD_NAME = "CALMS"
 EXPANDED_NAME = "Context-Aware Learning for Metabolite Annotation from Mass Spectra"
@@ -61,6 +62,12 @@ def arguments() -> argparse.Namespace:
         "--output",
         type=Path,
         default=ROOT / "deliverables/calms_project_summary_20261103",
+    )
+    parser.add_argument(
+        "--architecture-image",
+        type=Path,
+        default=ARCHITECTURE_ASSET,
+        help="Reader-approved architecture artwork. Its legacy title area is cropped at render time.",
     )
     parser.add_argument("--dpi", type=int, default=300)
     return parser.parse_args()
@@ -437,48 +444,47 @@ def draw_roc(ax: plt.Axes, frame) -> None:
     )
 
 
-def render(output: Path, dpi: int) -> list[str]:
+def render(output: Path, dpi: int, architecture_image: Path) -> list[str]:
     output.mkdir(parents=True, exist_ok=True)
+    if not architecture_image.is_file():
+        raise FileNotFoundError(architecture_image)
     frames = source.common_frames()
     frame = frames[PANEL]
 
-    fig = plt.figure(figsize=(17.0, 12.4))
-    grid = fig.add_gridspec(
-        2,
-        2,
-        height_ratios=(1.18, 0.82),
-        left=0.055,
-        right=0.975,
-        bottom=0.075,
-        top=0.895,
-        hspace=0.24,
-        wspace=0.27,
-    )
-    architecture = fig.add_subplot(grid[0, :])
-    ladder = fig.add_subplot(grid[1, 0])
-    roc = fig.add_subplot(grid[1, 1])
+    # Use the reader-approved architecture artwork directly.  Only the legacy
+    # title/subtitle strip is cropped; the architecture itself is untouched.
+    fig = plt.figure(figsize=(15.2, 11.0))
+    architecture = fig.add_axes((0.035, 0.415, 0.930, 0.480))
+    ladder = fig.add_axes((0.115, 0.090, 0.345, 0.265))
+    roc = fig.add_axes((0.565, 0.090, 0.315, 0.265))
 
-    draw_architecture(architecture)
+    artwork = plt.imread(architecture_image)
+    height, width = artwork.shape[:2]
+    crop = artwork[int(round(0.165 * height)) : int(round(0.995 * height)), int(round(0.004 * width)) : int(round(0.996 * width))]
+    architecture.imshow(crop, interpolation="lanczos")
+    architecture.set_axis_off()
+    architecture.text(-0.010, 1.015, "a", transform=architecture.transAxes, fontsize=16, fontweight="bold", va="top")
+
     draw_ladder(ladder, frame)
     draw_roc(roc, frame)
 
     fig.suptitle(
         f"{METHOD_NAME}: {EXPANDED_NAME}",
-        x=0.515,
-        y=0.972,
-        fontsize=23,
+        x=0.500,
+        y=0.978,
+        fontsize=22,
         fontweight="bold",
     )
     fig.text(
-        0.515,
-        0.935,
-        "Condition-robust spectral learning, fragmentation chemistry and candidate-specific evidence support metabolite annotation.",
+        0.500,
+        0.942,
+        "Spectral representations, fragmentation matching and candidate chemistry are integrated for metabolite annotation.",
         ha="center",
-        fontsize=12.5,
+        fontsize=12.0,
         color="#334155",
     )
     fig.text(
-        0.515,
+        0.500,
         0.025,
         "GNPS common-domain identity-disjoint development panel; all methods share the same query and candidate axis. "
         "MS2DeepScore 2.x is dashed because its native objective is structural similarity rather than exact annotation.",
@@ -505,6 +511,7 @@ def render(output: Path, dpi: int) -> list[str]:
         "public_method_name": METHOD_NAME,
         "expanded_name": EXPANDED_NAME,
         "frozen_implementation_alias": "Full23 v1.3.2",
+        "architecture_asset": str(architecture_image.relative_to(ROOT)),
         "panel": PANEL,
         "dataset_role": "consumed development",
         "queries": int(frame.iloc[0]["N_Q"]),
@@ -538,7 +545,7 @@ def render(output: Path, dpi: int) -> list[str]:
 def main() -> None:
     args = arguments()
     style()
-    files = render(args.output, args.dpi)
+    files = render(args.output, args.dpi, args.architecture_image)
     print(
         json.dumps(
             {
