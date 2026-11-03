@@ -22,6 +22,7 @@ import render_dreams_volar_publication_suite as source  # noqa: E402
 
 
 ROOT = Path(__file__).resolve().parents[1]
+ARCHITECTURE_ARTWORK = ROOT / "assets/calms_architecture_ai_v3.png"
 METHOD_ID = "full23_v132"
 METHOD_NAME = "CALMS"
 EXPANDED_NAME = "Context-Aware Learning for Metabolite Annotation from Mass Spectra"
@@ -353,6 +354,41 @@ def draw_architecture(ax: plt.Axes) -> None:
     arrow(ax, (0.813, 0.505), (0.855, 0.505))
 
 
+def draw_ai_architecture(ax: plt.Axes) -> None:
+    """Render the AI-drawn, text-free architecture with deterministic labels.
+
+    Keeping all typography in Matplotlib prevents generated pseudo-text and
+    guarantees stable alignment in PNG, PDF and SVG exports.
+    """
+    if not ARCHITECTURE_ARTWORK.is_file():
+        raise FileNotFoundError(ARCHITECTURE_ARTWORK)
+    artwork = plt.imread(ARCHITECTURE_ARTWORK)
+    ax.imshow(artwork, interpolation="lanczos", aspect="auto")
+    ax.set_axis_off()
+    ax.text(-0.010, 1.015, "a", transform=ax.transAxes, fontsize=16, fontweight="bold", va="top")
+
+    labels = (
+        (0.109, 0.850, "LC–MS/MS spectrum &\ncandidate structures", "#27313D", 9.5),
+        (0.418, 0.910, "Condition-robust spectral representation", "#27313D", 9.8),
+        (0.418, 0.592, "Fragmentation chemistry-guided discrimination", "#27313D", 9.2),
+        (0.418, 0.278, "Biochemical relationships in biological samples", "#27313D", 9.0),
+        (0.681, 0.618, "CALMS\nmetabolite annotation", "#315A7D", 8.4),
+        (0.879, 0.850, "Annotated candidate structures", "#27313D", 9.7),
+    )
+    for xx, yy, label, color, fontsize in labels:
+        ax.text(
+            xx,
+            yy,
+            label,
+            transform=ax.transAxes,
+            ha="center",
+            va="center",
+            fontsize=fontsize,
+            fontweight="bold",
+            color=color,
+        )
+
+
 def draw_ladder(ax: plt.Axes, frame) -> None:
     data = frame.loc[list(PUBLIC_METHODS)].sort_values("recall@1", ascending=True)
     yy = np.arange(len(data))
@@ -455,7 +491,7 @@ def render(output: Path, dpi: int) -> list[str]:
     ladder = fig.add_axes((0.175, 0.085, 0.285, 0.255))
     roc = fig.add_axes((0.565, 0.085, 0.285, 0.255))
 
-    draw_architecture(architecture)
+    draw_ai_architecture(architecture)
 
     draw_ladder(ladder, frame)
     draw_roc(roc, frame)
@@ -486,7 +522,9 @@ def render(output: Path, dpi: int) -> list[str]:
         "public_method_name": METHOD_NAME,
         "expanded_name": EXPANDED_NAME,
         "frozen_implementation_alias": "Full23 v1.3.2",
-        "architecture_scope": "three reader-facing scientific modules; internal implementation names omitted",
+        "architecture_asset": str(ARCHITECTURE_ARTWORK.relative_to(ROOT)),
+        "architecture_prompt_record": "deliverables/calms_project_summary_20261103/ARTWORK_PROMPT.md",
+        "architecture_scope": "three reader-facing scientific modules; AI-drawn text-free artwork with deterministic code typography",
         "panel": PANEL,
         "dataset_role": "consumed development",
         "queries": int(frame.iloc[0]["N_Q"]),
