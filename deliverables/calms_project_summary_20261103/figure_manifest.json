@@ -3,7 +3,7 @@
   "public_method_name": "CALMS",
   "expanded_name": "Context-Aware Learning for Metabolite Annotation from Mass Spectra",
   "frozen_implementation_alias": "Full23 v1.3.2",
-  "architecture_asset": "assets\\calms_architecture_ai_v5.png",
+  "architecture_asset": "assets\\calms_architecture_ai_v7.png",
   "architecture_prompt_record": "deliverables/calms_project_summary_20261103/ARTWORK_PROMPT.md",
   "architecture_scope": "three reader-facing scientific modules; AI-drawn text-free artwork with deterministic code typography",
   "panel": "identity_disjoint",

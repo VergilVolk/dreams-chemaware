@@ -22,7 +22,7 @@ import render_dreams_volar_publication_suite as source  # noqa: E402
 
 
 ROOT = Path(__file__).resolve().parents[1]
-ARCHITECTURE_ARTWORK = ROOT / "assets/calms_architecture_ai_v5.png"
+ARCHITECTURE_ARTWORK = ROOT / "assets/calms_architecture_ai_v7.png"
 METHOD_ID = "full23_v132"
 METHOD_NAME = "CALMS"
 EXPANDED_NAME = "Context-Aware Learning for Metabolite Annotation from Mass Spectra"
@@ -380,13 +380,13 @@ def draw_ai_architecture(ax: plt.Axes) -> None:
     ax.text(-0.010, 1.015, "a", transform=ax.transAxes, fontsize=16, fontweight="bold", va="top")
 
     labels = (
-        (0.120, 0.858, "LC-MS/MS spectrum\nand candidate structures", "#214F73", 12.6),
+        (0.120, 0.826, "LC-MS/MS spectrum\nand candidate structures", "#214F73", 13.0),
         (0.418, 0.906, "Condition-robust\nspectral representation", "#214F73", 12.2),
         (0.418, 0.585, "Fragmentation chemistry-guided\ndiscrimination", "#214F73", 11.8),
-        (0.418, 0.258, "Biochemical relationships in\nbiological samples", "#214F73", 11.8),
+        (0.418, 0.250, "Biochemical relationships in\nbiological samples", "#214F73", 11.8),
         (0.681, 0.525, "CALMS", "#214F73", 19.0),
         (0.681, 0.420, "metabolite\nannotation", "#214F73", 12.6),
-        (0.875, 0.858, "Annotated candidate\nstructures", "#214F73", 12.6),
+        (0.875, 0.826, "Annotated candidate\nstructures", "#214F73", 13.0),
     )
     for xx, yy, label, color, fontsize in labels:
         ax.text(
