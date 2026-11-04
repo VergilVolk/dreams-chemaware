@@ -68,16 +68,28 @@ def load_consumed_registry(path: Path) -> tuple[set[str], set[str], dict[str, se
     formulas: set[str] = set()
     hashes = {"primary_sha256": set(), "secondary_blake2b": set()}
     loaders = {"hdf5": load_hdf5, "csv": load_csv, "mgf": load_mgf}
+    sources = load_exclusion_registry(path)
+    unsupported = [
+        f"{source.get('name', '<unnamed>')} -> {source.get('kind', '<missing>')}"
+        for source in sources
+        if str(source.get("kind", "")) not in loaders
+    ]
+    if unsupported:
+        raise RuntimeError(f"unsupported consumed-source kinds: {unsupported}")
+    missing = [
+        f"{source.get('name', '<unnamed>')} -> {source.get('path', '<missing>')}"
+        for source in sources
+        if bool(source.get("required", True))
+        and not Path(str(source.get("path", ""))).is_file()
+    ]
+    if missing:
+        raise RuntimeError(f"required consumed sources missing: {missing}")
     reports = []
-    for source in load_exclusion_registry(path):
+    for source in sources:
         name = str(source["name"])
         kind = str(source.get("kind", ""))
         source_path = Path(str(source.get("path", "")))
         required = bool(source.get("required", True))
-        if kind not in loaders:
-            raise RuntimeError(f"unsupported consumed-source kind: {name} -> {kind}")
-        if required and not source_path.is_file():
-            raise RuntimeError(f"required consumed source missing: {name} -> {source_path}")
         report = loaders[kind](source_path, identities, formulas, hashes)
         report.update({"name": name, "kind": kind, "required": required})
         reports.append(report)
