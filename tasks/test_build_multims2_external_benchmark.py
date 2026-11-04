@@ -2,10 +2,14 @@
 """Executable contracts for the score-blind MultiMS2 panel builder."""
 from __future__ import annotations
 
+import json
+import tempfile
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 
-from build_multims2_external_benchmark import build_panel
+from build_multims2_external_benchmark import build_panel, load_consumed_registry
 
 
 def fixture() -> pd.DataFrame:
@@ -55,6 +59,24 @@ def main() -> None:
     assert formula_report["competitive_queries"] == 2
     _, _, ead_report = build_panel(fixture(), "EAD", 16.0, "identity", 10.0)
     assert ead_report["competitive_queries"] == 2
+
+    # Missing required exclusions must fail before any large source is loaded.
+    with tempfile.TemporaryDirectory(prefix="multims2_registry_") as temporary:
+        registry = Path(temporary) / "registry.json"
+        registry.write_text(json.dumps({
+            "schema": "unified_consumed_source_registry_v1",
+            "sources": [
+                {"name": "large_first", "kind": "hdf5", "path": "large.hdf5", "required": True},
+                {"name": "missing_second", "kind": "mgf", "path": "missing.mgf", "required": True},
+            ]
+        }), encoding="utf-8")
+        try:
+            load_consumed_registry(registry)
+        except RuntimeError as exc:
+            assert "required consumed sources missing" in str(exc)
+            assert "large_first" in str(exc) and "missing_second" in str(exc)
+        else:
+            raise AssertionError("missing required consumed sources did not fail closed")
     print("PASS: MultiMS2 external score-blind benchmark contracts")
 
 

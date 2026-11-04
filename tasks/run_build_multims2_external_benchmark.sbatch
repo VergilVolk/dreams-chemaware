@@ -41,16 +41,13 @@ for path in "${required[@]}"; do
 done
 [[ ! -e "$OUT" ]] || { echo "MULTIMS2_EXTERNAL_OUTPUT_EXISTS: $OUT" >&2; exit 3; }
 
-if [[ ! -d "$SOURCE_DIR/.git" ]]; then
-  git clone --filter=blob:none --no-checkout https://github.com/zamboni-lab/MultiMS2.git "$SOURCE_DIR"
-  git -C "$SOURCE_DIR" sparse-checkout init --no-cone
-  git -C "$SOURCE_DIR" sparse-checkout set data/multims2_spectra.mgf
-fi
-git -C "$SOURCE_DIR" fetch --depth=1 origin "$COMMIT"
-git -C "$SOURCE_DIR" checkout --detach "$COMMIT"
-actual_commit=$(git -C "$SOURCE_DIR" rev-parse HEAD)
-[[ "$actual_commit" == "$COMMIT" ]] || { echo "MULTIMS2_COMMIT_MISMATCH: $actual_commit" >&2; exit 5; }
-[[ -s "$SOURCE_MGF" ]] || { echo "MULTIMS2_SOURCE_MISSING: $SOURCE_MGF" >&2; exit 6; }
+# The compute cluster is intentionally treated as offline.  Stage the pinned
+# source MGF at SOURCE_MGF before submission; provenance is enforced by the
+# byte-level hash below rather than by an in-job network checkout.
+[[ -s "$SOURCE_MGF" ]] || {
+  echo "MULTIMS2_SOURCE_MISSING_UPLOAD_PINNED_MGF: $SOURCE_MGF" >&2
+  exit 6
+}
 actual_sha256=$(sha256sum "$SOURCE_MGF" | awk '{print $1}')
 [[ "$actual_sha256" == "$SOURCE_SHA256" ]] || {
   echo "MULTIMS2_SOURCE_HASH_MISMATCH: expected=$SOURCE_SHA256 actual=$actual_sha256" >&2
