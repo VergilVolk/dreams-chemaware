@@ -98,8 +98,16 @@ def sha256(path: Path) -> str:
 def load_embedding(path: Path) -> dict[str, np.ndarray]:
     with np.load(path, allow_pickle=False) as body:
         ids = np.asarray(body["entity_id"]).astype("U")
-        matrix = np.asarray(body["embeddings"], dtype=np.float32)
-    if matrix.ndim != 2 or len(ids) != len(matrix) or len(ids) != len(set(ids)):
+        matrix_keys = [key for key in ("embeddings", "embedding") if key in body.files]
+        if len(matrix_keys) != 1:
+            raise RuntimeError(f"embedding cache lacks embeddings/embedding matrix: {path}")
+        matrix = np.asarray(body[matrix_keys[0]], dtype=np.float32)
+    if (
+        matrix.ndim != 2
+        or len(ids) != len(matrix)
+        or len(ids) != len(set(ids))
+        or not np.all(np.isfinite(matrix))
+    ):
         raise RuntimeError(f"invalid embedding cache: {path}")
     return dict(zip(ids.tolist(), matrix, strict=True))
 

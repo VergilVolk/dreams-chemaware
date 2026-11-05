@@ -394,6 +394,7 @@ def main() -> None:
     for method, block in decisions.groupby("method_name", sort=False):
         forward = block["query_study_id"].eq(NEW_STUDY)
         method_registered = registered.loc[registered["method_name"].eq(method)]
+        registered_ranks = pd.to_numeric(method_registered["candidate_rank"], errors="coerce")
         method_summary[str(method)] = {
             "forward_entity_queries": int(forward.sum()),
             "forward_selected_identity_hypotheses": int(
@@ -402,8 +403,30 @@ def main() -> None:
             "forward_mutual_identity_hypotheses": int((forward & block["mutual_top1"]).sum()),
             "prespecified_overlap_contexts": int(len(method_registered)),
             "prespecified_overlap_top1_contexts": int(method_registered["candidate_rank"].eq(1).sum()),
+            "prespecified_overlap_top3_contexts": int(registered_ranks.le(3).sum()),
+            "prespecified_overlap_top5_contexts": int(registered_ranks.le(5).sum()),
+            "prespecified_overlap_top10_contexts": int(registered_ranks.le(10).sum()),
+            "prespecified_overlap_mean_rank": (
+                float(registered_ranks.mean()) if len(method_registered) else None
+            ),
             "prespecified_overlap_median_rank": (
                 float(method_registered["candidate_rank"].median()) if len(method_registered) else None
+            ),
+        }
+    transition_summary = {}
+    for method, block in transitions.groupby("method_name", sort=False):
+        counts = block["transition_vs_wse"].value_counts()
+        transition_summary[str(method)] = {
+            "retained": int(counts.get("retained", 0)),
+            "changed": int(counts.get("changed", 0)),
+            "gained": int(counts.get("gained", 0)),
+            "lost": int(counts.get("lost", 0)),
+            "unresolved_both": int(counts.get("unresolved_both", 0)),
+            "mutual_top1_gained": int(
+                ((~block["baseline_mutual_top1"]) & block["mutual_top1"]).sum()
+            ),
+            "mutual_top1_lost": int(
+                (block["baseline_mutual_top1"] & (~block["mutual_top1"])).sum()
             ),
         }
     report = {
@@ -413,6 +436,7 @@ def main() -> None:
         "candidate_axis": "complete same-observed-precursor 10-ppm identity hypotheses",
         "methods": sorted(method_summary),
         "method_summary": method_summary,
+        "method_transitions_vs_wse": transition_summary,
         "denominators": {
             "new_study_response_entities": int(new_effects["raw_entity_id"].nunique()),
             "new_study_response_contrasts": int(new_effects["contrast_id"].nunique()),
