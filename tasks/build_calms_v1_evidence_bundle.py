@@ -20,6 +20,7 @@ BUNDLE_ROOT = PurePosixPath(BUNDLE_NAME)
 FIXED_ZIP_TIME = (2026, 11, 5, 0, 0, 0)
 
 RESULT_DOCS = (
+    "docs/CALMS_FROZEN_PACKAGE_AND_APPLICATION_RESULT_20261105.md",
     "docs/CALMS_GNPS_PAIRED_PUBLIC_METHOD_RESULT_20261105.md",
     "docs/CALMS_MECHANISM_AND_SELECTIVE_RANKING_RESULT_20261105.md",
 )
@@ -31,10 +32,19 @@ ANALYSIS_CODE = (
     "tasks/test_analyze_calms_correction_landscape.py",
     "tasks/test_evaluate_calms_closed_set_selective_ranking.py",
     "tasks/render_calms_mechanism_selective_figure.py",
+    "tasks/build_calms_manuscript_main_tables.py",
+    "tasks/test_build_calms_manuscript_main_tables.py",
+    "tasks/build_calms_v1_release_archive.py",
+    "tasks/test_build_calms_v1_release_archive.py",
     "tasks/build_calms_v1_evidence_bundle.py",
 )
 
 COMPACT_RESULTS = (
+    "deploy/unified_additive_full23_v1/evidence/strict_refit_enveda_report.json",
+    "deploy/unified_additive_full23_v1/evidence/strict_refit_gnps_report.json",
+    "deploy/unified_additive_full23_v132/evidence/gnps_development_residual_scale_report.json",
+    "deliverables/mega_sota_ladder/gnps_run18_msbert_common_20261102/identity/report.json",
+    "deliverables/mega_sota_ladder/gnps_run18_msbert_common_20261102/formula/report.json",
     "data/validation/calms_gnps_paired_superiority_v3_20261105/report.json",
     "data/validation/calms_gnps_paired_superiority_v3_20261105/calms_paired_superiority.tsv",
     "data/validation/calms_gnps_paired_superiority_v3_20261105/calms_paired_superiority.png",
@@ -50,6 +60,10 @@ COMPACT_RESULTS = (
     "deliverables/calms_v1_mechanism_selective_20261105/calms_mechanism_selective.svg",
     "deliverables/calms_v1_mechanism_selective_20261105/figure_caption.txt",
     "deliverables/calms_v1_mechanism_selective_20261105/panel_a_exchange_values.tsv",
+    "deliverables/calms_v1_manuscript_tables_20261105/table1_primary_results.csv",
+    "deliverables/calms_v1_manuscript_tables_20261105/table2_mechanism_selective.csv",
+    "deliverables/calms_v1_manuscript_tables_20261105/table3_two_layer_ablation.csv",
+    "deliverables/calms_v1_manuscript_tables_20261105/STATISTICAL_NOTES.md",
 )
 
 EXCLUDED_LARGE_LEDGERS = (
@@ -119,8 +133,9 @@ def bundle_readme() -> bytes:
     text = f"""# CALMS v1.0 compact evidence bundle
 
 This deterministic archive contains the executable frozen CALMS v1.0 release,
-the two 2026-11-05 consumed-GNPS result records, their exact summary and
-diagnostic scripts, synthetic contract tests, and compact reports/tables/plots.
+the 2026-11-05 package/application, consumed-GNPS and mechanism result records,
+their exact summary and diagnostic scripts, synthetic contract tests, and
+compact reports/tables/plots.
 
 Scientific boundary: GNPS was consumed during development and residual-scale
 selection. These results are development evidence, not unopened external
@@ -131,9 +146,15 @@ archive compact. Re-running the full diagnostics therefore additionally
 requires the original repository benchmark inputs and query ledgers. The
 frozen inference package itself is executable from this archive.
 
-From the archive root, validate frozen inference with:
+From the archive root, install and validate frozen inference with:
 
+    python -m pip install -r deploy/calms_v1/requirements-runtime.txt
     python deploy/calms_v1/test_calms_frozen_release.py
+    python tasks/build_calms_manuscript_main_tables.py --evidence-root . --output reproduced_tables
+
+Retain one synthetic end-to-end CLI example with:
+
+    python deploy/calms_v1/examples/run_smoke.py --output-root calms_smoke
 
 The analysis tests require numpy, pandas, scikit-learn and pytest and can be
 run with `tasks` on `PYTHONPATH`.

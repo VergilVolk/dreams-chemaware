@@ -14,11 +14,13 @@ candidate-evidence parent + 0.9 * frozen embedding correction
 
 The executable package is `deploy/calms_v1`.  It contains both selected
 checkpoints and the exact runtime rather than reimplementing their mathematics.
-The portable archive is `deliverables/CALMS_v1.0_20261103.zip` (2,385,975
-bytes; SHA-256
-`3f6fa8cfdba1ab54a110580f3a2893ef88cda52ce80b2cd85339f14ad2ebf1f0`).
-The CPU golden replay, missing-evidence fallback and batch-invariance tests
-pass.
+The documentation-complete portable archive is
+`deliverables/CALMS_v1.0_20261105.zip` (2,386,163 bytes; SHA-256
+`7305d38b74dad4edf74c1313e5a3989c72df1cfffd030781336a11dce2be6deb`).
+It retains a synthetic end-to-end CLI example in addition to the frozen
+scorer. The CPU golden replay, real CLI smoke, missing-evidence fallback and
+batch-invariance tests pass. This documentation-only refresh does not change
+either checkpoint or the scoring equation.
 
 This release scores a pre-aligned candidate/evidence axis.  It is not presented
 as an undocumented raw-MGF-to-every-feature pipeline.  It is a closed-library

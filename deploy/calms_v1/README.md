@@ -21,17 +21,19 @@ this package. Missing embedding evidence keeps the valid parent score; missing
 chemical evidence is explicitly unavailable and is never replaced by a
 fabricated zero observation.
 
-## Scope
+## Scope: scorer only, bring your own aligned inputs
 
-This is the frozen **candidate annotation engine**. It consumes a pre-aligned
-candidate-evidence bundle and embedding caches. It does not pretend to turn an
-arbitrary raw MGF into every upstream WSE, local-fragmentation, encoder, and
-chemical feature in one undocumented step. Candidate generation and upstream
-evidence production remain explicit preprocessing operations.
+This is the frozen **candidate annotation engine**, not a raw-LC-MS/MS
+processing pipeline. It does not parse an MGF, generate structures, construct
+a mass-compatible candidate set, run the four encoders, or calculate WSE,
+P2b, MSG, or ChemAware V2 evidence. The caller must supply a fixed candidate
+axis, all seven aligned candidate-evidence score families, the aligned
+representation index, and the four frozen-encoder embedding banks described
+below. CALMS does not expand or prune that candidate universe.
 
-The present release is a closed-library scorer. It does not provide a
-calibrated no-match probability. BioAware is a separate conditional extension
-and may be applied only when real sample-level event context exists.
+The present release is a closed-library scorer. It does not provide calibrated
+no-match/open-set rejection. BioAware is not part of this scorer because that
+conditional extension requires real sample-level event context.
 
 ## One-command inference
 
@@ -49,6 +51,9 @@ python deploy/calms_v1/calms.py \
   --device cpu
 ```
 
+`calms_predictions` must not already exist. The CLI fails rather than silently
+overwriting an earlier run.
+
 The output contains:
 
 - `candidate_scores.npz`: fixed candidate axis and `calms_score`;
@@ -58,41 +63,111 @@ The output contains:
 
 ## Input contract
 
-`candidate_evidence.npz` follows the existing
-`unified_additive_candidate_evidence_v1` contract. Its JSON manifest binds the
-candidate axis and all seven required score families to their frozen upstream
-artifacts. ChemAware V2 arrays are all present or all absent.
+### Candidate evidence
+
+`candidate_evidence.npz` follows schema
+`unified_additive_candidate_evidence_v1`. For `Q` queries and `C` candidate
+rows it contains the complete axis:
+
+- `query_ptr`: integer shape `[Q + 1]`, zero-based, nondecreasing, ending at
+  `C`;
+- `query_ids`: unique, non-empty strings of shape `[Q]`;
+- `candidate_query_ids`, `candidate_ids`, and `candidate_pair_ids`: string
+  arrays of shape `[C]`; rows are contiguous by query, pair IDs are unique,
+  and a query cannot repeat a candidate ID;
+- seven score arrays of shape `[C]`, named exactly `noise_v1`,
+  `weighted_spectral_entropy`, `p2b_noise_v1_frozen`,
+  `noise_msg_fusion_stack_v1`, `chemaware_stage1`, `chemaware_phasea`, and
+  `noise_chemaware_fullmsg`.
+
+Every non-empty query is scored by the parent only when all seven score arrays
+are finite for all its candidate rows; otherwise that query is retained as an
+abstention. Zero-candidate and singleton queries are legal.
+
+ChemAware V2 has exactly two modes. In `real` mode the NPZ also contains all
+five shape-`[C]` arrays `chem_valid`, `candidate_utility_correct`,
+`candidate_utility_zero`, `candidate_utility_reversed`, and
+`candidate_utility_rotated`; `chem_valid` is boolean or integer 0/1 and the
+four utilities are finite. In `unavailable` mode none of those arrays may be
+present. Partial presence is rejected, and unavailable chemistry is not
+encoded as zero evidence.
+
+The evidence JSON records the NPZ SHA256, the exact ordered seven-score list,
+and an exact `upstream_artifacts` registry containing `candidate_axis`, every
+score family, and `chemaware_v2_continuous_null`. Frozen upstream identities
+and the real/unavailable V2 contract are checked at load time.
+
+### Aligned representations
 
 `candidate_references.npz` contains:
 
-- `candidate_pair_ids` with the exact same order as the evidence bundle;
-- `query_positions`, shape `[candidates, 4]`;
-- `reference_positions`, shape `[candidates, 4, 3]`;
-- `reference_mask`, shape `[candidates, 4, 3]`.
+- `candidate_pair_ids`, shape `[C]`, in exactly the evidence-bundle order;
+- `query_positions`, integer shape `[C, 4]`;
+- `reference_positions`, integer shape `[C, 4, 3]`;
+- `reference_mask`, boolean shape `[C, 4, 3]`.
 
-Its manifest uses schema `calms_aligned_representation_v1`, records the SHA256
-of the representation file and candidate-evidence file, and registers the four
-embedding banks. Each bank is an NPZ with an `embeddings` array of shape
-`[n, 1024]`; an optional unique `rows` registry is accepted. The CLI computes
-every bank's file SHA256 itself and verifies the frozen encoder checkpoint
-identity declared in the representation manifest.
+The four encoder columns use the frozen encoder order. Query positions must be
+constant across every candidate row of a query. Active references must point
+to valid bank rows, the first reference must be active, and reference
+multiplicity must agree across the four encoders. Invalid or unavailable
+representation rows cause a parent-score fallback for the whole query; they
+are not replaced by zero vectors.
 
-Templates are provided under `examples/`. The application evidence adapter in
-`tasks/build_full23_application_evidence.py` can produce the scalar evidence
-contract without changing the frozen model.
+Each embedding bank is an NPZ with a finite `embeddings` array of shape
+`[n, 1024]`; an optional unique integer `rows` registry of shape `[n]` is
+accepted. Optional scalar `schema` and `encoder_name` entries, when present,
+must equal `calms_embedding_bank_v1` and the registered bank name.
 
-## Installation and release test
+The representation manifest uses schema `calms_aligned_representation_v1` and
+binds the evidence and representation SHA256 values, all four bank SHA256
+values, and the four frozen encoder checkpoint identities. The CLI recomputes
+every file hash. Templates and a retained synthetic CLI example are provided
+under `examples/`. This scorer-only release does not include a generic raw-MGF
+candidate generator or upstream seven-score/four-embedding producer.
 
-Only NumPy and PyTorch are required at runtime:
+## Installation, self-test, and retained smoke run
+
+Only NumPy and PyTorch are required at runtime. The retained release smoke was
+validated with Python 3.11.9, NumPy 2.4.6, and PyTorch 2.14.0+cpu; the declared
+runtime floor remains NumPy 1.24 and PyTorch 2.0.
+
+### Bash
 
 ```bash
 python -m pip install -r deploy/calms_v1/requirements-runtime.txt
 python deploy/calms_v1/test_calms_frozen_release.py
+python deploy/calms_v1/examples/run_smoke.py --output-root calms_smoke
+```
+
+Single line:
+
+```bash
+python -m pip install -r deploy/calms_v1/requirements-runtime.txt && python deploy/calms_v1/test_calms_frozen_release.py && python deploy/calms_v1/examples/run_smoke.py --output-root calms_smoke
+```
+
+### PowerShell
+
+```powershell
+py -m pip install -r deploy/calms_v1/requirements-runtime.txt
+py deploy/calms_v1/test_calms_frozen_release.py
+py deploy/calms_v1/examples/run_smoke.py --output-root calms_smoke
+```
+
+Single line:
+
+```powershell
+py -m pip install -r deploy/calms_v1/requirements-runtime.txt; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; py deploy/calms_v1/test_calms_frozen_release.py; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; py deploy/calms_v1/examples/run_smoke.py --output-root calms_smoke
 ```
 
 The release test is CPU-only, checks package hashes, replays a golden example,
 tests batch invariance and fail-closed axes, and verifies that missing
 representation evidence falls back exactly to the parent score.
+
+The smoke helper reuses that deterministic synthetic fixture but retains both
+`calms_smoke/inputs/` and the real CLI outputs in
+`calms_smoke/predictions/`. It is an executable I/O example only, not a
+scientific benchmark. Its `--output-root` must not already exist; choose a new
+path or deliberately remove an old smoke directory before rerunning it.
 
 The package is distributed under the repository's MIT license; see `LICENSE`.
 
