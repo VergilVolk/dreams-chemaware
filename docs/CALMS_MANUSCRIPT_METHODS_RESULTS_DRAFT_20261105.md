@@ -265,7 +265,10 @@ added.
 CALMS was applied without response access during spectral scoring to 38,628
 directional entity queries on the existing MSV000095331 plus three-study
 application axis. The axis contained 22,046 candidate pairs, of which 16,916
-were CALMS-scoreable; 3,324 queries received the full embedding correction.
+were CALMS-scoreable. These pairs formed 8,583 scored query blocks; 3,324
+query blocks received the full embedding correction. The application endpoint
+used 22,014 forward MSV000095331-to-candidate-study queries, whereas 38,628 is
+the complete bidirectional axis; these denominators are not interchangeable.
 
 Across 30 registered positive-control contexts, CALMS achieved Top-3/Top-5 of
 7/10 and the best mean rank among 11 compared methods (10.30). Against WSE at
