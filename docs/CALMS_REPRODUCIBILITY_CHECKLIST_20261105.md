@@ -116,8 +116,9 @@ embedding banks.
 - [ ] Do not claim open-set false-acceptance control, calibrated match
       probability or FDR control.
 - [ ] Do not describe the portable scorer as a raw-MGF-to-annotation workflow.
-- [ ] Keep BioAware outside CALMS v1.0 unless genuine sample-event context is
-      available.
+- [ ] Keep BioAware outside CALMS v1.0. Any future sample-event extension
+      requires a separate versioned interface and evaluation with genuine
+      candidate-specific events.
 - [ ] Require a genuinely unused source and a frozen contamination-exclusion
       protocol before an external-confirmation or field-wide SOTA claim.
 

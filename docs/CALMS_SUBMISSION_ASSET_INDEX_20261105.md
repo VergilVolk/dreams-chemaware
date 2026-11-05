@@ -48,9 +48,12 @@ python tasks/build_calms_manuscript_main_tables.py \
 
 | Artifact | Recommended placement | Notes |
 |---|---|---|
-| `deliverables/calms_project_summary_20261103/calms_project_summary.pdf` | Graphical Abstract or overview figure | SHA-256 `e8adede2ec09c63665d9beec86ca5fa318d691597dce74741463e91c9e82fc5b`; biological-sample relationships are a conditional project extension, not part of the frozen scorer |
+| `deliverables/calms_project_summary_20261103/calms_project_summary.pdf` | Graphical Abstract or overview figure | SHA-256 `3dfc8e73a4011d7c4325b21340c1295227f5a5caad0afc4026a29a5dbe1d898a`; BioAware is shown only as a disconnected future sample-event direction and is not included or evaluated in the frozen scorer |
 | `deliverables/calms_v1_mechanism_selective_20261105/calms_mechanism_selective.pdf` | Main mechanism/selective-ranking figure | SHA-256 `4672eb857feb1c1a924028dea474e796df372c0a49c48fc4cdd36b3b817c88d3`; source is included in the evidence bundle |
 | `deliverables/full23_v132_manuscript_figures_20261102/` | Supplementary figure source | Must be relabelled from internal `Full23 v1.3.2` to public `CALMS v1.0` before submission |
+
+The development-set boundary and exact query-formula intersections are frozen
+in `docs/CALMS_ENVEDA_GNPS_QUERY_FORMULA_OVERLAP_AUDIT_20261105.md`.
 
 The phrase “approximately 9 pp” is ambiguous across current figures. AUPRC
 versus WSE and Recall@1 versus MS2DeepScore 2.x are different endpoints and

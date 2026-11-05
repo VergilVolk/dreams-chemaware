@@ -19,11 +19,15 @@ molecular features, yet reliable metabolite annotation remains limited by
 acquisition-dependent spectral variation, competition among structurally
 similar candidates and incomplete use of fragmentation chemistry. We developed
 CALMS (Context-Aware Learning for Metabolite Annotation from Mass Spectra), a
-two-layer closed-library annotation method. A low-capacity candidate-evidence
+frozen two-layer scorer for caller-supplied, mass-compatible candidates in a
+closed-library setting. Here, context denotes candidate-relative statistics,
+reference-set aggregation, cross-encoder interactions and chemistry
+availability; it does not denote sample-level metabolic-network or BioAware
+context. A low-capacity candidate-evidence
 model combines condition-robust spectral representations, fragmentation
 matching, local spectral rerankers and availability-aware chemical evidence. A
 bounded residual layer then reads complete 1,024-dimensional representations
-from four independently trained encoders. On strict common-availability axes
+from four frozen encoder checkpoints. On strict common-availability axes
 of the consumed GNPS Gold/Silver development resource, CALMS achieved
 Recall@1/3/5 of 88.400%/95.939%/97.505% for 10,983 identity-disjoint queries
 and 89.644%/97.658%/98.972% for 5,253 formula-disjoint queries. Micro candidate
@@ -51,7 +55,7 @@ under changing acquisition conditions and close candidate competition. The
 method therefore separates annotation into two complementary operations. A
 low-capacity parent first combines aligned representation, fragmentation and
 candidate-chemistry evidence on a shared candidate axis. A bounded second
-layer reads complete embeddings from four independently trained encoders and
+layer reads complete embeddings from four frozen encoder checkpoints and
 can adjust the parent when dimension-level representation information is
 available. This division preserves the transferability and interpretability of
 candidate-level evidence while permitting information discarded by scalar

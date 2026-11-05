@@ -5,7 +5,7 @@
   "frozen_implementation_alias": "Full23 v1.3.2",
   "architecture_asset": "assets\\calms_architecture_ai_v9.png",
   "architecture_prompt_record": "deliverables/calms_project_summary_20261103/ARTWORK_PROMPT.md",
-  "architecture_scope": "three reader-facing scientific modules; AI-drawn text-free layout with deterministic code typography and RDKit molecular structures",
+  "architecture_scope": "two frozen CALMS v1.0 evidence modules plus one disconnected future sample-event extension; AI-drawn text-free layout with deterministic code typography and RDKit molecular structures",
   "panel": "identity_disjoint",
   "dataset_role": "consumed development",
   "queries": 10983,

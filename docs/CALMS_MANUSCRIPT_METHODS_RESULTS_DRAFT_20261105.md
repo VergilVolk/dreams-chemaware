@@ -21,6 +21,14 @@ score and a ranked structural hypothesis. The released scorer does not create
 the candidate universe, compute upstream evidence from raw MGF files, or
 provide calibrated no-match rejection.
 
+In CALMS v1.0, “context-aware” refers to within-query candidate-relative
+statistics, reference-set aggregation, cross-encoder interactions and the
+availability of candidate-specific chemistry. It does not mean that
+biological-sample networks or BioAware events are inputs to the frozen scorer.
+BioAware remains outside CALMS v1.0; any future sample-event extension requires
+a separate versioned interface and evaluation with genuine sample-level
+events.
+
 The model has two frozen layers:
 
 \[
@@ -155,6 +163,19 @@ identity-disjoint queries (4,204 formula clusters) and 5,261 formula-disjoint
 queries (2,210 formula clusters). The panels overlap: 5,237 of 5,261 formula
 queries also occur in the identity panel, so their counts and error exchanges
 must not be added.
+
+The panel names describe each benchmark's own construction and must not be
+interpreted as a global zero-overlap guarantee against every formula later
+used to train CALMS. A post-freeze exact-set audit found that the 4,426 formulas
+in the Enveda formula-disjoint training panel had zero overlap with either
+GNPS panel, whereas the full 10,179-formula Enveda training union shared 1,046
+query formulas with GNPS identity and 339 with GNPS formula. All overlap came
+from the Enveda identity-disjoint training panel, whose design permits seen
+formulas. This is not by itself evidence of query-identity or candidate-label
+leakage, but it reinforces that GNPS is consumed development evidence rather
+than an external formula-disjoint confirmation of the final refit. Input
+hashes, exact-set counts and interpretation limits are frozen in
+`docs/CALMS_ENVEDA_GNPS_QUERY_FORMULA_OVERLAP_AUDIT_20261105.md`.
 
 For the 18-method comparison, all methods were restricted to the strict common
 availability axis: 10,983 identity queries (4,199 formula clusters) and 5,253

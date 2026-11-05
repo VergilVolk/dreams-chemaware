@@ -392,11 +392,27 @@ def draw_ai_architecture(ax: plt.Axes) -> None:
     ax.set_axis_off()
     ax.text(-0.010, 1.015, "a", transform=ax.transAxes, fontsize=16, fontweight="bold", va="top")
 
+    # The generated base artwork contains a third, sample-context lane with
+    # solid connections.  BioAware is not an input to CALMS v1.0, so mask
+    # that lane and its two connections before adding deterministic labels.
+    ax.add_patch(
+        FancyBboxPatch(
+            (0.226, 0.030),
+            0.374,
+            0.330,
+            transform=ax.transAxes,
+            boxstyle="square,pad=0",
+            facecolor="white",
+            edgecolor="white",
+            linewidth=0,
+            zorder=6,
+        )
+    )
+
     labels = (
         (0.120, 0.844, "LC-MS/MS spectra\nand candidate structures", "#214F73", 13.0),
         (0.418, 0.922, "Condition-robust\nspectral representation", "#214F73", 12.7),
         (0.418, 0.594, "Fragmentation chemistry-guided\ndiscrimination", "#214F73", 12.7),
-        (0.418, 0.298, "Biochemical relationships in\nbiological samples", "#214F73", 12.4),
         (0.671, 0.548, "CALMS", "#214F73", 20.5),
         (0.671, 0.448, "metabolite\nannotation", "#214F73", 13.4),
         (0.862, 0.844, "Annotated candidate\nstructures", "#214F73", 13.0),
@@ -414,6 +430,34 @@ def draw_ai_architecture(ax: plt.Axes) -> None:
             color=color,
             linespacing=1.12,
         )
+
+    # Retain BioAware only as a visibly disconnected future direction.
+    ax.add_patch(
+        FancyBboxPatch(
+            (0.300, 0.125),
+            0.238,
+            0.105,
+            transform=ax.transAxes,
+            boxstyle="round,pad=0.006,rounding_size=0.014",
+            facecolor="#F8FAFC",
+            edgecolor="#64748B",
+            linewidth=1.15,
+            linestyle=(0, (5, 3)),
+            zorder=7,
+        )
+    )
+    ax.text(
+        0.418,
+        0.178,
+        "FUTURE SAMPLE-EVENT EXTENSION (BioAware)\nNOT INCLUDED OR EVALUATED IN CALMS v1.0",
+        transform=ax.transAxes,
+        ha="center",
+        va="center",
+        fontsize=8.0,
+        fontweight="bold",
+        color="#52687A",
+        zorder=8,
+    )
 
     # The same candidate identities are shown throughout the decision path.
     # Input order presents the candidate set; the fragmentation panel marks
@@ -607,7 +651,7 @@ def render(output: Path, dpi: int) -> list[str]:
         "frozen_implementation_alias": "Full23 v1.3.2",
         "architecture_asset": str(ARCHITECTURE_ARTWORK.relative_to(ROOT)),
         "architecture_prompt_record": "deliverables/calms_project_summary_20261103/ARTWORK_PROMPT.md",
-        "architecture_scope": "three reader-facing scientific modules; AI-drawn text-free layout with deterministic code typography and RDKit molecular structures",
+        "architecture_scope": "two frozen CALMS v1.0 evidence modules plus one disconnected future sample-event extension; AI-drawn text-free layout with deterministic code typography and RDKit molecular structures",
         "panel": PANEL,
         "dataset_role": "consumed development",
         "queries": int(frame.iloc[0]["N_Q"]),
@@ -626,8 +670,8 @@ def render(output: Path, dpi: int) -> list[str]:
     (output / "CAPTION.md").write_text(
         "# CALMS project summary figure\n\n"
         "**a,** CALMS combines condition-robust MS/MS representations with fragmentation-structure consistency evidence, "
-        "then optionally refines ambiguous annotations using real-sample metabolic context when that context is available. "
-        "The sample-context module was not used for the GNPS benchmark. **b,** Recall@1 on the common-domain GNPS "
+        "while BioAware is shown only as a disconnected future sample-event research direction. It is not included or evaluated in "
+        "the frozen CALMS v1.0 scorer and was not used for the GNPS benchmark. **b,** Recall@1 on the common-domain GNPS "
         f"identity-disjoint development panel ({int(frame.iloc[0]['N_Q']):,} queries). CALMS reaches "
         f"{100.0 * calms_r1:.2f}% and improves over DreaMS by "
         f"{100.0 * (calms_r1 - dreams_r1):.2f} percentage points. **c,** Candidate-level ROC curves on the same "
